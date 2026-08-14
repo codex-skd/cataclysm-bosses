@@ -1,0 +1,14 @@
+The Sundering is a port of L_Ender's Cataclysm by L_Ender (MCL_Ender).
+
+L_Ender's Cataclysm's own stated code license is CC BY-NC-ND 4.0. The Sundering's source code
+is distributed under the same terms:
+
+Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International (CC BY-NC-ND 4.0)
+
+Full license text: https://creativecommons.org/licenses/by-nc-nd/4.0/legalcode
+
+Note on assets: all original assets from L_Ender's Cataclysm (textures, sounds, models,
+structures) are unlicensed with all rights reserved by L_Ender/MCL_Ender. The Sundering does
+not claim additional rights over them. Attribution to L_Ender / MCL_Ender as the original
+author must be preserved in README.md, docs/curseforge/project_description.md, and the
+`credits` field of neoforge.mods.toml.
