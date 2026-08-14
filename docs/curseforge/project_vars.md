@@ -4,7 +4,7 @@
 
 | Variable | Valor |
 |----------|-------|
-| `curseforge_project_id` | *(pendiente — el usuario lo pasa tras crear el proyecto)* |
+| `curseforge_project_id` | `1652963` |
 | `mod_id` | `sundering` |
 | `display_name` | `The Sundering` |
 
@@ -23,11 +23,11 @@ Autenticación Core: cabecera `x-api-key`
 ## Variables para script (lectura automática)
 
 ```
-project_id =                  # pendiente
+project_id = 1652963
 api_token = ee776b0a-ee95-4850-b554-06be02a8657f
 release_type = beta
 game_versions = 9638, 9639, 16498, 10150
-relations = nautilus-api:requiredDependency, curios:requiredDependency
+relations =                   # dependencias (NautilusAPI, Curios) no cableadas aun -- sin relations hasta que existan como jars/proyectos referenciables
 ```
 
 ## Rama
