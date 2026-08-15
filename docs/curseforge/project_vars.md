@@ -5,7 +5,7 @@
 | Variable | Valor |
 |----------|-------|
 | `curseforge_project_id` | `1652963` |
-| `mod_id` | `sundering` |
+| `mod_id` | `the_sundering` |
 | `display_name` | `The Sundering` |
 
 ## Tokens
@@ -64,7 +64,7 @@ Datos a usar al crear el proyecto en https://www.curseforge.com/ (Minecraft → 
 | **Repository URL** | `https://github.com/stalking-dragons/the-sundering` (mirror público — confirmar tras configurar el mirror en GitLab) |
 | **Issue tracker** | `https://gitlab.com/stalking-dragons/minecraft/the-sundering/-/issues` |
 | **Description** | Contenido de `docs/curseforge/project_description.md` (HTML) |
-| **Logo** | `assets/sundering/icon.png` (pendiente de generar) |
+| **Logo** | `assets/the_sundering/icon.png` (listo) |
 | **Relaciones / dependencias** | NautilusAPI (requerida), Curios API (requerida) |
 
 **IMPORTANTE — sin mencionar el permiso del autor en ningún campo** (ver nota de confidencialidad en `docs/WORKFLOW_SUNDERING_26-2.md`).

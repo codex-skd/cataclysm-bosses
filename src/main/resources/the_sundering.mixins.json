@@ -3,7 +3,7 @@
   "minVersion": "0.8",
   "package": "com.skd.sundering.mixin",
   "compatibilityLevel": "JAVA_25",
-  "refmap": "sundering.refmap.json",
+  "refmap": "the_sundering.refmap.json",
   "mixins": [],
   "client": [],
   "injectors": {

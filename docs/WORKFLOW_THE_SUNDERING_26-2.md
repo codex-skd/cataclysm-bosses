@@ -9,7 +9,7 @@
 
 | Dato | Valor |
 |---|---|
-| Mod ID (`gradle.properties`) | `sundering` |
+| Mod ID (`gradle.properties`) | `the_sundering` |
 | Clase principal | `Sundering` |
 | Display name (Title Case) | `The Sundering` |
 | Versiones de Minecraft | `26.2` |
@@ -18,16 +18,16 @@
 ### Notas específicas de este mod
 
 - **Fork de**: [L_Ender's Cataclysm](https://www.curseforge.com/minecraft/mc-mods/lendercataclysm) por L_Ender (MCL_Ender). Referencia original: `L_Ender's Cataclysm 1.21.1-3.32.jar` (mod id `cataclysm`, package `com.github.L_Ender.cataclysm`, versión 3.32 para MC 1.21.1/NeoForge). Sin código fuente público disponible — el port parte de una descompilación (CFR) del jar compilado.
-- **mod_id vs package**: `mod_id=sundering` pero el package Java es `com.skd.sundering` — mismo patrón que `nautilus_api`/`com.skd.nautilusapi` y `utility_core`/`com.skd.utilitycore`.
+- **mod_id vs package**: `mod_id=the_sundering` (con guion bajo, coincide con el nombre de la carpeta local `the_sundering/`) pero el package Java es `com.skd.sundering` (sin "the", sin guion bajo) — mismo patrón que `nautilus_api`/`com.skd.nautilusapi` y `utility_core`/`com.skd.utilitycore`. **Bug real encontrado y corregido el 2026-08-15**: `build.gradle` tenía `from "src/main/templates"` (ruta por defecto del MDK) en la tarea `generateModMetadata` en vez de `from "src/main/resources/templates"` (donde realmente vive la plantilla en este repo) — la tarea nunca generaba el `META-INF/neoforge.mods.toml` real, el jar solo llevaba la plantilla sin procesar bajo `templates/META-INF/`, y Minecraft lo rechazaba con "not a valid mod file". Revisar este mismo detalle si se crea otro mod nuevo copiando esta plantilla.
 - **Minecraft / NeoForge**: `26.2` / `26.2.0.45-beta` (versión pineada explícitamente por el usuario — **no actualizar sin pedirlo explícitamente**, ni siquiera a otra beta de la misma rama 26.2)
 - **Permiso del autor original — obligatorio, no asumir, CONFIDENCIAL**: L_Ender/MCL_Ender concedió permiso explícito para portar y redistribuir públicamente este derivado (confirmado por el usuario el 2026-08-15, mismo permiso que cubre NautilusAPI/LionfishAPI). **Este acuerdo es confidencial por instrucción expresa del usuario: no mencionar su existencia en ningún texto público** (README.md, project_description.md, versions/*.md, credits de neoforge.mods.toml, o cualquier otro archivo que se publique en CurseForge o en el mirror de GitHub). Esta nota interna (docs/) nunca se publica — REPO_SETUP.md excluye `docs/` del mirror a GitHub — así que es el único lugar donde debe constar el hecho del permiso.
 - **Licencia — CC BY-NC-ND 4.0, la más restrictiva del conglomerado**: L_Ender's Cataclysm declara su código bajo **CC BY-NC-ND 4.0** (No-Derivadas) — la cláusula ND en teoría prohíbe distribuir obras derivadas por completo; el permiso confidencial del autor es lo único que hace viable este port público. Los assets originales (texturas, sonidos, modelos, NBTs) son "unlicensed, all rights reserved" — sin licencia de reutilización propia, dependen también del mismo permiso. **No relicenciar** sin confirmar antes con el usuario.
 - **Atribución obligatoria (sin mencionar el permiso)**: mantener "port of L_Ender's Cataclysm by L_Ender (MCL_Ender)" — sin ninguna referencia a permiso/autorización — en `README.md`, `docs/curseforge/project_description.md`, `docs/curseforge/versions/*.md` y `credits` de `neoforge.mods.toml` durante todo el desarrollo.
-- **Sin residuos del original**: el mod original usa el package `com.github.L_Ender.cataclysm` y namespace de recursos `cataclysm:` — todo el código, assets y datos portados deben quedar bajo `com.skd.sundering` / `sundering:`.
+- **Sin residuos del original**: el mod original usa el package `com.github.L_Ender.cataclysm` y namespace de recursos `cataclysm:` — todo el código, assets y datos portados deben quedar bajo `com.skd.sundering` / `the_sundering:`.
 - **Dependencias**:
   - **NautilusAPI** (`nautilus_api`, este mismo conglomerado, ya portada y compilando — `nautilus_api/neoforge/26.2/`) — dependencia obligatoria, sustituye a LionfishAPI. Aún no cableada en `build.gradle` (comentada, pendiente de que exista un jar publicado).
   - **Curios API** — **ya tiene build oficial para NeoForge 26.2** (`curios-neoforge-16.0.0+26.2.jar` confirmado en Fase 0), **no requiere port**. Aún no cableada en `build.gradle`.
-- **Icono pendiente**: `assets/sundering/icon.png` aún no existe — diseñar uno propio antes de la primera subida a CurseForge, no reutilizar assets de Cataclysm sin verificar que el permiso cubre su redistribución.
+- **Icono pendiente**: `assets/the_sundering/icon.png` aún no existe — diseñar uno propio antes de la primera subida a CurseForge, no reutilizar assets de Cataclysm sin verificar que el permiso cubre su redistribución.
 - **Fase 0 (diagnóstico de compilación de LionfishAPI/NautilusAPI) ya completada** — ver `temp/cataclysm_port_fase0/FASE0_REPORT.md` (fuera de este repo, en la raíz del workspace de mods) para el catálogo verificado de cambios de API entre 1.21.1 y 26.2.0.45-beta. Cataclysm es MUCHO más grande (1310 clases vs 51 de LionfishAPI) — los mismos patrones de cambio (ResourceLocation→Identifier, RenderType reubicado, EntityModel/AnimationState reescritos, Screen.render→extractRenderState, EventBusSubscriber sin bus=) se van a repetir masivamente, pero a esa escala no es razonable aplicarlos a mano archivo por archivo como en NautilusAPI — evaluar delegación a OpenCode en bloques bien acotados (por paquete/sistema) en vez de todo de una vez.
 - **Cataclysm trae además, sin equivalente ya resuelto en NautilusAPI**: 22 mixins/accessors (incluyendo mixins de generación de estructuras), un AT de 25 entradas propio (sin verificar todavía contra 26.2.0.45-beta), un hack de extensión de enum vía ASM para rarezas custom, una dimensión propia con worldgen completo (structure sets, template pools, 188 NBTs), y un sistema de animación en 4 capas (AnimationMonster, InternalAnimationMonster, Deepling, Pet) que asumirá la base de `BasicEntityModel`/`AdvancedEntityModel` ya rediseñada en NautilusAPI (desacoplada de `EntityModel` vanilla) — cualquier renderer de jefe portado tendrá que asumir esa misma decisión de diseño, no vanilla `LivingEntityRenderer<T,S,M>`.
 
@@ -35,7 +35,7 @@
 
 | Convención | Uso | Ejemplo |
 |---|---|---|
-| **snake_case** | `mod_id`, assets/ | `sundering` |
+| **snake_case** | `mod_id`, assets/ | `the_sundering` |
 | **PascalCase** | Clases Java principales | `Sundering` |
 | **camelCase** | Variables, métodos, config keys | `sunderingConfig` |
 | **Title Case** | Display name (README, CHANGELOG, docs, CurseForge) | `The Sundering` |
