@@ -1,5 +1,12 @@
 # Changelog — The Sundering
 
+## [0.0.0-beta.2] - 2026-08-15
+
+### Fix
+
+- **Jar rechazado por Minecraft ("not a valid mod file") en la v0.0.0-beta.1**: `build.gradle` apuntaba a `src/main/templates` (ruta antigua del MDK) en vez de `src/main/resources/templates`, así que `META-INF/neoforge.mods.toml` nunca se generaba de verdad dentro del jar. Corregido.
+- `mod_id` normalizado a `the_sundering` (antes `sundering`, inconsistente con el nombre de la carpeta local y el repo).
+
 ## [0.0.0-beta.1] - 2026-08-15
 
 ### Setup
