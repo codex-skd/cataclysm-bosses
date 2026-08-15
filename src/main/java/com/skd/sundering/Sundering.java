@@ -3,7 +3,6 @@ package com.skd.sundering;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.neoforge.common.NeoForge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,6 +13,10 @@ public class Sundering {
     public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 
     public Sundering(IEventBus modEventBus, ModContainer modContainer) {
-        NeoForge.EVENT_BUS.register(this);
+        // No @SubscribeEvent listeners exist yet (placeholder scaffolding). Registering an
+        // instance with zero listener methods now throws IllegalArgumentException in this
+        // NeoForge version (was a silent no-op before) -- do not call
+        // NeoForge.EVENT_BUS.register(this) / modEventBus.register(this) until there's an
+        // actual @SubscribeEvent method to register.
     }
 }
