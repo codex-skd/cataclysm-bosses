@@ -25,6 +25,12 @@ sourceSets.main.resources {
     exclude("**/*.bbmodel") // BlockBench project files
 
     exclude("src/generated/**/.cache") // datagen cache files
+
+    // The unprocessed template lives only in src/main/resources/templates/ -- its processed
+    // output (with ${mod_id} etc. expanded) is added separately via generateModMetadata below.
+    // Without this exclude, the jar ends up with both the real META-INF/neoforge.mods.toml
+    // AND a redundant, unprocessed templates/META-INF/neoforge.mods.toml copy.
+    exclude("templates/**")
 }
 
 repositories {
@@ -139,7 +145,7 @@ var generateModMetadata = tasks.register("generateModMetadata", ProcessResources
     ]
     inputs.properties replaceProperties
     expand replaceProperties
-    from "src/main/templates"
+    from "src/main/resources/templates"
     into "build/generated/sources/modMetadata"
 }
 // Include the output of "generateModMetadata" as an input directory for the build

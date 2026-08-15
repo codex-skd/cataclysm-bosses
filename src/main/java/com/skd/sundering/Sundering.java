@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 @Mod(Sundering.MODID)
 public class Sundering {
 
-    public static final String MODID = "sundering";
+    public static final String MODID = "the_sundering";
     public static final Logger LOGGER = LoggerFactory.getLogger(MODID);
 
     public Sundering(IEventBus modEventBus, ModContainer modContainer) {
