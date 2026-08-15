@@ -1,0 +1,32 @@
+{
+  "build.gradle": {
+    "mtime": 1786750769.0075164,
+    "ast_hash": "df05d548ee9665b39371b96aedef03f8",
+    "semantic_hash": "df05d548ee9665b39371b96aedef03f8"
+  },
+  "gradlew": {
+    "mtime": 1786750674.1958447,
+    "ast_hash": "f2d3d383787f61a4a99710ee8d780434",
+    "semantic_hash": "f2d3d383787f61a4a99710ee8d780434"
+  },
+  "settings.gradle": {
+    "mtime": 1786750674.2096317,
+    "ast_hash": "99e779284ca5df48a056afa6a0bf2cd1",
+    "semantic_hash": "99e779284ca5df48a056afa6a0bf2cd1"
+  },
+  "src/main/java/com/skd/sundering/Sundering.java": {
+    "mtime": 1786750783.1961925,
+    "ast_hash": "cf237b9bc78630d6e7cd5b6f4c388b28",
+    "semantic_hash": "cf237b9bc78630d6e7cd5b6f4c388b28"
+  },
+  "src/main/resources/assets/sundering/lang/en_us.json": {
+    "mtime": 1786750788.6999786,
+    "ast_hash": "5b76b0eef9af8a2300673e0553f609f9",
+    "semantic_hash": "5b76b0eef9af8a2300673e0553f609f9"
+  },
+  "src/main/resources/sundering.mixins.json": {
+    "mtime": 1786750786.3416276,
+    "ast_hash": "5ecba0940ebc00737a1e4c2eaad8be69",
+    "semantic_hash": "5ecba0940ebc00737a1e4c2eaad8be69"
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "communities": {
+    "0": [
+      "gradlew",
+      "gradlew__entry",
+      "gradlew_die",
+      "gradlew_warn"
+    ],
+    "1": [
+      "logger",
+      "mod",
+      "src_main_java_com_skd_sundering_sundering",
+      "src_main_java_com_skd_sundering_sundering_sundering"
+    ],
+    "2": [
+      "ieventbus",
+      "modcontainer",
+      "src_main_java_com_skd_sundering_sundering_sundering_sundering"
+    ],
+    "3": [
+      "1"
+    ],
+    "4": [
+      "2"
+    ],
+    "5": [
+      "build"
+    ],
+    "6": [
+      "settings"
+    ]
+  },
+  "cohesion": {
+    "0": 0.8333333333333334,
+    "1": 0.8333333333333334,
+    "2": 0.6666666666666666,
+    "3": 1.0,
+    "4": 1.0,
+    "5": 1.0,
+    "6": 1.0
+  },
+  "gods": [
+    {
+      "id": "src_main_java_com_skd_sundering_sundering_sundering",
+      "label": "Sundering",
+      "degree": 4
+    },
+    {
+      "id": "1",
+      "label": "Logo for The Sundering mod",
+      "degree": 0
+    },
+    {
+      "id": "2",
+      "label": "Icon for The Sundering mod",
+      "degree": 0
+    }
+  ],
+  "surprises": [],
+  "questions": [
+    {
+      "type": "bridge_node",
+      "question": "Why does `Sundering` connect `Mod Development` to `Event Handling`?",
+      "why": "High betweenness centrality (0.031) - this node is a cross-community bridge."
+    },
+    {
+      "type": "isolated_nodes",
+      "question": "What connects `Logo for The Sundering mod`, `Icon for The Sundering mod` to the rest of the system?",
+      "why": "2 weakly-connected nodes found - possible documentation gaps or missing edges."
+    }
+  ]
+}

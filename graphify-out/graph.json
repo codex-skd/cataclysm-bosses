@@ -1,0 +1,348 @@
+{
+  "directed": false,
+  "multigraph": false,
+  "graph": {},
+  "nodes": [
+    {
+      "label": "build.gradle",
+      "file_type": "code",
+      "source_file": "build.gradle",
+      "source_location": "L1",
+      "_origin": "ast",
+      "community": 5,
+      "norm_label": "build.gradle",
+      "id": "build",
+      "community_name": "Build Configuration"
+    },
+    {
+      "label": "gradlew",
+      "file_type": "code",
+      "source_file": "gradlew",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "_origin": "ast",
+      "community": 0,
+      "norm_label": "gradlew",
+      "id": "gradlew",
+      "community_name": "Gradle Scripts"
+    },
+    {
+      "label": "gradlew script",
+      "file_type": "code",
+      "source_file": "gradlew",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "_origin": "ast",
+      "community": 0,
+      "norm_label": "gradlew script",
+      "id": "gradlew__entry",
+      "community_name": "Gradle Scripts"
+    },
+    {
+      "label": "warn()",
+      "file_type": "code",
+      "source_file": "gradlew",
+      "source_location": "L94",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 0,
+      "norm_label": "warn()",
+      "id": "gradlew_warn",
+      "community_name": "Gradle Scripts"
+    },
+    {
+      "label": "die()",
+      "file_type": "code",
+      "source_file": "gradlew",
+      "source_location": "L98",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_function"
+      },
+      "_origin": "ast",
+      "community": 0,
+      "norm_label": "die()",
+      "id": "gradlew_die",
+      "community_name": "Gradle Scripts"
+    },
+    {
+      "label": "settings.gradle",
+      "file_type": "code",
+      "source_file": "settings.gradle",
+      "source_location": "L1",
+      "_origin": "ast",
+      "community": 6,
+      "norm_label": "settings.gradle",
+      "id": "settings",
+      "community_name": "Project Settings"
+    },
+    {
+      "label": "Sundering.java",
+      "file_type": "code",
+      "source_file": "src/main/java/com/skd/sundering/Sundering.java",
+      "source_location": "L1",
+      "_origin": "ast",
+      "community": 1,
+      "norm_label": "sundering.java",
+      "id": "src_main_java_com_skd_sundering_sundering",
+      "community_name": "Mod Development"
+    },
+    {
+      "label": "Sundering",
+      "file_type": "code",
+      "source_file": "src/main/java/com/skd/sundering/Sundering.java",
+      "source_location": "L10",
+      "_origin": "ast",
+      "community": 1,
+      "norm_label": "sundering",
+      "id": "src_main_java_com_skd_sundering_sundering_sundering",
+      "community_name": "Mod Development"
+    },
+    {
+      "label": "Mod",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "community": 1,
+      "norm_label": "mod",
+      "id": "mod",
+      "community_name": "Mod Development"
+    },
+    {
+      "label": "Logger",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "community": 1,
+      "norm_label": "logger",
+      "id": "logger",
+      "community_name": "Mod Development"
+    },
+    {
+      "label": ".Sundering()",
+      "file_type": "code",
+      "source_file": "src/main/java/com/skd/sundering/Sundering.java",
+      "source_location": "L16",
+      "_origin": "ast",
+      "community": 2,
+      "norm_label": ".sundering()",
+      "id": "src_main_java_com_skd_sundering_sundering_sundering_sundering",
+      "community_name": "Event Handling"
+    },
+    {
+      "label": "IEventBus",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "community": 2,
+      "norm_label": "ieventbus",
+      "id": "ieventbus",
+      "community_name": "Event Handling"
+    },
+    {
+      "label": "ModContainer",
+      "file_type": "code",
+      "source_file": "",
+      "source_location": "",
+      "_origin": "ast",
+      "community": 2,
+      "norm_label": "modcontainer",
+      "id": "modcontainer",
+      "community_name": "Event Handling"
+    },
+    {
+      "file_type": "image",
+      "source_file": "docs/curseforge/logo_512.png",
+      "label": "Logo for The Sundering mod",
+      "community": 3,
+      "norm_label": "logo for the sundering mod",
+      "id": "1",
+      "community_name": "Mod Logo"
+    },
+    {
+      "file_type": "image",
+      "source_file": "src/main/resources/assets/sundering/icon.png",
+      "label": "Icon for The Sundering mod",
+      "community": 4,
+      "norm_label": "icon for the sundering mod",
+      "id": "2",
+      "community_name": "Mod Icon"
+    }
+  ],
+  "links": [
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "gradlew",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "gradlew",
+      "target": "gradlew__entry"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "gradlew",
+      "source_location": "L98",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "gradlew",
+      "target": "gradlew_die"
+    },
+    {
+      "relation": "defines",
+      "confidence": "EXTRACTED",
+      "source_file": "gradlew",
+      "source_location": "L94",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "gradlew",
+      "target": "gradlew_warn"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "gradlew",
+      "source_location": "L129",
+      "weight": 1.0,
+      "context": "call",
+      "confidence_score": 1.0,
+      "source": "gradlew__entry",
+      "target": "gradlew_die"
+    },
+    {
+      "relation": "calls",
+      "confidence": "EXTRACTED",
+      "source_file": "gradlew",
+      "source_location": "L152",
+      "weight": 1.0,
+      "context": "call",
+      "confidence_score": 1.0,
+      "source": "gradlew__entry",
+      "target": "gradlew_warn"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/main/java/com/skd/sundering/Sundering.java",
+      "source_location": "L3",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_main_java_com_skd_sundering_sundering",
+      "target": "ieventbus"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/main/java/com/skd/sundering/Sundering.java",
+      "source_location": "L7",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_main_java_com_skd_sundering_sundering",
+      "target": "logger"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/main/java/com/skd/sundering/Sundering.java",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_main_java_com_skd_sundering_sundering",
+      "target": "mod"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/main/java/com/skd/sundering/Sundering.java",
+      "source_location": "L4",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_main_java_com_skd_sundering_sundering",
+      "target": "modcontainer"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/main/java/com/skd/sundering/Sundering.java",
+      "source_location": "L10",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_main_java_com_skd_sundering_sundering",
+      "target": "src_main_java_com_skd_sundering_sundering_sundering"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "src/main/java/com/skd/sundering/Sundering.java",
+      "source_location": "L14",
+      "weight": 1.0,
+      "context": "field",
+      "confidence_score": 1.0,
+      "source": "src_main_java_com_skd_sundering_sundering_sundering",
+      "target": "logger"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "src/main/java/com/skd/sundering/Sundering.java",
+      "source_location": "L10",
+      "weight": 1.0,
+      "context": "attribute",
+      "confidence_score": 1.0,
+      "source": "src_main_java_com_skd_sundering_sundering_sundering",
+      "target": "mod"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/main/java/com/skd/sundering/Sundering.java",
+      "source_location": "L16",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_main_java_com_skd_sundering_sundering_sundering",
+      "target": "src_main_java_com_skd_sundering_sundering_sundering_sundering"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "src/main/java/com/skd/sundering/Sundering.java",
+      "source_location": "L16",
+      "weight": 1.0,
+      "context": "parameter_type",
+      "confidence_score": 1.0,
+      "source": "src_main_java_com_skd_sundering_sundering_sundering_sundering",
+      "target": "ieventbus"
+    },
+    {
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "source_file": "src/main/java/com/skd/sundering/Sundering.java",
+      "source_location": "L16",
+      "weight": 1.0,
+      "context": "parameter_type",
+      "confidence_score": 1.0,
+      "source": "src_main_java_com_skd_sundering_sundering_sundering_sundering",
+      "target": "modcontainer"
+    }
+  ],
+  "hyperedges": [],
+  "built_at_commit": "cf733278f5969fd1ebac22ab8f31aa9c1cc1131d"
+}
