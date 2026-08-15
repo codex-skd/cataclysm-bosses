@@ -1,5 +1,12 @@
 # Changelog — The Sundering
 
+## [0.0.0-beta.3] - 2026-08-15
+
+### Fix
+
+- **Crash al arrancar en la v0.0.0-beta.2**: `IllegalArgumentException: class ... has no @SubscribeEvent methods, but register was called anyway`. La clase principal (placeholder) llamaba a `NeoForge.EVENT_BUS.register(this)` sin tener ningún método `@SubscribeEvent` — esta versión de NeoForge ya no lo tolera como no-op silencioso. Quitada la llamada hasta que exista un listener real.
+- Confirmado en juego: carga correctamente junto al resto de mods de la instancia de pruebas.
+
 ## [0.0.0-beta.2] - 2026-08-15
 
 ### Fix
