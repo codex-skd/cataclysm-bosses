@@ -1,0 +1,233 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  javax.annotation.Nullable
+ *  net.minecraft.nbt.CompoundTag
+ *  net.minecraft.network.syncher.EntityDataAccessor
+ *  net.minecraft.network.syncher.EntityDataSerializer
+ *  net.minecraft.network.syncher.EntityDataSerializers
+ *  net.minecraft.network.syncher.SynchedEntityData
+ *  net.minecraft.network.syncher.SynchedEntityData$Builder
+ *  net.minecraft.server.level.ServerLevel
+ *  net.minecraft.server.level.ServerPlayer
+ *  net.minecraft.sounds.SoundEvent
+ *  net.minecraft.sounds.SoundEvents
+ *  net.minecraft.util.Mth
+ *  net.minecraft.world.damagesource.DamageSource
+ *  net.minecraft.world.entity.Entity
+ *  net.minecraft.world.entity.EntityType
+ *  net.minecraft.world.entity.LivingEntity
+ *  net.minecraft.world.entity.player.Player
+ *  net.minecraft.world.entity.projectile.arrow.AbstractArrow
+ *  net.minecraft.world.entity.projectile.arrow.AbstractArrow$Pickup
+ *  net.minecraft.world.item.ItemStack
+ *  net.minecraft.world.item.enchantment.EnchantmentHelper
+ *  net.minecraft.world.level.ItemLike
+ *  net.minecraft.world.level.Level
+ *  net.minecraft.world.level.block.state.BlockState
+ *  net.minecraft.world.phys.BlockHitResult
+ *  net.minecraft.world.phys.EntityHitResult
+ *  net.minecraft.world.phys.Vec3
+ */
+package com.skd.thesundering.entity.projectile;
+
+import com.skd.thesundering.init.ModEntities;
+import com.skd.thesundering.init.ModItems;
+import javax.annotation.Nullable;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializer;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.Vec3;
+
+public class ThrownCoral_Bardiche_Entity
+extends AbstractArrow {
+    private static final EntityDataAccessor<Byte> ID_LOYALTY = SynchedEntityData.defineId(ThrownCoral_Bardiche_Entity.class, (EntityDataSerializer)EntityDataSerializers.BYTE);
+    private static final EntityDataAccessor<Boolean> ID_FOIL = SynchedEntityData.defineId(ThrownCoral_Bardiche_Entity.class, (EntityDataSerializer)EntityDataSerializers.BOOLEAN);
+    private boolean dealtDamage;
+    public int clientSideReturnTridentTickCount;
+
+    public ThrownCoral_Bardiche_Entity(EntityType<? extends ThrownCoral_Bardiche_Entity> p_37561_, Level p_37562_) {
+        super(p_37561_, p_37562_);
+    }
+
+    public ThrownCoral_Bardiche_Entity(Level p_37569_, LivingEntity p_37570_, ItemStack p_37571_) {
+        super((EntityType)ModEntities.CORAL_BARDICHE.get(), p_37570_, p_37569_, p_37571_, null);
+        this.entityData.set(ID_LOYALTY, (Object)this.getLoyaltyFromItem(p_37571_));
+        this.entityData.set(ID_FOIL, (Object)p_37571_.hasFoil());
+    }
+
+    public ThrownCoral_Bardiche_Entity(Level p_338686_, double p_338771_, double p_338674_, double p_338477_, ItemStack p_338255_) {
+        super((EntityType)ModEntities.CORAL_BARDICHE.get(), p_338771_, p_338674_, p_338477_, p_338686_, p_338255_, p_338255_);
+        this.entityData.set(ID_LOYALTY, (Object)this.getLoyaltyFromItem(p_338255_));
+        this.entityData.set(ID_FOIL, (Object)p_338255_.hasFoil());
+    }
+
+    protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
+        super.defineSynchedData(p_326229_);
+        p_326229_.define(ID_LOYALTY, (Object)0);
+        p_326229_.define(ID_FOIL, (Object)false);
+    }
+
+    public void tick() {
+        if (this.inGroundTime > 4) {
+            this.dealtDamage = true;
+        }
+        Entity entity = this.getOwner();
+        byte i = (Byte)this.entityData.get(ID_LOYALTY);
+        if (i > 0 && (this.dealtDamage || this.isNoPhysics()) && entity != null) {
+            if (!this.isAcceptibleReturnOwner()) {
+                if (!this.level().isClientSide() && this.pickup == AbstractArrow.Pickup.ALLOWED) {
+                    this.spawnAtLocation(this.getPickupItem(), 0.1f);
+                }
+                this.discard();
+            } else {
+                this.setNoPhysics(true);
+                Vec3 vec3 = entity.getEyePosition().subtract(this.position());
+                this.setPosRaw(this.getX(), this.getY() + vec3.y * 0.015 * (double)i, this.getZ());
+                if (this.level().isClientSide()) {
+                    this.yOld = this.getY();
+                }
+                double d0 = 0.05 * (double)i;
+                this.setDeltaMovement(this.getDeltaMovement().scale(0.95).add(vec3.normalize().scale(d0)));
+                if (this.clientSideReturnTridentTickCount == 0) {
+                    this.playSound(SoundEvents.TRIDENT_RETURN, 10.0f, 1.0f);
+                }
+                ++this.clientSideReturnTridentTickCount;
+            }
+        }
+        super.tick();
+    }
+
+    private boolean isAcceptibleReturnOwner() {
+        Entity entity = this.getOwner();
+        return entity == null || !entity.isAlive() ? false : !(entity instanceof ServerPlayer) || !entity.isSpectator();
+    }
+
+    public boolean isFoil() {
+        return (Boolean)this.entityData.get(ID_FOIL);
+    }
+
+    @Nullable
+    protected EntityHitResult findHitEntity(Vec3 p_37575_, Vec3 p_37576_) {
+        return this.dealtDamage ? null : super.findHitEntity(p_37575_, p_37576_);
+    }
+
+    protected void onHitEntity(EntityHitResult p_37573_) {
+        Entity entity = p_37573_.getEntity();
+        float f = 6.5f;
+        Entity entity1 = this.getOwner();
+        DamageSource damagesource = this.damageSources().trident((Entity)this, (Entity)(entity1 == null ? this : entity1));
+        Level level = this.level();
+        if (level instanceof ServerLevel) {
+            ServerLevel serverlevel = (ServerLevel)level;
+            f = EnchantmentHelper.modifyDamage((ServerLevel)serverlevel, (ItemStack)this.getWeaponItem(), (Entity)entity, (DamageSource)damagesource, (float)f);
+        }
+        this.dealtDamage = true;
+        if (entity.hurt(damagesource, f)) {
+            if (entity.getType() == EntityType.ENDERMAN) {
+                return;
+            }
+            level = this.level();
+            if (level instanceof ServerLevel) {
+                ServerLevel serverlevel1 = (ServerLevel)level;
+                EnchantmentHelper.doPostAttackEffectsWithItemSource((ServerLevel)serverlevel1, (Entity)entity, (DamageSource)damagesource, (ItemStack)this.getWeaponItem());
+            }
+            if (entity instanceof LivingEntity) {
+                LivingEntity livingentity = (LivingEntity)entity;
+                this.doKnockback(livingentity, damagesource);
+                this.doPostHurtEffects(livingentity);
+            }
+        }
+        this.setDeltaMovement(this.getDeltaMovement().multiply(-0.01, -0.1, -0.01));
+        this.playSound(SoundEvents.TRIDENT_HIT, 1.0f, 1.0f);
+    }
+
+    protected void hitBlockEnchantmentEffects(ServerLevel p_344953_, BlockHitResult p_346320_, ItemStack p_344999_) {
+        LivingEntity livingentity;
+        Vec3 vec3 = p_346320_.getBlockPos().clampLocationWithin(p_346320_.getLocation());
+        Entity entity = this.getOwner();
+        EnchantmentHelper.onHitBlock((ServerLevel)p_344953_, (ItemStack)p_344999_, (LivingEntity)(entity instanceof LivingEntity ? (livingentity = (LivingEntity)entity) : null), (Entity)this, null, (Vec3)vec3, (BlockState)p_344953_.getBlockState(p_346320_.getBlockPos()), p_348680_ -> this.kill());
+    }
+
+    public ItemStack getWeaponItem() {
+        return this.getPickupItemStackOrigin();
+    }
+
+    protected boolean tryPickup(Player p_150196_) {
+        return super.tryPickup(p_150196_) || this.isNoPhysics() && this.ownedBy((Entity)p_150196_) && p_150196_.getInventory().add(this.getPickupItem());
+    }
+
+    protected ItemStack getDefaultPickupItem() {
+        return new ItemStack((ItemLike)ModItems.CORAL_BARDICHE.get());
+    }
+
+    protected SoundEvent getDefaultHitGroundSoundEvent() {
+        return SoundEvents.TRIDENT_HIT_GROUND;
+    }
+
+    public void playerTouch(Player p_37580_) {
+        if (this.ownedBy((Entity)p_37580_) || this.getOwner() == null) {
+            super.playerTouch(p_37580_);
+        }
+    }
+
+    public void readAdditionalSaveData(CompoundTag p_37578_) {
+        super.readAdditionalSaveData(p_37578_);
+        this.dealtDamage = p_37578_.getBoolean("DealtDamage");
+        this.entityData.set(ID_LOYALTY, (Object)this.getLoyaltyFromItem(this.getPickupItemStackOrigin()));
+    }
+
+    public void addAdditionalSaveData(CompoundTag p_37582_) {
+        super.addAdditionalSaveData(p_37582_);
+        p_37582_.putBoolean("DealtDamage", this.dealtDamage);
+    }
+
+    private byte getLoyaltyFromItem(ItemStack p_345571_) {
+        byte by;
+        Level level = this.level();
+        if (level instanceof ServerLevel) {
+            ServerLevel serverlevel = (ServerLevel)level;
+            by = (byte)Mth.clamp((int)EnchantmentHelper.getTridentReturnToOwnerAcceleration((ServerLevel)serverlevel, (ItemStack)p_345571_, (Entity)this), (int)0, (int)127);
+        } else {
+            by = 0;
+        }
+        return by;
+    }
+
+    public void tickDespawn() {
+        byte i = (Byte)this.entityData.get(ID_LOYALTY);
+        if (this.pickup != AbstractArrow.Pickup.ALLOWED || i <= 0) {
+            super.tickDespawn();
+        }
+    }
+
+    protected float getWaterInertia() {
+        return 0.99f;
+    }
+
+    public boolean shouldRender(double p_37588_, double p_37589_, double p_37590_) {
+        return true;
+    }
+}
+
