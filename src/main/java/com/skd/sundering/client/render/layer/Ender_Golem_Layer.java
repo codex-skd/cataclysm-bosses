@@ -1,0 +1,53 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.blaze3d.vertex.PoseStack
+ *  com.mojang.blaze3d.vertex.VertexConsumer
+ *  net.minecraft.client.renderer.MultiBufferSource
+ *  net.minecraft.client.renderer.rendertype.RenderType
+ *  net.minecraft.client.renderer.entity.RenderLayerParent
+ *  net.minecraft.client.renderer.entity.layers.RenderLayer
+ *  net.minecraft.client.renderer.texture.OverlayTexture
+ *  net.minecraft.resources.Identifier
+ *  net.minecraft.util.FastColor$ARGB32
+ *  net.neoforged.api.distmarker.Dist
+ *  net.neoforged.api.distmarker.OnlyIn
+ */
+package com.skd.sundering.client.render.layer;
+
+import com.skd.sundering.client.model.entity.Ender_Golem_Model;
+import com.skd.sundering.client.render.entity.Ender_Golem_Renderer;
+import com.skd.sundering.entity.AnimationMonster.BossMonsters.Ender_Golem_Entity;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.entity.RenderLayerParent;
+import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.FastColor;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+
+@OnlyIn(value=Dist.CLIENT)
+public class Ender_Golem_Layer
+extends RenderLayer<Ender_Golem_Entity, Ender_Golem_Model> {
+    private static final Identifier ENDER_GOLEM_LAYER_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/ender_golem_layer.png");
+
+    public Ender_Golem_Layer(Ender_Golem_Renderer renderIn) {
+        super((RenderLayerParent)renderIn);
+    }
+
+    public void render(PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn, Ender_Golem_Entity entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+        if (entity.deathTime <= 45) {
+            int f = (int)(255.0f - entity.deactivateProgress * 255.0f / 30.0f);
+            RenderType eyes = RenderType.eyes((Identifier)ENDER_GOLEM_LAYER_TEXTURES);
+            VertexConsumer VertexConsumer2 = bufferIn.getBuffer(eyes);
+            int i = FastColor.ARGB32.color((int)f, (int)f, (int)f);
+            ((Ender_Golem_Model)this.getParentModel()).renderToBuffer(matrixStackIn, VertexConsumer2, packedLightIn, OverlayTexture.NO_OVERLAY, i);
+        }
+    }
+}
+
