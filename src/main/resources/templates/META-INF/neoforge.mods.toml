@@ -84,12 +84,12 @@ config="${mod_id}.mixins.json"
 
 # NautilusAPI (port of LionfishAPI) -- animation-library dependency. Uncomment once the
 # NautilusAPI jar is wired into build.gradle and its actual released version is known.
-#[[dependencies.${mod_id}]]
-#    modId="nautilus_api"
-#    type="required"
-#    versionRange="[0.0.0-beta.1,)"
-#    ordering="NONE"
-#    side="BOTH"
+[[dependencies.${mod_id}]]
+    modId="nautilus_api"
+    type="required"
+    versionRange="[0.0.0-beta.2,)"
+    ordering="NONE"
+    side="BOTH"
 
 # Curios API -- already has an official NeoForge 26.2 build, no port needed (confirmed Fase 0).
 # Uncomment once its maven coordinates for 26.2 are wired into build.gradle.

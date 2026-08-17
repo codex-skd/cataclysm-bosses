@@ -117,9 +117,8 @@ configurations {
 }
 
 dependencies {
-    // NautilusAPI (port of LionfishAPI, this mod's own animation-library dependency) -- not
-    // yet wired up. Once a NautilusAPI jar exists in ./libs, add it here, e.g.:
-    // implementation files("libs/nautilus_api-${minecraft_version}-neoforge-${neo_version}-<version>.jar")
+    // NautilusAPI (port of LionfishAPI, this mod's own animation-library dependency).
+    implementation files("libs/nautilus_api-26.2-neoforge-26.2.0.45-beta-0.0.0-beta.2.jar")
 
     // Curios API -- already has an official NeoForge 26.2 build on CurseForge, does NOT need
     // porting (confirmed during Fase 0 diagnostics). Add as a compile/runtime dependency once
