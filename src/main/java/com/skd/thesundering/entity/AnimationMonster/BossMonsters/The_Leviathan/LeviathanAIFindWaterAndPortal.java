@@ -1,0 +1,75 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  net.minecraft.core.BlockPos
+ *  net.minecraft.tags.FluidTags
+ *  net.minecraft.util.RandomSource
+ *  net.minecraft.world.entity.ai.goal.Goal
+ *  net.minecraft.world.entity.ai.goal.Goal$Flag
+ */
+package com.skd.thesundering.entity.AnimationMonster.BossMonsters.The_Leviathan;
+
+import com.skd.thesundering.entity.AnimationMonster.BossMonsters.The_Leviathan.The_Leviathan_Entity;
+import com.skd.thesundering.entity.etc.ISemiAquatic;
+import java.util.EnumSet;
+import net.minecraft.core.BlockPos;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.ai.goal.Goal;
+
+public class LeviathanAIFindWaterAndPortal
+extends Goal {
+    private final The_Leviathan_Entity creature;
+    private BlockPos targetPos;
+    private final int executionChance = 30;
+
+    public LeviathanAIFindWaterAndPortal(The_Leviathan_Entity creature) {
+        this.creature = creature;
+        this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
+    }
+
+    public boolean canUse() {
+        if (this.creature.onGround() && !this.creature.level().getFluidState(this.creature.blockPosition()).is(FluidTags.WATER) && this.creature.shouldEnterWater() && (this.creature.getTarget() != null || this.creature.getRandom().nextInt(30) == 0)) {
+            this.targetPos = this.generateTarget();
+            return this.targetPos != null;
+        }
+        return false;
+    }
+
+    public void start() {
+        if (this.targetPos != null) {
+            this.creature.getNavigation().moveTo((double)this.targetPos.getX(), (double)this.targetPos.getY(), (double)this.targetPos.getZ(), 1.0);
+        }
+    }
+
+    public void tick() {
+        if (this.targetPos != null) {
+            this.creature.getNavigation().moveTo((double)this.targetPos.getX(), (double)this.targetPos.getY(), (double)this.targetPos.getZ(), 1.0);
+        }
+    }
+
+    public boolean canContinueToUse() {
+        if (this.creature instanceof ISemiAquatic && !this.creature.shouldEnterWater()) {
+            this.creature.getNavigation().stop();
+            return false;
+        }
+        return !this.creature.getNavigation().isDone() && this.targetPos != null && !this.creature.level().getFluidState(this.creature.blockPosition()).is(FluidTags.WATER);
+    }
+
+    public BlockPos generateTarget() {
+        BlockPos blockpos = null;
+        RandomSource random = this.creature.getRandom();
+        int range = this.creature.getWaterSearchRange();
+        for (int i = 0; i < 15; ++i) {
+            BlockPos blockPos = this.creature.blockPosition().offset(random.nextInt(range) - range / 2, 3, random.nextInt(range) - range / 2);
+            while (this.creature.level().isEmptyBlock(blockPos) && blockPos.getY() > 1) {
+                blockPos = blockPos.below();
+            }
+            if (!this.creature.level().getFluidState(blockPos).is(FluidTags.WATER)) continue;
+            blockpos = blockPos;
+        }
+        return blockpos;
+    }
+}
+
