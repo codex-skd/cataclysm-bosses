@@ -4,6 +4,8 @@
 > Este archivo pertenece al proyecto **The Sundering**. Cambios aquí solo afectan a este proyecto.
 > **Trabaja directamente con este archivo**: es el workflow operativo del mod, autocontenido. No leas `codex-docs/WORKFLOW_AGENT.md` ni `WORKFLOW_GENERIC.md` de forma rutinaria.
 > On-demand (solo si la tarea lo necesita): `codex-docs/reference/CURSEFORGE.md` (formato HTML al publicar), `codex-docs/reference/GRAPHIFY.md` (backend LLM de Graphify), `codex-docs/reference/REPO_SETUP.md` (setup único de repo).
+>
+> ⚠️ **CurseForge cerró el proyecto (2026-08-15)** por subir versiones esqueleto sin contenido real — ver `docs/curseforge/project_vars.md` para el detalle. **No subir nada a CurseForge ni recrear el proyecto hasta tener una versión genuinamente estable.**
 
 ## Específico del mod
 

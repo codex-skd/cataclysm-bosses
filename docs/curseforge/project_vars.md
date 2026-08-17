@@ -1,10 +1,21 @@
 # CurseForge — Variables del proyecto
 
+> ⚠️ **PROYECTO CERRADO POR CURSEFORGE (2026-08-15)**: subimos versiones esqueleto sin
+> contenido real y CurseForge cerró el proyecto. `project_id=1652963` **ya no es válido** —
+> no usar `curseforge-upload.ps1` ni ningún dato de este archivo hasta que el usuario indique
+> lo contrario. **No recrear el proyecto ni subir nada a CurseForge hasta tener una versión
+> genuinamente estable** (con contenido real portado de Cataclysm, no solo scaffolding).
+> Dado que The Sundering depende de NautilusAPI (también cerrado, ver su propio
+> `project_vars.md`), esto probablemente no ocurra hasta bastante avanzada la Fase 1. Cuando
+> llegue ese momento, crear un proyecto nuevo desde cero siguiendo el formulario manual
+> documentado más abajo — los datos de Name/Summary/Description/License siguen siendo
+> válidos como referencia.
+
 ## Proyecto
 
 | Variable | Valor |
 |----------|-------|
-| `curseforge_project_id` | `1652963` |
+| `curseforge_project_id` | ~~`1652963`~~ **INVÁLIDO — proyecto cerrado, ver aviso arriba** |
 | `mod_id` | `the_sundering` |
 | `display_name` | `The Sundering` |
 
