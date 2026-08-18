@@ -284,10 +284,6 @@ extends Entity {
         return 1.0f;
     }
 
-    public boolean hurt(DamageSource p_37616_, float p_37617_) {
-        return false;
-    }
-
     public float getLightLevelDependentMagicValue() {
         return 1.0f;
     }
@@ -300,6 +296,16 @@ extends Entity {
 
     public void recreateFromPacket(ClientboundAddEntityPacket p_150128_) {
         super.recreateFromPacket(p_150128_);
+        Vec3 vec3 = p_150128_.getMovement();
+        double d0 = vec3.x();
+        double d1 = vec3.y();
+        double d2 = vec3.z();
+        double d3 = Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
+        if (d3 != 0.0) {
+            this.xPower = d0 / d3 * 0.1;
+            this.yPower = d1 / d3 * 0.1;
+            this.zPower = d2 / d3 * 0.1;
+        }
     }
 }
 

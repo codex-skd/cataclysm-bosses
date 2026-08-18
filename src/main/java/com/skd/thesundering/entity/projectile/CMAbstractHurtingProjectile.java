@@ -132,27 +132,6 @@ extends Projectile {
         }
     }
 
-    public boolean hurt(DamageSource p_341896_, float p_341906_) {
-        return !this.isInvulnerableTo(p_341896_);
-    }
-
-    protected boolean canHitEntity(Entity p_36842_) {
-        return super.canHitEntity(p_36842_) && !p_36842_.noPhysics;
-    }
-
-    protected boolean shouldBurn() {
-        return true;
-    }
-
-    @Nullable
-    protected ParticleOptions getTrailParticle() {
-        return ParticleTypes.SMOKE;
-    }
-
-    protected float getInertia() {
-        return 0.95f;
-    }
-
     protected float getLiquidInertia() {
         return 0.8f;
     }
@@ -185,9 +164,10 @@ extends Projectile {
 
     public void recreateFromPacket(ClientboundAddEntityPacket p_150128_) {
         super.recreateFromPacket(p_150128_);
-        double d0 = p_150128_.getXa();
-        double d1 = p_150128_.getYa();
-        double d2 = p_150128_.getZa();
+        Vec3 vec3 = p_150128_.getMovement();
+        double d0 = vec3.x();
+        double d1 = vec3.y();
+        double d2 = vec3.z();
         double d3 = Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
         if (d3 != 0.0) {
             this.xPower = d0 / d3 * 0.1;
@@ -197,7 +177,6 @@ extends Projectile {
     }
 
     protected void onDeflection(@Nullable Entity p_341940_, boolean p_341895_) {
-        super.onDeflection(p_341940_, p_341895_);
         if (p_341895_) {
             if (p_341940_ != null) {
                 if (!this.level().isClientSide()) {

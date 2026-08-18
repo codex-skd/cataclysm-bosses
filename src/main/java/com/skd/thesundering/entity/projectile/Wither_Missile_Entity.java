@@ -230,10 +230,6 @@ extends Projectile {
         return 1.0f;
     }
 
-    public boolean hurt(DamageSource p_37616_, float p_37617_) {
-        return false;
-    }
-
     public float getLightLevelDependentMagicValue() {
         return 1.0f;
     }
@@ -248,11 +244,9 @@ extends Projectile {
 
     private void assignDirectionalMovement(Vec3 movement, double accelerationPower) {
         this.setDeltaMovement(movement.normalize().scale(accelerationPower));
-        this.hasImpulse = true;
     }
 
     protected void onDeflection(@Nullable Entity entity, boolean deflectedByPlayer) {
-        super.onDeflection(entity, deflectedByPlayer);
         this.accelerationPower = deflectedByPlayer ? 0.1 : (this.accelerationPower *= 0.5);
     }
 }
