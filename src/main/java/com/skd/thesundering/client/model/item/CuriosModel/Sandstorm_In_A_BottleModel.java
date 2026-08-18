@@ -4,6 +4,7 @@
  * Could not load the following classes:
  *  com.google.common.collect.ImmutableList
  *  net.minecraft.client.model.HumanoidModel
+ *  net.minecraft.client.model.HumanoidRenderState
  *  net.minecraft.client.model.geom.ModelPart
  *  net.minecraft.client.model.geom.PartPose
  *  net.minecraft.client.model.geom.builders.CubeDeformation
@@ -17,6 +18,7 @@ package com.skd.thesundering.client.model.item.CuriosModel;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.model.HumanoidRenderState;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
@@ -24,10 +26,9 @@ import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
-import net.minecraft.world.entity.LivingEntity;
 
 public class Sandstorm_In_A_BottleModel
-extends HumanoidModel<LivingEntity> {
+extends HumanoidModel<HumanoidRenderState> {
     public Sandstorm_In_A_BottleModel(ModelPart root) {
         super(root);
     }
