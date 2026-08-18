@@ -4,12 +4,12 @@
  * Could not load the following classes:
  *  com.mojang.blaze3d.vertex.PoseStack
  *  net.minecraft.client.Minecraft
- *  net.minecraft.client.model.EntityModel
  *  net.minecraft.client.model.HeadedModel
  *  net.minecraft.client.model.SkullModelBase
- *  net.minecraft.client.renderer.MultiBufferSource
- *  net.minecraft.client.renderer.rendertype.RenderType
+ *  net.minecraft.client.renderer.SubmitNodeCollector
  *  net.minecraft.client.renderer.entity.RenderLayerParent
+ *  net.minecraft.client.renderer.entity.state.HumanoidRenderState
+ *  net.minecraft.client.renderer.entity.state.LivingEntityRenderState
  *  net.minecraft.world.entity.Entity
  *  net.minecraft.world.entity.LivingEntity
  *  net.minecraft.world.entity.WalkAnimationState
@@ -29,12 +29,12 @@ import com.skd.thesundering.client.render.blockentity.Cataclysm_Skull_Block_Rend
 import com.mojang.blaze3d.vertex.PoseStack;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HeadedModel;
 import net.minecraft.client.model.SkullModelBase;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.WalkAnimationState;
@@ -47,36 +47,57 @@ import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.client.ICurioRenderer;
 
 public class CurioHeadRenderer
-implements ICurioRenderer {
+implements ICurioRenderer.ModelRender<HumanoidRenderState, HeadedModel> {
     private Map<SkullBlock.Type, SkullModelBase> skullModels = Cataclysm_Skull_Block_Renderer.createSkullRenderers(Minecraft.getInstance().getEntityModels());
 
-    public <T extends LivingEntity, M extends EntityModel<T>> void render(ItemStack stack, SlotContext slotContext, PoseStack matrixStack, RenderLayerParent<T, M> renderLayerParent, MultiBufferSource renderTypeBuffer, int light, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
-        EntityModel entityModel = renderLayerParent.getModel();
+    @Override
+    public HeadedModel getModel(ItemStack stack, SlotContext slotContext) {
+        EntityModel entityModel = slotContext.entity().getRenderState().getModel();
         if (entityModel instanceof HeadedModel) {
-            Block block;
-            HeadedModel headModel = (HeadedModel)entityModel;
+            return (HeadedModel) entityModel;
+        }
+        return null;
+    }
+
+    @Override
+    public Identifier getModelTexture(ItemStack stack, SlotContext slotContext) {
+        return null; // Not used for skulls
+    }
+
+    @Override
+    public void prepareModel(ItemStack stack, SlotContext slotContext, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight, HumanoidRenderState renderState, RenderLayerParent<HumanoidRenderState, HeadedModel> renderLayerParent, EntityRendererProvider.Context context, float limbSwing, float ageInTicks) {
+        if (!stack.isEmpty()) {
             Item item = stack.getItem();
-            if (!stack.isEmpty() && item instanceof BlockItem && ((block = ((BlockItem)item).getBlock()) instanceof Cataclysm_Skull_Block || block instanceof Cataclysm_Wall_Skull_Block)) {
-                WalkAnimationState walkanimationstate;
-                matrixStack.pushPose();
-                headModel.getHead().translateAndRotate(matrixStack);
-                matrixStack.scale(1.1875f, -1.1875f, -1.1875f);
-                matrixStack.translate(-0.5, 0.0, -0.5);
-                SkullBlock.Type type = block instanceof Cataclysm_Skull_Block ? ((Cataclysm_Skull_Block)block).getType() : ((Cataclysm_Wall_Skull_Block)block).getType();
-                SkullModelBase skullmodelbase = this.skullModels.get(type);
-                RenderType rendertype = Cataclysm_Skull_Block_Renderer.getRenderType(type);
-                Entity entity = slotContext.entity().getVehicle();
-                if (entity instanceof LivingEntity) {
-                    LivingEntity livingEntity = (LivingEntity)entity;
-                    walkanimationstate = livingEntity.walkAnimation;
-                } else {
-                    walkanimationstate = slotContext.entity().walkAnimation;
+            if (item instanceof BlockItem) {
+                Block block = ((BlockItem) item).getBlock();
+                if (block instanceof Cataclysm_Skull_Block || block instanceof Cataclysm_Wall_Skull_Block) {
+                    HeadedModel headModel = getModel(stack, slotContext);
+                    if (headModel != null) {
+                        poseStack.pushPose();
+                        headModel.getHead().translateAndRotate(poseStack);
+                        poseStack.scale(1.1875f, -1.1875f, -1.1875f);
+                        poseStack.translate(-0.5, 0.0, -0.5);
+                        
+                        SkullBlock.Type type = block instanceof Cataclysm_Skull_Block 
+                            ? ((Cataclysm_Skull_Block) block).getType() 
+                            : ((Cataclysm_Wall_Skull_Block) block).getType();
+                        SkullModelBase skullModel = this.skullModels.get(type);
+                        RenderType renderType = Cataclysm_Skull_Block_Renderer.getRenderType(type);
+                        
+                        Entity entity = slotContext.entity().getVehicle();
+                        WalkAnimationState walkAnimationState;
+                        if (entity instanceof LivingEntity) {
+                            walkAnimationState = ((LivingEntity) entity).walkAnimation;
+                        } else {
+                            walkAnimationState = renderState.walkAnimation;
+                        }
+                        float f3 = walkAnimationState.position(0.0f); // partialTicks not available here
+                        
+                        Cataclysm_Skull_Block_Renderer.renderSkull(null, 180.0f, f3, poseStack, submitNodeCollector, packedLight, skullModel, renderType, type, true);
+                        poseStack.popPose();
+                    }
                 }
-                float f3 = walkanimationstate.position(partialTicks);
-                Cataclysm_Skull_Block_Renderer.renderSkull(null, 180.0f, f3, matrixStack, renderTypeBuffer, light, skullmodelbase, rendertype, type, true);
-                matrixStack.popPose();
             }
         }
     }
 }
-
