@@ -304,10 +304,8 @@ extends CMAbstractHurtingProjectile {
     }
 
     @Override
-    public boolean hurt(DamageSource p_36839_, float p_36840_) {
-        if (this.isInvulnerableTo(p_36839_)) {
-            return false;
-        }
+    public void onHitEntity(EntityHitResult p_36839_) {
+        super.onHitEntity(p_36839_);
         this.markHurt();
         Entity entity = p_36839_.getEntity();
         if (entity != null && this.getFired()) {
@@ -319,9 +317,7 @@ extends CMAbstractHurtingProjectile {
                 this.zPower = vec3.z * 0.1;
                 this.setOwner(entity);
             }
-            return true;
         }
-        return false;
     }
 }
 

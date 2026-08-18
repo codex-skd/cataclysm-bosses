@@ -223,9 +223,6 @@ extends CMAbstractHurtingProjectile {
     }
 
     @Override
-    public boolean hurt(DamageSource p_37616_, float p_37617_) {
-        return false;
-    }
 
     public Vec3 getTrailPosition(int pointer, float partialTick) {
         if (this.isRemoved()) {
