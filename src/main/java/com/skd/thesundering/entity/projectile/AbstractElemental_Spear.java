@@ -136,36 +136,6 @@ extends Projectile {
         }
     }
 
-    public boolean hurt(DamageSource p_341896_, float p_341906_) {
-        return !this.isInvulnerableTo(p_341896_);
-    }
-
-    public void checkDespawn() {
-        if (this.level().getDifficulty() == Difficulty.PEACEFUL) {
-            this.discard();
-        } else {
-            int i;
-            int j;
-            double d0;
-            Player entity = this.level().getNearestPlayer((Entity)this, -1.0);
-            if (entity != null && (d0 = entity.distanceToSqr((Entity)this)) > (double)(j = (i = this.getType().getCategory().getDespawnDistance()) * i) && this.removeWhenFarAway(d0)) {
-                this.discard();
-            }
-        }
-    }
-
-    public boolean removeWhenFarAway(double distanceToClosestPlayer) {
-        return true;
-    }
-
-    protected boolean canHitEntity(Entity p_36842_) {
-        return super.canHitEntity(p_36842_) && !p_36842_.noPhysics;
-    }
-
-    protected float getInertia() {
-        return 0.95f;
-    }
-
     protected float getLiquidInertia() {
         return 0.95f;
     }
@@ -201,7 +171,6 @@ extends Projectile {
 
     protected void assignDirectionalMovement(Vec3 movement, double accelerationPower) {
         this.setDeltaMovement(movement.normalize().scale(accelerationPower));
-        this.hasImpulse = true;
     }
 
     public void lerpTo(double x, double y, double z, float yr, float xr, int steps) {
@@ -222,7 +191,6 @@ extends Projectile {
     }
 
     protected void onDeflection(@Nullable Entity entity, boolean deflectedByPlayer) {
-        super.onDeflection(entity, deflectedByPlayer);
         this.accelerationPower = deflectedByPlayer ? 0.1 : (this.accelerationPower *= 0.5);
     }
 }
