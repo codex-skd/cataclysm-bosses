@@ -45,7 +45,7 @@ import net.minecraft.world.level.levelgen.structure.StructureStart;
 
 public class MixinUtils {
     public static boolean isPositionInTaggedStructure(WorldGenRegion worldGenRegion, BlockPos pos, TagKey<Structure> structureTagKey) {
-        Registry structureRegistry = worldGenRegion.registryAccess().registryOrThrow(Registries.STRUCTURE);
+        Registry structureRegistry = worldGenRegion.registryAccess().lookupOrThrow(Registries.STRUCTURE);
         SectionPos sectionPos = SectionPos.of((BlockPos)pos);
         ChunkAccess chunkAccess = worldGenRegion.getChunk(sectionPos.x(), sectionPos.z(), ChunkStatus.STRUCTURE_REFERENCES);
         if (!chunkAccess.getHighestGeneratedStatus().isOrAfter(ChunkStatus.STRUCTURE_REFERENCES)) {
@@ -56,7 +56,7 @@ public class MixinUtils {
             Structure structure = (Structure)entry.getKey();
             LongSet references = (LongSet)entry.getValue();
             Optional structureKey = structureRegistry.getResourceKey((Object)structure);
-            boolean isTaggedStructure = structureKey.isPresent() && structureRegistry.getHolderOrThrow((ResourceKey)structureKey.get()).is(structureTagKey);
+            boolean isTaggedStructure = structureKey.isPresent() && structureRegistry.getOrThrow((ResourceKey)structureKey.get()).is(structureTagKey);
             if (!isTaggedStructure || !MixinUtils.isAnyReferenceValidStartForStructure(worldGenRegion, structure, references, structureStart -> structureStart.getBoundingBox().isInside((Vec3i)pos))) continue;
             return true;
         }
@@ -70,7 +70,7 @@ public class MixinUtils {
             ChunkAccess structureStartChunkAccess;
             StructureStart structureStart;
             long reference = (Long)longIterator.next();
-            SectionPos structureStartSectionPos = SectionPos.of((ChunkPos)new ChunkPos(reference), (int)worldGenRegion.getMinSection());
+            SectionPos structureStartSectionPos = SectionPos.of((ChunkPos)ChunkPos.unpack(reference), (int)worldGenRegion.getMinSectionY());
             if (!worldGenRegion.hasChunk(structureStartSectionPos.x(), structureStartSectionPos.z()) || (structureStart = structureManager.getStartForStructure(structureStartSectionPos, structure, (StructureAccess)(structureStartChunkAccess = worldGenRegion.getChunk(structureStartSectionPos.x(), structureStartSectionPos.z(), ChunkStatus.STRUCTURE_STARTS)))) == null || !structureStart.isValid() || !filter.test(structureStart)) continue;
             return true;
         }

@@ -86,7 +86,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
@@ -122,19 +121,21 @@ import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.entity.player.CriticalHitEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import top.theillusivec4.curios.api.CuriosApi;
 
-@EventBusSubscriber(modid="cataclysm")
+@EventBusSubscriber(modid="the_sundering")
 public class ServerEventHandler {
     @SubscribeEvent
     public static void onLivingUpdateEvent(PlayerTickEvent.Post event) {
         ((ChargeAttachment)event.getEntity().getData(ModDataAttachments.CHARGE_ATTACHMENT)).tick((LivingEntity)event.getEntity());
         ((RenderRushAttachment)event.getEntity().getData(ModDataAttachments.RENDER_RUSH_ATTACHMENT)).tick((LivingEntity)event.getEntity());
         if (((Boolean)event.getEntity().getData(ModDataAttachments.HOOK_FALLING)).booleanValue()) {
-            event.getEntity().setIgnoreFallDamageFromCurrentImpulse(true);
-            event.getEntity().currentImpulseImpactPos = event.getEntity().position();
+            // setIgnoreFallDamageFromCurrentImpulse now takes the impact position directly
+            // (was a separate manual field assignment before) -- same net effect.
+            event.getEntity().setIgnoreFallDamageFromCurrentImpulse(true, event.getEntity().position());
         }
     }
 
@@ -227,7 +228,7 @@ public class ServerEventHandler {
     }
 
     @SubscribeEvent
-    public static void onBreakBlock(BlockEvent.BreakEvent event) {
+    public static void onBreakBlock(BreakBlockEvent event) {
         if (event.getPlayer().hasEffect(ModEffect.EFFECTSTUN)) {
             event.setCanceled(true);
         }
@@ -255,7 +256,7 @@ public class ServerEventHandler {
                 flag = true;
             }
             if (event.getLevel().isClientSide() && flag) {
-                PacketDistributor.sendToServer((CustomPacketPayload)new MessageSwingArm(InteractionHand.MAIN_HAND), (CustomPacketPayload[])new CustomPacketPayload[0]);
+                ClientPacketDistributor.sendToServer((CustomPacketPayload)new MessageSwingArm(InteractionHand.MAIN_HAND), new CustomPacketPayload[0]);
             }
         }
     }
@@ -285,7 +286,7 @@ public class ServerEventHandler {
     public static void onLivingSetTargetEvent(LivingChangeTargetEvent event) {
         Mob mob;
         LivingEntity livingEntity;
-        if (event.getNewAboutToBeSetTarget() != null && (livingEntity = event.getEntity()) instanceof Mob && (mob = (Mob)livingEntity).getType().is(ModTag.LAVA_MONSTER) && event.getEntity().getLastHurtByMob() != event.getNewAboutToBeSetTarget() && event.getNewAboutToBeSetTarget().getItemBySlot(EquipmentSlot.HEAD).is((Item)ModItems.IGNITIUM_HELMET.get())) {
+        if (event.getNewAboutToBeSetTarget() != null && (livingEntity = event.getEntity()) instanceof Mob && (mob = (Mob)livingEntity).getType().builtInRegistryHolder().is(ModTag.LAVA_MONSTER) && event.getEntity().getLastHurtByMob() != event.getNewAboutToBeSetTarget() && event.getNewAboutToBeSetTarget().getItemBySlot(EquipmentSlot.HEAD).is((Item)ModItems.IGNITIUM_HELMET.get())) {
             event.setCanceled(true);
             return;
         }
@@ -297,12 +298,15 @@ public class ServerEventHandler {
         Entity entity;
         LivingEntity entity2 = event.getEntity();
         DamageSource source = event.getSource();
-        if (entity2.getHealth() <= event.getNewDamage() && entity2.hasEffect(ModEffect.EFFECTSTUN)) {
+        if (entity2.getHealth() <= event.getHealthDamage() && entity2.hasEffect(ModEffect.EFFECTSTUN)) {
             entity2.removeEffect(ModEffect.EFFECTSTUN);
         }
         if (source.is(CMDamageTypes.DRACONIC_WOUND) && entity2.hasEffect(MobEffects.ABSORPTION)) {
             entity2.removeEffect(MobEffects.ABSORPTION);
         }
+        // TODO(Curios): CuriosApi is not on the compile classpath yet -- deferred per
+        // FASE1_PLAN_CATACLYSM.md until Curios is wired into build.gradle (batches 4-5 area).
+        // Do not attempt to fix this block until then.
         if ((entity = event.getSource().getDirectEntity()) instanceof LivingEntity) {
             LivingEntity living = (LivingEntity)entity;
             List slot = CuriosApi.getCuriosHelper().findCurios(living, stack -> stack.is((Item)ModItems.BLAZING_GRIPS.get()));
@@ -329,7 +333,7 @@ public class ServerEventHandler {
         Item item = entity.getUseItem().getItem();
         Entity directEntity = source.getDirectEntity();
         if (source.is(CMDamageTypes.MALEDICTIO_SAGITTA)) {
-            event.setShieldDamage(0.0f);
+            event.setShieldDamage(0);
         }
         ParryAttachment charge = (ParryAttachment)entity.getData(ModDataAttachments.PARRY_ATTACHMENT);
         if (item == ModItems.BULWARK_OF_THE_FLAME.get() && event.getBlocked() && charge.getParryFrame() < 13 && directEntity instanceof LivingEntity) {
@@ -337,17 +341,19 @@ public class ServerEventHandler {
             livingEntity.igniteForSeconds(3.0f);
             livingEntity.playSound(SoundEvents.ANVIL_LAND, 0.8f, 1.3f);
             effectinstance = new MobEffectInstance(ModEffect.EFFECTBLAZING_BRAND, 100, 0);
-            livingEntity.knockback(0.5, entity.getX() - livingEntity.getX(), entity.getZ() - livingEntity.getZ());
+            // knockback now requires a DamageSource and a knockback-force float; this call has
+            // no associated damage, so it reuses the shield's own damage source with 0 force.
+            livingEntity.knockback(0.5, entity.getX() - livingEntity.getX(), entity.getZ() - livingEntity.getZ(), source, 0.0f);
             livingEntity.addEffect(effectinstance);
         }
         if (item == ModItems.AZURE_SEA_SHIELD.get() && event.getBlocked() && charge.getParryFrame() < 10) {
-            event.setShieldDamage(0.0f);
+            event.setShieldDamage(0);
             if (directEntity instanceof LivingEntity) {
                 livingEntity = (LivingEntity)directEntity;
                 livingEntity.playSound((SoundEvent)ModSounds.PARRY.get(), 0.4f, 1.0f);
-                entity.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 40, 1));
-                effectinstance = new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 120, 1);
-                livingEntity.knockback(0.5, entity.getX() - livingEntity.getX(), entity.getZ() - livingEntity.getZ());
+                entity.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 40, 1));
+                effectinstance = new MobEffectInstance(MobEffects.SLOWNESS, 120, 1);
+                livingEntity.knockback(0.5, entity.getX() - livingEntity.getX(), entity.getZ() - livingEntity.getZ(), source, 0.0f);
                 livingEntity.addEffect(effectinstance);
             }
         }
@@ -465,7 +471,7 @@ public class ServerEventHandler {
         Player player;
         LivingEntity livingEntity;
         Item item = event.getItem().getItem();
-        if ((item == ModItems.AZURE_SEA_SHIELD.get() || item == ModItems.BULWARK_OF_THE_FLAME.get()) && (livingEntity = event.getEntity()) instanceof Player && !(player = (Player)livingEntity).getCooldowns().isOnCooldown(item)) {
+        if ((item == ModItems.AZURE_SEA_SHIELD.get() || item == ModItems.BULWARK_OF_THE_FLAME.get()) && (livingEntity = event.getEntity()) instanceof Player && !(player = (Player)livingEntity).getCooldowns().isOnCooldown(event.getItem())) {
             ParryAttachment charge = (ParryAttachment)player.getData(ModDataAttachments.PARRY_ATTACHMENT);
             charge.setParryFrame(0);
         }
@@ -502,7 +508,9 @@ public class ServerEventHandler {
             if (!player.getInventory().add(reward)) {
                 player.drop(reward, false);
             }
-            player.playNotifySound((SoundEvent)ModSounds.THE_CATACLYSM_FARER.get(), SoundSource.RECORDS, 1.0f, 1.0f);
+            // playNotifySound(SoundEvent, SoundSource, float, float) is gone; Entity only
+            // exposes the 3-arg playSound(SoundEvent, float, float) overload now.
+            player.playSound((SoundEvent)ModSounds.THE_CATACLYSM_FARER.get(), 1.0f, 1.0f);
         }
     }
 }

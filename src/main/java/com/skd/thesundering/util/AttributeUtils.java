@@ -43,7 +43,7 @@ public class AttributeUtils {
         for (ItemAttributeModifiers.Entry newEntry : newModifiers.modifiers()) {
             combinedBuilder.add(newEntry.attribute(), newEntry.modifier(), newEntry.slot());
         }
-        builder.set(DataComponents.ATTRIBUTE_MODIFIERS, (Object)combinedBuilder.build());
+        builder.set(DataComponents.ATTRIBUTE_MODIFIERS, combinedBuilder.build());
     }
 
     public static float OriginDamage(LivingEntity living, ItemStack itemStack) {

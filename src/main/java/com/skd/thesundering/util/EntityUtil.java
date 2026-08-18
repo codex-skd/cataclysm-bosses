@@ -34,7 +34,7 @@ public class EntityUtil {
 
     public static void disableShield(Player player, int ticks) {
         if (!player.level().isClientSide() && player.isBlocking()) {
-            player.getCooldowns().addCooldown(player.getUseItem().getItem(), ticks);
+            player.getCooldowns().addCooldown(player.getUseItem(), ticks);
             player.stopUsingItem();
             player.level().broadcastEntityEvent((Entity)player, (byte)30);
         }
@@ -66,6 +66,9 @@ public class EntityUtil {
         return distSqr < (double)(dis * dis);
     }
 
+    // TODO(Curios): CuriosApi is not on the compile classpath yet -- deferred per
+    // FASE1_PLAN_CATACLYSM.md until Curios is wired into build.gradle (batches 4-5 area).
+    // Do not attempt to fix this call site until then.
     public static boolean isEquipped(Item item, @Nullable LivingEntity entity) {
         return entity != null && CuriosApi.getCuriosInventory((LivingEntity)entity).map(inv -> inv.findFirstCurio(item).isPresent()).orElse(false) != false;
     }

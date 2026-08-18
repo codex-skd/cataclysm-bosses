@@ -120,10 +120,8 @@ dependencies {
     // NautilusAPI (port of LionfishAPI, this mod's own animation-library dependency).
     implementation files("libs/nautilus_api-26.2-neoforge-26.2.0.45-beta-0.0.0-beta.2.jar")
 
-    // Curios API -- already has an official NeoForge 26.2 build on CurseForge, does NOT need
-    // porting (confirmed during Fase 0 diagnostics). Add as a compile/runtime dependency once
-    // its maven coordinates for 26.2 are confirmed:
-    // implementation "top.theillusivec4.curios:curios-neoforge:<version>+26.2"
+    // Curios API -- official NeoForge 26.2 build
+    implementation files("libs/curios-neoforge-15.0.0-beta.2+26.2.jar")
 
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
@@ -169,6 +167,7 @@ publishing {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+    options.compilerArgs << '-Xmaxerrs' << '5000' // TEMP: Fase 1 diagnostic, revert once port is done
 }
 
 // IDEA no longer automatically downloads sources/javadoc jars for dependencies, so we need to explicitly enable the behavior.

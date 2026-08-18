@@ -54,7 +54,7 @@ public class CMDamageTypes {
     public static final ResourceKey<DamageType> DAGGER = ResourceKey.create((ResourceKey)Registries.DAMAGE_TYPE, (Identifier)Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"dagger"));
 
     public static DamageSource causeLaserDamage(Entity attacker, Entity caster) {
-        return new DamageSource((Holder)((Registry)attacker.level().registryAccess().registry(Registries.DAMAGE_TYPE).get()).getHolderOrThrow(LASER), attacker, caster);
+        return new DamageSource((Holder)attacker.level().registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(LASER), attacker, caster);
     }
 
     public static DamageSource getDamageSource(Level level, ResourceKey<DamageType> type, EntityType<?> ... toIgnore) {
@@ -66,75 +66,75 @@ public class CMDamageTypes {
     }
 
     public static DamageSource getIndirectEntityDamageSource(Level level, ResourceKey<DamageType> type, @Nullable Entity attacker, @Nullable Entity indirectAttacker, EntityType<?> ... toIgnore) {
-        return toIgnore.length > 0 ? new EntityExcludedDamageSource((Holder<DamageType>)level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(type), toIgnore) : new DamageSource((Holder)level.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(type), attacker, indirectAttacker);
+        return toIgnore.length > 0 ? new EntityExcludedDamageSource((Holder<DamageType>)level.registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(type), toIgnore) : new DamageSource((Holder)level.registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(type), attacker, indirectAttacker);
     }
 
     public static DamageSource causeDeathLaserDamage(Entity attacker, LivingEntity caster) {
-        return new DamageSource((Holder)((Registry)attacker.level().registryAccess().registry(Registries.DAMAGE_TYPE).get()).getHolderOrThrow(DEATHLASER), attacker, (Entity)caster);
+        return new DamageSource((Holder)attacker.level().registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(DEATHLASER), attacker, (Entity)caster);
     }
 
     public static DamageSource causeShredderDamage(LivingEntity attacker) {
-        return new DamageSource((Holder)((Registry)attacker.level().registryAccess().registry(Registries.DAMAGE_TYPE).get()).getHolderOrThrow(SHREDDER), (Entity)attacker);
+        return new DamageSource((Holder)attacker.level().registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(SHREDDER), (Entity)attacker);
     }
 
     public static DamageSource causeSwordDanceDamage(LivingEntity attacker) {
-        return new DamageSource((Holder)((Registry)attacker.level().registryAccess().registry(Registries.DAMAGE_TYPE).get()).getHolderOrThrow(SWORD_DANCE), (Entity)attacker);
+        return new DamageSource((Holder)attacker.level().registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(SWORD_DANCE), (Entity)attacker);
     }
 
     public static DamageSource causeMaledictioDamage(LivingEntity attacker) {
-        return new DamageSource((Holder)((Registry)attacker.level().registryAccess().registry(Registries.DAMAGE_TYPE).get()).getHolderOrThrow(MALEDICTIO), (Entity)attacker);
+        return new DamageSource((Holder)attacker.level().registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(MALEDICTIO), (Entity)attacker);
     }
 
     public static DamageSource causeMaledictioSoulDamage(LivingEntity attacker) {
-        return new DamageSource((Holder)((Registry)attacker.level().registryAccess().registry(Registries.DAMAGE_TYPE).get()).getHolderOrThrow(MALEDICTIO_ANIMA), (Entity)attacker);
+        return new DamageSource((Holder)attacker.level().registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(MALEDICTIO_ANIMA), (Entity)attacker);
     }
 
     public static DamageSource causeMaledictioSagittaDamage(Entity attacker, Entity caster) {
-        return new DamageSource((Holder)((Registry)attacker.level().registryAccess().registry(Registries.DAMAGE_TYPE).get()).getHolderOrThrow(MALEDICTIO_SAGITTA), attacker, caster);
+        return new DamageSource((Holder)attacker.level().registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(MALEDICTIO_SAGITTA), attacker, caster);
     }
 
     public static DamageSource causeStarLanceDamage(Entity attacker, Entity caster) {
-        return new DamageSource((Holder)((Registry)attacker.level().registryAccess().registry(Registries.DAMAGE_TYPE).get()).getHolderOrThrow(STAR_LANCE), attacker, caster);
+        return new DamageSource((Holder)attacker.level().registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(STAR_LANCE), attacker, caster);
     }
 
     public static DamageSource causeMaledictioMagicaeDamage(Entity attacker, Entity caster) {
-        return new DamageSource((Holder)((Registry)attacker.level().registryAccess().registry(Registries.DAMAGE_TYPE).get()).getHolderOrThrow(MALEDICTIO_MAGICAE), attacker, caster);
+        return new DamageSource((Holder)attacker.level().registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(MALEDICTIO_MAGICAE), attacker, caster);
     }
 
     public static DamageSource causePenetrateDamage(LivingEntity attacker) {
-        return new DamageSource((Holder)((Registry)attacker.level().registryAccess().registry(Registries.DAMAGE_TYPE).get()).getHolderOrThrow(PENETRATE), (Entity)attacker);
+        return new DamageSource((Holder)attacker.level().registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(PENETRATE), (Entity)attacker);
     }
 
     public static DamageSource causeDraconicSlashMobDamage(LivingEntity attacker) {
-        return new DamageSource((Holder)((Registry)attacker.level().registryAccess().registry(Registries.DAMAGE_TYPE).get()).getHolderOrThrow(DRACONIC_SLASH), (Entity)attacker);
+        return new DamageSource((Holder)attacker.level().registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(DRACONIC_SLASH), (Entity)attacker);
     }
 
     public static DamageSource causeDraconicWoundEruptionDamage(Entity attacker, Entity caster) {
-        return new DamageSource((Holder)((Registry)attacker.level().registryAccess().registry(Registries.DAMAGE_TYPE).get()).getHolderOrThrow(DRACONIC_WOUND_ERUPTION), attacker, caster);
+        return new DamageSource((Holder)attacker.level().registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(DRACONIC_WOUND_ERUPTION), attacker, caster);
     }
 
     public static DamageSource causeLightningDamage(Entity attacker, Entity caster) {
-        return new DamageSource((Holder)((Registry)attacker.level().registryAccess().registry(Registries.DAMAGE_TYPE).get()).getHolderOrThrow(LIGHTNING), attacker, caster);
+        return new DamageSource((Holder)attacker.level().registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(LIGHTNING), attacker, caster);
     }
 
     public static DamageSource causeLightningMobDamage(LivingEntity attacker) {
-        return new DamageSource((Holder)((Registry)attacker.level().registryAccess().registry(Registries.DAMAGE_TYPE).get()).getHolderOrThrow(LIGHTNING), (Entity)attacker);
+        return new DamageSource((Holder)attacker.level().registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(LIGHTNING), (Entity)attacker);
     }
 
     public static DamageSource causeStormBringerDamage(Entity attacker, Entity caster) {
-        return new DamageSource((Holder)((Registry)attacker.level().registryAccess().registry(Registries.DAMAGE_TYPE).get()).getHolderOrThrow(STORM_BRINGER), attacker, caster);
+        return new DamageSource((Holder)attacker.level().registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(STORM_BRINGER), attacker, caster);
     }
 
     public static DamageSource causeDaggerDamage(Entity attacker, Entity caster) {
-        return new DamageSource((Holder)((Registry)attacker.level().registryAccess().registry(Registries.DAMAGE_TYPE).get()).getHolderOrThrow(DAGGER), attacker, caster);
+        return new DamageSource((Holder)attacker.level().registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(DAGGER), attacker, caster);
     }
 
     public static DamageSource causePlayerCeraunusDamage(Entity attacker, Entity caster) {
-        return new DamageSource((Holder)((Registry)attacker.level().registryAccess().registry(Registries.DAMAGE_TYPE).get()).getHolderOrThrow(PLAYER_CERAUNUS), attacker, caster);
+        return new DamageSource((Holder)attacker.level().registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(PLAYER_CERAUNUS), attacker, caster);
     }
 
     public static DamageSource causeFlameStrikeDamage(Entity attacker, Entity caster) {
-        return new DamageSource((Holder)((Registry)attacker.level().registryAccess().registry(Registries.DAMAGE_TYPE).get()).getHolderOrThrow(FLAME_STRIKE), attacker, caster);
+        return new DamageSource((Holder)attacker.level().registryAccess().lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(FLAME_STRIKE), attacker, caster);
     }
 }
 

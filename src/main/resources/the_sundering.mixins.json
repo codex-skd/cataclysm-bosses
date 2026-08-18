@@ -4,8 +4,33 @@
   "package": "com.skd.thesundering.mixin",
   "compatibilityLevel": "JAVA_25",
   "refmap": "the_sundering.refmap.json",
-  "mixins": [],
-  "client": [],
+  "mixins": [
+    "FoodDataMixin",
+    "ItemMixin",
+    "LivingEntityMixin",
+    "NoBasaltColumnsInStructuresMixin",
+    "NoDeltasInStructuresMixin",
+    "NoGeodeInStructuresMixin",
+    "NoLakesInStructuresMixin",
+    "NoMagmaBlockInStructuresMixin",
+    "NoMultifaceGrowthFeatureInStructuresMixin",
+    "NoOreInStructuresMixin",
+    "NoteBlockInstrumentMixin",
+    "NoteBlockMixin",
+    "accessor.BeardifierAccessor",
+    "accessor.BoundingBoxAccessor",
+    "accessor.FeaturePoolElementAccessor",
+    "accessor.ListPoolElementAccessor",
+    "accessor.LivingEntityRendererAccessor",
+    "accessor.SinglePoolElementAccessor",
+    "accessor.StructureManagerAccessor",
+    "accessor.StructureProcessorAccessor",
+    "accessor.StructureTemplatePoolAccessor"
+  ],
+  "client": [
+    "Client.HumanoidArmorLayerMixin",
+    "Client.HumanoidModelMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }

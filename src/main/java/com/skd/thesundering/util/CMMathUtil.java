@@ -80,11 +80,11 @@ public class CMMathUtil {
     }
 
     public static Optional<Vec3> readVec3(CompoundTag tag, String key) {
-        ListTag listTag = tag.getList(key, 6);
-        if (listTag.size() == 3) {
-            double x = listTag.getDouble(0);
-            double y = listTag.getDouble(1);
-            double z = listTag.getDouble(2);
+        ListTag listTag = tag.getList(key).orElse(null);
+        if (listTag != null && listTag.size() == 3) {
+            double x = listTag.getDoubleOr(0, 0.0);
+            double y = listTag.getDoubleOr(1, 0.0);
+            double z = listTag.getDoubleOr(2, 0.0);
             return Optional.of(new Vec3(x, y, z));
         }
         return Optional.empty();
@@ -92,9 +92,9 @@ public class CMMathUtil {
 
     public static ListTag writeVec3(Vec3 pos) {
         ListTag listTag = new ListTag();
-        listTag.add((Object)DoubleTag.valueOf((double)pos.x));
-        listTag.add((Object)DoubleTag.valueOf((double)pos.y));
-        listTag.add((Object)DoubleTag.valueOf((double)pos.z));
+        listTag.add(0, DoubleTag.valueOf((double)pos.x));
+        listTag.add(1, DoubleTag.valueOf((double)pos.y));
+        listTag.add(2, DoubleTag.valueOf((double)pos.z));
         return listTag;
     }
 
