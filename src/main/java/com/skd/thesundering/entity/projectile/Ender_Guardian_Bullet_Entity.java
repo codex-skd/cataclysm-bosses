@@ -203,14 +203,5 @@ extends AbstractHurtingProjectile {
     public boolean canBeCollidedWith() {
         return false;
     }
-
-    public boolean hurt(DamageSource source, float amount) {
-        if (!this.level().isClientSide() && this.fired) {
-            this.playSound(SoundEvents.SHULKER_BULLET_HURT, 1.0f, 1.0f);
-            ((ServerLevel)this.level()).sendParticles((ParticleOptions)ParticleTypes.CRIT, this.getX(), this.getY(), this.getZ(), 15, 0.2, 0.2, 0.2, 0.0);
-            this.discard();
-        }
-        return true;
-    }
 }
 

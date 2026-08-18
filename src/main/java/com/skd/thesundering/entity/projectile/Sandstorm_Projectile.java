@@ -315,9 +315,6 @@ extends Projectile {
         return 1.0f;
     }
 
-    public boolean hurt(DamageSource p_37616_, float p_37617_) {
-        return false;
-    }
 
     public Packet<ClientGamePacketListener> getAddEntityPacket() {
         Entity entity = this.getOwner();

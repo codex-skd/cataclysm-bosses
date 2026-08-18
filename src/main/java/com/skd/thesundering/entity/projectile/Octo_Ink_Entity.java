@@ -112,9 +112,9 @@ extends Projectile {
 
     public void recreateFromPacket(ClientboundAddEntityPacket packet) {
         super.recreateFromPacket(packet);
-        double d0 = packet.getXa();
-        double d1 = packet.getYa();
-        double d2 = packet.getZa();
+        double d0 = vec3.x();
+        double d1 = vec3.y();
+        double d2 = vec3.z();
         for (int i = 0; i < 7; ++i) {
             double d3 = 0.4 + 0.1 * (double)i;
             this.level().addParticle((ParticleOptions)ParticleTypes.SQUID_INK, this.getX(), this.getY(), this.getZ(), d0 * d3, d1, d2 * d3);
