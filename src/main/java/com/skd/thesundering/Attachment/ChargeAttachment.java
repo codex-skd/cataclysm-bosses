@@ -35,13 +35,15 @@ public class ChargeAttachment {
                 checks.remove(entity);
                 if (!checks.isEmpty()) {
                     Wall_Watcher_Entity watchEntity = new Wall_Watcher_Entity(entity.level(), entity.blockPosition(), temp, this.effectiveChargeTime, this.knockbackSpeedIndex, this.damagePerEffectiveCharge, this.dx, this.dz, entity);
-                    List impact = entity.level().getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox().inflate(3.5, 0.75, 3.5));
+                    List<LivingEntity> impact = entity.level().getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox().inflate(3.5, 0.75, 3.5));
                     impact.remove(entity);
                     for (LivingEntity target : impact) {
                         if (target.isAlliedTo((Entity)entity)) continue;
-                        boolean flag = target.hurt(entity.damageSources().mobProjectile((Entity)entity, entity), this.damagePerEffectiveCharge * (float)this.effectiveChargeTime);
+                        // Entity.hurt(...) returns void in 26.2.0.45-beta (was boolean) -- no
+                        // longer tells us whether the hit actually connected, so the sound now
+                        // plays unconditionally instead of being gated on a success flag.
+                        target.hurt(entity.damageSources().mobProjectile((Entity)entity, entity), this.damagePerEffectiveCharge * (float)this.effectiveChargeTime);
                         watchEntity.watch(target);
-                        if (!flag) continue;
                         target.playSound(SoundEvents.ANVIL_LAND, 1.5f, 0.8f);
                     }
                     entity.level().addFreshEntity((Entity)watchEntity);

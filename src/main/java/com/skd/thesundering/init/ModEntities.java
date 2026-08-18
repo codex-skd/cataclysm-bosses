@@ -153,7 +153,7 @@ import net.neoforged.neoforge.event.entity.RegisterSpawnPlacementsEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-@EventBusSubscriber(modid="cataclysm", bus=EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid="the_sundering", bus=EventBusSubscriber.Bus.MOD)
 public class ModEntities {
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPE = DeferredRegister.create((Registry)BuiltInRegistries.ENTITY_TYPE, (String)"cataclysm");
     public static final DeferredHolder<EntityType<?>, EntityType<Ender_Golem_Entity>> ENDER_GOLEM = ENTITY_TYPE.register("ender_golem", () -> EntityType.Builder.of(Ender_Golem_Entity::new, (MobCategory)MobCategory.MONSTER).sized(2.5f, 3.5f).fireImmune().build("cataclysm:ender_golem"));
