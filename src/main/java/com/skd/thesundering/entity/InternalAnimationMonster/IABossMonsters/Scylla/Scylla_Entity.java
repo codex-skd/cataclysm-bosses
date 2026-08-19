@@ -2080,11 +2080,6 @@ extends IABoss_monster {
     }
 
     @Override
-    public boolean removeWhenFarAway(double p_21542_) {
-        return false;
-    }
-
-    @Override
     protected boolean shouldDespawnInPeaceful() {
         return false;
     }
@@ -2975,7 +2970,6 @@ extends IABoss_monster {
                     motion = new Vec3(0.0, motion.y, 0.0);
                 }
                 this.entity.setDeltaMovement(motion);
-                this.entity.hasImpulse = true;
             }
         }
 

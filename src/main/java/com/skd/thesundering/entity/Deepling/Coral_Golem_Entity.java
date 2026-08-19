@@ -29,7 +29,7 @@
  *  net.minecraft.world.entity.EntityType
  *  net.minecraft.world.entity.LivingEntity
  *  net.minecraft.world.entity.Mob
- *  net.minecraft.world.entity.MobSpawnType
+ *  MobSpawnType
  *  net.minecraft.world.entity.MoverType
  *  net.minecraft.world.entity.PathfinderMob
  *  net.minecraft.world.entity.ai.attributes.AttributeSupplier$Builder
@@ -81,7 +81,7 @@ import com.skd.thesundering.world.data.CMWorldData;
 import com.skd.nautilusapi.server.animation.Animation;
 import com.skd.nautilusapi.server.animation.AnimationHandler;
 import java.util.EnumSet;
-import javax.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
@@ -104,7 +104,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -121,6 +120,7 @@ import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.util.DefaultRandomPos;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -144,9 +144,9 @@ implements ISemiAquatic {
     public static final Animation CORAL_GOLEM_RIGHT_SMASH = Animation.create((int)36);
     public static final int LEAP_ATTACK_COOLDOWN = 160;
     private int leap_attack_cooldown = 0;
-    private static final EntityDataAccessor<Boolean> GOLEMSWIM = SynchedEntityData.defineId(Coral_Golem_Entity.class, (EntityDataSerializer)EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> GOLEMSWIM = SynchedEntityData.defineId(Coral_Golem_Entity.class, EntityDataSerializers.BOOLEAN);
 
-    public Coral_Golem_Entity(EntityType entity, Level world) {
+    public Coral_Golem_Entity(EntityType<?> entity, Level world) {
         super(entity, world);
         this.xpReward = 15;
         this.moveControl = new GolemMoveControl(this, 2.0f);
@@ -162,20 +162,20 @@ implements ISemiAquatic {
 
     protected void registerGoals() {
         super.registerGoals();
-        this.goalSelector.addGoal(5, (Goal)new GolemGoToBeachGoal(this, 1.0));
-        this.goalSelector.addGoal(6, (Goal)new GolemSwimUpGoal(this, 1.0, this.level().getSeaLevel()));
-        this.goalSelector.addGoal(4, (Goal)new MobAIFindWater((PathfinderMob)this, 1.0));
-        this.goalSelector.addGoal(4, (Goal)new MobAILeaveWater((PathfinderMob)this));
+        this.goalSelector.addGoal(5, new GolemGoToBeachGoal(this, 1.0));
+        this.goalSelector.addGoal(6, new GolemSwimUpGoal(this, 1.0, this.level().getSeaLevel()));
+        this.goalSelector.addGoal(4, new MobAIFindWater(this, 1.0));
+        this.goalSelector.addGoal(4, new MobAILeaveWater(this));
         this.goalSelector.addGoal(0, new AttackAnimationGoal1<Coral_Golem_Entity>(this, CORAL_GOLEM_LEFT_SMASH, 16, true));
         this.goalSelector.addGoal(0, new AttackAnimationGoal1<Coral_Golem_Entity>(this, CORAL_GOLEM_RIGHT_SMASH, 16, true));
-        this.goalSelector.addGoal(0, (Goal)new Leap(this, CORAL_GOLEM_LEAP));
+        this.goalSelector.addGoal(0, new Leap(this, CORAL_GOLEM_LEAP));
         this.goalSelector.addGoal(0, new SimpleAnimationGoal<Coral_Golem_Entity>(this, CORAL_GOLEM_SMASH));
-        this.goalSelector.addGoal(2, (Goal)new CmAttackGoal((PathfinderMob)this, 1.0));
-        this.goalSelector.addGoal(7, (Goal)new RandomStrollGoal((PathfinderMob)this, 1.0));
-        this.goalSelector.addGoal(6, (Goal)new LookAtPlayerGoal((Mob)this, Player.class, 8.0f));
-        this.goalSelector.addGoal(6, (Goal)new RandomLookAroundGoal((Mob)this));
-        this.targetSelector.addGoal(1, (Goal)new HurtByTargetGoal((PathfinderMob)this, new Class[0]).setAlertOthers(new Class[0]));
-        this.targetSelector.addGoal(2, (Goal)new NearestAttackableTargetGoal((Mob)this, Player.class, true));
+        this.goalSelector.addGoal(2, new CmAttackGoal(this, 1.0));
+        this.goalSelector.addGoal(7, new RandomStrollGoal(this, 1.0));
+        this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 8.0f));
+        this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
+        this.targetSelector.addGoal(1, new HurtByTargetGoal(this, new Class[0]).setAlertOthers(new Class[0]));
+        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal(this, Player.class, true));
     }
 
     public static AttributeSupplier.Builder coralgolem() {
@@ -189,7 +189,7 @@ implements ISemiAquatic {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(GOLEMSWIM, (Object)false);
+        p_326229_.define(GOLEMSWIM, false);
     }
 
     public void addAdditionalSaveData(CompoundTag compound) {
@@ -248,10 +248,10 @@ implements ISemiAquatic {
             this.switchNavigator(true);
         }
         if (flag1 = this.canInFluidType(this.getEyeInFluidType())) {
-            if (this.level().noCollision((Entity)this, this.getBoundingBox()) && !this.getSwim()) {
+            if (this.level().noCollision(this, this.getBoundingBox()) && !this.getSwim()) {
                 this.setSwim(true);
             }
-        } else if (this.level().noCollision((Entity)this, this.getBoundingBox()) && this.getSwim()) {
+        } else if (this.level().noCollision(this, this.getBoundingBox()) && this.getSwim()) {
             this.setSwim(false);
         }
         if (this.leap_attack_cooldown > 0) {
@@ -259,10 +259,10 @@ implements ISemiAquatic {
         }
         LivingEntity target = this.getTarget();
         if (this.isAlive() && target != null && target.isAlive()) {
-            if (!this.getSwim() && this.leap_attack_cooldown <= 0 && !this.isNoAi() && this.getAnimation() == NO_ANIMATION && target.onGround() && this.random.nextInt(25) == 0 && this.distanceTo((Entity)target) <= 15.0f) {
+            if (!this.getSwim() && this.leap_attack_cooldown <= 0 && !this.isNoAi() && this.getAnimation() == NO_ANIMATION && target.onGround() && this.random.nextInt(25) == 0 && this.distanceTo(target) <= 15.0f) {
                 this.leap_attack_cooldown = 160;
                 this.setAnimation(CORAL_GOLEM_LEAP);
-            } else if (this.distanceTo((Entity)target) < 3.75f && !this.isNoAi() && this.getAnimation() == NO_ANIMATION) {
+            } else if (this.distanceTo(target) < 3.75f && !this.isNoAi() && this.getAnimation() == NO_ANIMATION) {
                 Animation animation = Coral_Golem_Entity.getRandomAttack(this.random);
                 this.setAnimation(animation);
             }
@@ -319,7 +319,7 @@ implements ISemiAquatic {
         double extraX = radius * Mth.sin((float)((float)(Math.PI + (double)angle)));
         double extraZ = radius * Mth.cos((float)angle);
         Vec3 vec3 = this.getPassengerRidingPosition(p_289537_);
-        Vec3 vec31 = p_289537_.getVehicleAttachmentPoint((Entity)this);
+        Vec3 vec31 = p_289537_.getVehicleAttachmentPoint(this);
         double px = vec3.x - vec31.x + extraX;
         double pz = vec3.z - vec31.z + extraZ;
         p_289541_.accept(p_289537_, px, this.getY(0.65), pz);
@@ -334,7 +334,7 @@ implements ISemiAquatic {
         ScreenShake_Entity.ScreenShake(this.level(), this.position(), 10.0f, 0.15f, 0, 20);
         this.playSound((SoundEvent)ModSounds.EXPLOSION.get(), 0.5f, 1.0f + this.getRandom().nextFloat() * 0.1f);
         for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate((double)grow))) {
-            if (this.isAlliedTo((Entity)entity) || entity instanceof Coral_Golem_Entity || entity == this) continue;
+            if (this.isAlliedTo(entity) || entity instanceof Coral_Golem_Entity || entity == this) continue;
             entity.hurt(this.damageSources().mobAttack((LivingEntity)this), (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) + (float)this.random.nextInt(damage));
             this.launch(entity, true);
         }
@@ -360,14 +360,14 @@ implements ISemiAquatic {
         e.push(d0 / d2 * (double)f, huge ? 0.5 : (double)0.2f, d1 / d2 * (double)f);
     }
 
-    public boolean isAlliedTo(Entity entityIn) {
+    public boolean isAlliedTo(@Nullable Entity entityIn) {
         if (entityIn == this) {
             return true;
         }
         if (super.isAlliedTo(entityIn)) {
             return true;
         }
-        if (entityIn.getType().is(ModTag.TEAM_THE_LEVIATHAN)) {
+        if (entityIn != null && entityIn.getType().is(ModTag.TEAM_THE_LEVIATHAN)) {
             return this.getTeam() == null && entityIn.getTeam() == null;
         }
         return false;
@@ -387,7 +387,7 @@ implements ISemiAquatic {
 
     private boolean canInFluidType(FluidType type) {
         NeoForgeMod.WATER_TYPE.value();
-        return type.canSwim((Entity)this.self());
+        return type.canSwim(this);
     }
 
     public boolean isVisuallySwimming() {
@@ -396,20 +396,20 @@ implements ISemiAquatic {
 
     public void switchNavigator(boolean onLand) {
         if (onLand) {
-            this.navigation = new GroundPathNavigatorWide((Mob)this, this.level());
+            this.navigation = new GroundPathNavigatorWide(this, this.level());
             this.isLandNavigator = true;
         } else {
-            this.navigation = new SemiAquaticPathNavigator((Mob)this, this.level());
+            this.navigation = new SemiAquaticPathNavigator(this, this.level());
             this.isLandNavigator = false;
         }
     }
 
     public boolean getSwim() {
-        return (Boolean)this.entityData.get(GOLEMSWIM);
+        return this.entityData.get(GOLEMSWIM);
     }
 
     public void setSwim(boolean swim) {
-        this.entityData.set(GOLEMSWIM, (Object)swim);
+        this.entityData.set(GOLEMSWIM, swim);
     }
 
     public boolean isPushedByFluid() {
@@ -437,7 +437,7 @@ implements ISemiAquatic {
     }
 
     protected BodyRotationControl createBodyControl() {
-        return new SmartBodyHelper2((Mob)this);
+        return new SmartBodyHelper2(this);
     }
 
     protected boolean closeToNextPos() {
@@ -457,7 +457,7 @@ implements ISemiAquatic {
         private final float speedMulti;
 
         public GolemMoveControl(Coral_Golem_Entity p_32433_, float speedMulti) {
-            super((Mob)p_32433_);
+            super(p_32433_);
             this.drowned = p_32433_;
             this.speedMulti = speedMulti;
         }
@@ -498,7 +498,7 @@ implements ISemiAquatic {
         private final Coral_Golem_Entity drowned;
 
         public GolemGoToBeachGoal(Coral_Golem_Entity p_32409_, double p_32410_) {
-            super((PathfinderMob)p_32409_, p_32410_, 8, 2);
+            super(p_32409_, p_32410_, 8, 2);
             this.drowned = p_32409_;
         }
 
@@ -512,7 +512,7 @@ implements ISemiAquatic {
 
         protected boolean isValidTarget(LevelReader p_32413_, BlockPos p_32414_) {
             BlockPos blockpos = p_32414_.above();
-            return p_32413_.isEmptyBlock(blockpos) && p_32413_.isEmptyBlock(blockpos.above()) ? p_32413_.getBlockState(p_32414_).entityCanStandOn((BlockGetter)p_32413_, p_32414_, (Entity)this.drowned) : false;
+            return p_32413_.isEmptyBlock(blockpos) && p_32413_.isEmptyBlock(blockpos.above()) ? p_32413_.getBlockState(p_32414_).entityCanStandOn(p_32413_, p_32414_, this.drowned) : false;
         }
 
         public void start() {
@@ -548,7 +548,7 @@ implements ISemiAquatic {
 
         public void tick() {
             if (this.drowned.getY() < (double)(this.seaLevel - 1) && (this.drowned.getNavigation().isDone() || this.drowned.closeToNextPos())) {
-                Vec3 vec3 = DefaultRandomPos.getPosTowards((PathfinderMob)this.drowned, (int)4, (int)8, (Vec3)new Vec3(this.drowned.getX(), (double)(this.seaLevel - 1), this.drowned.getZ()), (double)1.5707963705062866);
+                Vec3 vec3 = DefaultRandomPos.getPosTowards(this.drowned, 4, 8, new Vec3(this.drowned.getX(), (double)(this.seaLevel - 1), this.drowned.getZ()), (double)1.5707963705062866);
                 if (vec3 == null) {
                     this.stuck = true;
                     return;
@@ -580,8 +580,8 @@ implements ISemiAquatic {
         public void tick() {
             LivingEntity target = this.drowned.getTarget();
             if (target != null) {
-                this.drowned.lookAt((Entity)target, 30.0f, 30.0f);
-                this.drowned.getLookControl().setLookAt((Entity)target, 30.0f, 30.0f);
+                this.drowned.lookAt(target, 30.0f, 30.0f);
+                this.drowned.getLookControl().setLookAt(target, 30.0f, 30.0f);
                 if (this.drowned.getAnimationTick() == 22) {
                     double d0 = target.getX() - this.drowned.getX();
                     double d1 = target.getY() - this.drowned.getY();

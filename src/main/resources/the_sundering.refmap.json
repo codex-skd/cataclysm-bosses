@@ -1,3 +1,25 @@
 {
-  "mappings": {}
+  "FoodDataMixin": "net.minecraft.world.food.FoodData",
+  "ItemMixin": "net.minecraft.world.item.Item",
+  "LivingEntityMixin": "net.minecraft.world.entity.LivingEntity",
+  "NoBasaltColumnsInStructuresMixin": "net.minecraft.world.level.levelgen.feature.BasaltColumnsFeature",
+  "NoDeltasInStructuresMixin": "net.minecraft.world.level.levelgen.feature.DeltaFeature",
+  "NoGeodeInStructuresMixin": "net.minecraft.world.level.levelgen.feature.GeodeFeature",
+  "NoLakesInStructuresMixin": "net.minecraft.world.level.levelgen.feature.LakeFeature",
+  "NoMagmaBlockInStructuresMixin": "net.minecraft.world.level.levelgen.feature.MagmaBlockFeature",
+  "NoMultifaceGrowthFeatureInStructuresMixin": "net.minecraft.world.level.levelgen.feature.MultifaceGrowthFeature",
+  "NoOreInStructuresMixin": "net.minecraft.world.level.levelgen.feature.OreFeature",
+  "NoteBlockInstrumentMixin": "net.minecraft.world.level.block.NoteBlock",
+  "NoteBlockMixin": "net.minecraft.world.level.block.NoteBlock",
+  "accessor.BeardifierAccessor": "net.minecraft.world.level.levelgen.structure.pieces.Beardifier",
+  "accessor.BoundingBoxAccessor": "net.minecraft.world.level.levelgen.structure.BoundingBox",
+  "accessor.FeaturePoolElementAccessor": "net.minecraft.world.level.levelgen.structure.pools.FeaturePoolElement",
+  "accessor.ListPoolElementAccessor": "net.minecraft.world.level.levelgen.structure.pools.ListPoolElement",
+  "accessor.LivingEntityRendererAccessor": "net.minecraft.client.renderer.entity.LivingEntityRenderer",
+  "accessor.SinglePoolElementAccessor": "net.minecraft.world.level.levelgen.structure.pools.SinglePoolElement",
+  "accessor.StructureManagerAccessor": "net.minecraft.world.level.levelgen.structure.StructureManager",
+  "accessor.StructureProcessorAccessor": "net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor",
+  "accessor.StructureTemplatePoolAccessor": "net.minecraft.world.level.levelgen.structure.pools.StructureTemplatePool",
+  "Client.HumanoidArmorLayerMixin": "net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer",
+  "Client.HumanoidModelMixin": "net.minecraft.client.model.HumanoidModel"
 }

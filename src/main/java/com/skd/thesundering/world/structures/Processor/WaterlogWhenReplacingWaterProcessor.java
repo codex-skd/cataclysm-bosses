@@ -44,30 +44,30 @@ extends StructureProcessor {
     private WaterlogWhenReplacingWaterProcessor() {
     }
 
-    public StructureTemplate.StructureBlockInfo processBlock(LevelReader levelReader, BlockPos pos, BlockPos pos2, StructureTemplate.StructureBlockInfo infoIn1, StructureTemplate.StructureBlockInfo infoIn2, StructurePlaceSettings settings) {
-        if (infoIn2.state().hasProperty((Property)BlockStateProperties.WATERLOGGED)) {
+    public StructureTemplate.StructureBlockInfo processBlock(LevelReader levelReader, BlockPos pos, BlockPos pos2, BlockPos pos3, StructureTemplate.StructureBlockInfo infoIn, StructurePlaceSettings settings) {
+        if (infoIn.state().hasProperty((Property)BlockStateProperties.WATERLOGGED)) {
             WorldGenRegion worldGenRegion;
-            if (levelReader instanceof WorldGenRegion && !(worldGenRegion = (WorldGenRegion)levelReader).getCenter().equals((Object)new ChunkPos(infoIn2.pos()))) {
-                return infoIn2;
+            if (levelReader instanceof WorldGenRegion && !(worldGenRegion = (WorldGenRegion)levelReader).getCenter().equals((Object)new ChunkPos(infoIn.pos()))) {
+                return infoIn;
             }
-            BlockState blockState = levelReader.getChunk(infoIn2.pos()).getBlockState(infoIn2.pos());
+            BlockState blockState = levelReader.getChunk(infoIn.pos()).getBlockState(infoIn.pos());
             boolean isWater = blockState.getFluidState().is(FluidTags.WATER);
             if (isWater) {
-                ChunkAccess chunk = levelReader.getChunk(infoIn2.pos());
+                ChunkAccess chunk = levelReader.getChunk(infoIn.pos());
                 int minY = chunk.getMinBuildHeight();
                 int maxY = chunk.getMaxBuildHeight();
-                int currentY = infoIn2.pos().getY();
+                int currentY = infoIn.pos().getY();
                 if (currentY >= minY && currentY <= maxY) {
-                    ((LevelAccessor)levelReader).scheduleTick(infoIn2.pos(), infoIn2.state().getBlock(), 0);
+                    ((LevelAccessor)levelReader).scheduleTick(infoIn.pos(), infoIn.state().getBlock(), 0);
                 }
             }
-            return new StructureTemplate.StructureBlockInfo(infoIn2.pos(), (BlockState)infoIn2.state().setValue((Property)BlockStateProperties.WATERLOGGED, (Comparable)Boolean.valueOf(isWater)), infoIn2.nbt());
+            return new StructureTemplate.StructureBlockInfo(infoIn.pos(), (BlockState)infoIn.state().setValue((Property)BlockStateProperties.WATERLOGGED, (Comparable)Boolean.valueOf(isWater)), infoIn.nbt());
         }
-        return infoIn2;
+        return infoIn;
     }
 
-    protected StructureProcessorType<?> getType() {
-        return (StructureProcessorType)ModStructureProcessor.WATERLOGGING_WHEN_REPLACING_WATER_PROCESSOR.get();
+    protected StructureProcessorType getType() {
+        return ModStructureProcessor.WATERLOGGING_WHEN_REPLACING_WATER_PROCESSOR.get();
     }
 }
 

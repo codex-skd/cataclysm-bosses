@@ -22,7 +22,7 @@
  *  net.minecraft.world.entity.EquipmentSlot
  *  net.minecraft.world.entity.LivingEntity
  *  net.minecraft.world.entity.Mob
- *  net.minecraft.world.entity.MobSpawnType
+ *  MobSpawnType
  *  net.minecraft.world.entity.MoverType
  *  net.minecraft.world.entity.PathfinderMob
  *  net.minecraft.world.entity.SpawnGroupData
@@ -61,7 +61,6 @@ import com.skd.thesundering.init.ModEntities;
 import com.skd.thesundering.init.ModSounds;
 import com.skd.nautilusapi.server.animation.Animation;
 import java.util.EnumSet;
-import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -80,7 +79,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.SpawnGroupData;
@@ -95,6 +93,7 @@ import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.navigation.WaterBoundPathNavigation;
 import net.minecraft.world.entity.ai.util.DefaultRandomPos;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
@@ -107,6 +106,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 public class Deepling_Angler_Entity
 extends AbstractDeepling {
@@ -117,7 +117,7 @@ extends AbstractDeepling {
     private int hugcooldown = 100;
     public static final int HUG_COOLDOWN = 100;
 
-    public Deepling_Angler_Entity(EntityType entity, Level world) {
+    public Deepling_Angler_Entity(EntityType<?> entity, Level world) {
         super(entity, world);
         this.moveControl = new DeeplingMoveControl(this, 2.0f);
         this.switchNavigator(false);
@@ -127,10 +127,10 @@ extends AbstractDeepling {
     @Override
     protected void registerGoals() {
         super.registerGoals();
-        this.goalSelector.addGoal(5, (Goal)new DeeplingGoToBeachGoal(this, 1.0));
-        this.goalSelector.addGoal(6, (Goal)new DeeplingSwimUpGoal(this, 1.0, this.level().getSeaLevel()));
-        this.targetSelector.addGoal(1, (Goal)new HurtByTargetGoal((PathfinderMob)this, new Class[0]).setAlertOthers(new Class[0]));
-        this.goalSelector.addGoal(3, (Goal)new AnimationMeleeAttackGoal(this, 1.0, false));
+        this.goalSelector.addGoal(5, new DeeplingGoToBeachGoal(this, 1.0));
+        this.goalSelector.addGoal(6, new DeeplingSwimUpGoal(this, 1.0, this.level().getSeaLevel()));
+        this.targetSelector.addGoal(1, new HurtByTargetGoal(this, new Class[0]).setAlertOthers(new Class[0]));
+        this.goalSelector.addGoal(3, new AnimationMeleeAttackGoal(this, 1.0, false));
     }
 
     public static AttributeSupplier.Builder deepling() {
@@ -143,7 +143,7 @@ extends AbstractDeepling {
     }
 
     protected PathNavigation createNavigation(Level worldIn) {
-        return new WaterBoundPathNavigation((Mob)this, worldIn);
+        return new WaterBoundPathNavigation(this, worldIn);
     }
 
     @Override
@@ -185,7 +185,7 @@ extends AbstractDeepling {
         SpawnGroupData spawngroupdata = super.finalizeSpawn(p_34088_, p_34089_, p_34090_, p_34091_);
         RandomSource randomsource = p_34088_.getRandom();
         this.populateDefaultEquipmentSlots(randomsource, p_34089_);
-        Lionfish_Entity drowned = (Lionfish_Entity)((EntityType)ModEntities.LIONFISH.get()).create(this.level());
+        Lionfish_Entity drowned = (Lionfish_Entity)ModEntities.LIONFISH.get().create(this.level());
         drowned.finalizeSpawn(p_34088_, p_34089_, p_34090_, p_34091_);
         drowned.copyPosition((Entity)this);
         drowned.setLeashedTo((Entity)this, true);
@@ -217,14 +217,14 @@ extends AbstractDeepling {
             float damage;
             if (this.getAnimation() == DEEPLING_MELEE && this.getAnimationTick() == 5) {
                 this.playSound((SoundEvent)ModSounds.DEEPLING_SWING.get(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
-                if (target != null && this.distanceTo((Entity)target) < 3.0f) {
+                if (target != null && this.distanceTo(target) < 3.0f) {
                     damage = (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE);
                     target.hurt(this.damageSources().mobAttack((LivingEntity)this), damage);
                 }
             }
             if (this.getAnimation() == DEEPLING_HUG && this.getAnimationTick() == 9) {
                 this.playSound((SoundEvent)ModSounds.DEEPLING_SWING.get(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
-                if (target != null && this.distanceTo((Entity)target) < 3.0f) {
+                if (target != null && this.distanceTo(target) < 3.0f) {
                     damage = (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE);
                     boolean flag = target.hurt(this.damageSources().mobAttack((LivingEntity)this), damage);
                     if (flag) {
@@ -291,7 +291,7 @@ extends AbstractDeepling {
         private final float speedMulti;
 
         public DeeplingMoveControl(Deepling_Angler_Entity p_32433_, float speedMulti) {
-            super((Mob)p_32433_);
+            super(p_32433_);
             this.drowned = p_32433_;
             this.speedMulti = speedMulti;
         }
@@ -332,7 +332,7 @@ extends AbstractDeepling {
         private final Deepling_Angler_Entity drowned;
 
         public DeeplingGoToBeachGoal(Deepling_Angler_Entity p_32409_, double p_32410_) {
-            super((PathfinderMob)p_32409_, p_32410_, 8, 2);
+            super(p_32409_, p_32410_, 8, 2);
             this.drowned = p_32409_;
         }
 
@@ -346,7 +346,7 @@ extends AbstractDeepling {
 
         protected boolean isValidTarget(LevelReader p_32413_, BlockPos p_32414_) {
             BlockPos blockpos = p_32414_.above();
-            return p_32413_.isEmptyBlock(blockpos) && p_32413_.isEmptyBlock(blockpos.above()) ? p_32413_.getBlockState(p_32414_).entityCanStandOn((BlockGetter)p_32413_, p_32414_, (Entity)this.drowned) : false;
+            return p_32413_.isEmptyBlock(blockpos) && p_32413_.isEmptyBlock(blockpos.above()) ? p_32413_.getBlockState(p_32414_).entityCanStandOn(p_32413_, p_32414_, this.drowned) : false;
         }
 
         public void start() {
@@ -382,7 +382,7 @@ extends AbstractDeepling {
 
         public void tick() {
             if (this.drowned.getY() < (double)(this.seaLevel - 1) && (this.drowned.getNavigation().isDone() || this.drowned.closeToNextPos())) {
-                Vec3 vec3 = DefaultRandomPos.getPosTowards((PathfinderMob)this.drowned, (int)4, (int)8, (Vec3)new Vec3(this.drowned.getX(), (double)(this.seaLevel - 1), this.drowned.getZ()), (double)1.5707963705062866);
+                Vec3 vec3 = DefaultRandomPos.getPosTowards(this.drowned, 4, 8, new Vec3(this.drowned.getX(), (double)(this.seaLevel - 1), this.drowned.getZ()), (double)1.5707963705062866);
                 if (vec3 == null) {
                     this.stuck = true;
                     return;
@@ -406,7 +406,7 @@ extends AbstractDeepling {
         protected final Deepling_Angler_Entity mob;
 
         public AnimationMeleeAttackGoal(Deepling_Angler_Entity p_25552_, double p_25553_, boolean p_25554_) {
-            super((PathfinderMob)p_25552_, p_25553_, p_25554_);
+            super(p_25552_, p_25553_, p_25554_);
             this.mob = p_25552_;
             this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
         }

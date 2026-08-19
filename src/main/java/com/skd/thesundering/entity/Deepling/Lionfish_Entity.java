@@ -162,7 +162,6 @@ implements IAnimatedEntity {
         if (!this.isInWater() && this.onGround() && this.verticalCollision) {
             this.setDeltaMovement(this.getDeltaMovement().add((double)((this.random.nextFloat() * 2.0f - 1.0f) * 0.05f), (double)0.4f, (double)((this.random.nextFloat() * 2.0f - 1.0f) * 0.05f)));
             this.setOnGround(false);
-            this.hasImpulse = true;
             this.playSound(this.getFlopSound(), this.getSoundVolume(), this.getVoicePitch());
         }
         AnimationHandler.INSTANCE.updateAnimations((Entity)this);
@@ -255,9 +254,6 @@ implements IAnimatedEntity {
         }
     }
 
-    public boolean removeWhenFarAway(double p_219457_) {
-        return !this.isLeashedToAngler();
-    }
 
     private boolean isLeashedToAngler() {
         return this.getLeashHolder() instanceof Deepling_Angler_Entity;

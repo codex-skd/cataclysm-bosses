@@ -30,18 +30,10 @@
  */
 package com.skd.thesundering.entity.Deepling;
 
-import com.skd.thesundering.entity.AI.MobAIFindWater;
-import com.skd.thesundering.entity.AI.MobAILeaveWater;
-import com.skd.thesundering.entity.AnimationMonster.LLibrary_Monster;
-import com.skd.thesundering.entity.InternalAnimationMonster.Coralssus_Entity;
-import com.skd.thesundering.entity.etc.ISemiAquatic;
-import com.skd.thesundering.entity.etc.path.GroundPathNavigatorWide;
-import com.skd.thesundering.entity.etc.path.SemiAquaticPathNavigator;
-import com.skd.thesundering.init.ModTag;
-import java.util.List;
+
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.damagesource.DamageSource;
@@ -63,6 +55,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.fluids.FluidType;
+import org.jspecify.annotations.Nullable;
+import net.minecraft.world.entity.SpawnReason;
+import net.minecraft.world.entity.LivingEntity;
 
 public class AbstractDeepling
 extends LLibrary_Monster
@@ -73,40 +68,40 @@ Enemy {
     public float oLayerBrightness;
     public int LayerTicks;
     private boolean isLandNavigator;
-    private static final EntityDataAccessor<Integer> MOISTNESS = SynchedEntityData.defineId(AbstractDeepling.class, (EntityDataSerializer)EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Boolean> DEEPLINGSWIM = SynchedEntityData.defineId(AbstractDeepling.class, (EntityDataSerializer)EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Integer> MOISTNESS = SynchedEntityData.defineId(AbstractDeepling.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Boolean> DEEPLINGSWIM = SynchedEntityData.defineId(AbstractDeepling.class, EntityDataSerializers.BOOLEAN);
 
-    public AbstractDeepling(EntityType entity, Level world) {
+    public AbstractDeepling(EntityType<?> entity, Level world) {
         super(entity, world);
     }
 
     protected void registerGoals() {
         super.registerGoals();
-        this.goalSelector.addGoal(4, (Goal)new MobAIFindWater((PathfinderMob)this, 1.0));
-        this.goalSelector.addGoal(4, (Goal)new MobAILeaveWater((PathfinderMob)this));
-        this.goalSelector.addGoal(7, (Goal)new RandomStrollGoal((PathfinderMob)this, 1.0));
-        this.goalSelector.addGoal(5, (Goal)new RidingCoralssus(this));
-        this.goalSelector.addGoal(3, (Goal)new StopRiding(this));
-        this.goalSelector.addGoal(6, (Goal)new LookAtPlayerGoal((Mob)this, Player.class, 8.0f));
-        this.goalSelector.addGoal(6, (Goal)new RandomLookAroundGoal((Mob)this));
-        this.targetSelector.addGoal(2, (Goal)new NearestAttackableTargetGoal((Mob)this, Player.class, true));
+        this.goalSelector.addGoal(4, new MobAIFindWater(this, 1.0));
+        this.goalSelector.addGoal(4, new MobAILeaveWater(this));
+        this.goalSelector.addGoal(7, new RandomStrollGoal(this, 1.0));
+        this.goalSelector.addGoal(5, new RidingCoralssus(this));
+        this.goalSelector.addGoal(3, new StopRiding(this));
+        this.goalSelector.addGoal(6, new LookAtPlayerGoal(this, Player.class, 8.0f));
+        this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
+        this.targetSelector.addGoal(2, new NearestAttackableTargetGoal(this, Player.class, true));
     }
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(MOISTNESS, (Object)40000);
-        p_326229_.define(DEEPLINGSWIM, (Object)false);
+        p_326229_.define(MOISTNESS, 40000);
+        p_326229_.define(DEEPLINGSWIM, false);
     }
 
-    public boolean isAlliedTo(Entity entityIn) {
+    public boolean isAlliedTo(@Nullable Entity entityIn) {
         if (entityIn == this) {
             return true;
         }
         if (super.isAlliedTo(entityIn)) {
             return true;
         }
-        if (entityIn.getType().is(ModTag.TEAM_THE_LEVIATHAN)) {
+        if (entityIn != null && entityIn.getType().is(ModTag.TEAM_THE_LEVIATHAN)) {
             return this.getTeam() == null && entityIn.getTeam() == null;
         }
         return false;
@@ -123,7 +118,7 @@ Enemy {
         }
         if (this.isNoAi()) {
             this.setAirSupply(this.getMaxAirSupply());
-        } else if (this.isInWaterRainOrBubble()) {
+        } else if (this.isInWaterOrRain()) {
             this.setMoistness(6000);
         } else {
             int dry = this.level().isDay() ? 2 : 1;
@@ -133,16 +128,16 @@ Enemy {
                 this.moistureAttackTime = 20;
             }
         }
-        boolean flag1 = this.canInFluidType(this.getEyeInFluidType());
+        boolean flag1 = this.isInWater();
         if (this.level().isClientSide()) {
             if (flag1) {
-                if (this.level().noCollision((Entity)this, this.getSwimmingBox())) {
+                if (this.level().noCollision(this, this.getSwimmingBox())) {
                     if (!this.getDeeplingSwim()) {
                         this.setDeeplingSwim(true);
                     }
                     this.refreshDimensions();
                 }
-            } else if (this.level().noCollision((Entity)this, this.getNormalBox())) {
+            } else if (this.level().noCollision(this, this.getNormalBox())) {
                 if (this.getDeeplingSwim()) {
                     this.setDeeplingSwim(false);
                 }
@@ -158,7 +153,7 @@ Enemy {
 
     private boolean canInFluidType(FluidType type) {
         NeoForgeMod.WATER_TYPE.value();
-        return type.canSwim((Entity)this.self());
+        return type.canSwim(this);
     }
 
     public boolean isVisuallySwimming() {
@@ -167,19 +162,21 @@ Enemy {
 
     public void switchNavigator(boolean onLand) {
         if (onLand) {
-            this.navigation = new GroundPathNavigatorWide((Mob)this, this.level());
+            this.navigation = new GroundPathNavigatorWide(this, this.level());
             this.isLandNavigator = true;
         } else {
-            this.navigation = new SemiAquaticPathNavigator((Mob)this, this.level());
+            this.navigation = new SemiAquaticPathNavigator(this, this.level());
             this.isLandNavigator = false;
         }
     }
 
+    @Override
     public boolean hurt(DamageSource source, float damage) {
         if (source.is(DamageTypes.HOT_FLOOR)) {
             return false;
         }
-        return super.hurt(source, damage);
+        super.hurt(source, damage);
+        return true;
     }
 
     public void onInsideBubbleColumn(boolean p_20322_) {
@@ -204,30 +201,34 @@ Enemy {
         return this.getDeeplingSwim() ? this.getSwimmingSize() : this.getType().getDimensions().scale(this.getScale());
     }
 
-    public void addAdditionalSaveData(CompoundTag compound) {
-        super.addAdditionalSaveData(compound);
-        compound.putInt("Moisture", this.getMoistness());
+    @Override
+    protected void addAdditionalSaveData(ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.putInt("Moisture", this.getMoistness());
     }
 
-    public void readAdditionalSaveData(CompoundTag compound) {
-        super.readAdditionalSaveData(compound);
-        this.setMoistness(compound.getInt("Moisture"));
+    @Override
+    protected void readAdditionalSaveData(ValueInput input) {
+        super.readAdditionalSaveData(input);
+        if (input.has("Moisture")) {
+            this.setMoistness(input.getInt("Moisture").orElse(40000));
+        }
     }
 
     public int getMoistness() {
-        return (Integer)this.entityData.get(MOISTNESS);
+        return this.entityData.get(MOISTNESS);
     }
 
     public void setMoistness(int p_211137_1_) {
-        this.entityData.set(MOISTNESS, (Object)p_211137_1_);
+        this.entityData.set(MOISTNESS, p_211137_1_);
     }
 
     public boolean getDeeplingSwim() {
-        return (Boolean)this.entityData.get(DEEPLINGSWIM);
+        return this.entityData.get(DEEPLINGSWIM);
     }
 
     public void setDeeplingSwim(boolean swim) {
-        this.entityData.set(DEEPLINGSWIM, (Object)swim);
+        this.entityData.set(DEEPLINGSWIM, swim);
     }
 
     public boolean isPushedByFluid() {
@@ -254,8 +255,9 @@ Enemy {
         return 32;
     }
 
+    @Override
     protected AABB getAttackBoundingBox() {
-        AABB aabb = super.getAttackBoundingBox();
+        AABB aabb = this.getBoundingBox();
         return aabb.deflate(0.05, 0.0, 0.05);
     }
 
@@ -275,16 +277,16 @@ Enemy {
         public void start() {
             Coralssus_Entity sus = this.getClosestCoralssus_Entity();
             if (sus != null) {
-                this.drowned.getNavigation().moveTo((Entity)sus, 1.0);
+                this.drowned.getNavigation().moveTo(sus, 1.0);
             }
         }
 
         public void tick() {
             Coralssus_Entity sus = this.getClosestCoralssus_Entity();
             if (sus != null) {
-                this.drowned.getNavigation().moveTo((Entity)sus, 1.0);
-                if (this.drowned.distanceTo((Entity)sus) < 4.0f) {
-                    this.drowned.startRiding((Entity)sus, true);
+                this.drowned.getNavigation().moveTo(sus, 1.0);
+                if (this.drowned.distanceTo(sus) < 4.0f) {
+                    this.drowned.startRiding(sus);
                 }
             }
         }
@@ -294,11 +296,11 @@ Enemy {
         }
 
         private Coralssus_Entity getClosestCoralssus_Entity() {
-            List list = this.drowned.level().getEntitiesOfClass(Coralssus_Entity.class, this.drowned.getBoundingBox().inflate(15.0, 15.0, 15.0));
+            List<Coralssus_Entity> list = this.drowned.level().getEntitiesOfClass(Coralssus_Entity.class, this.drowned.getBoundingBox().inflate(15.0, 15.0, 15.0));
             Coralssus_Entity closest = null;
             if (!list.isEmpty()) {
                 for (Coralssus_Entity entity : list) {
-                    if (closest != null && !(closest.distanceTo((Entity)entity) > entity.distanceTo((Entity)entity))) continue;
+                    if (closest != null && !(closest.distanceTo(entity) > entity.distanceTo(entity))) continue;
                     closest = entity;
                 }
             }

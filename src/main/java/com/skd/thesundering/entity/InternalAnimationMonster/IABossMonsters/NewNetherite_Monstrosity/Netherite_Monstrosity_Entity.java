@@ -1221,11 +1221,6 @@ extends IABoss_monster {
     }
 
     @Override
-    public boolean removeWhenFarAway(double p_21542_) {
-        return false;
-    }
-
-    @Override
     protected boolean shouldDespawnInPeaceful() {
         return false;
     }

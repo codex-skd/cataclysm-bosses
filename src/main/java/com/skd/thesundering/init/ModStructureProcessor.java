@@ -18,7 +18,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public final class ModStructureProcessor {
-    public static final DeferredRegister<StructureProcessorType<?>> STRUCTURE_PROCESSOR = DeferredRegister.create((ResourceKey)Registries.STRUCTURE_PROCESSOR, (String)"cataclysm");
-    public static final DeferredHolder<StructureProcessorType<?>, StructureProcessorType<WaterlogWhenReplacingWaterProcessor>> WATERLOGGING_WHEN_REPLACING_WATER_PROCESSOR = STRUCTURE_PROCESSOR.register("waterlogging_when_replacing_water_processor", () -> () -> WaterlogWhenReplacingWaterProcessor.CODEC);
+    public static final DeferredRegister<StructureProcessorType> STRUCTURE_PROCESSOR = DeferredRegister.create((ResourceKey)Registries.STRUCTURE_PROCESSOR, (String)"cataclysm");
+    public static final DeferredHolder<StructureProcessorType, StructureProcessorType> WATERLOGGING_WHEN_REPLACING_WATER_PROCESSOR = STRUCTURE_PROCESSOR.register("waterlogging_when_replacing_water_processor", () -> () -> WaterlogWhenReplacingWaterProcessor.CODEC);
 }
 
