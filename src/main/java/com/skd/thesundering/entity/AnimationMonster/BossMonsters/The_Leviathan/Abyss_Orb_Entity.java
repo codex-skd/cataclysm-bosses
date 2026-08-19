@@ -326,9 +326,10 @@ extends Projectile {
 
     public void recreateFromPacket(ClientboundAddEntityPacket p_150128_) {
         super.recreateFromPacket(p_150128_);
-        double d0 = p_150128_.getXa();
-        double d1 = p_150128_.getYa();
-        double d2 = p_150128_.getZa();
+        Vec3 movement = p_150128_.getMovement();
+        double d0 = movement.x;
+        double d1 = movement.y;
+        double d2 = movement.z;
         double d3 = Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
         if (d3 != 0.0) {
             this.xPower = d0 / d3 * 0.1;

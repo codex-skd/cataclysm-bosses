@@ -21,7 +21,7 @@
  *  net.minecraft.world.entity.EntityType
  *  net.minecraft.world.entity.EquipmentSlot
  *  net.minecraft.world.entity.LivingEntity
- *  net.minecraft.world.entity.MobSpawnType
+ *  MobSpawnType
  *  net.minecraft.world.entity.MoverType
  *  net.minecraft.world.entity.PathfinderMob
  *  net.minecraft.world.entity.SpawnGroupData
@@ -54,7 +54,6 @@ import com.skd.thesundering.world.data.CMWorldData;
 import com.skd.nautilusapi.server.animation.Animation;
 import com.skd.nautilusapi.server.animation.IAnimatedEntity;
 import java.util.EnumSet;
-import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -71,7 +70,6 @@ import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.SpawnGroupData;
@@ -81,6 +79,7 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
@@ -89,6 +88,7 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 public class Deepling_Warlock_Entity
 extends AbstractDeepling {
@@ -99,7 +99,7 @@ extends AbstractDeepling {
     public static final int LIGHT_COOLDOWN = 400;
     private static final EntityDimensions SWIMMING_SIZE = EntityDimensions.fixed((float)1.15f, (float)0.6f);
 
-    public Deepling_Warlock_Entity(EntityType entity, Level world) {
+    public Deepling_Warlock_Entity(EntityType<?> entity, Level world) {
         super(entity, world);
         this.switchNavigator(false);
         this.xpReward = 10;
@@ -108,10 +108,10 @@ extends AbstractDeepling {
     @Override
     protected void registerGoals() {
         super.registerGoals();
-        this.goalSelector.addGoal(0, (Goal)new MagicTrackingGoal(this, DEEPLING_MAGIC));
-        this.goalSelector.addGoal(2, (Goal)new DeeplingMagicGoal(this));
-        this.targetSelector.addGoal(1, (Goal)new HurtByTargetGoal((PathfinderMob)this, new Class[0]).setAlertOthers(new Class[0]));
-        this.goalSelector.addGoal(3, (Goal)new AnimationMeleeAttackGoal(this, 1.0, false));
+        this.goalSelector.addGoal(0, new MagicTrackingGoal(this, DEEPLING_MAGIC));
+        this.goalSelector.addGoal(2, new DeeplingMagicGoal(this));
+        this.targetSelector.addGoal(1, new HurtByTargetGoal(this, new Class[0]).setAlertOthers(new Class[0]));
+        this.goalSelector.addGoal(3, new AnimationMeleeAttackGoal(this, 1.0, false));
     }
 
     public static AttributeSupplier.Builder deeplingwarlock() {
@@ -236,7 +236,7 @@ extends AbstractDeepling {
         public void start() {
             LivingEntity target = this.warlock.getTarget();
             if (target != null) {
-                this.warlock.getLookControl().setLookAt((Entity)target, 30.0f, 30.0f);
+                this.warlock.getLookControl().setLookAt(target, 30.0f, 30.0f);
             }
             super.start();
         }
@@ -244,7 +244,7 @@ extends AbstractDeepling {
         public void tick() {
             LivingEntity target = this.warlock.getTarget();
             if (target != null) {
-                this.warlock.getLookControl().setLookAt((Entity)target, 30.0f, 30.0f);
+                this.warlock.getLookControl().setLookAt(target, 30.0f, 30.0f);
                 if (this.warlock.getAnimationTick() == 18) {
                     double sx = this.warlock.getX();
                     double sy = this.warlock.getY();
@@ -267,7 +267,7 @@ extends AbstractDeepling {
 
         public boolean canUse() {
             LivingEntity target = this.angler.getTarget();
-            return this.angler.lightcooldown <= 0 && this.angler.getAnimation() == IAnimatedEntity.NO_ANIMATION && target != null && this.angler.distanceToSqr((Entity)target) >= 25.0 && target.isAlive() && this.angler.getRandom().nextFloat() * 100.0f < 12.0f;
+            return this.angler.lightcooldown <= 0 && this.angler.getAnimation() == IAnimatedEntity.NO_ANIMATION && target != null && this.angler.distanceToSqr(target) >= 25.0 && target.isAlive() && this.angler.getRandom().nextFloat() * 100.0f < 12.0f;
         }
 
         public void start() {
@@ -287,7 +287,7 @@ extends AbstractDeepling {
         protected final Deepling_Warlock_Entity mob;
 
         public AnimationMeleeAttackGoal(Deepling_Warlock_Entity p_25552_, double p_25553_, boolean p_25554_) {
-            super((PathfinderMob)p_25552_, p_25553_, p_25554_);
+            super(p_25552_, p_25553_, p_25554_);
             this.mob = p_25552_;
             this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
         }

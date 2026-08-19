@@ -423,10 +423,6 @@ implements NeutralMob {
         return this.despawnTime;
     }
 
-    @Override
-    public boolean removeWhenFarAway(double p_21542_) {
-        return super.removeWhenFarAway(p_21542_) && this.despawnTime >= 0;
-    }
 
     @Nullable
     public UUID getPersistentAngerTarget() {

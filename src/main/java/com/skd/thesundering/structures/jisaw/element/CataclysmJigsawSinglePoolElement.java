@@ -66,8 +66,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import javax.annotation.ParametersAreNonnullByDefault;
-import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Vec3i;
@@ -95,7 +94,6 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplateManager;
 
 @ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
 public class CataclysmJigsawSinglePoolElement
 extends CataclysmJigsawPoolElement {
     private static final Codec<Either<Identifier, StructureTemplate>> TEMPLATE_CODEC = Codec.of(CataclysmJigsawSinglePoolElement::encodeTemplate, (Decoder)Identifier.CODEC.map(Either::left));

@@ -45,7 +45,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Optional;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;

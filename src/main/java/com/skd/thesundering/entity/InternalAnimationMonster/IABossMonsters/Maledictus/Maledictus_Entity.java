@@ -382,7 +382,6 @@ implements IHoldEntity {
                 Vec3 m = Maledictus_Entity.this.getDeltaMovement().add((double)speed * Math.cos(dodgeYaw), 0.0, (double)speed * Math.sin(dodgeYaw));
                 Maledictus_Entity.this.playSound((SoundEvent)ModSounds.MALEDICTUS_JUMP.get(), 1.0f, 1.0f);
                 Maledictus_Entity.this.setDeltaMovement(m.x, 0.4, m.z);
-                Maledictus_Entity.this.hasImpulse = true;
             }
 
             @Override
@@ -1692,7 +1691,6 @@ implements IHoldEntity {
                     boolean flag;
                     if (this.isAlliedTo((Entity)entity) || entity == this || !(flag = entity.hurt(damageSource, finalDamage = baseDamage + Math.min(baseDamage, entity.getMaxHealth() * hpdamage)))) continue;
                     entity.setDeltaMovement(entity.getDeltaMovement().add(0.0, (double)(airborne * (float)distance) + this.level().random.nextDouble() * 0.15, 0.0));
-                    entity.hasImpulse = true;
                 }
             }
         }
@@ -1848,7 +1846,6 @@ implements IHoldEntity {
             double d0 = entity.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE);
             double d1 = Math.max(0.0, 1.0 - d0);
             entity.setDeltaMovement(entity.getDeltaMovement().add(0.0, (double)0.4f * d1, 0.0));
-            entity.hasImpulse = true;
         }
     }
 
@@ -2120,7 +2117,6 @@ implements IHoldEntity {
                 float f = this.entity.getYRot() * ((float)Math.PI / 180);
                 Vec3 vector3d1 = new Vec3((double)(-Mth.sin((float)f)), this.entity.getDeltaMovement().y, (double)Mth.cos((float)f)).scale(0.8).add(vector3d.scale(0.8));
                 this.entity.setDeltaMovement(vector3d1.x, this.entity.getDeltaMovement().y, vector3d1.z);
-                this.entity.hasImpulse = true;
             }
         }
 
@@ -2163,7 +2159,6 @@ implements IHoldEntity {
         public void tick() {
             if (this.entity.attackTicks == 19) {
                 this.entity.setDeltaMovement(0.0, 1.2, 0.0);
-                this.entity.hasImpulse = true;
                 this.entity.setFlying(true);
             }
             this.entity.setDeltaMovement(0.0, this.entity.getDeltaMovement().y, 0.0);
@@ -2295,12 +2290,10 @@ implements IHoldEntity {
                     double d2 = target.getZ() - this.entity.getZ();
                     Vec3 vec3 = new Vec3(d0, 0.7 + Mth.clamp((double)(d1 * 0.075), (double)0.0, (double)10.0), d2).multiply(0.2, 1.0, 0.2);
                     this.entity.setDeltaMovement(vec3);
-                    this.entity.hasImpulse = true;
-                } else {
+                    } else {
                     Vec3 vec3 = new Vec3(0.0, 0.7, 0.0);
                     this.entity.setDeltaMovement(vec3);
-                    this.entity.hasImpulse = true;
-                }
+                    }
             }
         }
 
@@ -2437,11 +2430,9 @@ implements IHoldEntity {
                     }
                     double d1 = target.getY() - this.entity.getY();
                     this.entity.setDeltaMovement(x * -r, 0.9 + Mth.clamp((double)(d1 * 0.075), (double)0.0, (double)7.0), z * -r);
-                    this.entity.hasImpulse = true;
-                } else {
+                    } else {
                     this.entity.setDeltaMovement(0.0, 0.9, 0.0);
-                    this.entity.hasImpulse = true;
-                }
+                    }
                 this.entity.setFlying(true);
             }
             if (this.entity.attackTicks == 20) {
@@ -2531,11 +2522,9 @@ implements IHoldEntity {
                 if (target != null) {
                     double d1 = target.getY() - this.entity.getY();
                     this.entity.setDeltaMovement(0.0, 0.9 + Mth.clamp((double)(d1 * 0.075), (double)0.0, (double)7.0), 0.0);
-                    this.entity.hasImpulse = true;
-                } else {
+                    } else {
                     this.entity.setDeltaMovement(0.0, 0.9, 0.0);
-                    this.entity.hasImpulse = true;
-                }
+                    }
                 this.entity.setFlying(true);
             }
             if (this.entity.attackTicks == this.attackstrike) {
@@ -2545,8 +2534,7 @@ implements IHoldEntity {
                     double Z = (double)0.1f * (target.getZ() - this.entity.getZ());
                     double X = (double)0.1f * (target.getX() - this.entity.getX());
                     this.entity.setDeltaMovement(this.entity.getDeltaMovement().add(X, -1.0 * Y, Z));
-                    this.entity.hasImpulse = true;
-                }
+                    }
             }
         }
 
@@ -2618,7 +2606,6 @@ implements IHoldEntity {
                 Vec3 m = this.entity.getDeltaMovement().add((double)speed * Math.cos(dodgeYaw), 0.0, (double)speed * Math.sin(dodgeYaw));
                 this.entity.playSound((SoundEvent)ModSounds.MALEDICTUS_JUMP.get(), 1.0f, 1.0f);
                 this.entity.setDeltaMovement(m.x, 0.4, m.z);
-                this.entity.hasImpulse = true;
             }
         }
 
@@ -2716,7 +2703,6 @@ implements IHoldEntity {
                 float dodgeYaw = (float)Math.toRadians(this.entity.getYRot() + 90.0f);
                 Vec3 m = this.entity.getDeltaMovement().add((double)speed * Math.cos(dodgeYaw), 0.0, (double)speed * Math.sin(dodgeYaw));
                 this.entity.setDeltaMovement(m.x, 0.4, m.z);
-                this.entity.hasImpulse = true;
             }
         }
 

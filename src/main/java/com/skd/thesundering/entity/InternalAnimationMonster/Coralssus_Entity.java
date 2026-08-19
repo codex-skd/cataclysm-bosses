@@ -695,10 +695,6 @@ ISemiAquatic {
         return p_34192_.getEffect() != ModEffect.EFFECTSTUN && p_34192_.getEffect() != ModEffect.EFFECTABYSSAL_CURSE.get() && super.canBeAffected(p_34192_);
     }
 
-    public boolean removeWhenFarAway(double p_21542_) {
-        return false;
-    }
-
     protected boolean shouldDespawnInPeaceful() {
         return false;
     }

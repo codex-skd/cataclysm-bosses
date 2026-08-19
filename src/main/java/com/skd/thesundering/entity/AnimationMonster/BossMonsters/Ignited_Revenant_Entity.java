@@ -480,7 +480,6 @@ extends LLibrary_Boss_Monster {
             if (target != null && target.getEyeY() > ((Ignited_Revenant_Entity)this.entity).getEyeY() + (double)((Ignited_Revenant_Entity)this.entity).allowedHeightOffset && ((Ignited_Revenant_Entity)this.entity).canAttack(target)) {
                 Vec3 vec3 = ((Ignited_Revenant_Entity)this.entity).getDeltaMovement();
                 ((Ignited_Revenant_Entity)this.entity).setDeltaMovement(((Ignited_Revenant_Entity)this.entity).getDeltaMovement().add(0.0, ((double)0.3f - vec3.y) * (double)0.3f, 0.0));
-                ((Ignited_Revenant_Entity)this.entity).hasImpulse = true;
             }
         }
     }

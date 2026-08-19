@@ -24,7 +24,7 @@
  *  net.minecraft.world.entity.EquipmentSlot
  *  net.minecraft.world.entity.LivingEntity
  *  net.minecraft.world.entity.Mob
- *  net.minecraft.world.entity.MobSpawnType
+ *  MobSpawnType
  *  net.minecraft.world.entity.MoverType
  *  net.minecraft.world.entity.PathfinderMob
  *  net.minecraft.world.entity.SpawnGroupData
@@ -57,7 +57,6 @@ import com.skd.thesundering.world.data.CMWorldData;
 import com.skd.nautilusapi.server.animation.Animation;
 import com.skd.nautilusapi.server.animation.IAnimatedEntity;
 import java.util.EnumSet;
-import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -77,7 +76,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.SpawnGroupData;
@@ -89,6 +87,7 @@ import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.navigation.WaterBoundPathNavigation;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
@@ -97,6 +96,7 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 public class Deepling_Priest_Entity
 extends AbstractDeepling {
@@ -107,7 +107,7 @@ extends AbstractDeepling {
     public static final int LIGHT_COOLDOWN = 200;
     private static final EntityDimensions SWIMMING_SIZE = EntityDimensions.fixed((float)1.15f, (float)0.6f);
 
-    public Deepling_Priest_Entity(EntityType entity, Level world) {
+    public Deepling_Priest_Entity(EntityType<?> entity, Level world) {
         super(entity, world);
         this.switchNavigator(false);
         this.xpReward = 10;
@@ -116,9 +116,9 @@ extends AbstractDeepling {
     @Override
     protected void registerGoals() {
         super.registerGoals();
-        this.goalSelector.addGoal(2, (Goal)new DeeplingLightGoal(this));
-        this.targetSelector.addGoal(1, (Goal)new HurtByTargetGoal((PathfinderMob)this, new Class[0]).setAlertOthers(new Class[0]));
-        this.goalSelector.addGoal(3, (Goal)new AnimationMeleeAttackGoal(this, 1.0, false));
+        this.goalSelector.addGoal(2, new DeeplingLightGoal(this));
+        this.targetSelector.addGoal(1, new HurtByTargetGoal(this, new Class[0]).setAlertOthers(new Class[0]));
+        this.goalSelector.addGoal(3, new AnimationMeleeAttackGoal(this, 1.0, false));
     }
 
     public static AttributeSupplier.Builder deeplingpriest() {
@@ -131,7 +131,7 @@ extends AbstractDeepling {
     }
 
     protected PathNavigation createNavigation(Level worldIn) {
-        return new WaterBoundPathNavigation((Mob)this, worldIn);
+        return new WaterBoundPathNavigation(this, worldIn);
     }
 
     @Override
@@ -200,7 +200,7 @@ extends AbstractDeepling {
         Vec3 Vector3d1 = new Vec3(seen.getX() - looker.getX(), seen.getBoundingBox().minY + (double)seen.getEyeHeight() - (looker.getY() + (double)looker.getEyeHeight()), seen.getZ() - looker.getZ());
         double d0 = Vector3d1.length();
         double d1 = Vector3d.dot(Vector3d1 = Vector3d1.normalize());
-        return d1 > 1.0 - (degree *= 1.0 + (double)looker.distanceTo((Entity)seen) * 0.1) / d0 && looker.hasLineOfSight((Entity)seen);
+        return d1 > 1.0 - (degree *= 1.0 + (double)looker.distanceTo(seen) * 0.1) / d0 && looker.hasLineOfSight(seen);
     }
 
     @Override
@@ -213,7 +213,7 @@ extends AbstractDeepling {
         if (this.isAlive()) {
             if (this.getAnimation() == DEEPLING_MELEE && this.getAnimationTick() == 5) {
                 this.playSound((SoundEvent)ModSounds.DEEPLING_SWING.get(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
-                if (target != null && this.distanceTo((Entity)target) < 3.0f) {
+                if (target != null && this.distanceTo(target) < 3.0f) {
                     float damage = (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE);
                     target.hurt(this.damageSources().mobAttack((LivingEntity)this), damage);
                 }
@@ -225,7 +225,7 @@ extends AbstractDeepling {
                 if (this.getAnimationTick() > 18 && this.getAnimationTick() < 47) {
                     for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(7.0))) {
                         boolean flag;
-                        if (this.isAlliedTo((Entity)entity) || entity == this || !this.isEntityLookingAt(entity, (LivingEntity)this, 0.6) || !(flag = entity.hurt(this.damageSources().indirectMagic((Entity)this, (Entity)this), (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) * 0.7f))) continue;
+                        if (this.isAlliedTo(entity) || entity == this || !this.isEntityLookingAt(entity, (LivingEntity)this, 0.6) || !(flag = entity.hurt(this.damageSources().indirectMagic(this, this), (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) * 0.7f))) continue;
                         entity.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 80));
                     }
                 }
@@ -267,7 +267,7 @@ extends AbstractDeepling {
 
         public boolean canUse() {
             LivingEntity target = this.angler.getTarget();
-            return this.angler.lightcooldown <= 0 && this.angler.getAnimation() == IAnimatedEntity.NO_ANIMATION && target != null && this.angler.distanceToSqr((Entity)target) <= 64.0 && target.isAlive() && this.angler.getRandom().nextFloat() * 100.0f < 12.0f;
+            return this.angler.lightcooldown <= 0 && this.angler.getAnimation() == IAnimatedEntity.NO_ANIMATION && target != null && this.angler.distanceToSqr(target) <= 64.0 && target.isAlive() && this.angler.getRandom().nextFloat() * 100.0f < 12.0f;
         }
 
         public void start() {
@@ -287,7 +287,7 @@ extends AbstractDeepling {
         protected final Deepling_Priest_Entity mob;
 
         public AnimationMeleeAttackGoal(Deepling_Priest_Entity p_25552_, double p_25553_, boolean p_25554_) {
-            super((PathfinderMob)p_25552_, p_25553_, p_25554_);
+            super(p_25552_, p_25553_, p_25554_);
             this.mob = p_25552_;
             this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
         }

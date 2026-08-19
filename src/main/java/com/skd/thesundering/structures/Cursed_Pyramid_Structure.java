@@ -64,7 +64,7 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelHeightAccessor;
 import net.minecraft.world.level.ServerLevelAccessor;
@@ -213,7 +213,7 @@ extends CataclysmStructure {
                     if (koboleton == null) break;
                     koboleton.setPersistenceRequired();
                     koboleton.moveTo(pos, 0.0f, 0.0f);
-                    koboleton.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(koboleton.blockPosition()), MobSpawnType.STRUCTURE, null);
+                    koboleton.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(koboleton.blockPosition()), EntitySpawnReason.STRUCTURE, null);
                     worldIn.addFreshEntityWithPassengers((Entity)koboleton);
                     worldIn.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
                     break;
@@ -223,7 +223,7 @@ extends CataclysmStructure {
                     if (wadjet == null) break;
                     wadjet.setPersistenceRequired();
                     wadjet.moveTo(pos, 0.0f, 0.0f);
-                    wadjet.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(wadjet.blockPosition()), MobSpawnType.STRUCTURE, null);
+                    wadjet.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(wadjet.blockPosition()), EntitySpawnReason.STRUCTURE, null);
                     worldIn.addFreshEntityWithPassengers((Entity)wadjet);
                     worldIn.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
                     break;
@@ -234,7 +234,7 @@ extends CataclysmStructure {
                     kobolediator.setPersistenceRequired();
                     kobolediator.moveTo(pos, 0.0f, 0.0f);
                     kobolediator.setSleep(true);
-                    kobolediator.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(kobolediator.blockPosition()), MobSpawnType.STRUCTURE, null);
+                    kobolediator.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(kobolediator.blockPosition()), EntitySpawnReason.STRUCTURE, null);
                     worldIn.addFreshEntityWithPassengers((Entity)kobolediator);
                     worldIn.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
                     break;
@@ -245,7 +245,7 @@ extends CataclysmStructure {
                     remnant.setNecklace(false);
                     remnant.setPersistenceRequired();
                     remnant.moveTo(pos, 0.0f, 0.0f);
-                    remnant.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(remnant.blockPosition()), MobSpawnType.STRUCTURE, null);
+                    remnant.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(remnant.blockPosition()), EntitySpawnReason.STRUCTURE, null);
                     worldIn.addFreshEntityWithPassengers((Entity)remnant);
                     worldIn.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
                 }

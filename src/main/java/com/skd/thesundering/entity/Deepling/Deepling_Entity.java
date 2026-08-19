@@ -23,7 +23,7 @@
  *  net.minecraft.world.entity.EquipmentSlot
  *  net.minecraft.world.entity.LivingEntity
  *  net.minecraft.world.entity.Mob
- *  net.minecraft.world.entity.MobSpawnType
+ *  MobSpawnType
  *  net.minecraft.world.entity.MoverType
  *  net.minecraft.world.entity.PathfinderMob
  *  net.minecraft.world.entity.SpawnGroupData
@@ -64,7 +64,6 @@ import com.skd.thesundering.init.ModSounds;
 import com.skd.nautilusapi.server.animation.Animation;
 import com.skd.nautilusapi.server.animation.IAnimatedEntity;
 import java.util.EnumSet;
-import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -83,7 +82,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.SpawnGroupData;
@@ -98,6 +96,7 @@ import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.navigation.WaterBoundPathNavigation;
 import net.minecraft.world.entity.ai.util.DefaultRandomPos;
 import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -110,6 +109,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
 public class Deepling_Entity
 extends AbstractDeepling {
@@ -118,7 +118,7 @@ extends AbstractDeepling {
     public static final Animation DEEPLING_MELEE = Animation.create((int)20);
     private static final EntityDimensions SWIMMING_SIZE = EntityDimensions.fixed((float)1.15f, (float)0.6f);
 
-    public Deepling_Entity(EntityType entity, Level world) {
+    public Deepling_Entity(EntityType<?> entity, Level world) {
         super(entity, world);
         this.moveControl = new DeeplingMoveControl(this, 2.0f);
         this.switchNavigator(false);
@@ -128,11 +128,11 @@ extends AbstractDeepling {
     @Override
     protected void registerGoals() {
         super.registerGoals();
-        this.goalSelector.addGoal(2, (Goal)new DeeplingTridentShoot(this, 0.8, 10.0f));
-        this.goalSelector.addGoal(5, (Goal)new DeeplingGoToBeachGoal(this, 1.0));
-        this.goalSelector.addGoal(6, (Goal)new DeeplingSwimUpGoal(this, 1.0, this.level().getSeaLevel()));
-        this.targetSelector.addGoal(1, (Goal)new HurtByTargetGoal((PathfinderMob)this, new Class[0]).setAlertOthers(new Class[0]));
-        this.goalSelector.addGoal(3, (Goal)new AnimationMeleeAttackGoal(this, 1.0, false));
+        this.goalSelector.addGoal(2, new DeeplingTridentShoot(this, 0.8, 10.0f));
+        this.goalSelector.addGoal(5, new DeeplingGoToBeachGoal(this, 1.0));
+        this.goalSelector.addGoal(6, new DeeplingSwimUpGoal(this, 1.0, this.level().getSeaLevel()));
+        this.targetSelector.addGoal(1, new HurtByTargetGoal(this, new Class[0]).setAlertOthers(new Class[0]));
+        this.goalSelector.addGoal(3, new AnimationMeleeAttackGoal(this, 1.0, false));
     }
 
     public static AttributeSupplier.Builder deepling() {
@@ -145,7 +145,7 @@ extends AbstractDeepling {
     }
 
     protected PathNavigation createNavigation(Level worldIn) {
-        return new WaterBoundPathNavigation((Mob)this, worldIn);
+        return new WaterBoundPathNavigation(this, worldIn);
     }
 
     @Override
@@ -209,7 +209,7 @@ extends AbstractDeepling {
         LivingEntity target = this.getTarget();
         if (this.isAlive()) {
             if (this.getAnimation() == DEEPLING_TRIDENT_THROW && target != null && this.getAnimationTick() == 11) {
-                ThrownCoral_Spear_Entity throwntrident = new ThrownCoral_Spear_Entity(this.level(), (LivingEntity)this, new ItemStack((ItemLike)ModItems.CORAL_SPEAR.get()));
+                ThrownCoral_Spear_Entity throwntrident = new ThrownCoral_Spear_Entity(this.level(), this, new ItemStack(ModItems.CORAL_SPEAR.get()));
                 double p0 = target.getX() - this.getX();
                 double p1 = target.getY(0.3333333333333333) - throwntrident.getY();
                 double p2 = target.getZ() - this.getZ();
@@ -220,7 +220,7 @@ extends AbstractDeepling {
             }
             if (this.getAnimation() == DEEPLING_MELEE && this.getAnimationTick() == 5) {
                 this.playSound((SoundEvent)ModSounds.DEEPLING_SWING.get(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
-                if (target != null && this.distanceTo((Entity)target) < 3.0f) {
+                if (target != null && this.distanceTo(target) < 3.0f) {
                     float damage = (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE);
                     target.hurt(this.damageSources().mobAttack((LivingEntity)this), damage);
                 }
@@ -274,7 +274,7 @@ extends AbstractDeepling {
         private final float speedMulti;
 
         public DeeplingMoveControl(Deepling_Entity p_32433_, float speedMulti) {
-            super((Mob)p_32433_);
+            super(p_32433_);
             this.drowned = p_32433_;
             this.speedMulti = speedMulti;
         }
@@ -331,7 +331,7 @@ extends AbstractDeepling {
 
         public boolean canUse() {
             LivingEntity livingentity = this.mob.getTarget();
-            return livingentity != null && livingentity.isAlive() && this.mob.getMainHandItem().is((Item)ModItems.CORAL_SPEAR.get()) && this.mob.distanceToSqr((Entity)livingentity) >= 36.0;
+            return livingentity != null && livingentity.isAlive() && this.mob.getMainHandItem().is(ModItems.CORAL_SPEAR.get()) && this.mob.distanceToSqr(livingentity) >= 36.0;
         }
 
         public boolean canContinueToUse() {
@@ -367,7 +367,7 @@ extends AbstractDeepling {
                     this.mob.getNavigation().stop();
                     ++this.strafingTime;
                 } else {
-                    this.mob.getNavigation().moveTo((Entity)livingentity, this.moveSpeedAmp);
+                    this.mob.getNavigation().moveTo(livingentity, this.moveSpeedAmp);
                     this.strafingTime = -1;
                 }
                 if (this.strafingTime >= 20) {
@@ -386,9 +386,9 @@ extends AbstractDeepling {
                         this.strafingBackwards = true;
                     }
                     this.mob.getMoveControl().strafe(this.strafingBackwards ? -0.5f : 0.5f, this.strafingClockwise ? 0.5f : -0.5f);
-                    this.mob.lookAt((Entity)livingentity, 30.0f, 30.0f);
+                    this.mob.lookAt(livingentity, 30.0f, 30.0f);
                 } else {
-                    this.mob.getLookControl().setLookAt((Entity)livingentity, 30.0f, 30.0f);
+                    this.mob.getLookControl().setLookAt(livingentity, 30.0f, 30.0f);
                 }
                 if (!flag && this.seeTime < -60) {
                     this.mob.stopUsingItem();
@@ -405,7 +405,7 @@ extends AbstractDeepling {
         private final Deepling_Entity drowned;
 
         public DeeplingGoToBeachGoal(Deepling_Entity p_32409_, double p_32410_) {
-            super((PathfinderMob)p_32409_, p_32410_, 8, 2);
+            super(p_32409_, p_32410_, 8, 2);
             this.drowned = p_32409_;
         }
 
@@ -419,7 +419,7 @@ extends AbstractDeepling {
 
         protected boolean isValidTarget(LevelReader p_32413_, BlockPos p_32414_) {
             BlockPos blockpos = p_32414_.above();
-            return p_32413_.isEmptyBlock(blockpos) && p_32413_.isEmptyBlock(blockpos.above()) ? p_32413_.getBlockState(p_32414_).entityCanStandOn((BlockGetter)p_32413_, p_32414_, (Entity)this.drowned) : false;
+            return p_32413_.isEmptyBlock(blockpos) && p_32413_.isEmptyBlock(blockpos.above()) ? p_32413_.getBlockState(p_32414_).entityCanStandOn(p_32413_, p_32414_, this.drowned) : false;
         }
 
         public void start() {
@@ -455,7 +455,7 @@ extends AbstractDeepling {
 
         public void tick() {
             if (this.drowned.getY() < (double)(this.seaLevel - 1) && (this.drowned.getNavigation().isDone() || this.drowned.closeToNextPos())) {
-                Vec3 vec3 = DefaultRandomPos.getPosTowards((PathfinderMob)this.drowned, (int)4, (int)8, (Vec3)new Vec3(this.drowned.getX(), (double)(this.seaLevel - 1), this.drowned.getZ()), (double)1.5707963705062866);
+                Vec3 vec3 = DefaultRandomPos.getPosTowards(this.drowned, 4, 8, new Vec3(this.drowned.getX(), (double)(this.seaLevel - 1), this.drowned.getZ()), (double)1.5707963705062866);
                 if (vec3 == null) {
                     this.stuck = true;
                     return;
@@ -479,7 +479,7 @@ extends AbstractDeepling {
         protected final Deepling_Entity mob;
 
         public AnimationMeleeAttackGoal(Deepling_Entity p_25552_, double p_25553_, boolean p_25554_) {
-            super((PathfinderMob)p_25552_, p_25553_, p_25554_);
+            super(p_25552_, p_25553_, p_25554_);
             this.mob = p_25552_;
             this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
         }

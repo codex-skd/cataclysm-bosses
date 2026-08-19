@@ -299,10 +299,6 @@ IHomeEntity {
         return p_34192_.getEffect().getDelegate().is(ModTag.EFFECTIVE_FOR_BOSSES) && super.canBeAffected(p_34192_);
     }
 
-    public boolean removeWhenFarAway(double p_21542_) {
-        return false;
-    }
-
     protected boolean shouldDespawnInPeaceful() {
         return false;
     }

@@ -247,9 +247,6 @@ IHomeEntity {
         return false;
     }
 
-    public boolean removeWhenFarAway(double p_21542_) {
-        return false;
-    }
 
     protected boolean shouldDespawnInPeaceful() {
         return false;

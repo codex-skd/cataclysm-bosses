@@ -59,7 +59,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Blocks;
@@ -314,7 +314,7 @@ extends Structure {
             for (Mob mob : list) {
                 mob.setPersistenceRequired();
                 mob.moveTo(pos, 0.0f, 0.0f);
-                mob.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(mob.blockPosition()), MobSpawnType.STRUCTURE, null);
+                mob.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(mob.blockPosition()), EntitySpawnReason.STRUCTURE, null);
                 worldIn.addFreshEntityWithPassengers((Entity)mob);
                 worldIn.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
             }
