@@ -1,4 +1,4 @@
-<h1 align="center">⚔️ The Sundering</h1>
+<h1 align="center">⚔️ Cataclysm Bosses</h1>
 
 <p align="center"><strong>A boss-monster mod for NeoForge.</strong></p>
 
@@ -10,7 +10,7 @@
 
 <h2>✨ Overview</h2>
 
-<p>The Sundering adds a set of powerful, elaborately-animated boss monsters and their own custom dimension to explore. It is a port of <a href="https://www.curseforge.com/minecraft/mc-mods/lendercataclysm"><strong>L_Ender's Cataclysm</strong></a> by <em>L_Ender</em> (MCL_Ender).</p>
+<p>Cataclysm Bosses adds a set of powerful, elaborately-animated boss monsters and their own custom dimension to explore. It is a port of <a href="https://www.curseforge.com/minecraft/mc-mods/lendercataclysm"><strong>L_Ender's Cataclysm</strong></a> by <em>L_Ender</em> (MCL_Ender).</p>
 
 <p>The mod is currently in early development (<code>0.0.0-beta.1</code>) — porting is in progress and no content is playable yet.</p>
 
@@ -31,7 +31,7 @@
 <ol>
 <li>Install <a href="https://neoforge.net/">NeoForge</a> for Minecraft 26.2.</li>
 <li>Install NautilusAPI and Curios API.</li>
-<li>Drop The Sundering jar into your <code>mods/</code> folder.</li>
+<li>Drop Cataclysm_Bosses jar into your <code>mods/</code> folder.</li>
 </ol>
 
 <br>
@@ -45,6 +45,7 @@
 <p>This mod is a port of <a href="https://www.curseforge.com/minecraft/mc-mods/lendercataclysm"><strong>L_Ender's Cataclysm</strong></a> by <em>L_Ender</em> (MCL_Ender).</p>
 
 <br>
+
 <br>
 
 <p align="center">

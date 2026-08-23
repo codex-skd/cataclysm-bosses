@@ -1,0 +1,151 @@
+/*
+ * Decompiled with CFR 0.152.
+ * 
+ * Could not load the following classes:
+ *  com.mojang.datafixers.kinds.App
+ *  com.mojang.datafixers.kinds.Applicative
+ *  com.mojang.serialization.Codec
+ *  com.mojang.serialization.MapCodec
+ *  com.mojang.serialization.codecs.RecordCodecBuilder
+ *  net.minecraft.core.Holder
+ *  net.minecraft.core.HolderSet
+ *  net.minecraft.core.RegistryCodecs
+ *  net.minecraft.core.Vec3i
+ *  net.minecraft.core.registries.Registries
+ *  net.minecraft.resources.ResourceKey
+ *  net.minecraft.util.ExtraCodecs
+ *  net.minecraft.util.RandomSource
+ *  net.minecraft.world.level.ChunkPos
+ *  net.minecraft.world.level.chunk.ChunkGeneratorStructureState
+ *  net.minecraft.world.level.levelgen.LegacyRandomSource
+ *  net.minecraft.world.level.levelgen.WorldgenRandom
+ *  net.minecraft.world.level.levelgen.structure.StructureSet
+ *  net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement
+ *  net.minecraft.world.level.levelgen.structure.placement.RandomSpreadType
+ *  net.minecraft.world.level.levelgen.structure.placement.StructurePlacement$ExclusionZone
+ *  net.minecraft.world.level.levelgen.structure.placement.StructurePlacement$FrequencyReductionMethod
+ *  net.minecraft.world.level.levelgen.structure.placement.StructurePlacementType
+ */
+package com.skd.cataclysmbosses.world.structures.placements;
+
+import com.skd.cataclysmbosses.init.ModStructurePlacementType;
+import com.mojang.datafixers.kinds.App;
+import com.mojang.datafixers.kinds.Applicative;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+import java.util.Optional;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.RegistryCodecs;
+import net.minecraft.core.Vec3i;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.util.ExtraCodecs;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.chunk.ChunkGeneratorStructureState;
+import net.minecraft.world.level.levelgen.LegacyRandomSource;
+import net.minecraft.world.level.levelgen.WorldgenRandom;
+import net.minecraft.world.level.levelgen.structure.StructureSet;
+import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadStructurePlacement;
+import net.minecraft.world.level.levelgen.structure.placement.RandomSpreadType;
+import net.minecraft.world.level.levelgen.structure.placement.StructurePlacement;
+import net.minecraft.world.level.levelgen.structure.placement.StructurePlacementType;
+
+public class CataclysmRandomSpread
+extends RandomSpreadStructurePlacement {
+    public static final MapCodec<CataclysmRandomSpread> CODEC = RecordCodecBuilder.mapCodec(instance -> instance.group((App)Vec3i.offsetCodec((int)16).optionalFieldOf("locate_offset", (Object)Vec3i.ZERO).forGetter(rec$ -> ((CataclysmRandomSpread)((Object)((Object)((Object)rec$)))).locateOffset()), (App)StructurePlacement.FrequencyReductionMethod.CODEC.optionalFieldOf("frequency_reduction_method", (Object)StructurePlacement.FrequencyReductionMethod.DEFAULT).forGetter(rec$ -> ((CataclysmRandomSpread)((Object)((Object)((Object)rec$)))).frequencyReductionMethod()), (App)Codec.floatRange((float)0.0f, (float)1.0f).optionalFieldOf("frequency", (Object)Float.valueOf(1.0f)).forGetter(rec$ -> Float.valueOf(((CataclysmRandomSpread)((Object)((Object)((Object)rec$)))).frequency())), (App)ExtraCodecs.NON_NEGATIVE_INT.fieldOf("salt").forGetter(rec$ -> ((CataclysmRandomSpread)((Object)((Object)((Object)rec$)))).salt()), (App)StructurePlacement.ExclusionZone.CODEC.optionalFieldOf("exclusion_zone").forGetter(rec$ -> ((CataclysmRandomSpread)((Object)((Object)((Object)rec$)))).exclusionZone()), (App)SuperExclusionZone.CODEC.optionalFieldOf("super_exclusion_zone").forGetter(CataclysmRandomSpread::superExclusionZone), (App)Codec.intRange((int)0, (int)Integer.MAX_VALUE).fieldOf("spacing").forGetter(CataclysmRandomSpread::spacing), (App)Codec.intRange((int)0, (int)Integer.MAX_VALUE).fieldOf("separation").forGetter(CataclysmRandomSpread::separation), (App)RandomSpreadType.CODEC.optionalFieldOf("spread_type", (Object)RandomSpreadType.LINEAR).forGetter(CataclysmRandomSpread::spreadType), (App)Codec.intRange((int)0, (int)Integer.MAX_VALUE).optionalFieldOf("min_distance_from_world_origin").forGetter(CataclysmRandomSpread::minDistanceFromWorldOrigin)).apply((Applicative)instance, instance.stable(CataclysmRandomSpread::new)));
+    private final int spacing;
+    private final int separation;
+    private final RandomSpreadType spreadType;
+    private final Optional<Integer> minDistanceFromWorldOrigin;
+    private final Optional<SuperExclusionZone> superExclusionZone;
+
+    public CataclysmRandomSpread(Vec3i locationOffset, StructurePlacement.FrequencyReductionMethod frequencyReductionMethod, float frequency, int salt, Optional<StructurePlacement.ExclusionZone> exclusionZone, Optional<SuperExclusionZone> superExclusionZone, int spacing, int separation, RandomSpreadType spreadType, Optional<Integer> minDistanceFromWorldOrigin) {
+        super(locationOffset, frequencyReductionMethod, frequency, salt, exclusionZone, spacing, separation, spreadType);
+        this.spacing = spacing;
+        this.separation = separation;
+        this.spreadType = spreadType;
+        this.minDistanceFromWorldOrigin = minDistanceFromWorldOrigin;
+        this.superExclusionZone = superExclusionZone;
+        if (spacing <= separation) {
+            throw new RuntimeException("    Repurposed Structures: Spacing cannot be less or equal to separation.\n    Please correct this error as there's no way to spawn this structure properly\n        Spacing: %s\n        Separation: %s.\n".formatted(spacing, separation));
+        }
+    }
+
+    public int spacing() {
+        return this.spacing;
+    }
+
+    public int separation() {
+        return this.separation;
+    }
+
+    public RandomSpreadType spreadType() {
+        return this.spreadType;
+    }
+
+    public Optional<Integer> minDistanceFromWorldOrigin() {
+        return this.minDistanceFromWorldOrigin;
+    }
+
+    public Optional<SuperExclusionZone> superExclusionZone() {
+        return this.superExclusionZone;
+    }
+
+    public boolean isStructureChunk(ChunkGeneratorStructureState chunkGeneratorStructureState, int i, int j) {
+        if (!super.isStructureChunk(chunkGeneratorStructureState, i, j)) {
+            return false;
+        }
+        return this.superExclusionZone.isEmpty() || !this.superExclusionZone.get().isPlacementForbidden(chunkGeneratorStructureState, i, j);
+    }
+
+    public ChunkPos getPotentialStructureChunk(long seed, int x, int z) {
+        int regionX = Math.floorDiv(x, this.spacing);
+        int regionZ = Math.floorDiv(z, this.spacing);
+        WorldgenRandom worldgenrandom = new WorldgenRandom((RandomSource)new LegacyRandomSource(0L));
+        worldgenrandom.setLargeFeatureWithSalt(seed, regionX, regionZ, this.salt());
+        int diff = this.spacing - this.separation;
+        int offsetX = this.spreadType.evaluate((RandomSource)worldgenrandom, diff);
+        int offsetZ = this.spreadType.evaluate((RandomSource)worldgenrandom, diff);
+        return new ChunkPos(regionX * this.spacing + offsetX, regionZ * this.spacing + offsetZ);
+    }
+
+    protected boolean isPlacementChunk(ChunkGeneratorStructureState chunkGeneratorStructureState, int x, int z) {
+        long zBlockPos;
+        long xBlockPos;
+        if (this.minDistanceFromWorldOrigin.isPresent() && (xBlockPos = (long)x * 16L) * xBlockPos + (zBlockPos = (long)z * 16L) * zBlockPos < (long)this.minDistanceFromWorldOrigin.get().intValue() * (long)this.minDistanceFromWorldOrigin.get().intValue()) {
+            return false;
+        }
+        ChunkPos chunkpos = this.getPotentialStructureChunk(chunkGeneratorStructureState.getLevelSeed(), x, z);
+        return chunkpos.x == x && chunkpos.z == z;
+    }
+
+    public StructurePlacementType<?> type() {
+        return (StructurePlacementType)ModStructurePlacementType.ADVANCED_RANDOM_SPREAD.get();
+    }
+
+    public record SuperExclusionZone(HolderSet<StructureSet> otherSet, int chunkCount, Optional<Integer> allowedChunkCount) {
+        public static final Codec<SuperExclusionZone> CODEC = RecordCodecBuilder.create(builder -> builder.group((App)RegistryCodecs.homogeneousList((ResourceKey)Registries.STRUCTURE_SET, (Codec)StructureSet.DIRECT_CODEC).fieldOf("other_set").forGetter(SuperExclusionZone::otherSet), (App)Codec.intRange((int)1, (int)Integer.MAX_VALUE).fieldOf("chunk_count").forGetter(SuperExclusionZone::chunkCount), (App)Codec.intRange((int)1, (int)Integer.MAX_VALUE).optionalFieldOf("allowed_chunk_count").forGetter(SuperExclusionZone::allowedChunkCount)).apply((Applicative)builder, SuperExclusionZone::new));
+
+        boolean isPlacementForbidden(ChunkGeneratorStructureState chunkGeneratorStructureState, int l, int j) {
+            for (Holder holder : this.otherSet) {
+                if (!chunkGeneratorStructureState.hasStructureChunkInRange(holder, l, j, this.chunkCount)) continue;
+                return true;
+            }
+            if (this.allowedChunkCount.isPresent() && this.allowedChunkCount.get() > this.chunkCount) {
+                boolean isAnyInRange = false;
+                for (Holder holder : this.otherSet) {
+                    if (!chunkGeneratorStructureState.hasStructureChunkInRange(holder, l, j, this.allowedChunkCount.get().intValue())) continue;
+                    isAnyInRange = true;
+                }
+                if (!isAnyInRange) {
+                    return false;
+                }
+            }
+            return false;
+        }
+    }
+}
+

@@ -1,0 +1,37 @@
+/*
+ * Decompiled with CFR 0.152.
+ */
+package com.skd.cataclysmbosses.Attachment;
+
+import java.util.UUID;
+
+public class TidalTentacleAttachment {
+    private UUID lastTentacle;
+    private boolean tentacle;
+    public int id;
+
+    public void setHasTentacle(boolean Tentacle) {
+        this.tentacle = Tentacle;
+    }
+
+    public boolean hasTentacle() {
+        return this.tentacle;
+    }
+
+    public void setLastTentacleID(int frozenPitch) {
+        this.id = frozenPitch;
+    }
+
+    public int getLastTentacleID() {
+        return this.id;
+    }
+
+    public void setLastTentacleUUID(UUID livingEntity) {
+        this.lastTentacle = livingEntity;
+    }
+
+    public UUID getLastTentacleUUID() {
+        return this.lastTentacle;
+    }
+}
+
