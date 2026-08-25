@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+// import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.MutableComponent;
@@ -159,17 +159,17 @@ public class CustomBossBar {
         }
         event.setIncrement(this.getVerticalIncrement());
     }
-
-    private void drawBar(GuiGraphics guiGraphics, int x, int y, BossEvent event) {
-        guiGraphics.blit(this.getBaseTexture(), x, y, 0.0f, 0.0f, this.getProgress(), this.getBaseHeight(), 256, this.getBaseTextureHeight());
-        int i = (int)(event.getProgress() * (float)(this.getProgress() + 1));
-        if (i > 0) {
-            guiGraphics.blit(this.getBaseTexture(), x, y, 0.0f, (float)this.getBaseHeight(), i, this.getBaseHeight(), 256, this.getBaseTextureHeight());
-        }
-    }
-
+//     
+//         private void drawBar(GuiGraphics guiGraphics, int x, int y, BossEvent event) {
+//             guiGraphics.blit(this.getBaseTexture(), x, y, 0.0f, 0.0f, this.getProgress(), this.getBaseHeight(), 256, this.getBaseTextureHeight());
+//             int i = (int)(event.getProgress() * (float)(this.getProgress() + 1));
+//             if (i > 0) {
+//                 guiGraphics.blit(this.getBaseTexture(), x, y, 0.0f, (float)this.getBaseHeight(), i, this.getBaseHeight(), 256, this.getBaseTextureHeight());
+//             }
+//         }
+//     
     static {
-        customBossBars.put(0, new CustomBossBar(Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/gui/boss_bar/monstrosity_bar_base.png"), Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/gui/boss_bar/monstrosity_bar_overlay.png"), 5, 16, 1, 1, -2, -2, 256, 16, 25, 182, ChatFormatting.RED));
+        customBossBars.put(0, new CustomBossBar(Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/gui/boss_bar/monstrosity_bar_base.png"), Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/gui/boss_bar/ender_guardian_bar_overlay.png"), 5, 16, 1, 1, -2, -2, 256, 16, 25, 182, ChatFormatting.RED));
         customBossBars.put(1, new CustomBossBar(Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/gui/boss_bar/ender_guardian_bar_base.png"), Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/gui/boss_bar/ender_guardian_bar_overlay.png"), 5, 16, 1, 1, -2, -2, 256, 16, 25, 182, ChatFormatting.LIGHT_PURPLE));
         customBossBars.put(2, new CustomBossBar(Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/gui/boss_bar/ignis_bar_base.png"), Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/gui/boss_bar/ignis_bar_overlay.png"), 5, 16, 1, 1, -2, -2, 256, 16, 25, 182, ChatFormatting.YELLOW));
         customBossBars.put(3, new CustomBossBar(Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/gui/boss_bar/ignis_soul_bar_base.png"), Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/gui/boss_bar/ignis_soul_bar_overlay.png"), 5, 16, 1, 1, -2, -2, 256, 16, 25, 182, ChatFormatting.DARK_AQUA));
@@ -183,4 +183,3 @@ public class CustomBossBar {
         customBossBars.put(12, new CustomBossBar(Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/gui/boss_bar/scylla_bar_base.png"), Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/gui/boss_bar/scylla_bar_overlay.png"), 5, 16, 0, 7, -7, -8, 256, 32, 25, 182, ChatFormatting.BLUE));
     }
 }
-

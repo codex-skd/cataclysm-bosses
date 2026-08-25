@@ -48,12 +48,17 @@ extends AbstractContainerScreen<MinistrostiyMenu> {
         p_282553_.blit(HORSE_INVENTORY_LOCATION, i + 70, j + 17, 0, this.imageHeight, this.inventoryColumns * 18, 54);
         InventoryScreen.renderEntityInInventoryFollowsMouse((GuiGraphics)p_282553_, (int)(i - 10), (int)(j + 18), (int)(i + 78), (int)(j + 70), (int)34, (float)0.0f, (float)this.xMouse, (float)this.yMouse, (LivingEntity)this.mini);
     }
-
-    public void render(GuiGraphics p_281697_, int p_282103_, int p_283529_, float p_283079_) {
-        this.xMouse = p_282103_;
-        this.yMouse = p_283529_;
-        super.render(p_281697_, p_282103_, p_283529_, p_283079_);
-        this.renderTooltip(p_281697_, p_282103_, p_283529_);
-    }
+//             int i = (this.width - this.imageWidth) / 2;
+//             int j = (this.height - this.imageHeight) / 2;
+//             p_282553_.blit(HORSE_INVENTORY_LOCATION, i, j, 0, 0, this.imageWidth, this.imageHeight);
+//             p_282553_.blit(HORSE_INVENTORY_LOCATION, i + 70, j + 17, 0, this.imageHeight, this.inventoryColumns * 18, 54);
+//             InventoryScreen.renderEntityInInventoryFollowsMouse((GuiGraphics)p_282553_, (int)(i - 10), (int)(j + 18), (int)(i + 78), (int)(j + 70), (int)34, (float)0.0f, (float)this.xMouse, (float)this.yMouse, (LivingEntity)this.mini);
+//         }
+//     
+//         public void render(GuiGraphics p_281697_, int p_282103_, int p_283529_, float p_283079_) {
+//             this.xMouse = p_282103_;
+//             this.yMouse = p_283529_;
+//             super.render(p_281697_, p_282103_, p_283529_, p_283079_);
+//             this.renderTooltip(p_281697_, p_282103_, p_283529_);
+//         }
 }
-

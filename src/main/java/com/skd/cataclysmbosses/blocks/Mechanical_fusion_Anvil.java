@@ -74,9 +74,10 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class Mechanical_fusion_Anvil
 extends BaseEntityBlock {
+    public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
     public static final MapCodec<Mechanical_fusion_Anvil> CODEC = Mechanical_fusion_Anvil.simpleCodec(Mechanical_fusion_Anvil::new);
     private static final Component CONTAINER_TITLE = Component.translatable((String)"cataclysm.container.weapon_fusion");
-    public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
+    // public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
     private static final VoxelShape X_BASE = Block.box((double)1.0, (double)0.0, (double)3.0, (double)15.0, (double)3.0, (double)13.0);
     private static final VoxelShape Z_BASE = Block.box((double)3.0, (double)0.0, (double)1.0, (double)13.0, (double)3.0, (double)15.0);
     private static final VoxelShape X_LEG1 = Block.box((double)3.0, (double)3.0, (double)5.0, (double)13.0, (double)8.0, (double)11.0);
@@ -139,4 +140,3 @@ extends BaseEntityBlock {
         return Mechanical_fusion_Anvil.createTickerHelper(p_152182_, (BlockEntityType)((BlockEntityType)ModTileentites.MECHANICAL_FUSION_ANVIL.get()), Mechanical_fusion_Anvil_Block_Entity::commonTick);
     }
 }
-

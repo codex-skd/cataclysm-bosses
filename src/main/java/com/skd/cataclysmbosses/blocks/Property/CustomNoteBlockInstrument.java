@@ -45,4 +45,3 @@ public enum CustomNoteBlockInstrument {
         return NoteBlockInstrument.valueOf((String)this.name());
     }
 }
-

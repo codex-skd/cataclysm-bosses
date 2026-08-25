@@ -24,10 +24,10 @@ import net.minecraft.client.animation.AnimationChannel;
 import net.minecraft.client.animation.AnimationDefinition;
 import net.minecraft.client.animation.Keyframe;
 import net.minecraft.client.animation.KeyframeAnimations;
-import net.minecraft.client.model.HierarchicalModel;
+// import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.AnimationState;
+// import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
@@ -44,16 +44,16 @@ public class AnimationUtils {
         return new Vec3((double)(f3 * f4), (double)(-f5), (double)(f2 * f4));
     }
 
-    public static void animateAmplitude(HierarchicalModel<?> model, AnimationState anim, AnimationDefinition animDef, float tick, float speed, float amplitude) {
-        anim.updateTime(tick, speed);
-        anim.ifStarted(p_233392_ -> KeyframeAnimations.animate((HierarchicalModel)model, (AnimationDefinition)animDef, (long)p_233392_.getAccumulatedTime(), (float)amplitude, (Vector3f)ANIMATION_VECTOR_CACHE));
-    }
-
-    public static void animateWalkAmplitude(HierarchicalModel<?> model, AnimationDefinition animDef, float limbSwing, float limbSwingAmount, float speed, float amplitude) {
-        long i = (long)(limbSwing * 50.0f * speed);
-        float f = limbSwingAmount * amplitude;
-        KeyframeAnimations.animate(model, (AnimationDefinition)animDef, (long)i, (float)f, (Vector3f)ANIMATION_VECTOR_CACHE);
-    }
+//         public static void animateAmplitude(HierarchicalModel<?> model, AnimationState anim, AnimationDefinition animDef, float tick, float speed, float amplitude) {
+//             anim.updateTime(tick, speed);
+//             anim.ifStarted(p_233392_ -> KeyframeAnimations.animate((HierarchicalModel)model, (AnimationDefinition)animDef, (long)p_233392_.getAccumulatedTime(), (float)amplitude, (Vector3f)ANIMATION_VECTOR_CACHE));
+//         }
+//     
+//         public static void animateWalkAmplitude(HierarchicalModel<?> model, AnimationDefinition animDef, float limbSwing, float limbSwingAmount, float speed, float amplitude) {
+//             long i = (long)(limbSwing * 50.0f * speed);
+//             float f = limbSwingAmount * amplitude;
+//             KeyframeAnimations.animate(model, (AnimationDefinition)animDef, (long)i, (float)f, (Vector3f)ANIMATION_VECTOR_CACHE);
+//         }
 
     public static void progressPositionPrev(ModelPart model, float progress, float rotX, float rotY, float rotZ, float divisor) {
         model.x += progress * rotX / divisor;

@@ -30,8 +30,6 @@
  *  net.minecraft.world.level.block.state.BlockState
  *  net.minecraft.world.level.block.state.StateDefinition$Builder
  *  net.minecraft.world.level.block.state.properties.BlockStateProperties
- *  net.minecraft.world.level.block.state.properties.BooleanProperty
- *  net.minecraft.world.level.block.state.properties.DirectionProperty
  *  net.minecraft.world.level.block.state.properties.DripstoneThickness
  *  net.minecraft.world.level.block.state.properties.EnumProperty
  *  net.minecraft.world.level.block.state.properties.Property
@@ -76,7 +74,7 @@ import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-// import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DripstoneThickness;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.Property;
@@ -94,9 +92,9 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public class PointedIcicleBlock
 extends Block
 implements SimpleWaterloggedBlock {
-    // public static final DirectionProperty TIP_DIRECTION = BlockStateProperties.VERTICAL_DIRECTION;
+    public static final EnumProperty<Direction> TIP_DIRECTION = BlockStateProperties.VERTICAL_DIRECTION;
     public static final EnumProperty<DripstoneThickness> THICKNESS = BlockStateProperties.DRIPSTONE_THICKNESS;
-    // public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
+    public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
     private static final int MAX_SEARCH_LENGTH_WHEN_CHECKING_DRIP_TYPE = 11;
     private static final int DELAY_BEFORE_FALLING = 2;
     private static final float DRIP_PROBABILITY_PER_ANIMATE_TICK = 0.02f;
@@ -177,7 +175,7 @@ implements SimpleWaterloggedBlock {
     }
 
     public void tick(BlockState p_221865_, ServerLevel p_221866_, BlockPos p_221867_, RandomSource p_221868_) {
-        if (PointedIcicleBlock.isStalagmite(p_221865_) && !this.canSurvive(p_221865_, (LevelReader)p_221866_, p_221867_)) {
+        if (PointedIcicleBlock.isStalactite(p_221865_) && !this.canSurvive(p_221865_, (LevelReader)p_221866_, p_221867_)) {
             p_221866_.destroyBlock(p_221867_, true);
         } else {
             PointedIcicleBlock.spawnFallingStalactite(p_221865_, p_221866_, p_221867_);
@@ -190,7 +188,6 @@ implements SimpleWaterloggedBlock {
         }
     }
 
-    @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext p_154040_) {
         Direction direction;
         BlockPos blockpos;
@@ -298,11 +295,11 @@ implements SimpleWaterloggedBlock {
         }
     }
 
-    private static void createDripstone(LevelAccessor p_154088_, BlockPos p_154089_, Direction p_154090_, DripstoneThickness p_154091_) {
-        BlockState blockstate = (BlockState)((BlockState)((BlockState)((Block)ModBlocks.POINTED_ICICLE.get()).defaultBlockState().setValue((Property)TIP_DIRECTION, (Comparable)p_154090_)).setValue(THICKNESS, (Comparable)p_154091_)).setValue((Property)WATERLOGGED, (Comparable)Boolean.valueOf(p_154088_.getFluidState(p_154089_).getType() == Fluids.WATER));
-        p_154088_.setBlock(p_154089_, blockstate, 3);
-    }
-
+    // private static void createDripstone(LevelAccessor p_154088_, BlockPos p_154089_, Direction p_154090_, DripstoneThickness p_154091_) {
+    //         BlockState blockstate = (BlockState)((BlockState)((BlockState)((Block)ModBlocks.POINTED_ICICLE.get()).defaultBlockState().setValue((Property)TIP_DIRECTION, (Comparable)p_154090_)).setValue(THICKNESS, (Comparable)p_154091_)).setValue((Property)WATERLOGGED, (Comparable)Boolean.valueOf(p_154088_.getFluidState(p_154089_).getType() == Fluids.WATER));
+    //         p_154088_.setBlock(p_154089_, blockstate, 3);
+    //     }
+    //
     private static void createMergedTips(BlockState p_154231_, LevelAccessor p_154232_, BlockPos p_154233_) {
         BlockPos blockpos;
         BlockPos blockpos1;
@@ -313,8 +310,8 @@ implements SimpleWaterloggedBlock {
             blockpos = p_154233_;
             blockpos1 = p_154233_.below();
         }
-        PointedIcicleBlock.createDripstone(p_154232_, blockpos, Direction.DOWN, DripstoneThickness.TIP_MERGE);
-        PointedIcicleBlock.createDripstone(p_154232_, blockpos1, Direction.UP, DripstoneThickness.TIP_MERGE);
+        // PointedIcicleBlock.createDripstone(p_154232_, blockpos, Direction.DOWN, DripstoneThickness.TIP_MERGE);
+        // PointedIcicleBlock.createDripstone(p_154232_, blockpos1, Direction.UP, DripstoneThickness.TIP_MERGE);
     }
 
     @Nullable
@@ -341,22 +338,22 @@ implements SimpleWaterloggedBlock {
         return direction;
     }
 
-    private static DripstoneThickness calculateDripstoneThickness(LevelReader p_154093_, BlockPos p_154094_, Direction p_154095_, boolean p_154096_) {
-        Direction direction = p_154095_.getOpposite();
-        BlockState blockstate = p_154093_.getBlockState(p_154094_.relative(p_154095_));
-        if (PointedIcicleBlock.isPointedDripstoneWithDirection(blockstate, direction)) {
-            return !p_154096_ && blockstate.getValue(THICKNESS) != DripstoneThickness.TIP_MERGE ? DripstoneThickness.TIP : DripstoneThickness.TIP_MERGE;
-        }
-        if (!PointedIcicleBlock.isPointedDripstoneWithDirection(blockstate, p_154095_)) {
-            return DripstoneThickness.TIP;
-        }
-        DripstoneThickness dripstonethickness = (DripstoneThickness)blockstate.getValue(THICKNESS);
-        if (dripstonethickness != DripstoneThickness.TIP && dripstonethickness != DripstoneThickness.TIP_MERGE) {
-            BlockState blockstate1 = p_154093_.getBlockState(p_154094_.relative(direction));
-            return !PointedIcicleBlock.isPointedDripstoneWithDirection(blockstate1, p_154095_) ? DripstoneThickness.BASE : DripstoneThickness.MIDDLE;
-        }
-        return DripstoneThickness.FRUSTUM;
-    }
+    // private static DripstoneThickness calculateDripstoneThickness(LevelReader p_154093_, BlockPos p_154094_, Direction p_154095_, boolean p_154096_) {
+    //         Direction direction = p_154095_.getOpposite();
+    //         BlockState blockstate = p_154093_.getBlockState(p_154094_.relative(p_154095_));
+    //         if (PointedIcicleBlock.isPointedDripstoneWithDirection(blockstate, direction)) {
+    //             return !p_154096_ && blockstate.getValue(THICKNESS) != DripstoneThickness.TIP_MERGE ? DripstoneThickness.TIP : DripstoneThickness.TIP_MERGE;
+    //         }
+    //         if (!PointedIcicleBlock.isPointedDripstoneWithDirection(blockstate, p_154095_)) {
+    //             return DripstoneThickness.TIP;
+    //         }
+    //         DripstoneThickness dripstonethickness = (DripstoneThickness)blockstate.getValue(THICKNESS);
+    //         if (dripstonethickness != DripstoneThickness.TIP && dripstonethickness != DripstoneThickness.TIP_MERGE) {
+    //             BlockState blockstate1 = p_154093_.getBlockState(p_154094_.relative(direction));
+    //             return !PointedIcicleBlock.isPointedDripstoneWithDirection(blockstate1, p_154095_) ? DripstoneThickness.BASE : DripstoneThickness.MIDDLE;
+    //         }
+    //         return DripstoneThickness.FRUSTUM;
+    //     }
 
     public static boolean canDrip(BlockState p_154239_) {
         return PointedIcicleBlock.isStalactite(p_154239_) && p_154239_.getValue(THICKNESS) == DripstoneThickness.TIP && (Boolean)p_154239_.getValue((Property)WATERLOGGED) == false;
@@ -449,4 +446,3 @@ implements SimpleWaterloggedBlock {
         return !Shapes.joinIsNotEmpty((VoxelShape)REQUIRED_SPACE_TO_DRIP_THROUGH_NON_SOLID_BLOCK, (VoxelShape)voxelshape, (BooleanOp)BooleanOp.AND);
     }
 }
-

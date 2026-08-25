@@ -71,7 +71,6 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.Property;
@@ -84,7 +83,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public class Statue_Block
 extends BaseEntityBlock {
     public static final MapCodec<Statue_Block> CODEC = Statue_Block.simpleCodec(Statue_Block::new);
-    public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
+    // public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
     public static final EnumProperty<DoubleBlockHalf> HALF = BlockStateProperties.DOUBLE_BLOCK_HALF;
     protected static final VoxelShape NORTH_AABB = Block.box((double)2.0, (double)0.0, (double)6.0, (double)14.0, (double)16.0, (double)13.0);
     protected static final VoxelShape WEST_AABB = Block.box((double)6.0, (double)0.0, (double)2.0, (double)13.0, (double)16.0, (double)14.0);
