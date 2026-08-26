@@ -437,7 +437,7 @@ IHoldEntity {
     }
 
     public ItemEntity spawnAtLocation(ItemStack stack) {
-        ItemEntity itementity = this.spawnAtLocation(stack, 0.0f);
+        ItemEntity itementity = this.spawnAtLocation((ServerLevel)this.level(), stack, 0.0f);
         if (itementity != null) {
             itementity.setGlowingTag(true);
             itementity.setExtendedLifetime();
@@ -1185,7 +1185,7 @@ IHoldEntity {
                 if (target.isShiftKeyDown()) {
                     target.setShiftKeyDown(false);
                 }
-                target.startRiding((Entity)this, true);
+                target.startRiding((Entity)this, true, true);
                 AnimationHandler.INSTANCE.sendAnimationMessage((Entity)this, LEVIATHAN_TENTACLE_HOLD_BLAST);
             }
         }
@@ -2090,7 +2090,7 @@ IHoldEntity {
                 }
                 flag = true;
                 break;
-            } while ((blockpos = blockpos.above()).getY() < Math.min(((The_Leviathan_Entity)this.entity).level().getMaxBuildHeight(), ((The_Leviathan_Entity)this.entity).getBlockY() + 100) && !((The_Leviathan_Entity)this.entity).level().getBlockState(blockpos).isSolid());
+            } while ((blockpos = blockpos.above()).getY() < Math.min(((The_Leviathan_Entity)this.entity).level().getMaxY() + 1, ((The_Leviathan_Entity)this.entity).getBlockY() + 100) && !((The_Leviathan_Entity)this.entity).level().getBlockState(blockpos).isSolid());
             if (flag) {
                 ((The_Leviathan_Entity)this.entity).level().addFreshEntity((Entity)new Abyss_Blast_Portal_Entity(((The_Leviathan_Entity)this.entity).level(), x, (double)blockpos.getY() + d0 + 0.5, z, rotation, delay, (float)CMCommonConfig.Leviathan.AbyssBlastDamage, (float)CMCommonConfig.Leviathan.AbyssBlastHpDamage, (LivingEntity)this.entity));
             }

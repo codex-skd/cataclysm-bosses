@@ -82,7 +82,7 @@ extends SingleQuadParticle {
         public Particle createParticle(SimpleParticleType typeIn, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
             CustomExplodeParticle particle = new CustomExplodeParticle(worldIn, x, y, z, xSpeed, this.spriteSet);
             particle.setSpriteFromAge(this.spriteSet);
-            particle.scale(1.0f + worldIn.random.nextFloat() * 0.9f);
+            particle.scale(1.0f + worldIn.getRandom().nextFloat() * 0.9f);
             return particle;
         }
     }
@@ -98,7 +98,7 @@ extends SingleQuadParticle {
         public Particle createParticle(SimpleParticleType typeIn, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
             CustomExplodeParticle particle = new CustomExplodeParticle(worldIn, x, y, z, xSpeed, this.spriteSet);
             particle.setSpriteFromAge(this.spriteSet);
-            particle.scale(1.0f + worldIn.random.nextFloat() * 0.9f);
+            particle.scale(1.0f + worldIn.getRandom().nextFloat() * 0.9f);
             return particle;
         }
     }

@@ -583,7 +583,7 @@ implements IHoldEntity {
     }
 
     public ItemEntity spawnAtLocation(ItemStack stack) {
-        ItemEntity itementity = this.spawnAtLocation(stack, 0.0f);
+        ItemEntity itementity = this.spawnAtLocation((ServerLevel)this.level(), stack, 0.0f);
         if (itementity != null) {
             itementity.setDeltaMovement(itementity.getDeltaMovement().multiply(0.0, 1.5, 0.0));
             itementity.setGlowingTag(true);
@@ -1831,7 +1831,7 @@ implements IHoldEntity {
                 if (entityHit.isShiftKeyDown()) {
                     entityHit.setShiftKeyDown(false);
                 }
-                entityHit.startRiding((Entity)this, true);
+                entityHit.startRiding((Entity)this, true, true);
                 AnimationHandler.INSTANCE.sendAnimationMessage((Entity)this, POKED_ATTACK);
             }
         }
@@ -2075,7 +2075,7 @@ implements IHoldEntity {
                         entity.setDeltaMovement(entity.getDeltaMovement().add(x, y, z));
                         continue;
                     }
-                    entity.setDeltaMovement(entity.getDeltaMovement().add(0.0, (double)(airborne * (float)distance) + this.level().random.nextDouble() * 0.15, 0.0));
+                    entity.setDeltaMovement(entity.getDeltaMovement().add(0.0, (double)(airborne * (float)distance) + thislevel().getRandom().nextDouble() * 0.15, 0.0));
                 }
             }
         }
@@ -2127,7 +2127,7 @@ implements IHoldEntity {
                         }
                     }
                     if (!flag) continue;
-                    entity.setDeltaMovement(entity.getDeltaMovement().add(0.0, (double)airborne + this.level().random.nextDouble() * 0.15, 0.0));
+                    entity.setDeltaMovement(entity.getDeltaMovement().add(0.0, (double)airborne + thislevel().getRandom().nextDouble() * 0.15, 0.0));
                 }
             }
         }

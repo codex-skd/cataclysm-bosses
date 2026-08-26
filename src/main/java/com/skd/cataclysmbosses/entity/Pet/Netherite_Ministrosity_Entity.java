@@ -309,7 +309,7 @@ HasCustomInventoryScreen {
             for (int i = 0; i < this.miniInventory.getContainerSize(); ++i) {
                 ItemStack itemstack = this.miniInventory.getItem(i);
                 if (itemstack.isEmpty()) continue;
-                this.spawnAtLocation(itemstack, 0.0f);
+                this.spawnAtLocation((ServerLevel)this.level(), itemstack, 0.0f);
             }
         }
     }

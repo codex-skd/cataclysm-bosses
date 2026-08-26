@@ -118,7 +118,7 @@ extends Cataclysm_Weapon {
                 double extraX = caster.getX() + distance * (double)Mth.cos((float)angle);
                 double extraY = caster.getY() + (double)0.3f;
                 double extraZ = caster.getZ() + distance * (double)Mth.sin((float)angle);
-                world.addParticle((ParticleOptions)ModParticle.PHANTOM_WING_FLAME.get(), extraX, extraY, extraZ, 0.0, world.random.nextGaussian() * 0.04, 0.0);
+                world.addParticle((ParticleOptions)ModParticle.PHANTOM_WING_FLAME.get(), extraX, extraY, extraZ, 0.0, world.getRandom().nextGaussian() * 0.04, 0.0);
             }
         }
     }

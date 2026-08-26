@@ -108,7 +108,7 @@ extends BaseEntityBlock {
     private static void activate(BlockState state, Level world, BlockPos pos, Entity entity) {
         if (!((Boolean)state.getValue((Property)LIT)).booleanValue() && Sandstone_Ignite_Trap.shouldTrigger(entity)) {
             world.setBlock(pos, (BlockState)state.setValue((Property)LIT, (Comparable)Boolean.valueOf(true)), 3);
-            world.playLocalSound((double)pos.getX() + 0.5, (double)pos.getY() + 0.5, (double)pos.getZ() + 0.5, (SoundEvent)ModSounds.FLAME_TRAP.get(), SoundSource.BLOCKS, 1.0f + world.random.nextFloat(), world.random.nextFloat() * 0.7f + 0.3f, false);
+            world.playLocalSound((double)pos.getX() + 0.5, (double)pos.getY() + 0.5, (double)pos.getZ() + 0.5, (SoundEvent)ModSounds.FLAME_TRAP.get(), SoundSource.BLOCKS, 1.0f + world.getRandom().nextFloat(), world.getRandom().nextFloat() * 0.7f + 0.3f, false);
         }
     }
 

@@ -190,7 +190,7 @@ extends Monster {
         if (entity instanceof Creeper && (creeper = (Creeper)entity).canDropMobsSkull()) {
             ItemStack itemstack = new ItemStack((ItemLike)ModItems.DRAUGR_HEAD.get());
             creeper.increaseDroppedSkulls();
-            this.spawnAtLocation(itemstack);
+            this.spawnAtLocation((ServerLevel)this.level(), itemstack, 0.0f);
         }
     }
 

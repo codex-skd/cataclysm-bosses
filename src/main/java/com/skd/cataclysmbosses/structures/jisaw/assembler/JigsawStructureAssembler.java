@@ -499,7 +499,7 @@ public class JigsawStructureAssembler {
             if (y < this.levelHeightAccessor.getMinBuildHeight() + this.dimensionPadding.bottom()) {
                 return false;
             }
-            return y <= this.levelHeightAccessor.getMaxBuildHeight() - this.dimensionPadding.top();
+            return y <= this.levelHeightAccessor.getMaxY() + 1 - this.dimensionPadding.top();
         }
     }
 }

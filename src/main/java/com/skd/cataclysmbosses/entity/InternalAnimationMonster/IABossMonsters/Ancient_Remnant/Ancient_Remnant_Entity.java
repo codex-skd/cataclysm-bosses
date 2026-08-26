@@ -324,7 +324,7 @@ extends IABoss_monster {
     }
 
     public ItemEntity spawnAtLocation(ItemStack stack) {
-        ItemEntity itementity = this.spawnAtLocation(stack, 0.0f);
+        ItemEntity itementity = this.spawnAtLocation((ServerLevel)this.level(), stack, 0.0f);
         if (itementity != null) {
             itementity.setGlowingTag(true);
             itementity.setExtendedLifetime();
@@ -1918,7 +1918,7 @@ extends IABoss_monster {
                 if (this.entity.level().isEmptyBlock(blockpos) || (voxelshape = (blockstate1 = this.entity.level().getBlockState(blockpos)).getCollisionShape((BlockGetter)this.entity.level(), blockpos)).isEmpty()) break;
                 d0 = voxelshape.max(Direction.Axis.Y);
                 break;
-            } while ((blockpos = blockpos.above()).getY() < Math.min(this.entity.level().getMaxBuildHeight(), this.entity.getBlockY() + 20));
+            } while ((blockpos = blockpos.above()).getY() < Math.min(this.entity.level().getMaxY() + 1, this.entity.getBlockY() + 20));
             this.entity.level().addFreshEntity((Entity)new Ancient_Desert_Stele_Entity(this.entity.level(), posX, (double)blockpos.getY() + d0 - 3.0, posZ, rotation, delay, (float)CMCommonConfig.AncientRemnant.AncientDesertSteledamage, (LivingEntity)this.entity));
         }
     }

@@ -110,7 +110,7 @@ extends ThrowableProjectile {
 
     protected void doTerrainEffects() {
         BlockPos landed = this.blockPosition();
-        while (landed.getY() < this.level().getMaxBuildHeight() && (!this.level().getBlockState(landed).isAir() || !this.level().getBlockState(landed).getFluidState().isEmpty() && this.level().getBlockState(landed).getFluidState().getFluidType() != NeoForgeMod.LAVA_TYPE.value())) {
+        while (landed.getY() < this.level().getMaxY() + 1 && (!this.level().getBlockState(landed).isAir() || !this.level().getBlockState(landed).getFluidState().isEmpty() && this.level().getBlockState(landed).getFluidState().getFluidType() != NeoForgeMod.LAVA_TYPE.value())) {
             landed = landed.above();
         }
         this.setLavaPos(landed);

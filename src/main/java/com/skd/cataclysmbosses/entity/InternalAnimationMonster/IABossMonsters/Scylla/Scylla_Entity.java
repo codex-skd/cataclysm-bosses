@@ -1813,7 +1813,7 @@ extends IABoss_monster {
                     }
                 }
                 if (!flag) continue;
-                entity.setDeltaMovement(entity.getDeltaMovement().add(0.0, (double)airborne * distance + this.level().random.nextDouble() * 0.15, 0.0));
+                entity.setDeltaMovement(entity.getDeltaMovement().add(0.0, (double)airborne * distance + thislevel().getRandom().nextDouble() * 0.15, 0.0));
             }
         }
     }

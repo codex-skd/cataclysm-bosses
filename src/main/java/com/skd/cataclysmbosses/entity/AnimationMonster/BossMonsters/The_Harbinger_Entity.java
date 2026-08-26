@@ -262,7 +262,7 @@ PowerableMob {
     }
 
     public ItemEntity spawnAtLocation(ItemStack stack) {
-        ItemEntity itementity = this.spawnAtLocation(stack, 0.0f);
+        ItemEntity itementity = this.spawnAtLocation((ServerLevel)this.level(), stack, 0.0f);
         if (itementity != null) {
             itementity.setGlowingTag(true);
             itementity.setExtendedLifetime();
@@ -417,7 +417,7 @@ PowerableMob {
             this.setIsCharge(false);
         }
         if (this.getAnimation() == STUN_ANIAMATION && this.getAnimationTick() == 15) {
-            this.level().playSound((Player)null, (Entity)this, (SoundEvent)ModSounds.HARBINGER_STUN.get(), SoundSource.HOSTILE, 4.0f, this.level().random.nextFloat() * 0.2f + 1.0f);
+            this.level().playSound((Player)null, (Entity)this, (SoundEvent)ModSounds.HARBINGER_STUN.get(), SoundSource.HOSTILE, 4.0f, thislevel().getRandom().nextFloat() * 0.2f + 1.0f);
         }
         if (this.getAnimation() == DEATHLASER_ANIMATION && this.getAnimationTick() == 33) {
             this.level().playSound((Player)null, (Entity)this, (SoundEvent)ModSounds.DEATH_LASER.get(), SoundSource.HOSTILE, 4.0f, 0.75f);

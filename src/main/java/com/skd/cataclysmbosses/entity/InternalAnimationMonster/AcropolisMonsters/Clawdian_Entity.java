@@ -883,7 +883,7 @@ implements IHoldEntity {
                         }
                     }
                     if (!flag) continue;
-                    entity.setDeltaMovement(entity.getDeltaMovement().add(0.0, (double)airborne + this.level().random.nextDouble() * 0.15, 0.0));
+                    entity.setDeltaMovement(entity.getDeltaMovement().add(0.0, (double)airborne + thislevel().getRandom().nextDouble() * 0.15, 0.0));
                 }
             }
         }
@@ -942,7 +942,7 @@ implements IHoldEntity {
                         entityHit.setShiftKeyDown(false);
                     }
                     if (!entityHit.hurtOrSimulate(damagesource, 1.0f)) continue;
-                    entityHit.startRiding((Entity)this, true);
+                    entityHit.startRiding((Entity)this, true, true);
                     PacketDistributor.sendToPlayersTrackingEntityAndSelf((Entity)entityHit, (CustomPacketPayload)new MessageEntityCameraSwitch.ThridPerson(entityHit.getId()), (CustomPacketPayload[])new CustomPacketPayload[0]);
                     continue;
                 }
@@ -1168,7 +1168,7 @@ implements IHoldEntity {
                         acc.shoot(d1, d2 + distance * (double)0.2f, d3, 1.4f, 4.0f);
                         acc.setDamage(15.0f);
                         acc.setBlockState(this.entity.getHoldBlock());
-                        rider.startRiding((Entity)acc, true);
+                        rider.startRiding((Entity)acc, true, true);
                         acc.level().addFreshEntity((Entity)acc);
                     } else {
                         double d1 = target.getX() - this.entity.getX();
@@ -1183,7 +1183,7 @@ implements IHoldEntity {
                         acc.shoot(d1, d2 + distance * (double)0.2f, d3, 1.4f, 4.0f);
                         acc.setDamage(15.0f);
                         acc.setBlockState(this.entity.getHoldBlock());
-                        rider.startRiding((Entity)acc, true);
+                        rider.startRiding((Entity)acc, true, true);
                         acc.level().addFreshEntity((Entity)acc);
                     }
                 }

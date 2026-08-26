@@ -103,7 +103,7 @@ extends BaseEntityBlock {
 
     private static void spawnParticles(Level world, BlockPos worldIn) {
         double d0 = 0.5625;
-        RandomSource random = world.random;
+        RandomSource random = world.getRandom();
         for (Direction direction : Direction.values()) {
             BlockPos blockpos = worldIn.relative(direction);
             if (world.getBlockState(blockpos).isSolidRender((BlockGetter)world, blockpos)) continue;

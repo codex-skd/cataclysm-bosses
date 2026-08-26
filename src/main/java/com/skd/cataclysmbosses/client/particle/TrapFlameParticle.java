@@ -34,8 +34,8 @@ extends SingleQuadParticle {
         this.xd = xSpeed;
         this.yd = ySpeed;
         this.zd = zSpeed;
-        this.quadSize = 0.4f + world.random.nextFloat() * 0.25f;
-        this.lifetime = 10 + world.random.nextInt(20);
+        this.quadSize = 0.4f + world.getRandom().nextFloat() * 0.25f;
+        this.lifetime = 10 + world.getRandom().nextInt(20);
         this.friction = 0.99f;
     }
 

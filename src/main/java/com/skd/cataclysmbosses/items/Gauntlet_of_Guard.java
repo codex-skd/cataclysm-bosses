@@ -80,14 +80,14 @@ extends Cataclysm_Weapon {
         }
         if (world.isClientSide()) {
             for (int i = 0; i < 3; ++i) {
-                int j = world.random.nextInt(2) * 2 - 1;
-                int k = world.random.nextInt(2) * 2 - 1;
+                int j = world.getRandom().nextInt(2) * 2 - 1;
+                int k = world.getRandom().nextInt(2) * 2 - 1;
                 double d0 = livingEntityIn.getX() + 0.25 * (double)j;
-                double d1 = (float)livingEntityIn.getY() + world.random.nextFloat();
+                double d1 = (float)livingEntityIn.getY() + world.getRandom().nextFloat();
                 double d2 = livingEntityIn.getZ() + 0.25 * (double)k;
-                double d3 = world.random.nextFloat() * (float)j;
-                double d4 = ((double)world.random.nextFloat() - 0.5) * 0.125;
-                double d5 = world.random.nextFloat() * (float)k;
+                double d3 = world.getRandom().nextFloat() * (float)j;
+                double d4 = ((double)world.getRandom().nextFloat() - 0.5) * 0.125;
+                double d5 = world.getRandom().nextFloat() * (float)k;
                 world.addParticle((ParticleOptions)ParticleTypes.PORTAL, d0, d1, d2, d3, d4, d5);
             }
         }

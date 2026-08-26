@@ -55,7 +55,7 @@ extends StructureProcessor {
             if (isWater) {
                 ChunkAccess chunk = levelReader.getChunk(infoIn.pos());
                 int minY = chunk.getMinBuildHeight();
-                int maxY = chunk.getMaxBuildHeight();
+                int maxY = chunk.getMaxY() + 1;
                 int currentY = infoIn.pos().getY();
                 if (currentY >= minY && currentY <= maxY) {
                     ((LevelAccessor)levelReader).scheduleTick(infoIn.pos(), infoIn.state().getBlock(), 0);

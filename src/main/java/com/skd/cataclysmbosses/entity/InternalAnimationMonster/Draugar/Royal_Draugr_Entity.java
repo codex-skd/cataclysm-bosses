@@ -157,7 +157,7 @@ implements IShieldEntity {
             if (!source.is(DamageTypeTags.IS_PROJECTILE) && entity instanceof LivingEntity) {
                 this.blockUsingShield((LivingEntity)entity);
             }
-            this.playSound(SoundEvents.SHIELD_BLOCK, 1.0f, 0.8f + this.level().random.nextFloat() * 0.4f);
+            this.playSound(SoundEvents.SHIELD_BLOCK, 1.0f, 0.8f + thislevel().getRandom().nextFloat() * 0.4f);
             return false;
         }
         return super.hurtOrSimulate(source, damage);
@@ -187,7 +187,7 @@ implements IShieldEntity {
         this.shieldCooldownTime = 100;
         this.stopUsingItem();
         this.level().broadcastEntityEvent((Entity)this, (byte)30);
-        this.playSound(SoundEvents.SHIELD_BREAK, 0.8f, 0.8f + this.level().random.nextFloat() * 0.4f);
+        this.playSound(SoundEvents.SHIELD_BREAK, 0.8f, 0.8f + thislevel().getRandom().nextFloat() * 0.4f);
     }
 
     protected void hurtCurrentlyUsedShield(float p_36383_) {
@@ -212,7 +212,7 @@ implements IShieldEntity {
                     this.setItemSlot(EquipmentSlot.OFFHAND, ItemStack.EMPTY);
                 }
                 this.useItem = ItemStack.EMPTY;
-                this.playSound(SoundEvents.SHIELD_BREAK, 0.8f, 0.8f + this.level().random.nextFloat() * 0.4f);
+                this.playSound(SoundEvents.SHIELD_BREAK, 0.8f, 0.8f + thislevel().getRandom().nextFloat() * 0.4f);
             }
         }
     }
@@ -290,7 +290,7 @@ implements IShieldEntity {
         if (entity instanceof Creeper && (creeper = (Creeper)entity).canDropMobsSkull()) {
             ItemStack itemstack = new ItemStack((ItemLike)ModItems.DRAUGR_HEAD.get());
             creeper.increaseDroppedSkulls();
-            this.spawnAtLocation(itemstack);
+            this.spawnAtLocation((ServerLevel)this.level(), itemstack, 0.0f);
         }
     }
 

@@ -206,7 +206,7 @@ extends AbstractArrow {
             this.setYRot(this.getYRot() + 180.0f);
             this.yRotO += 180.0f;
             if (!this.level().isClientSide() && this.getDeltaMovement().lengthSqr() < 1.0E-7 && this.pickup == AbstractArrow.Pickup.ALLOWED) {
-                this.spawnAtLocation(this.getPickupItem(), 0.1f);
+                this.spawnAtLocation((ServerLevel)this.level(), this.getPickupItem(), 0.1f);
             }
             this.discard();
         }

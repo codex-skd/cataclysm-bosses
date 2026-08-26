@@ -702,7 +702,7 @@ extends Internal_Animation_Monster {
                 if (this.entity.level().isEmptyBlock(blockpos) || (voxelshape = (blockstate1 = this.entity.level().getBlockState(blockpos)).getCollisionShape((BlockGetter)this.entity.level(), blockpos)).isEmpty()) break;
                 d0 = voxelshape.max(Direction.Axis.Y);
                 break;
-            } while ((blockpos = blockpos.above()).getY() < Math.min(this.entity.level().getMaxBuildHeight(), this.entity.getBlockY() + 12));
+            } while ((blockpos = blockpos.above()).getY() < Math.min(this.entity.level().getMaxY() + 1, this.entity.getBlockY() + 12));
             this.entity.level().addFreshEntity((Entity)new Ancient_Desert_Stele_Entity(this.entity.level(), posX, (double)blockpos.getY() + d0 - 3.0, posZ, rotation, delay, (float)CMCommonConfig.Wadjet.AncientDesertSteledamage, (LivingEntity)this.entity));
         }
     }

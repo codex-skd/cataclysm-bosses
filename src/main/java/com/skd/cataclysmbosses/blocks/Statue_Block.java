@@ -115,7 +115,7 @@ extends BaseEntityBlock {
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockPos blockpos = context.getClickedPos();
         Level level = context.getLevel();
-        if (blockpos.getY() < level.getMaxBuildHeight() - 1 && level.getBlockState(blockpos.above()).canBeReplaced(context)) {
+        if (blockpos.getY() < level.getMaxY() + 1 - 1 && level.getBlockState(blockpos.above()).canBeReplaced(context)) {
             return (BlockState)((BlockState)this.defaultBlockState().setValue((Property)FACING, (Comparable)context.getHorizontalDirection().getOpposite())).setValue(HALF, (Comparable)DoubleBlockHalf.LOWER);
         }
         return null;

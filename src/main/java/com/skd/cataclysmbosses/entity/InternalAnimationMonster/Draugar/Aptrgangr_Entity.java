@@ -275,7 +275,7 @@ implements IHoldEntity {
     }
 
     public ItemEntity spawnAtLocation(ItemStack stack) {
-        ItemEntity itementity = this.spawnAtLocation(stack, 0.0f);
+        ItemEntity itementity = this.spawnAtLocation((ServerLevel)this.level(), stack, 0.0f);
         if (itementity != null) {
             itementity.setGlowingTag(true);
             itementity.setExtendedLifetime();
@@ -399,7 +399,7 @@ implements IHoldEntity {
         if (entity instanceof Creeper && (creeper = (Creeper)entity).canDropMobsSkull()) {
             ItemStack itemstack = new ItemStack((ItemLike)ModItems.APTRGANGR_HEAD.get());
             creeper.increaseDroppedSkulls();
-            this.spawnAtLocation(itemstack);
+            this.spawnAtLocation((ServerLevel)this.level(), itemstack, 0.0f);
         }
     }
 
@@ -621,7 +621,7 @@ implements IHoldEntity {
                 entity.setShiftKeyDown(false);
             }
             if (this.level().isClientSide()) continue;
-            entity.startRiding((Entity)this, true);
+            entity.startRiding((Entity)this, true, true);
             PacketDistributor.sendToPlayersTrackingEntityAndSelf((Entity)entity, (CustomPacketPayload)new MessageEntityCameraSwitch.ThridPerson(entity.getId()), (CustomPacketPayload[])new CustomPacketPayload[0]);
         }
     }
@@ -629,7 +629,7 @@ implements IHoldEntity {
     private void Icicle_Crash() {
         if (this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
             BlockPos ceil = this.blockPosition().offset(0, 5, 0);
-            while (!(this.level().getBlockState(ceil).isSolid() && this.level().getBlockState(ceil).getBlock() != ModBlocks.POINTED_ICICLE.get() || ceil.getY() >= this.level().getMaxBuildHeight())) {
+            while (!(this.level().getBlockState(ceil).isSolid() && this.level().getBlockState(ceil).getBlock() != ModBlocks.POINTED_ICICLE.get() || ceil.getY() >= this.level().getMaxY() + 1)) {
                 ceil = ceil.above();
             }
             int i = 8;
@@ -638,7 +638,7 @@ implements IHoldEntity {
             for (BlockPos blockpos1 : BlockPos.betweenClosed((BlockPos)ceil.offset(-8, -8, -8), (BlockPos)ceil.offset(8, 8, 8))) {
                 if (!(this.level().getBlockState(blockpos1).getBlock() instanceof Fallable)) continue;
                 if (this.isHangingIcicle(blockpos1)) {
-                    while (this.isHangingIcicle(blockpos1.above()) && blockpos1.getY() < this.level().getMaxBuildHeight()) {
+                    while (this.isHangingIcicle(blockpos1.above()) && blockpos1.getY() < this.level().getMaxY() + 1) {
                         blockpos1 = blockpos1.above();
                     }
                     if (!this.isHangingIcicle(blockpos1)) continue;

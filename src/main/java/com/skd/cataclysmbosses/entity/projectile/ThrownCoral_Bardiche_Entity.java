@@ -100,7 +100,7 @@ extends AbstractArrow {
         if (i > 0 && (this.dealtDamage || this.isNoPhysics()) && entity != null) {
             if (!this.isAcceptibleReturnOwner()) {
                 if (!this.level().isClientSide() && this.pickup == AbstractArrow.Pickup.ALLOWED) {
-                    this.spawnAtLocation(this.getPickupItem(), 0.1f);
+                    this.spawnAtLocation((ServerLevel)this.level(), this.getPickupItem(), 0.1f);
                 }
                 this.discard();
             } else {

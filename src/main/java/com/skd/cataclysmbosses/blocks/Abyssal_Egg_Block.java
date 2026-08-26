@@ -148,7 +148,7 @@ implements SimpleWaterloggedBlock {
             p_277739_.destroyBlock(p_277692_, false);
             The_Baby_Leviathan_Entity levia = (The_Baby_Leviathan_Entity)((EntityType)ModEntities.THE_BABY_LEVIATHAN.get()).create((Level)p_277739_);
             if (levia != null) {
-                levia.moveTo((double)p_277692_.getX() + 0.5, (double)p_277692_.getY() + 0.5, (double)p_277692_.getZ() + 0.5, Mth.wrapDegrees((float)(p_277739_.random.nextFloat() * 360.0f)), 0.0f);
+                levia.moveTo((double)p_277692_.getX() + 0.5, (double)p_277692_.getY() + 0.5, (double)p_277692_.getZ() + 0.5, Mth.wrapDegrees((float)(p_277739_.getRandom().nextFloat() * 360.0f)), 0.0f);
                 p_277739_.addFreshEntity((Entity)levia);
             }
         }
@@ -157,7 +157,7 @@ implements SimpleWaterloggedBlock {
     public void onPlace(BlockState p_277964_, Level p_277827_, BlockPos p_277526_, BlockState p_277618_, boolean p_277819_) {
         int j = 4000;
         p_277827_.gameEvent((Holder)GameEvent.BLOCK_PLACE, p_277526_, GameEvent.Context.of((BlockState)p_277964_));
-        p_277827_.scheduleTick(p_277526_, (Block)this, j + p_277827_.random.nextInt(300));
+        p_277827_.scheduleTick(p_277526_, (Block)this, j + p_277827_.getRandom().nextInt(300));
     }
 
     protected boolean isPathfindable(BlockState p_51023_, PathComputationType p_51026_) {

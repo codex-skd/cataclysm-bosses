@@ -197,7 +197,7 @@ extends ThrowableProjectile {
     public void handleEntityEvent(byte id) {
         super.handleEntityEvent(id);
         if (id == 4) {
-            this.level().playLocalSound(this.getX(), this.getY(), this.getZ(), (SoundEvent)ModSounds.EXPLOSION.get(), SoundSource.BLOCKS, 4.0f, (1.0f + (this.level().random.nextFloat() - this.level().random.nextFloat()) * 0.2f) * 0.7f, false);
+            this.level().playLocalSound(this.getX(), this.getY(), this.getZ(), (SoundEvent)ModSounds.EXPLOSION.get(), SoundSource.BLOCKS, 4.0f, (1.0f + (thislevel().getRandom().nextFloat() - thislevel().getRandom().nextFloat()) * 0.2f) * 0.7f, false);
             this.level().addParticle((ParticleOptions)ModParticle.FLARE_EXPLODE.get(), this.getX(), this.getY(), this.getZ(), 0.1, 0.0, 0.0);
         }
     }

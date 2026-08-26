@@ -186,7 +186,7 @@ extends Entity {
     }
 
     public void damageEntityLivingBaseNearby(double radius) {
-        AABB region = new AABB(this.getX() - radius, this.getY() - 0.5, this.getZ() - radius, this.getX() + radius, (double)(this.level().getMaxBuildHeight() + 20), this.getZ() + radius);
+        AABB region = new AABB(this.getX() - radius, this.getY() - 0.5, this.getZ() - radius, this.getX() + radius, (double)(this.level().getMaxY() + 1 + 20), this.getZ() + radius);
         List entities = this.level().getEntitiesOfClass(LivingEntity.class, region);
         for (LivingEntity entity : entities) {
             this.damage(entity);

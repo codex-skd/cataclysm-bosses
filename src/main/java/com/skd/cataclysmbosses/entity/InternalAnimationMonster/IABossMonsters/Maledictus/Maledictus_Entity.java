@@ -412,7 +412,7 @@ implements IHoldEntity {
     }
 
     public ItemEntity spawnAtLocation(ItemStack stack) {
-        ItemEntity itementity = this.spawnAtLocation(stack, 0.0f);
+        ItemEntity itementity = this.spawnAtLocation((ServerLevel)this.level(), stack, 0.0f);
         if (itementity != null) {
             itementity.setGlowingTag(true);
             itementity.setExtendedLifetime();
@@ -1641,7 +1641,7 @@ implements IHoldEntity {
                     entity.setShiftKeyDown(false);
                 }
                 if (!this.getPassengers().isEmpty() || this.level().isClientSide()) continue;
-                entity.startRiding((Entity)this, true);
+                entity.startRiding((Entity)this, true, true);
                 PacketDistributor.sendToPlayersTrackingEntityAndSelf((Entity)entity, (CustomPacketPayload)new MessageEntityCameraSwitch.ThridPerson(entity.getId()), (CustomPacketPayload[])new CustomPacketPayload[0]);
             }
         }
@@ -1692,7 +1692,7 @@ implements IHoldEntity {
                     float finalDamage;
                     boolean flag;
                     if (this.isAlliedTo((Entity)entity) || entity == this || !(flag = entity.hurtOrSimulate(damageSource, finalDamage = baseDamage + Math.min(baseDamage, entity.getMaxHealth() * hpdamage)))) continue;
-                    entity.setDeltaMovement(entity.getDeltaMovement().add(0.0, (double)(airborne * (float)distance) + this.level().random.nextDouble() * 0.15, 0.0));
+                    entity.setDeltaMovement(entity.getDeltaMovement().add(0.0, (double)(airborne * (float)distance) + thislevel().getRandom().nextDouble() * 0.15, 0.0));
                 }
             }
         }
