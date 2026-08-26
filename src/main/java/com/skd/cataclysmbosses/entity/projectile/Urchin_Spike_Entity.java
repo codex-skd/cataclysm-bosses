@@ -41,6 +41,8 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Urchin_Spike_Entity
 extends ThrowableItemProjectile {
@@ -52,11 +54,11 @@ extends ThrowableItemProjectile {
         super((EntityType)ModEntities.URCHIN_SPIKE.get(), throwerIn, worldIn);
     }
 
-    public void addAdditionalSaveData(CompoundTag tag) {
+    public void addAdditionalSaveData(ValueOutput tag) {
         super.addAdditionalSaveData(tag);
     }
 
-    public void readAdditionalSaveData(CompoundTag tag) {
+    public void readAdditionalSaveData(ValueInput tag) {
         super.readAdditionalSaveData(tag);
     }
 
@@ -70,11 +72,11 @@ extends ThrowableItemProjectile {
         Entity entity = result.getEntity();
         float i = 4.0f;
         if (shooter instanceof LivingEntity) {
-            if (entity != shooter && !shooter.isAlliedTo(entity) && entity.hurt(this.damageSources().mobProjectile((Entity)this, (LivingEntity)shooter), i) && entity instanceof LivingEntity) {
+            if (entity != shooter && !shooter.isAlliedTo(entity) && entity.hurtOrSimulate(this.damageSources().mobProjectile((Entity)this, (LivingEntity)shooter), i) && entity instanceof LivingEntity) {
                 ((LivingEntity)entity).addEffect(new MobEffectInstance(MobEffects.POISON, 60, 0), (Entity)this);
             }
         } else {
-            entity.hurt(this.damageSources().mobProjectile((Entity)this, null), i);
+            entity.hurtOrSimulate(this.damageSources().mobProjectile((Entity)this, null), i);
         }
     }
 

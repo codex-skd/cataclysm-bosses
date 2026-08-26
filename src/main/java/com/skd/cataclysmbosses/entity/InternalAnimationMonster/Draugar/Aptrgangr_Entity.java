@@ -122,7 +122,7 @@ import net.minecraft.world.entity.ai.goal.RandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
-import net.minecraft.world.entity.animal.IronGolem;
+import net.minecraft.world.entity.animal.golem.IronGolem;
 import net.minecraft.world.entity.animal.SnowGolem;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -144,6 +144,8 @@ import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Aptrgangr_Entity
 extends Internal_Animation_Monster
@@ -288,7 +290,7 @@ implements IHoldEntity {
         if (source.is(ModTag.BLOCK_SELF_REGEN)) {
             this.self_regen = 80;
         }
-        return super.hurt(source, damage);
+        return super.hurtOrSimulate(source, damage);
     }
 
     protected int decreaseAirSupply(int air) {
@@ -406,11 +408,11 @@ implements IHoldEntity {
         return 60;
     }
 
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
     }
 
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
     }
 
@@ -551,7 +553,7 @@ implements IHoldEntity {
                 float entityRelativeAngle = entityHitAngle - entityAttackingAngle;
                 float entityHitDistance = (float)Math.sqrt((entityHit.getZ() - this.getZ()) * (entityHit.getZ() - this.getZ()) + (entityHit.getX() - this.getX()) * (entityHit.getX() - this.getX()));
                 if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || this.isAlliedTo((Entity)entityHit) || entityHit instanceof Aptrgangr_Entity || entityHit == this) continue;
-                boolean hurt = entityHit.hurt(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
+                boolean hurt = entityHit.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
                 if (entityHit.isDamageSourceBlocked(damagesource) && entityHit instanceof Player) {
                     Player player = (Player)entityHit;
                     if (shieldbreakticks > 0) {
@@ -583,7 +585,7 @@ implements IHoldEntity {
                 float entityHitDistance = (float)Math.sqrt((entityHit.getZ() - this.getZ()) * (entityHit.getZ() - this.getZ()) + (entityHit.getX() - this.getX()) * (entityHit.getX() - this.getX()));
                 if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || this.isAlliedTo((Entity)entityHit) || entityHit instanceof Aptrgangr_Entity || entityHit == this) continue;
                 DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
-                boolean hurt = entityHit.hurt(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
+                boolean hurt = entityHit.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
                 if (entityHit.isDamageSourceBlocked(damagesource) && entityHit instanceof Player) {
                     Player player = (Player)entityHit;
                     if (shieldbreakticks > 0) {
@@ -607,7 +609,7 @@ implements IHoldEntity {
         for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, attackRange)) {
             if (this.isAlliedTo((Entity)entity) || entity == this || !this.getPassengers().isEmpty()) continue;
             DamageSource damagesource = maledictio ? CMDamageTypes.causeMaledictioDamage((LivingEntity)this) : this.damageSources().mobAttack((LivingEntity)this);
-            boolean flag = entity.hurt(damagesource, damage);
+            boolean flag = entity.hurtOrSimulate(damagesource, damage);
             if (entity.isDamageSourceBlocked(damagesource) && entity instanceof Player) {
                 Player player = (Player)entity;
                 if (shieldbreakticks > 0) {
@@ -681,7 +683,7 @@ implements IHoldEntity {
                     DamageSource damagesource;
                     LivingEntity living;
                     boolean flag;
-                    if (passenger instanceof LivingEntity && (flag = (living = (LivingEntity)passenger).hurt(damagesource = CMDamageTypes.causeMaledictioDamage((LivingEntity)this), (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * 1.5)))) {
+                    if (passenger instanceof LivingEntity && (flag = (living = (LivingEntity)passenger).hurtOrSimulate(damagesource = CMDamageTypes.causeMaledictioDamage((LivingEntity)this), (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * 1.5)))) {
                         this.playSound(SoundEvents.ZOMBIE_ATTACK_IRON_DOOR, 1.0f, 0.9f);
                     }
                     if (!this.level().isClientSide()) {

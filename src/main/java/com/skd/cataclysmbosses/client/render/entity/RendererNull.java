@@ -17,9 +17,10 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 public class RendererNull
-extends EntityRenderer<Entity> {
+extends EntityRenderer<Entity, EntityRenderState> {
     public RendererNull(EntityRendererProvider.Context renderManagerIn) {
         super(renderManagerIn);
     }

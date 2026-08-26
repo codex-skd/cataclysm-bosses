@@ -28,7 +28,7 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
@@ -46,7 +46,7 @@ extends RenderLayer<The_Leviathan_Entity, The_Leviathan_Model> {
         float alpha = entity.getMeltDown() ? 1.0f : entity.LayerBrightness;
         Identifier resourceLocation = entity.getMeltDown() ? BURNING_LEVIATHAN_LAYER : LEVIATHAN_LAYER;
         RenderType eyes = CMRenderTypes.CMEyes(resourceLocation);
-        int i = FastColor.ARGB32.color((int)255, (int)((int)(255.0f * alpha)), (int)((int)(255.0f * alpha)), (int)((int)(255.0f * alpha)));
+        int i = ARGB.color((int)255, (int)((int)(255.0f * alpha)), (int)((int)(255.0f * alpha)), (int)((int)(255.0f * alpha)));
         VertexConsumer VertexConsumer2 = bufferIn.getBuffer(eyes);
         ((The_Leviathan_Model)this.getParentModel()).renderToBuffer(matrixStackIn, VertexConsumer2, packedLightIn, OverlayTexture.NO_OVERLAY, i);
     }

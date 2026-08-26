@@ -33,7 +33,7 @@
  *  net.minecraft.world.entity.EntityType
  *  net.minecraft.world.entity.LivingEntity
  *  net.minecraft.world.entity.Mob
- *  net.minecraft.world.entity.MobSpawnType
+ *  net.minecraft.world.entity.EntitySpawnReason
  *  net.minecraft.world.entity.PathfinderMob
  *  net.minecraft.world.entity.SpawnGroupData
  *  net.minecraft.world.entity.ai.attributes.AttributeSupplier$Builder
@@ -122,7 +122,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -151,6 +151,8 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Maledictus_Entity
 extends IABoss_monster
@@ -426,7 +428,7 @@ implements IHoldEntity {
         if (this.destroyBlocksTick <= 0) {
             this.destroyBlocksTick = 20;
         }
-        return super.hurt(source, damage);
+        return super.hurtOrSimulate(source, damage);
     }
 
     @Override
@@ -570,10 +572,10 @@ implements IHoldEntity {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(TOMBSTONE_DIRECTION, (Object)Direction.NORTH);
-        p_326229_.define(WEAPON, (Object)0);
-        p_326229_.define(FLYING, (Object)false);
-        p_326229_.define(RAGE, (Object)0);
+        p_326229_.define(TOMBSTONE_DIRECTION, Direction.NORTH);
+        p_326229_.define(WEAPON, 0);
+        p_326229_.define(FLYING, false);
+        p_326229_.define(RAGE, 0);
     }
 
     public int getWeapon() {
@@ -581,7 +583,7 @@ implements IHoldEntity {
     }
 
     public void setWeapon(int weapon) {
-        this.entityData.set(WEAPON, (Object)weapon);
+        this.entityData.set(WEAPON, weapon);
     }
 
     public boolean isFlying() {
@@ -589,7 +591,7 @@ implements IHoldEntity {
     }
 
     public void setFlying(boolean flying) {
-        this.entityData.set(FLYING, (Object)flying);
+        this.entityData.set(FLYING, flying);
     }
 
     public Direction getTombstoneDirection() {
@@ -597,7 +599,7 @@ implements IHoldEntity {
     }
 
     public void setTombstoneDirection(Direction p_30220_) {
-        this.entityData.set(TOMBSTONE_DIRECTION, (Object)p_30220_);
+        this.entityData.set(TOMBSTONE_DIRECTION, p_30220_);
     }
 
     public int getRageMeter() {
@@ -605,7 +607,7 @@ implements IHoldEntity {
     }
 
     public void setRageMeter(int Rage) {
-        this.entityData.set(RAGE, (Object)Rage);
+        this.entityData.set(RAGE, Rage);
     }
 
     public void travel(Vec3 travelVector) {
@@ -890,22 +892,22 @@ implements IHoldEntity {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         compound.putInt("RageMeter", this.getRageMeter());
         compound.putByte("Tombstone_Direction", (byte)this.getTombstoneDirection().get3DDataValue());
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
         this.setTombstoneDirection(Direction.from3DDataValue((int)compound.getByte("Tombstone_Direction")));
-        this.setRageMeter(compound.getInt("RageMeter"));
+        this.setRageMeter(compound.getIntOr("RageMeter", 0));
     }
 
     @Override
     @Nullable
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_30153_, DifficultyInstance p_30154_, MobSpawnType p_30155_, @Nullable SpawnGroupData p_30156_) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_30153_, DifficultyInstance p_30154_, EntitySpawnReason p_30155_, @Nullable SpawnGroupData p_30156_) {
         return super.finalizeSpawn(p_30153_, p_30154_, p_30155_, p_30156_);
     }
 
@@ -1056,7 +1058,7 @@ implements IHoldEntity {
                     DamageSource damagesource = CMDamageTypes.causeMaledictioSoulDamage((LivingEntity)this);
                     for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(7.0))) {
                         if (this.isAlliedTo((Entity)entity) || entity == this) continue;
-                        entity.hurt(damagesource, this.DMG() * 1.5f + Math.min(this.DMG() * 1.5f, entity.getMaxHealth() * (float)CMCommonConfig.Maledictus.AOEHpDamage));
+                        entity.hurtOrSimulate(damagesource, this.DMG() * 1.5f + Math.min(this.DMG() * 1.5f, entity.getMaxHealth() * (float)CMCommonConfig.Maledictus.AOEHpDamage));
                     }
                 }
             }
@@ -1087,7 +1089,7 @@ implements IHoldEntity {
                     DamageSource damagesource = CMDamageTypes.causeMaledictioDamage((LivingEntity)this);
                     for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(3.5))) {
                         boolean flag;
-                        if (this.isAlliedTo((Entity)entity) || entity == this || !(flag = entity.hurt(damagesource, this.DMG() * 1.25f + Math.min(this.DMG() * 1.25f, entity.getMaxHealth() * (float)CMCommonConfig.Maledictus.FlyingSmashHpDamage)))) continue;
+                        if (this.isAlliedTo((Entity)entity) || entity == this || !(flag = entity.hurtOrSimulate(damagesource, this.DMG() * 1.25f + Math.min(this.DMG() * 1.25f, entity.getMaxHealth() * (float)CMCommonConfig.Maledictus.FlyingSmashHpDamage)))) continue;
                         this.rageTicks = 200;
                         if (this.getRageMeter() >= 5) continue;
                         this.setRageMeter(this.getRageMeter() + 1);
@@ -1281,7 +1283,7 @@ implements IHoldEntity {
                     DamageSource damagesource = CMDamageTypes.causeMaledictioDamage((LivingEntity)this);
                     for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(2.0))) {
                         boolean flag;
-                        if (this.isAlliedTo((Entity)entity) || entity == this || !(flag = entity.hurt(damagesource, this.DMG() * 1.25f + Math.min(this.DMG() * 1.25f, entity.getMaxHealth() * (float)CMCommonConfig.Maledictus.FlyingSmashHpDamage)))) continue;
+                        if (this.isAlliedTo((Entity)entity) || entity == this || !(flag = entity.hurtOrSimulate(damagesource, this.DMG() * 1.25f + Math.min(this.DMG() * 1.25f, entity.getMaxHealth() * (float)CMCommonConfig.Maledictus.FlyingSmashHpDamage)))) continue;
                         this.rageTicks = 200;
                         if (this.getRageMeter() >= 5) continue;
                         this.setRageMeter(this.getRageMeter() + 1);
@@ -1297,7 +1299,7 @@ implements IHoldEntity {
                     DamageSource damagesource = CMDamageTypes.causeMaledictioDamage((LivingEntity)this);
                     for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(2.0))) {
                         boolean flag;
-                        if (this.isAlliedTo((Entity)entity) || entity == this || !(flag = entity.hurt(damagesource, this.DMG() * 1.25f + Math.min(this.DMG() * 1.25f, entity.getMaxHealth() * (float)CMCommonConfig.Maledictus.FlyingSmashHpDamage)))) continue;
+                        if (this.isAlliedTo((Entity)entity) || entity == this || !(flag = entity.hurtOrSimulate(damagesource, this.DMG() * 1.25f + Math.min(this.DMG() * 1.25f, entity.getMaxHealth() * (float)CMCommonConfig.Maledictus.FlyingSmashHpDamage)))) continue;
                         this.rageTicks = 200;
                         if (this.getRageMeter() >= 5) continue;
                         this.setRageMeter(this.getRageMeter() + 1);
@@ -1406,7 +1408,7 @@ implements IHoldEntity {
                     DamageSource damagesource = CMDamageTypes.causeMaledictioSoulDamage((LivingEntity)this);
                     for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(7.0))) {
                         if (this.isAlliedTo((Entity)entity) || entity == this) continue;
-                        entity.hurt(damagesource, this.DMG() * 1.75f + Math.min(this.DMG() * 1.75f, entity.getMaxHealth() * (float)CMCommonConfig.Maledictus.AOEHpDamage));
+                        entity.hurtOrSimulate(damagesource, this.DMG() * 1.75f + Math.min(this.DMG() * 1.75f, entity.getMaxHealth() * (float)CMCommonConfig.Maledictus.AOEHpDamage));
                     }
                 }
             }
@@ -1600,7 +1602,7 @@ implements IHoldEntity {
                 float entityRelativeAngle = entityHitAngle - entityAttackingAngle;
                 float entityHitDistance = (float)Math.sqrt((entityHit.getZ() - this.getZ()) * (entityHit.getZ() - this.getZ()) + (entityHit.getX() - this.getX()) * (entityHit.getX() - this.getX()));
                 if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || this.isAlliedTo((Entity)entityHit) || entityHit instanceof Maledictus_Entity || entityHit == this) continue;
-                boolean flag = entityHit.hurt(damagesource, this.DMG() * damage + Math.min(this.DMG() * damage, entityHit.getMaxHealth() * hpdamage));
+                boolean flag = entityHit.hurtOrSimulate(damagesource, this.DMG() * damage + Math.min(this.DMG() * damage, entityHit.getMaxHealth() * hpdamage));
                 if (entityHit.isDamageSourceBlocked(damagesource) && entityHit instanceof Player) {
                     Player player = (Player)entityHit;
                     if (shieldbreakticks > 0) {
@@ -1625,7 +1627,7 @@ implements IHoldEntity {
             DamageSource damagesource = maledictio ? CMDamageTypes.causeMaledictioDamage((LivingEntity)this) : this.damageSources().mobAttack((LivingEntity)this);
             for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, attackRange)) {
                 if (this.isAlliedTo((Entity)entity) || entity == this) continue;
-                boolean flag = entity.hurt(damagesource, this.DMG() * damage + Math.min(this.DMG() * damage, entity.getMaxHealth() * hpdamage));
+                boolean flag = entity.hurtOrSimulate(damagesource, this.DMG() * damage + Math.min(this.DMG() * damage, entity.getMaxHealth() * hpdamage));
                 if (entity.isDamageSourceBlocked(damagesource) && entity instanceof Player) {
                     Player player = (Player)entity;
                     if (shieldbreakticks > 0) {
@@ -1689,7 +1691,7 @@ implements IHoldEntity {
                 for (LivingEntity entity : hit) {
                     float finalDamage;
                     boolean flag;
-                    if (this.isAlliedTo((Entity)entity) || entity == this || !(flag = entity.hurt(damageSource, finalDamage = baseDamage + Math.min(baseDamage, entity.getMaxHealth() * hpdamage)))) continue;
+                    if (this.isAlliedTo((Entity)entity) || entity == this || !(flag = entity.hurtOrSimulate(damageSource, finalDamage = baseDamage + Math.min(baseDamage, entity.getMaxHealth() * hpdamage)))) continue;
                     entity.setDeltaMovement(entity.getDeltaMovement().add(0.0, (double)(airborne * (float)distance) + this.level().random.nextDouble() * 0.15, 0.0));
                 }
             }
@@ -1807,7 +1809,7 @@ implements IHoldEntity {
             DamageSource damagesource = maledictio ? CMDamageTypes.causeMaledictioDamage((LivingEntity)this) : this.damageSources().mobAttack((LivingEntity)this);
             for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, attackRange)) {
                 if (this.isAlliedTo((Entity)entity) || entity == this) continue;
-                boolean flag = entity.hurt(damagesource, this.DMG() * damage + Math.min(this.DMG() * damage, entity.getMaxHealth() * hpdamage));
+                boolean flag = entity.hurtOrSimulate(damagesource, this.DMG() * damage + Math.min(this.DMG() * damage, entity.getMaxHealth() * hpdamage));
                 if (entity.isDamageSourceBlocked(damagesource) && entity instanceof Player) {
                     Player player = (Player)entity;
                     if (shieldbreakticks > 0) {
@@ -1830,7 +1832,7 @@ implements IHoldEntity {
         DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
         for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, attackRange)) {
             if (this.isAlliedTo((Entity)entity) || entity == this) continue;
-            boolean flag = entity.hurt(damagesource, this.DMG() * damage + Math.min(this.DMG() * damage, entity.getMaxHealth() * hpdamage));
+            boolean flag = entity.hurtOrSimulate(damagesource, this.DMG() * damage + Math.min(this.DMG() * damage, entity.getMaxHealth() * hpdamage));
             if (entity.isDamageSourceBlocked(damagesource) && entity instanceof Player) {
                 Player player = (Player)entity;
                 if (shieldbreakticks > 0) {
@@ -1864,7 +1866,7 @@ implements IHoldEntity {
             float entityRelativeAngle = entityHitAngle - entityAttackingAngle;
             float entityHitDistance = (float)Math.sqrt((entityHit.getZ() - this.getZ()) * (entityHit.getZ() - this.getZ()) + (entityHit.getX() - this.getX()) * (entityHit.getX() - this.getX()));
             if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || this.isAlliedTo((Entity)entityHit) || entityHit instanceof Maledictus_Entity || entityHit == this) continue;
-            boolean flag = entityHit.hurt(damagesource, this.DMG() * damage + Math.min(this.DMG() * damage, entityHit.getMaxHealth() * hpdamage));
+            boolean flag = entityHit.hurtOrSimulate(damagesource, this.DMG() * damage + Math.min(this.DMG() * damage, entityHit.getMaxHealth() * hpdamage));
             if (entityHit.isDamageSourceBlocked(damagesource) && entityHit instanceof Player) {
                 Player player = (Player)entityHit;
                 if (shieldbreakticks > 0) {

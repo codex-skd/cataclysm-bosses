@@ -27,7 +27,7 @@ import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -50,7 +50,7 @@ extends RenderLayer<Maledictus_Entity, Maledictus_Model> {
         float hide = entity.getHealth() / entity.getMaxHealth() - 0.4f;
         float alpha = (1.0f - hide) * 0.6f;
         boolean hurt = Math.max(entity.hurtTime, entity.deathTime) > 0;
-        int i = FastColor.ARGB32.color((int)((int)(alpha * 255.0f)), (int)(hurt ? 102 : 255), (int)(hurt ? 204 : 255), (int)(hurt ? 178 : 255));
+        int i = ARGB.color((int)((int)(alpha * 255.0f)), (int)(hurt ? 102 : 255), (int)(hurt ? 204 : 255), (int)(hurt ? 178 : 255));
         ((Maledictus_Model)this.getParentModel()).renderToBuffer(matrixStackIn, vertexconsumer, packedLightIn, LivingEntityRenderer.getOverlayCoords((LivingEntity)entity, (float)0.0f), i);
     }
 }

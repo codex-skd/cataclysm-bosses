@@ -30,9 +30,10 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
-public class New_Netherite_Monstrosity_Renderer extends EntityRenderer<Netherite_Monstrosity_Entity> {
+public class New_Netherite_Monstrosity_Renderer extends EntityRenderer<Netherite_Monstrosity_Entity, EntityRenderState> {
     private static final Identifier NETHER_MONSTROSITY_TEXTURES = new ResourceLocation("cataclysm_bosses", "textures/entity/monstrosity/netherite_monstrosity.png");
 
     public New_Netherite_Monstrosity_Renderer(EntityRendererProvider.Context renderManagerIn) {

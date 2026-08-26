@@ -45,7 +45,7 @@ extends SingleQuadParticle {
         this.getR = r;
         this.getG = g;
         this.getB = b;
-        this.quadSize = 0.25f + level.random.nextFloat() * 0.15f;
+        this.quadSize = 0.25f + level.getRandom().nextFloat() * 0.15f;
         this.lifetime = 6;
         this.setSpriteFromAge(sprites);
     }

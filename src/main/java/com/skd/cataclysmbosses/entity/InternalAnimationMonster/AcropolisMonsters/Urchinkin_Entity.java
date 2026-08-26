@@ -86,6 +86,8 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Urchinkin_Entity
 extends Monster {
@@ -177,7 +179,7 @@ extends Monster {
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(ATTACK_STATE, (Object)0);
+        p_326229_.define(ATTACK_STATE, 0);
     }
 
     public void onSyncedDataUpdated(EntityDataAccessor<?> p_21104_) {
@@ -202,7 +204,7 @@ extends Monster {
 
     public void setAttackState(int input) {
         this.attackTicks = 0;
-        this.entityData.set(ATTACK_STATE, (Object)input);
+        this.entityData.set(ATTACK_STATE, input);
         this.level().broadcastEntityEvent((Entity)this, (byte)(-input));
     }
 
@@ -215,11 +217,11 @@ extends Monster {
         return super.doHurtTarget(p_219472_);
     }
 
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
     }
 
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
     }
 
@@ -257,7 +259,7 @@ extends Monster {
                 DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
                 for (LivingEntity livingentity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox())) {
                     boolean flag;
-                    if (this.isAlliedTo((Entity)livingentity) || livingentity instanceof Urchinkin_Entity || livingentity == this || !(flag = livingentity.hurt(damagesource, (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE)))) continue;
+                    if (this.isAlliedTo((Entity)livingentity) || livingentity instanceof Urchinkin_Entity || livingentity == this || !(flag = livingentity.hurtOrSimulate(damagesource, (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE)))) continue;
                     livingentity.addEffect(new MobEffectInstance(MobEffects.POISON, 60, 0), (Entity)this);
                 }
             }

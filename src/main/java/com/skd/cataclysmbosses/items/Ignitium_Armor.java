@@ -123,7 +123,7 @@ implements KeybindUsingArmor {
                     flag = living.addEffect(effectinstance);
                 }
                 if (!flag) continue;
-                player.getCooldowns().addCooldown((Item)ModItems.IGNITIUM_HELMET.get(), 300);
+                player.getCooldowns().addCooldown(ModItems.IGNITIUM_HELMET.get().getDefaultInstance(), 300);
             }
         }
     }

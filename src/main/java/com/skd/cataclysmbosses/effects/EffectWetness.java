@@ -29,7 +29,7 @@ extends MobEffect {
 
     public boolean applyEffectTick(LivingEntity LivingEntityIn, int amplifier) {
         if (LivingEntityIn.isSensitiveToWater()) {
-            LivingEntityIn.hurt(LivingEntityIn.damageSources().magic(), 1.0f);
+            LivingEntityIn.hurtOrSimulate(LivingEntityIn.damageSources().magic(), 1.0f);
         }
         return true;
     }

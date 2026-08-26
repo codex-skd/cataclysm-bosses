@@ -146,7 +146,7 @@ extends Goal {
         if (this.isHoldingCrossbow() && this.mob.isUsingItem()) {
             this.mob.stopUsingItem();
             this.mob.setChargingCrossbow(false);
-            this.mob.getUseItem().set(DataComponents.CHARGED_PROJECTILES, (Object)ChargedProjectiles.EMPTY);
+            this.mob.getUseItem().set(DataComponents.CHARGED_PROJECTILES, ChargedProjectiles.EMPTY);
         }
     }
 

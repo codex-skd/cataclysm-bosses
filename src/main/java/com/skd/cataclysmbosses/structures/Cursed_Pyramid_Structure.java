@@ -14,7 +14,7 @@
  *  net.minecraft.util.RandomSource
  *  net.minecraft.world.entity.Entity
  *  net.minecraft.world.entity.EntityType
- *  net.minecraft.world.entity.MobSpawnType
+ *  net.minecraft.world.entity.EntitySpawnReason
  *  net.minecraft.world.level.Level
  *  net.minecraft.world.level.LevelHeightAccessor
  *  net.minecraft.world.level.ServerLevelAccessor

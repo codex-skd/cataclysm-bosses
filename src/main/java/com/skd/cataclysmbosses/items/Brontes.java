@@ -40,7 +40,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -128,13 +128,13 @@ extends PickaxeItem {
         return null;
     }
 
-    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+    public InteractionResult use(Level world, Player player, InteractionHand hand) {
         ItemStack itemstack = player.getItemInHand(hand);
         if (itemstack.get(ModDataComponents.THROWN_HAMMER) == null && world.getWorldBorder().isWithinBounds(player.blockPosition())) {
             player.startUsingItem(hand);
-            return InteractionResultHolder.consume((Object)itemstack);
+            return InteractionResult.CONSUME;
         }
-        return InteractionResultHolder.fail((Object)itemstack);
+        return InteractionResult.FAIL;
     }
 
     public static boolean getThrowing(ItemStack itemStack) {

@@ -53,6 +53,8 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForgeMod;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Lava_Bomb_Entity
 extends ThrowableProjectile {
@@ -70,10 +72,10 @@ extends ThrowableProjectile {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(ON_GROUND, (Object)false);
-        p_326229_.define(LAVA_TIME, (Object)0);
-        p_326229_.define(MAX_LAVA_TIME, (Object)200);
-        p_326229_.define(LAVA_POS, (Object)BlockPos.ZERO);
+        p_326229_.define(ON_GROUND, false);
+        p_326229_.define(LAVA_TIME, 0);
+        p_326229_.define(MAX_LAVA_TIME, 200);
+        p_326229_.define(LAVA_POS, BlockPos.ZERO);
     }
 
     protected void onHit(HitResult ray) {
@@ -161,7 +163,7 @@ extends ThrowableProjectile {
     }
 
     public void setLavaPos(BlockPos p_31960_) {
-        this.entityData.set(LAVA_POS, (Object)p_31960_);
+        this.entityData.set(LAVA_POS, p_31960_);
     }
 
     public BlockPos getLavaPos() {
@@ -173,7 +175,7 @@ extends ThrowableProjectile {
     }
 
     public void setGround(boolean weapon) {
-        this.entityData.set(ON_GROUND, (Object)weapon);
+        this.entityData.set(ON_GROUND, weapon);
     }
 
     public int getLavaTime() {
@@ -181,7 +183,7 @@ extends ThrowableProjectile {
     }
 
     public void setLavaTime(int time) {
-        this.entityData.set(LAVA_TIME, (Object)time);
+        this.entityData.set(LAVA_TIME, time);
     }
 
     public int getMaxLavaTime() {
@@ -189,21 +191,21 @@ extends ThrowableProjectile {
     }
 
     public void setMaxLavaTime(int time) {
-        this.entityData.set(MAX_LAVA_TIME, (Object)time);
+        this.entityData.set(MAX_LAVA_TIME, time);
     }
 
-    protected void readAdditionalSaveData(CompoundTag compound) {
+    protected void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        this.setGround(compound.getBoolean("bomb_ground"));
-        this.setLavaTime(compound.getInt("lava_time"));
-        this.setMaxLavaTime(compound.getInt("max_lava_time"));
-        int i = compound.getInt("LavaPosX");
-        int j = compound.getInt("LavaPosY");
-        int k = compound.getInt("LavaPosZ");
+        this.setGround(compound.getBooleanOr("bomb_ground", false));
+        this.setLavaTime(compound.getIntOr("lava_time", 0));
+        this.setMaxLavaTime(compound.getIntOr("max_lava_time", 0));
+        int i = compound.getIntOr("LavaPosX", 0);
+        int j = compound.getIntOr("LavaPosY", 0);
+        int k = compound.getIntOr("LavaPosZ", 0);
         this.setLavaPos(new BlockPos(i, j, k));
     }
 
-    protected void addAdditionalSaveData(CompoundTag compound) {
+    protected void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         compound.putInt("LavaPosX", this.getLavaPos().getX());
         compound.putInt("LavaPosY", this.getLavaPos().getY());

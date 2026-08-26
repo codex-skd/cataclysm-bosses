@@ -42,7 +42,7 @@ extends RenderLayer<Urchinkin_Entity, Urchinkin_Model> {
     public void render(PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn, Urchinkin_Entity entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         RenderType eyes = RenderType.eyes((Identifier)this.Texture(entity));
         VertexConsumer VertexConsumer2 = bufferIn.getBuffer(eyes);
-        ((Urchinkin_Model)this.getParentModel()).renderToBuffer(matrixStackIn, VertexConsumer2, packedLightIn, OverlayTexture.NO_OVERLAY);
+        ((Urchinkin_Model)this.getParentModel()).renderToBuffer(matrixStackIn, VertexConsumer2, packedLightIn, OverlayTexture.NO_OVERLAY, -1);
     }
 
     public Identifier Texture(Urchinkin_Entity entity) {

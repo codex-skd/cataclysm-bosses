@@ -28,6 +28,7 @@ import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -63,7 +64,7 @@ implements BlockEntityRenderer<T> {
         matrixStackIn.mulPose(Axis.XP.rotationDegrees(90.0f));
         matrixStackIn.pushPose();
         MODEL.animate((AltarOfAbyss_Block_Entity)((Object)tileEntityIn), partialTicks);
-        MODEL.renderToBuffer(matrixStackIn, bufferIn.getBuffer(RenderType.entityCutoutNoCull((Identifier)TEXTURE)), combinedLightIn, combinedOverlayIn);
+        MODEL.renderToBuffer(matrixStackIn, bufferIn.getBuffer(RenderTypes.entityCutoutNoCull((Identifier)TEXTURE)), combinedLightIn, combinedOverlayIn, -1);
         matrixStackIn.popPose();
         matrixStackIn.popPose();
         this.renderItem(tileEntityIn, partialTicks, matrixStackIn, bufferIn, combinedLightIn);

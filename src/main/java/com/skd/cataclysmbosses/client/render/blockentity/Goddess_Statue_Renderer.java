@@ -27,6 +27,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.BlockPos;
@@ -72,7 +73,7 @@ implements BlockEntityRenderer<Statue_Block_Entity> {
             matrixStackIn.translate(0.5f, 1.5f, 0.5f);
             matrixStackIn.mulPose(Axis.YP.rotationDegrees(-f + 180.0f));
             matrixStackIn.scale(-1.0f, -1.0f, 1.0f);
-            MODEL.renderToBuffer(matrixStackIn, buffer.getBuffer(RenderType.entityCutoutNoCull((Identifier)TEXTURE)), packedLight, overlay);
+            MODEL.renderToBuffer(matrixStackIn, buffer.getBuffer(RenderTypes.entityCutoutNoCull((Identifier)TEXTURE)), packedLight, overlay, -1);
             matrixStackIn.popPose();
         }
     }

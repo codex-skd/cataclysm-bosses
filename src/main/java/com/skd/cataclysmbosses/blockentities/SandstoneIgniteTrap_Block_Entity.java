@@ -60,7 +60,7 @@ extends BlockEntity {
                 List entitiesInRange = level.getEntitiesOfClass(LivingEntity.class, new AABB(pos.offset(-1, 0, -1).getCenter(), pos.offset(1, 6, 1).getCenter()));
                 for (LivingEntity entity : entitiesInRange) {
                     if (entity.getType().is(ModTag.TEAM_ANCIENT_REMNANT) || entity.fireImmune()) continue;
-                    entity.hurt(entity.level().damageSources().inFire(), 5.0f);
+                    entity.hurtOrSimulate(entity.level().damageSources().inFire(), 5.0f);
                     entity.igniteForSeconds(5.0f);
                 }
             }

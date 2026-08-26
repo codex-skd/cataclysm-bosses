@@ -27,6 +27,7 @@ import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
@@ -55,7 +56,7 @@ implements BlockEntityRenderer<Boss_Respawn_Spawner_Block_Entity> {
         poseStack.translate(0.5f, 1.501f, 0.5f);
         poseStack.scale(1.0f, -1.0f, -1.0f);
         MODEL.animate(entity, delta);
-        MODEL.renderToBuffer(poseStack, buffer.getBuffer(RenderType.entityCutoutNoCull((Identifier)TEXTURE)), packedLight, overlay);
+        MODEL.renderToBuffer(poseStack, buffer.getBuffer(RenderTypes.entityCutoutNoCull((Identifier)TEXTURE)), packedLight, overlay, -1);
         poseStack.popPose();
         poseStack.pushPose();
         Entity currentEntity = entity.getDisplayEntity((Level)Minecraft.getInstance().level);

@@ -105,7 +105,7 @@ implements KeybindUsingArmor {
                 projectile.shoot(vx, vy + v3 * (double)0.2f, vz, speed, 1.0f);
                 player.level().addFreshEntity((Entity)projectile);
             }
-            player.getCooldowns().addCooldown((Item)ModItems.BLOOM_STONE_PAULDRONS.get(), 240);
+            player.getCooldowns().addCooldown(ModItems.BLOOM_STONE_PAULDRONS.get().getDefaultInstance(), 240);
         }
     }
 

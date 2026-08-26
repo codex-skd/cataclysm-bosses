@@ -88,7 +88,7 @@ extends PickaxeItem {
         Player player = context.getPlayer();
         if (player != null && player.getMainHandItem() == stack) {
             this.EarthQuake(context, player);
-            player.getCooldowns().addCooldown((Item)this, CMCommonConfig.InfernalForge.cooldown);
+            player.getCooldowns().addCooldown(this.getDefaultInstance(), CMCommonConfig.InfernalForge.cooldown);
             return InteractionResult.SUCCESS;
         }
         return super.useOn(context);

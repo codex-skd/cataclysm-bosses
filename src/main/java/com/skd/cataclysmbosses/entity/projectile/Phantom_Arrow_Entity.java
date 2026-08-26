@@ -37,6 +37,7 @@ import com.skd.cataclysmbosses.init.ModParticle;
 import com.skd.cataclysmbosses.util.CMDamageTypes;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -59,6 +60,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Phantom_Arrow_Entity
 extends AbstractArrow {
@@ -98,7 +101,7 @@ extends AbstractArrow {
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(TRANSPARENCY, (Object)0);
+        p_326229_.define(TRANSPARENCY, 0);
     }
 
     public int getTransparency() {
@@ -106,20 +109,20 @@ extends AbstractArrow {
     }
 
     public void setTransparency(int trans) {
-        this.entityData.set(TRANSPARENCY, (Object)trans);
+        this.entityData.set(TRANSPARENCY, trans);
     }
 
-    public void addAdditionalSaveData(CompoundTag p_37357_) {
+    public void addAdditionalSaveData(ValueOutput p_37357_) {
         super.addAdditionalSaveData(p_37357_);
         if (this.finalTarget != null) {
-            p_37357_.putUUID("Target", this.finalTarget.getUUID());
+            p_37357_.store("Target", UUIDUtil.CODEC, this.finalTarget.getUUID());
         }
     }
 
-    public void readAdditionalSaveData(CompoundTag p_37353_) {
+    public void readAdditionalSaveData(ValueInput p_37353_) {
         super.readAdditionalSaveData(p_37353_);
-        if (p_37353_.hasUUID("Target")) {
-            this.targetId = p_37353_.getUUID("Target");
+        if (p_37353_.read("Target", UUIDUtil.CODEC).isPresent()) {
+            this.targetId = p_37353_.read("Target", UUIDUtil.CODEC).orElse(null);
         }
     }
 
@@ -184,7 +187,7 @@ extends AbstractArrow {
         if (this.isOnFire() && !flag) {
             entity.igniteForSeconds(5.0f);
         }
-        if (entity.hurt(damagesource, f)) {
+        if (entity.hurtOrSimulate(damagesource, f)) {
             if (flag) {
                 return;
             }

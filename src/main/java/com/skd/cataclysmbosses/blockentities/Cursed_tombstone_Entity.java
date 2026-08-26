@@ -16,7 +16,7 @@
  *  net.minecraft.util.RandomSource
  *  net.minecraft.world.entity.Entity
  *  net.minecraft.world.entity.EntityType
- *  net.minecraft.world.entity.SpawnReason
+ *  net.minecraft.world.entity.EntitySpawnReason
  *  net.minecraft.world.level.Level
  *  net.minecraft.world.level.ServerLevelAccessor
  *  net.minecraft.world.level.block.Blocks
@@ -114,7 +114,7 @@ extends BlockEntity {
                             maledictus.setPos((double)pos.getX() + 0.5, pos.getY() + 2, (double)pos.getZ() + 0.5);
                             maledictus.setTombstoneDirection((Direction)blockState.getValue((Property)Cursed_Tombstone_Block.FACING));
                             maledictus.setHomePos(GlobalPos.of((ResourceKey)serverLevel.dimension(), (BlockPos)pos));
-                            // maledictus.finalizeSpawn((ServerLevelAccessor)serverLevel, serverLevel.getCurrentDifficultyAt(pos), SpawnReason.SPAWNER, null);
+                            // maledictus.finalizeSpawn((ServerLevelAccessor)serverLevel, serverLevel.getCurrentDifficultyAt(pos), EntitySpawnReason.SPAWNER, null);
                             int MthX = Mth.floor((float)pos.getX());
                             int MthY = Mth.floor((float)pos.getY());
                             int MthZ = Mth.floor((float)pos.getZ());

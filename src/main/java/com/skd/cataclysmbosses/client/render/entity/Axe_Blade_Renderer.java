@@ -31,15 +31,16 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Axe_Blade_Renderer
-extends EntityRenderer<Axe_Blade_Entity> {
+extends EntityRenderer<Axe_Blade_Entity, EntityRenderState> {
     private static final Identifier[] TEXTURE_PROGRESS = new Identifier[5];
     public Axe_Blade_Model model = new Axe_Blade_Model();
 
@@ -63,7 +64,7 @@ extends EntityRenderer<Axe_Blade_Entity> {
         this.model.setupAnim(entityIn, 0.0f, 0.0f, (float)entityIn.tickCount + partialTicks, 0.0f, 0.0f);
         float hide = (float)entityIn.getTransparency() / 80.0f;
         float alpha = 1.0f - hide;
-        int i = FastColor.ARGB32.color((int)Mth.floor((float)(alpha * 255.0f)), (int)-1);
+        int i = ARGB.color((int)Mth.floor((float)(alpha * 255.0f)), (int)-1);
         this.model.renderToBuffer(matrixStackIn, vertexconsumer, packedLightIn, OverlayTexture.NO_OVERLAY, i);
         matrixStackIn.popPose();
         super.render((Entity)entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);

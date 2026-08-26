@@ -28,7 +28,7 @@ import javax.annotation.Nonnull;
 import net.minecraft.core.Holder;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -50,7 +50,7 @@ extends ArmorItem {
         return p_41135_.is((Item)ModItems.IGNITIUM_INGOT.get());
     }
 
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         return this.swapWithEquipmentSlot((Item)this, level, player, hand);
     }
 

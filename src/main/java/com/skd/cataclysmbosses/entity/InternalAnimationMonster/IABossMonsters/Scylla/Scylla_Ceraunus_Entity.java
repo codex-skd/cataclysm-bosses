@@ -47,6 +47,7 @@ import com.skd.cataclysmbosses.util.CMDamageTypes;
 import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -73,6 +74,8 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Scylla_Ceraunus_Entity
 extends AbstractArrow
@@ -105,12 +108,12 @@ implements IHoldEntity {
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
         p_326229_.define(CONTROLLER_UUID, Optional.empty());
-        p_326229_.define(CONTROLLER_ID, (Object)-1);
-        p_326229_.define(GRAB, (Object)false);
-        p_326229_.define(HOOK_MODE, (Object)false);
-        p_326229_.define(Y_ROT_OLD, (Object)Float.valueOf(0.0f));
-        p_326229_.define(X_ROT_OLD, (Object)Float.valueOf(0.0f));
-        p_326229_.define(PHASE, (Object)0);
+        p_326229_.define(CONTROLLER_ID, -1);
+        p_326229_.define(GRAB, false);
+        p_326229_.define(HOOK_MODE, false);
+        p_326229_.define(Y_ROT_OLD, Float.valueOf(0.0f));
+        p_326229_.define(X_ROT_OLD, Float.valueOf(0.0f));
+        p_326229_.define(PHASE, 0);
     }
 
     @Nullable
@@ -136,7 +139,7 @@ implements IHoldEntity {
     }
 
     public void setGrab(boolean weapon) {
-        this.entityData.set(GRAB, (Object)weapon);
+        this.entityData.set(GRAB, weapon);
     }
 
     public boolean getHookMode() {
@@ -144,7 +147,7 @@ implements IHoldEntity {
     }
 
     public void setHookMode(boolean weapon) {
-        this.entityData.set(HOOK_MODE, (Object)weapon);
+        this.entityData.set(HOOK_MODE, weapon);
     }
 
     public float getYrotOld() {
@@ -152,7 +155,7 @@ implements IHoldEntity {
     }
 
     public void setYrotOld(float rot) {
-        this.entityData.set(Y_ROT_OLD, (Object)Float.valueOf(rot));
+        this.entityData.set(Y_ROT_OLD, Float.valueOf(rot));
     }
 
     public float getXrotOld() {
@@ -160,7 +163,7 @@ implements IHoldEntity {
     }
 
     public void setXrotOld(float rot) {
-        this.entityData.set(X_ROT_OLD, (Object)Float.valueOf(rot));
+        this.entityData.set(X_ROT_OLD, Float.valueOf(rot));
     }
 
     public int getPhase() {
@@ -168,23 +171,23 @@ implements IHoldEntity {
     }
 
     public void setPhase(int phase) {
-        this.entityData.set(PHASE, (Object)phase);
+        this.entityData.set(PHASE, phase);
     }
 
-    public void readAdditionalSaveData(CompoundTag tag) {
+    public void readAdditionalSaveData(ValueInput tag) {
         super.readAdditionalSaveData(tag);
-        if (tag.hasUUID("ControllerUUID")) {
-            this.setControllerUUID(tag.getUUID("ControllerUUID"));
+        if (tag.read("ControllerUUID", UUIDUtil.CODEC).isPresent()) {
+            this.setControllerUUID(tag.read("ControllerUUID", UUIDUtil.CODEC).orElse(null));
         }
-        this.setHookMode(tag.getBoolean("Hook"));
-        this.setGrab(tag.getBoolean("Grab"));
-        this.setPhase(tag.getInt("Phase"));
+        this.setHookMode(tag.getBooleanOr("Hook", false));
+        this.setGrab(tag.getBooleanOr("Grab", false));
+        this.setPhase(tag.getIntOr("Phase", 0));
     }
 
-    public void addAdditionalSaveData(CompoundTag tag) {
+    public void addAdditionalSaveData(ValueOutput tag) {
         super.addAdditionalSaveData(tag);
         if (this.getControllerUUID() != null) {
-            tag.putUUID("ControllerUUID", this.getControllerUUID());
+            tag.store("ControllerUUID", UUIDUtil.CODEC, this.getControllerUUID());
         }
         tag.putBoolean("Hook", this.getHookMode());
         tag.putBoolean("Grab", this.getGrab());
@@ -196,7 +199,7 @@ implements IHoldEntity {
         Entity controller = this.getController();
         if (controller instanceof Scylla_Entity) {
             Scylla_Entity levi = (Scylla_Entity)controller;
-            this.entityData.set(CONTROLLER_ID, (Object)levi.getId());
+            this.entityData.set(CONTROLLER_ID, levi.getId());
             levi.setAnchorUUID(this.getUUID());
             if (this.getHookMode()) {
                 if (this.getGrab() && !this.level().isClientSide()) {
@@ -246,7 +249,7 @@ implements IHoldEntity {
         Entity entity1;
         DamageSource damagesource;
         Entity entity = p_37573_.getEntity();
-        if (entity.hurt(damagesource = CMDamageTypes.causeStormBringerDamage((Entity)this, (Entity)((entity1 = this.getController()) == null ? this : entity1)), (float)this.getBaseDamage())) {
+        if (entity.hurtOrSimulate(damagesource = CMDamageTypes.causeStormBringerDamage((Entity)this, (Entity)((entity1 = this.getController()) == null ? this : entity1)), (float)this.getBaseDamage())) {
             if (entity.getType() == EntityType.ENDERMAN) {
                 return;
             }

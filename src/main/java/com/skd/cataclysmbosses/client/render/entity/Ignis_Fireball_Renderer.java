@@ -41,10 +41,11 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Matrix4f;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Ignis_Fireball_Renderer
-extends EntityRenderer<Ignis_Fireball_Entity> {
+extends EntityRenderer<Ignis_Fireball_Entity, EntityRenderState> {
     private static final Identifier IGNIS_FIRE_BALL = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/ignis_fireball.png");
     private static final Identifier IGNIS_FIRE_BALL_SOUL = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/ignis_fireball_soul.png");
     private static final Identifier TRAIL_TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/particle/storm.png");
@@ -71,7 +72,7 @@ extends EntityRenderer<Ignis_Fireball_Entity> {
         matrixStackIn.mulPose(Axis.ZP.rotationDegrees(Mth.sin((float)(f2 * 0.15f)) * 360.0f));
         this.model.setupAnim((Entity)entityIn, 0.0f, 0.0f, 0.0f, f, f1);
         VertexConsumer VertexConsumer2 = bufferIn.getBuffer(this.model.renderType(this.getTextureLocation(entityIn)));
-        this.model.renderToBuffer(matrixStackIn, VertexConsumer2, packedLightIn, OverlayTexture.NO_OVERLAY);
+        this.model.renderToBuffer(matrixStackIn, VertexConsumer2, packedLightIn, OverlayTexture.NO_OVERLAY, -1);
         matrixStackIn.popPose();
         if (entityIn.hasTrail()) {
             double x = Mth.lerp((double)partialTicks, (double)entityIn.xOld, (double)entityIn.getX());

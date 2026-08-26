@@ -29,7 +29,7 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -49,7 +49,7 @@ extends RenderLayer<Lionfish_Entity, Lionfish_Model> {
         float strength = 0.5f + Mth.clamp((float)((float)Math.cos(((float)entity.LayerTicks + partialTicks) * 0.1f) - 0.5f), (float)-0.5f, (float)0.5f);
         strength += Mth.lerp((float)partialTicks, (float)entity.oLayerBrightness, (float)entity.LayerBrightness) * 1.0f * (float)Math.PI;
         strength = Mth.clamp((float)strength, (float)0.1f, (float)1.0f) * 255.0f;
-        int i = FastColor.ARGB32.color((int)255, (int)((int)strength), (int)((int)strength), (int)((int)strength));
+        int i = ARGB.color((int)255, (int)((int)strength), (int)((int)strength), (int)((int)strength));
         ((Lionfish_Model)this.getParentModel()).renderToBuffer(matrixStackIn, VertexConsumer2, 0xF00000, OverlayTexture.NO_OVERLAY, i);
     }
 }

@@ -25,7 +25,7 @@
  *  net.minecraft.world.entity.EntityType
  *  net.minecraft.world.entity.LivingEntity
  *  net.minecraft.world.entity.Mob
- *  net.minecraft.world.entity.MobSpawnType
+ *  net.minecraft.world.entity.EntitySpawnReason
  *  net.minecraft.world.entity.PathfinderMob
  *  net.minecraft.world.entity.SpawnGroupData
  *  net.minecraft.world.entity.ai.attributes.AttributeSupplier$Builder
@@ -91,7 +91,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -116,6 +116,8 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Wadjet_Entity
 extends Internal_Animation_Monster {
@@ -171,7 +173,7 @@ extends Internal_Animation_Monster {
             @Override
             public void stop() {
                 super.stop();
-                Wadjet_Entity.this.setStab(Wadjet_Entity.this.random.nextBoolean());
+                Wadjet_Entity.this.setStab(Wadjet_Entity.this.getRandom().nextBoolean());
             }
         });
         this.goalSelector.addGoal(1, (Goal)new InternalAttackGoal(this, 0, 6, 0, 55, 55, 5.0f){
@@ -184,7 +186,7 @@ extends Internal_Animation_Monster {
             @Override
             public void stop() {
                 super.stop();
-                Wadjet_Entity.this.setStab(Wadjet_Entity.this.random.nextBoolean());
+                Wadjet_Entity.this.setStab(Wadjet_Entity.this.getRandom().nextBoolean());
             }
         });
         this.goalSelector.addGoal(1, (Goal)new InternalStateGoal(this, this, 1, 1, 0, 0, 0){
@@ -223,7 +225,7 @@ extends Internal_Animation_Monster {
             }
             return false;
         }
-        return super.hurt(source, damage);
+        return super.hurtOrSimulate(source, damage);
     }
 
     public void handleDamageEvent(DamageSource damageSource) {
@@ -233,7 +235,7 @@ extends Internal_Animation_Monster {
         if (soundevent != null) {
             this.playSound(soundevent, this.getSoundVolume(), (this.random.nextFloat() - this.random.nextFloat()) * 0.2f + 1.0f);
         }
-        this.hurt(this.damageSources().generic(), 0.0f);
+        this.hurtOrSimulate(this.damageSources().generic(), 0.0f);
         this.lastDamageSource = damageSource;
         this.lastDamageStamp = this.level().getGameTime();
     }
@@ -288,8 +290,8 @@ extends Internal_Animation_Monster {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(STAB, (Object)false);
-        p_326229_.define(AWAKEN, (Object)false);
+        p_326229_.define(STAB, false);
+        p_326229_.define(AWAKEN, false);
     }
 
     public boolean isAwaken() {
@@ -301,7 +303,7 @@ extends Internal_Animation_Monster {
     }
 
     public void setStab(boolean stab) {
-        this.entityData.set(STAB, (Object)stab);
+        this.entityData.set(STAB, stab);
     }
 
     public boolean getStab() {
@@ -312,7 +314,7 @@ extends Internal_Animation_Monster {
         if (necklace) {
             this.heal(this.getMaxHealth());
         }
-        this.entityData.set(AWAKEN, (Object)necklace);
+        this.entityData.set(AWAKEN, necklace);
     }
 
     public boolean getAwaken() {
@@ -323,7 +325,7 @@ extends Internal_Animation_Monster {
         return this.isAwaken() && super.canBeSeenAsEnemy();
     }
 
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_29678_, DifficultyInstance p_29679_, MobSpawnType p_29680_, @Nullable SpawnGroupData p_29681_) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_29678_, DifficultyInstance p_29679_, EntitySpawnReason p_29680_, @Nullable SpawnGroupData p_29681_) {
         return super.finalizeSpawn(p_29678_, p_29679_, p_29680_, p_29681_);
     }
 
@@ -400,14 +402,14 @@ extends Internal_Animation_Monster {
         return 60;
     }
 
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         compound.putBoolean("Awaken", this.getAwaken());
     }
 
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        this.setAwaken(compound.getBoolean("Awaken"));
+        this.setAwaken(compound.getBooleanOr("Awaken", false));
     }
 
     @Override
@@ -482,7 +484,7 @@ extends Internal_Animation_Monster {
                 float entityHitDistance = (float)Math.sqrt((entityHit.getZ() - this.getZ()) * (entityHit.getZ() - this.getZ()) + (entityHit.getX() - this.getX()) * (entityHit.getX() - this.getX()));
                 if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || this.isAlliedTo((Entity)entityHit) || entityHit instanceof Wadjet_Entity || entityHit == this) continue;
                 DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
-                boolean hurt = entityHit.hurt(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
+                boolean hurt = entityHit.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
                 if (entityHit.isDamageSourceBlocked(damagesource) && entityHit instanceof Player) {
                     Player player = (Player)entityHit;
                     if (shieldbreakticks > 0) {

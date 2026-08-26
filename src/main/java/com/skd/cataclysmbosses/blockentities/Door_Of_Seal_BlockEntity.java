@@ -92,7 +92,7 @@ extends BlockEntity {
                     ScreenShake_Entity.ScreenShake(level, Vec3.atCenterOf((Vec3i)pos), 20.0f, 0.05f, 0, 120);
                 }
                 if (entity.Animaitonticks == 28) {
-                    level.playSound((Player)null, pos, (SoundEvent)ModSounds.DOOR_OF_SEAL_OPEN.get(), SoundSource.BLOCKS, 4.0f, level.random.nextFloat() * 0.2f + 1.0f);
+                    level.playSound((Player)null, pos, (SoundEvent)ModSounds.DOOR_OF_SEAL_OPEN.get(), SoundSource.BLOCKS, 4.0f, level.getRandom().nextFloat() * 0.2f + 1.0f);
                     float x = (float)pos.getX() + 0.5f;
                     float y = pos.getY();
                     float z = (float)pos.getZ() + 0.5f;

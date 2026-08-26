@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.UUID;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
@@ -79,7 +80,7 @@ extends RenderLayer<Maledictus_Entity, Maledictus_Model> {
         matrixStackIn.translate(0.0f, -0.1f, 0.0f);
         matrixStackIn.scale(0.9f, 0.9f, 0.9f);
         PoseStack.Pose posestack$pose = matrixStackIn.last();
-        VertexConsumer portalStatic = bufferIn.getBuffer(RenderType.entityTranslucent((Identifier)Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/particle/ring_1.png"), (boolean)true));
+        VertexConsumer portalStatic = bufferIn.getBuffer(RenderTypes.entityTranslucent((Identifier)Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/particle/ring_1.png"), (boolean)true));
         matrixStackIn.translate(0.0f, 0.1f, 0.0f);
         if (entity.attackTicks > 1) {
             if (entity.getAttackState() == 1 && entity.attackTicks <= 50) {

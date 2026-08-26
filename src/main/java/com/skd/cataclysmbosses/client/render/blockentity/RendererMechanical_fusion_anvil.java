@@ -21,6 +21,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
@@ -43,8 +44,8 @@ implements BlockEntityRenderer<T> {
         matrixStackIn.mulPose(Axis.YP.rotationDegrees(-f + 90.0f));
         matrixStackIn.scale(-1.0f, -1.0f, 1.0f);
         MODEL.animate((Mechanical_fusion_Anvil_Block_Entity)((Object)tileEntityIn), partialTicks);
-        MODEL.renderToBuffer(matrixStackIn, bufferIn.getBuffer(RenderType.entityCutoutNoCull((Identifier)TEXTURE)), combinedLightIn, combinedOverlayIn);
-        MODEL.renderToBuffer(matrixStackIn, bufferIn.getBuffer(RenderType.entityTranslucentCull((Identifier)LAYER_TEXTURE)), combinedLightIn, combinedOverlayIn);
+        MODEL.renderToBuffer(matrixStackIn, bufferIn.getBuffer(RenderTypes.entityCutoutNoCull((Identifier)TEXTURE)), combinedLightIn, combinedOverlayIn, -1);
+        MODEL.renderToBuffer(matrixStackIn, bufferIn.getBuffer(RenderType.entityTranslucentCull((Identifier)LAYER_TEXTURE)), combinedLightIn, combinedOverlayIn, -1);
         matrixStackIn.popPose();
     }
 }

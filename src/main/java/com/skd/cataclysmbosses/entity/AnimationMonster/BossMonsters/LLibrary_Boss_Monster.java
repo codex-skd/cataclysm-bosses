@@ -22,7 +22,7 @@
  *  net.minecraft.world.entity.Entity
  *  net.minecraft.world.entity.EntityType
  *  net.minecraft.world.entity.LivingEntity
- *  net.minecraft.world.entity.SpawnReason
+ *  net.minecraft.world.entity.EntitySpawnReason
  *  net.minecraft.world.entity.SpawnGroupData
  *  net.minecraft.world.entity.monster.Enemy
  *  net.minecraft.world.level.Level
@@ -56,13 +56,15 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.SpawnReason;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class LLibrary_Boss_Monster
 extends LLibrary_Monster
@@ -96,18 +98,18 @@ IHomeEntity {
         builder.define(HOME_POS, Optional.empty());
     }
 
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         this.addAdditionalHomePoint(compound);
     }
 
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         this.readAdditionalHomePoint(compound);
         super.readAdditionalSaveData(compound);
     }
 
     @Nullable
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, SpawnReason spawnType, @Nullable SpawnGroupData spawnGroupData) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason spawnType, @Nullable SpawnGroupData spawnGroupData) {
         this.homeTicks = this.HOME_COOLDOWN;
         return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
     }
@@ -118,7 +120,7 @@ IHomeEntity {
             return false;
         }
         if (source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
-            return super.hurt(source, amount);
+            return super.hurtOrSimulate(source, amount);
         }
         amount = Math.min(this.DamageCap(), amount);
         double distSqr = this.calculateRange(source);
@@ -152,7 +154,7 @@ IHomeEntity {
                 this.damageBucket += amount;
             }
         }
-        if (flag = super.hurt(source, amount)) {
+        if (flag = super.hurtOrSimulate(source, amount)) {
             if (source.is(ModTag.BLOCK_SELF_REGEN)) {
                 this.self_regen = this.HealCooldown();
             }
@@ -229,7 +231,7 @@ IHomeEntity {
                 return;
             }
             if (!homeBlockPos.closerToCenterThan((Position)this.position(), 16.0)) {
-                this.moveTo(homeVec.x, homeVec.y, homeVec.z, this.getYRot(), this.getXRot());
+                this.setPos(homeVec.x, homeVec.y, homeVec.z, this.getYRot(), this.getXRot());
                 this.homeTicks = this.HOME_COOLDOWN;
             }
         }

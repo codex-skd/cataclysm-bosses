@@ -52,7 +52,7 @@ extends HumanoidModel<HumanoidRenderState> {
     public void renderArm(HumanoidArm handSide, PoseStack matrixStack, VertexConsumer buffer, int packedLight, int packedOverlay) {
         this.getArm((HumanoidArm)handSide).visible = true;
         this.getArm((HumanoidArm)handSide.getOpposite()).visible = false;
-        this.renderToBuffer(matrixStack, buffer, packedLight, packedOverlay);
+        this.renderToBuffer(matrixStack, buffer, packedLight, packedOverlay, -1);
     }
 
     protected Iterable<ModelPart> headParts() {

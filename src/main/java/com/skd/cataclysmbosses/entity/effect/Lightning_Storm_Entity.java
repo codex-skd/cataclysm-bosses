@@ -32,6 +32,7 @@ import com.skd.cataclysmbosses.init.ModSounds;
 import com.skd.cataclysmbosses.util.CMDamageTypes;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -49,6 +50,8 @@ import net.minecraft.world.entity.Pose;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Lightning_Storm_Entity
 extends Entity {
@@ -79,11 +82,11 @@ extends Entity {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(DAMAGE, (Object)Float.valueOf(0.0f));
-        p_326229_.define(HPDAMAGE, (Object)Float.valueOf(0.0f));
-        p_326229_.define(SIZE, (Object)Float.valueOf(0.0f));
-        p_326229_.define(LIFESPAN, (Object)0);
-        p_326229_.define(DELAY, (Object)0);
+        p_326229_.define(DAMAGE, Float.valueOf(0.0f));
+        p_326229_.define(HPDAMAGE, Float.valueOf(0.0f));
+        p_326229_.define(SIZE, Float.valueOf(0.0f));
+        p_326229_.define(LIFESPAN, 0);
+        p_326229_.define(DELAY, 0);
     }
 
     public int getLifespan() {
@@ -91,7 +94,7 @@ extends Entity {
     }
 
     public void setLifespan(int lifespan) {
-        this.entityData.set(LIFESPAN, (Object)lifespan);
+        this.entityData.set(LIFESPAN, lifespan);
     }
 
     public int getDelay() {
@@ -99,7 +102,7 @@ extends Entity {
     }
 
     public void setDelay(int delay) {
-        this.entityData.set(DELAY, (Object)delay);
+        this.entityData.set(DELAY, delay);
     }
 
     public float getSize() {
@@ -108,7 +111,7 @@ extends Entity {
 
     public void setSize(float size) {
         if (!this.level().isClientSide()) {
-            this.getEntityData().set(SIZE, (Object)Float.valueOf(Mth.clamp((float)size, (float)1.0f, (float)5.0f)));
+            this.getEntityData().set(SIZE, Float.valueOf(Mth.clamp((float)size, (float)1.0f, (float)5.0f)));
         }
     }
 
@@ -131,7 +134,7 @@ extends Entity {
     }
 
     public void setDamage(float damage) {
-        this.entityData.set(DAMAGE, (Object)Float.valueOf(damage));
+        this.entityData.set(DAMAGE, Float.valueOf(damage));
     }
 
     public float getHpDamage() {
@@ -139,7 +142,7 @@ extends Entity {
     }
 
     public void setHpDamage(float damage) {
-        this.entityData.set(HPDAMAGE, (Object)Float.valueOf(damage));
+        this.entityData.set(HPDAMAGE, Float.valueOf(damage));
     }
 
     public boolean shouldRenderAtSqrDistance(double distance) {
@@ -213,9 +216,9 @@ extends Entity {
         LivingEntity livingentity = this.getCaster();
         if (Hitentity.isAlive() && !Hitentity.isInvulnerable() && Hitentity != livingentity) {
             if (livingentity == null) {
-                Hitentity.hurt(this.damageSources().magic(), this.getDamage());
+                Hitentity.hurtOrSimulate(this.damageSources().magic(), this.getDamage());
             } else if (!livingentity.isAlliedTo((Entity)Hitentity) && !Hitentity.isAlliedTo((Entity)livingentity)) {
-                Hitentity.hurt(CMDamageTypes.causeLightningDamage(this, (Entity)livingentity), this.getDamage() + Hitentity.getMaxHealth() * this.getHpDamage());
+                Hitentity.hurtOrSimulate(CMDamageTypes.causeLightningDamage(this, (Entity)livingentity), this.getDamage() + Hitentity.getMaxHealth() * this.getHpDamage());
             }
         }
     }
@@ -238,26 +241,26 @@ extends Entity {
         }
     }
 
-    protected void addAdditionalSaveData(CompoundTag compound) {
+    protected void addAdditionalSaveData(ValueOutput compound) {
         compound.putInt("lifespan", this.getLifespan());
         compound.putInt("delay", this.getDelay());
         if (this.ownerUUID != null) {
-            compound.putUUID("Owner", this.ownerUUID);
+            compound.store("Owner", UUIDUtil.CODEC, this.ownerUUID);
         }
         compound.putFloat("damage", this.getDamage());
         compound.putFloat("Hpdamage", this.getHpDamage());
         compound.putFloat("size", this.getSize());
     }
 
-    protected void readAdditionalSaveData(CompoundTag compound) {
-        this.setLifespan(compound.getInt("lifespan"));
-        this.setDelay(compound.getInt("delay"));
-        if (compound.hasUUID("Owner")) {
-            this.ownerUUID = compound.getUUID("Owner");
+    protected void readAdditionalSaveData(ValueInput compound) {
+        this.setLifespan(compound.getIntOr("lifespan", 0));
+        this.setDelay(compound.getIntOr("delay", 0));
+        if (compound.read("Owner", UUIDUtil.CODEC).isPresent()) {
+            this.ownerUUID = compound.read("Owner", UUIDUtil.CODEC).orElse(null);
         }
-        this.setDamage(compound.getFloat("damage"));
-        this.setHpDamage(compound.getFloat("Hpdamage"));
-        this.setSize(compound.getFloat("size"));
+        this.setDamage(compound.getFloatOr("damage", 0.0f));
+        this.setHpDamage(compound.getFloatOr("Hpdamage", 0.0f));
+        this.setSize(compound.getFloatOr("size", 0.0f));
     }
 }
 

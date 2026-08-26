@@ -45,6 +45,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -73,6 +74,8 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.event.EventHooks;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Ancient_Desert_Stele_Entity
 extends Projectile {
@@ -98,9 +101,9 @@ extends Projectile {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(ACTIVATE, (Object)false);
-        p_326229_.define(DAMAGE, (Object)Float.valueOf(0.0f));
-        p_326229_.define(WARMUP, (Object)0);
+        p_326229_.define(ACTIVATE, false);
+        p_326229_.define(DAMAGE, Float.valueOf(0.0f));
+        p_326229_.define(WARMUP, 0);
     }
 
     public float getDamage() {
@@ -108,7 +111,7 @@ extends Projectile {
     }
 
     public void setDamage(float damage) {
-        this.entityData.set(DAMAGE, (Object)Float.valueOf(damage));
+        this.entityData.set(DAMAGE, Float.valueOf(damage));
     }
 
     public int getWarmUp() {
@@ -116,7 +119,7 @@ extends Projectile {
     }
 
     public void setWarmUp(int damage) {
-        this.entityData.set(WARMUP, (Object)damage);
+        this.entityData.set(WARMUP, damage);
     }
 
     public void setCaster(@Nullable LivingEntity p_190549_1_) {
@@ -133,18 +136,18 @@ extends Projectile {
         return this.caster;
     }
 
-    protected void readAdditionalSaveData(CompoundTag compound) {
-        this.setWarmUp(compound.getInt("Warmup"));
-        if (compound.hasUUID("Owner")) {
-            this.casterUuid = compound.getUUID("Owner");
+    protected void readAdditionalSaveData(ValueInput compound) {
+        this.setWarmUp(compound.getIntOr("Warmup", 0));
+        if (compound.read("Owner", UUIDUtil.CODEC).isPresent()) {
+            this.casterUuid = compound.read("Owner", UUIDUtil.CODEC).orElse(null);
         }
-        this.setDamage(compound.getFloat("damage"));
+        this.setDamage(compound.getFloatOr("damage", 0.0f));
     }
 
-    protected void addAdditionalSaveData(CompoundTag compound) {
+    protected void addAdditionalSaveData(ValueOutput compound) {
         compound.putInt("Warmup", this.getWarmUp());
         if (this.casterUuid != null) {
-            compound.putUUID("Owner", this.casterUuid);
+            compound.store("Owner", UUIDUtil.CODEC, this.casterUuid);
         }
         compound.putFloat("damage", this.getDamage());
     }
@@ -209,11 +212,11 @@ extends Projectile {
             if (shooter != null) {
                 DamageSource damagesource;
                 LivingEntity owner = shooter;
-                if (owner != entity && !owner.isAlliedTo(entity) && (flag = entity.hurt(damagesource = this.damageSources().mobProjectile((Entity)this, owner), this.getDamage()))) {
+                if (owner != entity && !owner.isAlliedTo(entity) && (flag = entity.hurtOrSimulate(damagesource = this.damageSources().mobProjectile((Entity)this, owner), this.getDamage()))) {
                     EnchantmentHelper.doPostAttackEffects((ServerLevel)serverlevel, (Entity)entity, (DamageSource)damagesource);
                 }
             } else {
-                flag = entity.hurt(this.damageSources().magic(), this.getDamage());
+                flag = entity.hurtOrSimulate(this.damageSources().magic(), this.getDamage());
             }
             if (flag && entity instanceof LivingEntity) {
                 MobEffectInstance effectinstance = new MobEffectInstance(ModEffect.EFFECTCURSE_OF_DESERT, 200, 0);
@@ -238,7 +241,7 @@ extends Projectile {
     }
 
     public void setActivate(boolean Activate) {
-        this.entityData.set(ACTIVATE, (Object)Activate);
+        this.entityData.set(ACTIVATE, Activate);
     }
 }
 

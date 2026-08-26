@@ -196,7 +196,7 @@ import com.skd.cataclysmbosses.init.ModKeybind;
 import com.skd.cataclysmbosses.init.ModMenu;
 import com.skd.cataclysmbosses.init.ModParticle;
 import com.skd.cataclysmbosses.init.ModTileentites;
-import net.minecraft.client.model.SkullModelBase;
+import net.minecraft.client.model.object.skull.SkullModelBase;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.renderer.blockentity.SkullBlockRenderer;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;

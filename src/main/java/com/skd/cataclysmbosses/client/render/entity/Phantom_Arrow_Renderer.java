@@ -30,9 +30,10 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 public class Phantom_Arrow_Renderer
-extends EntityRenderer<Phantom_Arrow_Entity> {
+extends EntityRenderer<Phantom_Arrow_Entity, EntityRenderState> {
     private static final Identifier TEXTURE_RED = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/maledictus/phantom_arrow.png");
     private static final RenderType RENDER_TYPE_RED = CMRenderTypes.getGhost(TEXTURE_RED);
 

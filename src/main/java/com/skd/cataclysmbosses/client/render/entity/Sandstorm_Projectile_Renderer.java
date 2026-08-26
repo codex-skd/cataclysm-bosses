@@ -29,10 +29,11 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Sandstorm_Projectile_Renderer
-extends EntityRenderer<Sandstorm_Projectile> {
+extends EntityRenderer<Sandstorm_Projectile, EntityRenderState> {
     private static final Identifier SANDSTORM = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/koboleton/sandstorm.png");
     public Sandstorm_Projectile_Model model = new Sandstorm_Projectile_Model();
 
@@ -48,7 +49,7 @@ extends EntityRenderer<Sandstorm_Projectile> {
         float f1 = Mth.lerp((float)partialTicks, (float)entityIn.xRotO, (float)entityIn.getXRot());
         VertexConsumer vertexconsumer = bufferIn.getBuffer(this.model.renderType(this.getTextureLocation(entityIn)));
         this.model.setupAnim(entityIn, 0.0f, 0.0f, (float)entityIn.tickCount + partialTicks, f, f1);
-        this.model.renderToBuffer(matrixStackIn, vertexconsumer, packedLightIn, OverlayTexture.NO_OVERLAY);
+        this.model.renderToBuffer(matrixStackIn, vertexconsumer, packedLightIn, OverlayTexture.NO_OVERLAY, -1);
         matrixStackIn.popPose();
         super.render((Entity)entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
     }

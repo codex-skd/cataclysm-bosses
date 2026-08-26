@@ -22,7 +22,7 @@
  *  net.minecraft.world.entity.EquipmentSlot
  *  net.minecraft.world.entity.LivingEntity
  *  net.minecraft.world.entity.Mob
- *  SpawnReason
+ *  EntitySpawnReason
  *  net.minecraft.world.entity.MoverType
  *  net.minecraft.world.entity.PathfinderMob
  *  net.minecraft.world.entity.SpawnGroupData
@@ -93,7 +93,7 @@ import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.navigation.WaterBoundPathNavigation;
 import net.minecraft.world.entity.ai.util.DefaultRandomPos;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.SpawnReason;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
@@ -107,6 +107,8 @@ import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Deepling_Angler_Entity
 extends AbstractDeepling {
@@ -147,12 +149,12 @@ extends AbstractDeepling {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
     }
 
@@ -176,12 +178,12 @@ extends AbstractDeepling {
         this.playSound((SoundEvent)ModSounds.DEEPLING_IDLE.get(), 0.15f, 0.6f);
     }
 
-    public boolean checkSpawnRules(LevelAccessor worldIn, SpawnReason spawnReasonIn) {
+    public boolean checkSpawnRules(LevelAccessor worldIn, EntitySpawnReason spawnReasonIn) {
         return ModEntities.rollSpawn(CMCommonConfig.Spawning.DeeplingAnglerSpawnRolls, this.getRandom(), spawnReasonIn);
     }
 
     @Nullable
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_34088_, DifficultyInstance p_34089_, SpawnReason p_34090_, @Nullable SpawnGroupData p_34091_) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_34088_, DifficultyInstance p_34089_, EntitySpawnReason p_34090_, @Nullable SpawnGroupData p_34091_) {
         SpawnGroupData spawngroupdata = super.finalizeSpawn(p_34088_, p_34089_, p_34090_, p_34091_);
         RandomSource randomsource = p_34088_.getRandom();
         this.populateDefaultEquipmentSlots(randomsource, p_34089_);
@@ -197,8 +199,8 @@ extends AbstractDeepling {
         return p_32829_.isUnobstructed((Entity)this);
     }
 
-    public static boolean candeeplingSpawn(EntityType<? extends Deepling_Angler_Entity> guardian, LevelAccessor level, SpawnReason spawnType, BlockPos pos, RandomSource random) {
-        return level.getDifficulty() != Difficulty.PEACEFUL && (SpawnReason.isSpawner((SpawnReason)spawnType) || level.getFluidState(pos).is(FluidTags.WATER));
+    public static boolean candeeplingSpawn(EntityType<? extends Deepling_Angler_Entity> guardian, LevelAccessor level, EntitySpawnReason spawnType, BlockPos pos, RandomSource random) {
+        return level.getDifficulty() != Difficulty.PEACEFUL && (EntitySpawnReason.isSpawner((EntitySpawnReason)spawnType) || level.getFluidState(pos).is(FluidTags.WATER));
     }
 
     @Override
@@ -219,14 +221,14 @@ extends AbstractDeepling {
                 this.playSound((SoundEvent)ModSounds.DEEPLING_SWING.get(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
                 if (target != null && this.distanceTo(target) < 3.0f) {
                     damage = (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE);
-                    target.hurt(this.damageSources().mobAttack((LivingEntity)this), damage);
+                    target.hurtOrSimulate(this.damageSources().mobAttack((LivingEntity)this), damage);
                 }
             }
             if (this.getAnimation() == DEEPLING_HUG && this.getAnimationTick() == 9) {
                 this.playSound((SoundEvent)ModSounds.DEEPLING_SWING.get(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
                 if (target != null && this.distanceTo(target) < 3.0f) {
                     damage = (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE);
-                    boolean flag = target.hurt(this.damageSources().mobAttack((LivingEntity)this), damage);
+                    boolean flag = target.hurtOrSimulate(this.damageSources().mobAttack((LivingEntity)this), damage);
                     if (flag) {
                         target.addEffect(new MobEffectInstance(MobEffects.POISON, 60, 1), (Entity)this);
                     }

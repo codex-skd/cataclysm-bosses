@@ -41,6 +41,7 @@ import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
@@ -121,7 +122,7 @@ extends MobRenderer<The_Leviathan_Entity, The_Leviathan_Model> {
             Vec3 fromVec = entity.getTonguePosition().add(headModelPos);
             Vec3 toVec = weapon.getPosition(partialTicks);
             Vec3 currentNeckButt = fromVec;
-            VertexConsumer neckConsumer = bufferIn.getBuffer(RenderType.entityCutoutNoCull((Identifier)LEVIATHAN_TEXTURES));
+            VertexConsumer neckConsumer = bufferIn.getBuffer(RenderTypes.entityCutoutNoCull((Identifier)LEVIATHAN_TEXTURES));
             double remainingDistance = toVec.distanceTo(fromVec);
             for (int segmentCount = 0; segmentCount < 128 && remainingDistance > 0.0; ++segmentCount) {
                 Vec3 powVec;
@@ -133,14 +134,14 @@ extends MobRenderer<The_Leviathan_Entity, The_Leviathan_Model> {
                 The_Leviathan_Renderer.renderNeckCube(currentNeckButt, next, matrixStackIn, neckConsumer, neckLight, OverlayTexture.NO_OVERLAY, 0.0f);
                 currentNeckButt = next;
             }
-            VertexConsumer clawConsumer = bufferIn.getBuffer(RenderType.entityCutoutNoCull((Identifier)LEVIATHAN_TEXTURES));
+            VertexConsumer clawConsumer = bufferIn.getBuffer(RenderTypes.entityCutoutNoCull((Identifier)LEVIATHAN_TEXTURES));
             matrixStackIn.pushPose();
             matrixStackIn.translate(toVec.x, toVec.y, toVec.z);
             matrixStackIn.translate(0.0f, -0.5f, 0.0f);
             float rotY = (float)(Mth.atan2((double)toVec.x, (double)toVec.z) * 57.2957763671875);
             float rotX = (float)(-(Mth.atan2((double)toVec.y, (double)toVec.horizontalDistance()) * 57.2957763671875));
             TONGUE_END_MODEL.setAttributes(rotX, rotY);
-            TONGUE_END_MODEL.renderToBuffer(matrixStackIn, clawConsumer, this.getLightColor((Entity)entity, toVec.add(x, y, z)), OverlayTexture.NO_OVERLAY);
+            TONGUE_END_MODEL.renderToBuffer(matrixStackIn, clawConsumer, this.getLightColor((Entity)entity, toVec.add(x, y, z)), OverlayTexture.NO_OVERLAY, -1);
             matrixStackIn.popPose();
             matrixStackIn.popPose();
         }
@@ -160,7 +161,7 @@ extends MobRenderer<The_Leviathan_Entity, The_Leviathan_Model> {
         matrixStackIn.translate(from.x, from.y, from.z);
         matrixStackIn.translate(0.0f, -0.5f, 0.0f);
         TONGUE_MODEL.setAttributes((float)sub.length(), rotX, rotY, additionalYaw);
-        TONGUE_MODEL.renderToBuffer(matrixStackIn, buffer, packedLightIn, overlayCoords);
+        TONGUE_MODEL.renderToBuffer(matrixStackIn, buffer, packedLightIn, overlayCoords, -1);
         matrixStackIn.popPose();
     }
 

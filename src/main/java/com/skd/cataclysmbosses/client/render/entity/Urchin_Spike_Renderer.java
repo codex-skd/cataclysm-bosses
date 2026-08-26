@@ -32,10 +32,11 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Urchin_Spike_Renderer
-extends EntityRenderer<Urchin_Spike_Entity> {
+extends EntityRenderer<Urchin_Spike_Entity, EntityRenderState> {
     public Urchin_Spike_Renderer(EntityRendererProvider.Context manager) {
         super(manager);
     }

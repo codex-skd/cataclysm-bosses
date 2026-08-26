@@ -83,6 +83,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Symbiocto_Entity
 extends Monster
@@ -171,7 +173,7 @@ implements RangedAttackMob {
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(ATTACK_STATE, (Object)0);
+        p_326229_.define(ATTACK_STATE, 0);
     }
 
     public void onSyncedDataUpdated(EntityDataAccessor<?> p_21104_) {
@@ -196,7 +198,7 @@ implements RangedAttackMob {
 
     public void setAttackState(int input) {
         this.attackTicks = 0;
-        this.entityData.set(ATTACK_STATE, (Object)input);
+        this.entityData.set(ATTACK_STATE, input);
         this.level().broadcastEntityEvent((Entity)this, (byte)(-input));
     }
 
@@ -213,11 +215,11 @@ implements RangedAttackMob {
         return super.doHurtTarget(p_219472_);
     }
 
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
     }
 
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
     }
 

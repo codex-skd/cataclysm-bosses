@@ -31,10 +31,11 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Wither_Missile_Renderer
-extends EntityRenderer<Wither_Missile_Entity> {
+extends EntityRenderer<Wither_Missile_Entity, EntityRenderState> {
     private static final Identifier WITHER_MISSILE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/harbinger/wither_missile.png");
     public Wither_Missile_Model model = new Wither_Missile_Model();
 
@@ -53,7 +54,7 @@ extends EntityRenderer<Wither_Missile_Entity> {
         float f1 = Mth.lerp((float)partialTicks, (float)entityIn.xRotO, (float)entityIn.getXRot());
         VertexConsumer vertexconsumer = bufferIn.getBuffer(this.model.renderType(this.getTextureLocation(entityIn)));
         this.model.setupAnim((Entity)entityIn, 0.0f, 0.0f, 0.0f, f, f1);
-        this.model.renderToBuffer(matrixStackIn, vertexconsumer, packedLightIn, OverlayTexture.NO_OVERLAY);
+        this.model.renderToBuffer(matrixStackIn, vertexconsumer, packedLightIn, OverlayTexture.NO_OVERLAY, -1);
         matrixStackIn.popPose();
         super.render((Entity)entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
     }

@@ -26,6 +26,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.BlockPos;
@@ -80,7 +81,7 @@ implements BlockEntityRenderer<Door_Of_Seal_BlockEntity> {
             poseStack.mulPose(dir.getOpposite().getRotation());
             poseStack.mulPose(Axis.XP.rotationDegrees(90.0f));
             MODEL.animate(entity, delta);
-            MODEL.renderToBuffer(poseStack, buffer.getBuffer(RenderType.entityCutoutNoCull((Identifier)TEXTURE)), packedLight, overlay);
+            MODEL.renderToBuffer(poseStack, buffer.getBuffer(RenderTypes.entityCutoutNoCull((Identifier)TEXTURE)), packedLight, overlay, -1);
             poseStack.popPose();
         }
     }

@@ -35,10 +35,11 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Thrown_Coral_Bardiche_Renderer
-extends EntityRenderer<ThrownCoral_Bardiche_Entity> {
+extends EntityRenderer<ThrownCoral_Bardiche_Entity, EntityRenderState> {
     private static final Identifier VOID_HOWITZER_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/coral_bardiche.png");
     private final Coral_Bardiche_Model model = new Coral_Bardiche_Model();
 
@@ -51,7 +52,7 @@ extends EntityRenderer<ThrownCoral_Bardiche_Entity> {
         matrixStackIn.mulPose(Axis.YP.rotationDegrees(Mth.lerp((float)partialTicks, (float)entityIn.yRotO, (float)entityIn.getYRot()) - 90.0f));
         matrixStackIn.mulPose(Axis.ZP.rotationDegrees(Mth.lerp((float)partialTicks, (float)entityIn.xRotO, (float)entityIn.getXRot()) + 90.0f));
         VertexConsumer vertexconsumer = ItemRenderer.getFoilBufferDirect((MultiBufferSource)bufferIn, (RenderType)this.model.renderType(this.getTextureLocation(entityIn)), (boolean)false, (boolean)entityIn.isFoil());
-        this.model.renderToBuffer(matrixStackIn, vertexconsumer, packedLightIn, OverlayTexture.NO_OVERLAY);
+        this.model.renderToBuffer(matrixStackIn, vertexconsumer, packedLightIn, OverlayTexture.NO_OVERLAY, -1);
         matrixStackIn.popPose();
         super.render((Entity)entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
     }

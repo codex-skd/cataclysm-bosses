@@ -45,7 +45,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -92,7 +92,7 @@ extends Cataclysm_Weapon {
                 }
                 if (hasSucceeded) {
                     if (!p_43395_.isClientSide()) {
-                        player.getCooldowns().addCooldown((Item)this, CMCommonConfig.Incinerator.cooldown);
+                        player.getCooldowns().addCooldown(this.getDefaultInstance(), CMCommonConfig.Incinerator.cooldown);
                     }
                     ScreenShake_Entity.ScreenShake(p_43395_, player.position(), 30.0f, 0.15f, 0, 30);
                     player.playSound((SoundEvent)ModSounds.SWORD_STOMP.get(), 1.0f, 1.0f);
@@ -109,15 +109,15 @@ extends Cataclysm_Weapon {
         }
     }
 
-    public InteractionResultHolder<ItemStack> use(Level p_77659_1_, Player p_77659_2_, InteractionHand p_77659_3_) {
+    public InteractionResult use(Level p_77659_1_, Player p_77659_2_, InteractionHand p_77659_3_) {
         ItemStack item = p_77659_2_.getItemInHand(p_77659_3_);
         InteractionHand otherhand = p_77659_3_ == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
         ItemStack otheritem = p_77659_2_.getItemInHand(otherhand);
         if (otheritem.canPerformAction(ItemAbilities.SHIELD_BLOCK) && !p_77659_2_.getCooldowns().isOnCooldown(otheritem.getItem())) {
-            return InteractionResultHolder.fail((Object)item);
+            return InteractionResult.FAIL;
         }
         p_77659_2_.startUsingItem(p_77659_3_);
-        return InteractionResultHolder.consume((Object)item);
+        return InteractionResult.CONSUME;
     }
 
     public boolean canDisableShield(ItemStack stack, ItemStack shield, LivingEntity entity, LivingEntity attacker) {

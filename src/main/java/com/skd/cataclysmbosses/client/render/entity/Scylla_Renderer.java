@@ -57,7 +57,7 @@ import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -162,7 +162,7 @@ extends MobRenderer<Scylla_Entity, Scylla_Model> {
             VertexConsumer vertexconsumer = bufferIn.getBuffer(rendertype);
             int n = i = entityIn.isDeadOrDying() ? OverlayTexture.NO_OVERLAY : Scylla_Renderer.getOverlayCoords((LivingEntity)entityIn, (float)this.getWhiteOverlayProgress((LivingEntity)entityIn, partialTicks));
             int alpha = entityIn.getAttackState() != 12 ? 255 : (entityIn.attackTicks < 100 ? 255 : Math.max(35, 255 - (entityIn.deathTime - 100) * 255 / (entityIn.deathtimer() - 100)));
-            int i1 = FastColor.ARGB32.color((int)alpha, (int)255, (int)255, (int)255);
+            int i1 = ARGB.color((int)alpha, (int)255, (int)255, (int)255);
             ((Scylla_Model)this.model).renderToBuffer(matrixStackIn, vertexconsumer, packedLightIn, i, flag1 ? i1 : -1);
         }
         if (!entityIn.isSpectator()) {

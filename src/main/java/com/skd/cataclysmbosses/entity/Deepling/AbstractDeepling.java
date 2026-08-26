@@ -56,8 +56,10 @@ import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.fluids.FluidType;
 import org.jspecify.annotations.Nullable;
-import net.minecraft.world.entity.SpawnReason;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class AbstractDeepling
 extends LLibrary_Monster
@@ -124,7 +126,7 @@ Enemy {
             int dry = this.level().isDay() ? 2 : 1;
             this.setMoistness(this.getMoistness() - dry);
             if (this.getMoistness() <= 0 && this.moistureAttackTime-- <= 0) {
-                this.hurt(this.damageSources().dryOut(), this.random.nextInt(2) == 0 ? 1.0f : 0.0f);
+                this.hurtOrSimulate(this.damageSources().dryOut(), this.random.nextInt(2) == 0 ? 1.0f : 0.0f);
                 this.moistureAttackTime = 20;
             }
         }
@@ -175,7 +177,7 @@ Enemy {
         if (source.is(DamageTypes.HOT_FLOOR)) {
             return false;
         }
-        super.hurt(source, damage);
+        super.hurtOrSimulate(source, damage);
         return true;
     }
 

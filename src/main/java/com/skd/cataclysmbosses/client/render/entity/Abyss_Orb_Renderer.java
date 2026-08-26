@@ -25,6 +25,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -33,12 +34,13 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Abyss_Orb_Renderer
-extends EntityRenderer<Abyss_Orb_Entity> {
+extends EntityRenderer<Abyss_Orb_Entity, EntityRenderState> {
     private static final Identifier TEXTURE_LOCATION = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/leviathan/abyss_orb.png");
-    private static final RenderType RENDER_TYPE = RenderType.entityCutoutNoCull((Identifier)TEXTURE_LOCATION);
+    private static final RenderType RENDER_TYPE = RenderTypes.entityCutoutNoCull((Identifier)TEXTURE_LOCATION);
 
     public Abyss_Orb_Renderer(EntityRendererProvider.Context p_173962_) {
         super(p_173962_);

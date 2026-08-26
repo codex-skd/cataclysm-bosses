@@ -24,6 +24,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -49,11 +50,11 @@ extends RenderLayer<Ignis_Entity, Ignis_Model> {
         Identifier lvt_12_3_ = ignis.getBossPhase() < 1 ? IGNIS_SHIELD : IGNIS_SOUL_SHIELD;
         ((Ignis_Model)this.getParentModel()).copyPropertiesTo((EntityModel)this.model);
         this.model.setupAnim(ignis, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
-        VertexConsumer lvt_13_1_ = bufferIn.getBuffer(RenderType.entityCutoutNoCull((Identifier)lvt_12_3_));
-        this.model.renderToBuffer(matrixStackIn, lvt_13_1_, packedLightIn, OverlayTexture.NO_OVERLAY);
+        VertexConsumer lvt_13_1_ = bufferIn.getBuffer(RenderTypes.entityCutoutNoCull((Identifier)lvt_12_3_));
+        this.model.renderToBuffer(matrixStackIn, lvt_13_1_, packedLightIn, OverlayTexture.NO_OVERLAY, -1);
         if (ignis.getShieldDurability() > 0) {
-            VertexConsumer lvt_13_2_ = ignis.getShieldDurability() >= 3 ? bufferIn.getBuffer(RenderType.entityCutoutNoCull((Identifier)IGNIS_SHIELD_CRACK3)) : (ignis.getShieldDurability() == 2 ? bufferIn.getBuffer(RenderType.entityCutoutNoCull((Identifier)IGNIS_SHIELD_CRACK2)) : bufferIn.getBuffer(RenderType.entityCutoutNoCull((Identifier)IGNIS_SHIELD_CRACK1)));
-            this.model.renderToBuffer(matrixStackIn, lvt_13_2_, packedLightIn, OverlayTexture.NO_OVERLAY);
+            VertexConsumer lvt_13_2_ = ignis.getShieldDurability() >= 3 ? bufferIn.getBuffer(RenderTypes.entityCutoutNoCull((Identifier)IGNIS_SHIELD_CRACK3)) : (ignis.getShieldDurability() == 2 ? bufferIn.getBuffer(RenderTypes.entityCutoutNoCull((Identifier)IGNIS_SHIELD_CRACK2)) : bufferIn.getBuffer(RenderTypes.entityCutoutNoCull((Identifier)IGNIS_SHIELD_CRACK1)));
+            this.model.renderToBuffer(matrixStackIn, lvt_13_2_, packedLightIn, OverlayTexture.NO_OVERLAY, -1);
         }
     }
 }

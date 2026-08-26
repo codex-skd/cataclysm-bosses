@@ -48,6 +48,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public abstract class AbstractElemental_Spear
 extends Projectile {
@@ -75,7 +77,7 @@ extends Projectile {
 
     public AbstractElemental_Spear(EntityType<? extends AbstractElemental_Spear> entityType, double x, double y, double z, Vec3 movement, Level level) {
         this(entityType, level);
-        this.moveTo(x, y, z, this.getYRot(), this.getXRot());
+        this.setPos(x, y, z, this.getYRot(), this.getXRot());
         this.reapplyPosition();
         this.assignDirectionalMovement(movement, this.accelerationPower);
     }
@@ -140,15 +142,15 @@ extends Projectile {
         return 0.95f;
     }
 
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         compound.putDouble("acceleration_power", this.accelerationPower);
     }
 
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
         if (compound.contains("acceleration_power", 6)) {
-            this.accelerationPower = compound.getDouble("acceleration_power");
+            this.accelerationPower = compound.getDoubleOr("acceleration_power", 0.0);
         }
     }
 

@@ -152,6 +152,8 @@ import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class The_Baby_Leviathan_Entity
 extends LLibraryAnimationPet
@@ -206,7 +208,7 @@ Bucketable {
         if (entity instanceof Mini_Abyss_Blast_Entity || entity instanceof Abyss_Blast_Entity || entity instanceof Portal_Abyss_Blast_Entity) {
             return false;
         }
-        return super.hurt(source, amount);
+        return super.hurtOrSimulate(source, amount);
     }
 
     public static AttributeSupplier.Builder babyleviathan() {
@@ -276,19 +278,19 @@ Bucketable {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(FROM_BUCKET, (Object)false);
+        p_326229_.define(FROM_BUCKET, false);
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         compound.putBoolean("FromBucket", this.fromBucket());
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        this.setFromBucket(compound.getBoolean("FromBucket"));
+        this.setFromBucket(compound.getBooleanOr("FromBucket", false));
     }
 
     @Override
@@ -301,7 +303,7 @@ Bucketable {
     }
 
     public void setFromBucket(boolean sit) {
-        this.entityData.set(FROM_BUCKET, (Object)sit);
+        this.entityData.set(FROM_BUCKET, sit);
     }
 
     public void saveToBucketTag(@Nonnull ItemStack bucket) {
@@ -422,7 +424,7 @@ Bucketable {
             List<LivingEntity> hit = this.raytraceEntities((Level)this.level(), (double)inflateX, (double)inflateY, (double)inflateZ, (Vec3)new Vec3((double)this.getX(), (double)this.getY(), (double)this.getZ()), (Vec3)new Vec3((double)this.endPosX, (double)this.endPosY, (double)this.endPosZ)).entities;
             for (LivingEntity target : hit) {
                 if (this.isAlliedTo((Entity)target) || target instanceof The_Baby_Leviathan_Entity || target == this) continue;
-                target.hurt(this.damageSources().mobAttack((LivingEntity)this), (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE));
+                target.hurtOrSimulate(this.damageSources().mobAttack((LivingEntity)this), (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE));
             }
         }
     }

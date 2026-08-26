@@ -52,9 +52,10 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
-public class Player_Ceraunus_Renderer extends EntityRenderer<Player_Ceraunus_Entity> {
+public class Player_Ceraunus_Renderer extends EntityRenderer<Player_Ceraunus_Entity, EntityRenderState> {
     private final Ceraunus_Model model;
     private static final Identifier TEXTURE = new ResourceLocation("cataclysm_bosses", "textures/entity/player_ceraunus.png");
     private static final Identifier CHAIN_TEXTURE = new ResourceLocation("cataclysm_bosses", "textures/entity/player_ceraunus_chain.png");
@@ -71,7 +72,7 @@ public class Player_Ceraunus_Renderer extends EntityRenderer<Player_Ceraunus_Ent
         float xRot = Mth.lerp((float)tickDelta, (float)entity.xRotO, (float)entity.getXRot());
         matrices.mulPose(Axis.YP.rotationDegrees(yRot - 90.0f));
         matrices.mulPose(Axis.ZP.rotationDegrees(xRot + 90.0f));
-        this.model.renderToBuffer(matrices, provider.getBuffer(this.model.renderType(TEXTURE)), light, OverlayTexture.NO_OVERLAY);
+        this.model.renderToBuffer(matrices, provider.getBuffer(this.model.renderType(TEXTURE)), light, OverlayTexture.NO_OVERLAY, -1);
         matrices.popPose();
     }
 

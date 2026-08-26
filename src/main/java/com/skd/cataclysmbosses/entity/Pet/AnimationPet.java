@@ -42,6 +42,8 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class AnimationPet
 extends TamableAnimal
@@ -57,8 +59,8 @@ implements IFollower {
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(COMMAND, (Object)0);
-        p_326229_.define(SITTING, (Object)false);
+        p_326229_.define(COMMAND, 0);
+        p_326229_.define(SITTING, false);
     }
 
     public int getCommand() {
@@ -66,7 +68,7 @@ implements IFollower {
     }
 
     public void setCommand(int command) {
-        this.entityData.set(COMMAND, (Object)command);
+        this.entityData.set(COMMAND, command);
     }
 
     public boolean isSitting() {
@@ -74,19 +76,19 @@ implements IFollower {
     }
 
     public void setOrderedToSit(boolean sit) {
-        this.entityData.set(SITTING, (Object)sit);
+        this.entityData.set(SITTING, sit);
     }
 
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         compound.putBoolean("CmPetSitting", this.isSitting());
         compound.putInt("Command", this.getCommand());
     }
 
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        this.setOrderedToSit(compound.getBoolean("CmPetSitting"));
-        this.setCommand(compound.getInt("Command"));
+        this.setOrderedToSit(compound.getBooleanOr("CmPetSitting", false));
+        this.setCommand(compound.getIntOr("Command", 0));
     }
 
     public void setConfigattribute(LivingEntity entity, double hpconfig, double dmgconfig) {

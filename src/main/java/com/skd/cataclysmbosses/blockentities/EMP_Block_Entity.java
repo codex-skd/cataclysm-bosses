@@ -78,11 +78,11 @@ extends BlockEntity {
         if (!overload && this.chompProgress == 15.0f) {
             this.level.addParticle((ParticleOptions)ModParticle.EM_PULSE.get(), (double)x, (double)y, (double)z, 0.0, 0.0, 0.0);
             ScreenShake_Entity.ScreenShake(this.level, Vec3.atCenterOf((Vec3i)this.getBlockPos()), 20.0f, 0.01f, 0, 20);
-            this.level.playSound((Player)null, this.getBlockPos(), (SoundEvent)ModSounds.EMP_ACTIVATED.get(), SoundSource.BLOCKS, 4.0f, this.level.random.nextFloat() * 0.2f + 1.0f);
+            this.level.playSound((Player)null, this.getBlockPos(), (SoundEvent)ModSounds.EMP_ACTIVATED.get(), SoundSource.BLOCKS, 4.0f, this.level.getRandom().nextFloat() * 0.2f + 1.0f);
             this.level.setBlockAndUpdate(this.getBlockPos(), (BlockState)this.getBlockState().setValue((Property)EMP_Block.OVERLOAD, (Comparable)Boolean.valueOf(true)));
             AABB screamBox = new AABB((double)((float)this.getBlockPos().getX() - 5.0f), (double)((float)this.getBlockPos().getY() - 5.0f), (double)(this.getBlockPos().getZ() - 5), (double)(this.getBlockPos().getX() + 5), (double)((float)this.getBlockPos().getY() + 5.0f), (double)((float)this.getBlockPos().getZ() + 5.0f));
             for (LivingEntity entity : this.level.getEntitiesOfClass(LivingEntity.class, screamBox)) {
-                entity.hurt(CMDamageTypes.getDamageSource(this.level, CMDamageTypes.EMP, new EntityType[0]), (float)(3 + entity.getRandom().nextInt(3)));
+                entity.hurtOrSimulate(CMDamageTypes.getDamageSource(this.level, CMDamageTypes.EMP, new EntityType[0]), (float)(3 + entity.getRandom().nextInt(3)));
             }
         }
         ++this.ticksExisted;

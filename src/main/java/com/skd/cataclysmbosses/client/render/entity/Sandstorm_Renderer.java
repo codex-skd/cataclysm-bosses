@@ -23,15 +23,17 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 public class Sandstorm_Renderer
-extends EntityRenderer<Sandstorm_Entity> {
+extends EntityRenderer<Sandstorm_Entity, EntityRenderState> {
     private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/ancient_remnant/sandstorm.png");
     private final Sandstorm_Model model = new Sandstorm_Model();
 
@@ -44,9 +46,9 @@ extends EntityRenderer<Sandstorm_Entity> {
         matrixStackIn.translate(0.0, 3.0, 0.0);
         matrixStackIn.scale(-2.0f, -2.0f, 2.0f);
         matrixStackIn.mulPose(Axis.YP.rotationDegrees(Mth.lerp((float)partialTicks, (float)entityIn.yRotO, (float)entityIn.getYRot()) - 90.0f));
-        VertexConsumer ivertexbuilder = bufferIn.getBuffer(RenderType.entityTranslucent((Identifier)TEXTURE));
+        VertexConsumer ivertexbuilder = bufferIn.getBuffer(RenderTypes.entityTranslucent((Identifier)TEXTURE));
         this.model.setupAnim(entityIn, 0.0f, 0.0f, (float)entityIn.tickCount + partialTicks, 0.0f, 0.0f);
-        this.model.renderToBuffer(matrixStackIn, ivertexbuilder, packedLightIn, OverlayTexture.NO_OVERLAY);
+        this.model.renderToBuffer(matrixStackIn, ivertexbuilder, packedLightIn, OverlayTexture.NO_OVERLAY, -1);
         matrixStackIn.popPose();
         super.render((Entity)entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
     }

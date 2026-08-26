@@ -48,7 +48,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -92,7 +92,7 @@ extends Cataclysm_Weapon {
                 }
                 if (hasSucceeded) {
                     if (!p_43395_.isClientSide()) {
-                        player.getCooldowns().addCooldown((Item)this, CMCommonConfig.Immolator.cooldown);
+                        player.getCooldowns().addCooldown(this.getDefaultInstance(), CMCommonConfig.Immolator.cooldown);
                     }
                     ScreenShake_Entity.ScreenShake(p_43395_, player.position(), 30.0f, 0.15f, 0, 30);
                     p_43395_.playSound(null, player.getX(), player.getY(), player.getZ(), (SoundEvent)ModSounds.EXPLOSION.get(), SoundSource.PLAYERS, 1.5f, 1.0f / (player.getRandom().nextFloat() * 0.4f + 0.8f));
@@ -165,15 +165,15 @@ extends Cataclysm_Weapon {
         }
     }
 
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack otherHand;
         ItemStack itemstack = player.getItemInHand(hand);
         ItemStack itemStack = otherHand = hand == InteractionHand.MAIN_HAND ? player.getItemInHand(InteractionHand.OFF_HAND) : player.getItemInHand(InteractionHand.MAIN_HAND);
         if (otherHand.is((Item)ModItems.THE_IMMOLATOR.get())) {
             player.startUsingItem(hand);
-            return InteractionResultHolder.consume((Object)itemstack);
+            return InteractionResult.CONSUME;
         }
-        return InteractionResultHolder.fail((Object)itemstack);
+        return InteractionResult.FAIL;
     }
 
     public boolean canDisableShield(ItemStack stack, ItemStack shield, LivingEntity entity, LivingEntity attacker) {

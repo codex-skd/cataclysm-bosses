@@ -34,7 +34,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -52,7 +52,7 @@ extends Item {
         super(group);
     }
 
-    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+    public InteractionResult use(Level world, Player player, InteractionHand hand) {
         int standingOnY = Mth.floor((double)player.getY()) - 1;
         double headY = player.getY() + 1.0;
         float yawRadians = (float)Math.toRadians(90.0f + player.getYRot());
@@ -78,10 +78,10 @@ extends Item {
         }
         ItemStack stack = player.getItemInHand(hand);
         if (hasSucceeded) {
-            player.getCooldowns().addCooldown((Item)this, CMCommonConfig.VoidCore.cooldown);
-            return InteractionResultHolder.success((Object)stack);
+            player.getCooldowns().addCooldown(this.getDefaultInstance(), CMCommonConfig.VoidCore.cooldown);
+            return InteractionResult.SUCCESS;
         }
-        return InteractionResultHolder.pass((Object)stack);
+        return InteractionResult.PASS;
     }
 
     private boolean spawnFangs(double x, double y, double z, int lowestYCheck, float yRot, int warmupDelayTicks, Level world, Player player) {

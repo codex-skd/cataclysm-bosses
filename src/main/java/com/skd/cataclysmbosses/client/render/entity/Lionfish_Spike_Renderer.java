@@ -32,9 +32,11 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
-public class Lionfish_Spike_Renderer extends EntityRenderer<Lionfish_Spike_Entity> {
+public class Lionfish_Spike_Renderer extends EntityRenderer<Lionfish_Spike_Entity, EntityRenderState> {
     private static final ResourceLocation TEXTURE = new ResourceLocation("cataclysm_bosses", "textures/entity/lionfish_spike.png");
 
     public Lionfish_Spike_Renderer(EntityRendererProvider.Context manager) {
@@ -49,7 +51,7 @@ public class Lionfish_Spike_Renderer extends EntityRenderer<Lionfish_Spike_Entit
         poseStack.translate(0.0, 0.0, 0.5);
         
         int packedLight = LightTexture.pack(entity.level(), entity.blockPosition());
-        this.model.renderToBuffer(poseStack, buffer.getBuffer(RenderType.entityCutout(TEXTURE)), packedLight, OverlayTexture.NO_OVERLAY, entity.getFColor(), entity.getFColor());
+        this.model.renderToBuffer(poseStack, buffer.getBuffer(RenderTypes.entityCutout(TEXTURE)), packedLight, OverlayTexture.NO_OVERLAY, entity.getFColor(), entity.getFColor());
         
         poseStack.popPose();
     }

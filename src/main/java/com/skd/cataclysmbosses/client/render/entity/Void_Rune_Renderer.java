@@ -35,10 +35,11 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Void_Rune_Renderer
-extends EntityRenderer<Void_Rune_Entity> {
+extends EntityRenderer<Void_Rune_Entity, EntityRenderState> {
     private static final Identifier VOID_RUNE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/void_rune.png");
     private final Void_Rune_Model model = new Void_Rune_Model();
     private final Random rnd = new Random();
@@ -54,7 +55,7 @@ extends EntityRenderer<Void_Rune_Entity> {
         matrixStackIn.scale(-2.0f, -2.0f, 2.0f);
         VertexConsumer vertexConsumer = bufferIn.getBuffer(CMRenderTypes.getBright(this.getTextureLocation(entityIn)));
         this.model.setupAnim(entityIn, 0.0f, 0.0f, (float)entityIn.tickCount + partialTicks, 0.0f, 0.0f);
-        this.model.renderToBuffer(matrixStackIn, vertexConsumer, packedLightIn, OverlayTexture.NO_OVERLAY);
+        this.model.renderToBuffer(matrixStackIn, vertexConsumer, packedLightIn, OverlayTexture.NO_OVERLAY, -1);
         matrixStackIn.popPose();
         super.render((Entity)entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
     }

@@ -42,10 +42,11 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Matrix4f;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Eye_Of_Dungeon_Renderer
-extends EntityRenderer<Eye_Of_Dungeon_Entity> {
+extends EntityRenderer<Eye_Of_Dungeon_Entity, EntityRenderState> {
     private final ItemRenderer itemRenderer;
     private static final Identifier TRAIL_TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/particle/gathering_lightning.png");
 

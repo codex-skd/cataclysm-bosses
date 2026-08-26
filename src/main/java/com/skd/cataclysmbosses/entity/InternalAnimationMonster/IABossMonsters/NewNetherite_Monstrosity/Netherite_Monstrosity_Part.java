@@ -21,6 +21,8 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.Pose;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Netherite_Monstrosity_Part
 extends Cm_Part_Entity<Netherite_Monstrosity_Entity> {
@@ -59,10 +61,10 @@ extends Cm_Part_Entity<Netherite_Monstrosity_Entity> {
         return this.isInvulnerableTo(source) ? false : this.parentMob.hurtParts(this, source, amount);
     }
 
-    protected void readAdditionalSaveData(CompoundTag compound) {
+    protected void readAdditionalSaveData(ValueInput compound) {
     }
 
-    protected void addAdditionalSaveData(CompoundTag compound) {
+    protected void addAdditionalSaveData(ValueOutput compound) {
     }
 
     public boolean is(Entity entity) {

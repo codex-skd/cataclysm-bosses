@@ -63,6 +63,8 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Wither_Missile_Entity
 extends Projectile {
@@ -75,7 +77,7 @@ extends Projectile {
 
     public Wither_Missile_Entity(EntityType<? extends Wither_Missile_Entity> type, double getX, double gety, double getz, Vec3 vec3, Level level) {
         this(type, level);
-        this.moveTo(getX, gety, getz, this.getYRot(), this.getXRot());
+        this.setPos(getX, gety, getz, this.getYRot(), this.getXRot());
         this.reapplyPosition();
         this.assignDirectionalMovement(vec3, this.accelerationPower);
     }
@@ -89,7 +91,7 @@ extends Projectile {
 
     public Wither_Missile_Entity(EntityType<? extends Wither_Missile_Entity> type, LivingEntity p_36827_, double getX, double gety, double getz, Vec3 vec3, float damage, Level level) {
         this(type, level);
-        this.moveTo(getX, gety, getz, this.getYRot(), this.getXRot());
+        this.setPos(getX, gety, getz, this.getYRot(), this.getXRot());
         this.setOwner((Entity)p_36827_);
         this.setDamage(damage);
         this.reapplyPosition();
@@ -97,7 +99,7 @@ extends Projectile {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(DAMAGE, (Object)Float.valueOf(0.0f));
+        p_326229_.define(DAMAGE, Float.valueOf(0.0f));
     }
 
     public float getDamage() {
@@ -105,7 +107,7 @@ extends Projectile {
     }
 
     public void setDamage(float damage) {
-        this.entityData.set(DAMAGE, (Object)Float.valueOf(damage));
+        this.entityData.set(DAMAGE, Float.valueOf(damage));
     }
 
     public boolean shouldRenderAtSqrDistance(double p_36837_) {
@@ -163,7 +165,7 @@ extends Projectile {
             if (entity2 instanceof LivingEntity) {
                 LivingEntity livingentity = (LivingEntity)entity2;
                 DamageSource damagesource = this.damageSources().mobProjectile((Entity)this, livingentity);
-                flag = entity.hurt(damagesource, this.getDamage());
+                flag = entity.hurtOrSimulate(damagesource, this.getDamage());
                 if (flag) {
                     if (entity.isAlive()) {
                         EnchantmentHelper.doPostAttackEffects((ServerLevel)serverlevel, (Entity)entity, (DamageSource)damagesource);
@@ -177,7 +179,7 @@ extends Projectile {
                     }
                 }
             } else {
-                flag = entity.hurt(this.damageSources().magic(), 5.0f);
+                flag = entity.hurtOrSimulate(this.damageSources().magic(), 5.0f);
             }
             if (flag && entity instanceof LivingEntity) {
                 LivingEntity livingentity1 = (LivingEntity)entity;
@@ -210,15 +212,15 @@ extends Projectile {
         return 1.0f;
     }
 
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         compound.putDouble("acceleration_power", this.accelerationPower);
     }
 
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
         if (compound.contains("acceleration_power", 6)) {
-            this.accelerationPower = compound.getDouble("acceleration_power");
+            this.accelerationPower = compound.getDoubleOr("acceleration_power", 0.0);
         }
     }
 

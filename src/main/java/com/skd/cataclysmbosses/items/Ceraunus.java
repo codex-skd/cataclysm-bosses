@@ -45,7 +45,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -101,7 +101,7 @@ extends Cataclysm_Weapon {
                 float angleStep = 25.0f;
                 double firstAngleOffset = (double)(numberOfWaves - 1) / 2.0 * (double)angleStep;
                 if (p_43396_.isShiftKeyDown()) {
-                    player.getCooldowns().addCooldown((Item)this, CMCommonConfig.Ceraunus.cooldown);
+                    player.getCooldowns().addCooldown(this.getDefaultInstance(), CMCommonConfig.Ceraunus.cooldown);
                     p_43395_.playSound((Player)null, player.getX(), player.getY(), player.getZ(), (SoundEvent)ModSounds.HEAVY_SMASH.get(), SoundSource.PLAYERS, 0.6f, 1.0f);
                     for (int k = 0; k < numberOfWaves; ++k) {
                         double angle = (double)player.getYRot() - firstAngleOffset + (double)((float)k * angleStep);
@@ -148,13 +148,13 @@ extends Cataclysm_Weapon {
         return null;
     }
 
-    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+    public InteractionResult use(Level world, Player player, InteractionHand hand) {
         ItemStack itemstack = player.getItemInHand(hand);
         if (itemstack.get(ModDataComponents.THROWN_ANCHOR) == null && world.getWorldBorder().isWithinBounds(player.blockPosition())) {
             player.startUsingItem(hand);
-            return InteractionResultHolder.consume((Object)itemstack);
+            return InteractionResult.CONSUME;
         }
-        return InteractionResultHolder.fail((Object)itemstack);
+        return InteractionResult.FAIL;
     }
 
     public static boolean getThrowing(ItemStack itemStack) {

@@ -26,6 +26,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -35,12 +36,13 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Ender_Guardian_bullet_Renderer
-extends EntityRenderer<Ender_Guardian_Bullet_Entity> {
+extends EntityRenderer<Ender_Guardian_Bullet_Entity, EntityRenderState> {
     private static final Identifier ENDER_GUARDIAN_TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/shulkerbullet.png");
-    private static final RenderType ENDER_GUARDIAN_RENDER_TYPE = RenderType.entityTranslucent((Identifier)ENDER_GUARDIAN_TEXTURE);
+    private static final RenderType ENDER_GUARDIAN_RENDER_TYPE = RenderTypes.entityTranslucent((Identifier)ENDER_GUARDIAN_TEXTURE);
     public Ender_Guardian_Bullet_Model model = new Ender_Guardian_Bullet_Model();
 
     public Ender_Guardian_bullet_Renderer(EntityRendererProvider.Context manager) {
@@ -63,7 +65,7 @@ extends EntityRenderer<Ender_Guardian_Bullet_Entity> {
         matrixStackIn.scale(-0.5f, -0.5f, 0.5f);
         this.model.setupAnim((Entity)entityIn, 0.0f, 0.0f, 0.0f, f, f1);
         VertexConsumer VertexConsumer2 = bufferIn.getBuffer(this.model.renderType(ENDER_GUARDIAN_TEXTURE));
-        this.model.renderToBuffer(matrixStackIn, VertexConsumer2, packedLightIn, OverlayTexture.NO_OVERLAY);
+        this.model.renderToBuffer(matrixStackIn, VertexConsumer2, packedLightIn, OverlayTexture.NO_OVERLAY, -1);
         matrixStackIn.scale(1.5f, 1.5f, 1.5f);
         VertexConsumer VertexConsumer1 = bufferIn.getBuffer(ENDER_GUARDIAN_RENDER_TYPE);
         this.model.renderToBuffer(matrixStackIn, VertexConsumer1, packedLightIn, OverlayTexture.NO_OVERLAY, 0x26FFFFFF);

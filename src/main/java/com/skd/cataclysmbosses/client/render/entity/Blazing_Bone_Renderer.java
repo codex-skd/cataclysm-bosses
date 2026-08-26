@@ -30,10 +30,11 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Blazing_Bone_Renderer
-extends EntityRenderer<Blazing_Bone_Entity> {
+extends EntityRenderer<Blazing_Bone_Entity, EntityRenderState> {
     public Blazing_Bone_Renderer(EntityRendererProvider.Context manager) {
         super(manager);
     }

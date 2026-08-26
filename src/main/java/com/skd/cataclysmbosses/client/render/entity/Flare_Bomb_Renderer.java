@@ -32,15 +32,16 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 public class Flare_Bomb_Renderer
-extends EntityRenderer<Flare_Bomb_Entity> {
+extends EntityRenderer<Flare_Bomb_Entity, EntityRenderState> {
     private static final Identifier OUTER_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/monstrosity/flare_bomb_outer.png");
     private static final Identifier INNER_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/monstrosity/flare_bomb_inner.png");
     private static final Identifier TRAIL_TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/particle/amogus.png");
@@ -57,9 +58,9 @@ extends EntityRenderer<Flare_Bomb_Entity> {
         matrixStackIn.mulPose(new Quaternionf().setAngleAxis(entityYaw * ((float)Math.PI / 180), 0.0f, -1.0f, 0.0f));
         VertexConsumer VertexConsumer2 = bufferIn.getBuffer(CMRenderTypes.CMEyes(this.getTextureLocation(entityIn)));
         this.model.setupAnim(entityIn, 0.0f, 0.0f, (float)entityIn.tickCount + partialTicks, 0.0f, 0.0f);
-        this.model.renderToBuffer(matrixStackIn, VertexConsumer2, packedLightIn, OverlayTexture.NO_OVERLAY);
+        this.model.renderToBuffer(matrixStackIn, VertexConsumer2, packedLightIn, OverlayTexture.NO_OVERLAY, -1);
         VertexConsumer VertexConsumer22 = bufferIn.getBuffer(CMRenderTypes.CMEyes(OUTER_TEXTURES));
-        int i = FastColor.ARGB32.color((int)102, (int)255, (int)255, (int)255);
+        int i = ARGB.color((int)102, (int)255, (int)255, (int)255);
         this.model.renderToBuffer(matrixStackIn, VertexConsumer22, packedLightIn, OverlayTexture.NO_OVERLAY, i);
         matrixStackIn.popPose();
         if (entityIn.hasTrail()) {

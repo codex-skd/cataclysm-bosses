@@ -27,7 +27,7 @@
  *  net.minecraft.world.entity.EntityType
  *  net.minecraft.world.entity.LivingEntity
  *  net.minecraft.world.entity.Mob
- *  net.minecraft.world.entity.MobSpawnType
+ *  net.minecraft.world.entity.EntitySpawnReason
  *  net.minecraft.world.entity.PathfinderMob
  *  net.minecraft.world.entity.SpawnGroupData
  *  net.minecraft.world.entity.ai.attributes.AttributeSupplier$Builder
@@ -98,7 +98,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -124,6 +124,8 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.event.EventHooks;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Kobolediator_Entity
 extends Internal_Animation_Monster {
@@ -237,7 +239,7 @@ extends Internal_Animation_Monster {
         if (this.isSleep() && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
             return false;
         }
-        return super.hurt(source, damage);
+        return super.hurtOrSimulate(source, damage);
     }
 
     private boolean canBlockDamageSource(DamageSource damageSourceIn) {
@@ -293,14 +295,14 @@ extends Internal_Animation_Monster {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(AWAKEN, (Object)false);
+        p_326229_.define(AWAKEN, false);
     }
 
     public void setAwaken(boolean necklace) {
         if (necklace) {
             this.heal(this.getMaxHealth());
         }
-        this.entityData.set(AWAKEN, (Object)necklace);
+        this.entityData.set(AWAKEN, necklace);
     }
 
     public boolean getAwaken() {
@@ -319,7 +321,7 @@ extends Internal_Animation_Monster {
         return !this.isSleep() && super.canBeSeenAsEnemy();
     }
 
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_29678_, DifficultyInstance p_29679_, MobSpawnType p_29680_, @Nullable SpawnGroupData p_29681_) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_29678_, DifficultyInstance p_29679_, EntitySpawnReason p_29680_, @Nullable SpawnGroupData p_29681_) {
         this.setSleep(true);
         return super.finalizeSpawn(p_29678_, p_29679_, p_29680_, p_29681_);
     }
@@ -403,14 +405,14 @@ extends Internal_Animation_Monster {
         return 60;
     }
 
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         compound.putBoolean("Awaken", this.getAwaken());
     }
 
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        this.setAwaken(compound.getBoolean("Awaken"));
+        this.setAwaken(compound.getBooleanOr("Awaken", false));
     }
 
     @Override
@@ -492,7 +494,7 @@ extends Internal_Animation_Monster {
                 DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
                 for (LivingEntity Lentity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(0.5))) {
                     boolean flag;
-                    if (this.isAlliedTo((Entity)Lentity) || Lentity instanceof Kobolediator_Entity || Lentity == this || !(flag = Lentity.hurt(damagesource, (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) * 0.4f)) || !Lentity.onGround()) continue;
+                    if (this.isAlliedTo((Entity)Lentity) || Lentity instanceof Kobolediator_Entity || Lentity == this || !(flag = Lentity.hurtOrSimulate(damagesource, (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) * 0.4f)) || !Lentity.onGround()) continue;
                     double d0 = Lentity.getX() - this.getX();
                     double d1 = Lentity.getZ() - this.getZ();
                     double d2 = Math.max(d0 * d0 + d1 * d1, 0.001);
@@ -577,7 +579,7 @@ extends Internal_Animation_Monster {
                 float entityRelativeAngle = entityHitAngle - entityAttackingAngle;
                 float entityHitDistance = (float)Math.sqrt((entityHit.getZ() - this.getZ()) * (entityHit.getZ() - this.getZ()) + (entityHit.getX() - this.getX()) * (entityHit.getX() - this.getX()));
                 if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || this.isAlliedTo((Entity)entityHit) || entityHit instanceof Kobolediator_Entity || entityHit == this) continue;
-                entityHit.hurt(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
+                entityHit.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
                 if (!entityHit.isDamageSourceBlocked(damagesource) || !(entityHit instanceof Player)) continue;
                 Player player = (Player)entityHit;
                 if (shieldbreakticks <= 0) continue;
@@ -645,7 +647,7 @@ extends Internal_Animation_Monster {
         if (!hit.isEmpty()) {
             for (LivingEntity entity : hit) {
                 if (this.isAlliedTo((Entity)entity) || entity instanceof Kobolediator_Entity || entity == this) continue;
-                boolean flag = entity.hurt(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
+                boolean flag = entity.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
                 if (entity.isDamageSourceBlocked(damagesource) && entity instanceof Player) {
                     Player player = (Player)entity;
                     if (shieldbreakticks > 0) {

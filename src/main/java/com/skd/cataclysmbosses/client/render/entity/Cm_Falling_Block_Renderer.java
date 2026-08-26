@@ -48,10 +48,11 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.RenderTypeHelper;
 import net.neoforged.neoforge.client.model.data.ModelData;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Cm_Falling_Block_Renderer
-extends EntityRenderer<Cm_Falling_Block_Entity> {
+extends EntityRenderer<Cm_Falling_Block_Entity, EntityRenderState> {
     private final BlockRenderDispatcher dispatcher;
 
     public Cm_Falling_Block_Renderer(EntityRendererProvider.Context p_174112_) {

@@ -53,7 +53,7 @@ extends MobEffect {
     }
 
     public boolean applyEffectTick(LivingEntity LivingEntityIn, int amplifier) {
-        boolean flag = LivingEntityIn.hurt(LivingEntityIn.damageSources().source(CMDamageTypes.ABYSSAL_BURN), 1.0f);
+        boolean flag = LivingEntityIn.hurtOrSimulate(LivingEntityIn.damageSources().source(CMDamageTypes.ABYSSAL_BURN), 1.0f);
         if (flag && LivingEntityIn.getRandom().nextFloat() < 0.75f - LivingEntityIn.getHealth() / LivingEntityIn.getMaxHealth() && !LivingEntityIn.level().isClientSide()) {
             double d0 = LivingEntityIn.getX();
             double d1 = LivingEntityIn.getY();

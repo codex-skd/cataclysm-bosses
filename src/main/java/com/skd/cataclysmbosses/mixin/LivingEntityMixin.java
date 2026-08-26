@@ -81,9 +81,9 @@ extends Entity {
             }
             return;
         }
-        if (EntityUtil.isEquipped((Item)ModItems.UNBREAKABLE_SKULL.get(), (LivingEntity)player) && !player.getCooldowns().isOnCooldown((Item)ModItems.UNBREAKABLE_SKULL.get())) {
+        if (EntityUtil.isEquipped((Item)ModItems.UNBREAKABLE_SKULL.get(), (LivingEntity)player) && !player.getCooldowns().isOnCooldown(ModItems.UNBREAKABLE_SKULL.get().getDefaultInstance())) {
             int cooldownTicks = 900;
-            player.getCooldowns().addCooldown((Item)ModItems.UNBREAKABLE_SKULL.get(), cooldownTicks);
+            player.getCooldowns().addCooldown(ModItems.UNBREAKABLE_SKULL.get().getDefaultInstance(), cooldownTicks);
             cir.setReturnValue((Object)false);
         }
     }

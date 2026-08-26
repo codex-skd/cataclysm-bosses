@@ -22,6 +22,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -29,10 +30,11 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Abyss_Mark_Renderer
-extends EntityRenderer<Abyss_Mark_Entity> {
+extends EntityRenderer<Abyss_Mark_Entity, EntityRenderState> {
     public static final Identifier ABYSS_MARK1 = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/deepling/deepling_warlock_mark1.png");
     public static final Identifier ABYSS_MARK2 = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/deepling/deepling_warlock_mark2.png");
 
@@ -47,7 +49,7 @@ extends EntityRenderer<Abyss_Mark_Entity> {
 
     public void render(Abyss_Mark_Entity flameStrike, float entityYaw, float delta, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
         matrixStackIn.pushPose();
-        VertexConsumer ivertexbuilder = bufferIn.getBuffer(RenderType.entityTranslucentEmissive((Identifier)this.getTextureLocation(flameStrike)));
+        VertexConsumer ivertexbuilder = bufferIn.getBuffer(RenderTypes.entityTranslucentEmissive((Identifier)this.getTextureLocation(flameStrike)));
         matrixStackIn.scale(1.0f, 1.0f, 1.0f);
         matrixStackIn.translate(0.0, 0.001, 0.0);
         PoseStack.Pose lvt_19_1_ = matrixStackIn.last();

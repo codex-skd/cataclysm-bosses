@@ -21,7 +21,7 @@
  *  net.minecraft.world.entity.EntityType
  *  net.minecraft.world.entity.EquipmentSlot
  *  net.minecraft.world.entity.LivingEntity
- *  SpawnReason
+ *  EntitySpawnReason
  *  net.minecraft.world.entity.MoverType
  *  net.minecraft.world.entity.PathfinderMob
  *  net.minecraft.world.entity.SpawnGroupData
@@ -79,7 +79,7 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.SpawnReason;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
@@ -89,6 +89,8 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Deepling_Warlock_Entity
 extends AbstractDeepling {
@@ -124,12 +126,12 @@ extends AbstractDeepling {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
     }
 
@@ -154,7 +156,7 @@ extends AbstractDeepling {
         this.playSound((SoundEvent)ModSounds.DEEPLING_IDLE.get(), 0.15f, 0.6f);
     }
 
-    public boolean checkSpawnRules(LevelAccessor worldIn, SpawnReason spawnReasonIn) {
+    public boolean checkSpawnRules(LevelAccessor worldIn, EntitySpawnReason spawnReasonIn) {
         if (ModEntities.rollSpawn(CMCommonConfig.Spawning.DeeplingWarlockSpawnRolls, this.getRandom(), spawnReasonIn) && worldIn instanceof ServerLevel) {
             ServerLevel serverLevel = (ServerLevel)worldIn;
             CMWorldData data = CMWorldData.get((Level)serverLevel, (ResourceKey<Level>)Level.OVERWORLD);
@@ -164,7 +166,7 @@ extends AbstractDeepling {
     }
 
     @Nullable
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_34088_, DifficultyInstance p_34089_, SpawnReason p_34090_, @Nullable SpawnGroupData p_34091_) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_34088_, DifficultyInstance p_34089_, EntitySpawnReason p_34090_, @Nullable SpawnGroupData p_34091_) {
         SpawnGroupData spawngroupdata = super.finalizeSpawn(p_34088_, p_34089_, p_34090_, p_34091_);
         RandomSource randomsource = p_34088_.getRandom();
         this.populateDefaultEquipmentSlots(randomsource, p_34089_);
@@ -175,8 +177,8 @@ extends AbstractDeepling {
         return p_32829_.isUnobstructed((Entity)this);
     }
 
-    public static boolean candeeplingSpawn(EntityType<? extends Deepling_Warlock_Entity> guardian, LevelAccessor level, SpawnReason spawnType, BlockPos pos, RandomSource random) {
-        return level.getDifficulty() != Difficulty.PEACEFUL && (SpawnReason.isSpawner((SpawnReason)spawnType) || level.getFluidState(pos).is(FluidTags.WATER));
+    public static boolean candeeplingSpawn(EntityType<? extends Deepling_Warlock_Entity> guardian, LevelAccessor level, EntitySpawnReason spawnType, BlockPos pos, RandomSource random) {
+        return level.getDifficulty() != Difficulty.PEACEFUL && (EntitySpawnReason.isSpawner((EntitySpawnReason)spawnType) || level.getFluidState(pos).is(FluidTags.WATER));
     }
 
     @Override
@@ -195,7 +197,7 @@ extends AbstractDeepling {
             this.playSound((SoundEvent)ModSounds.DEEPLING_SWING.get(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
             if (target != null && this.distanceTo((Entity)target) < 3.0f) {
                 float damage = (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE);
-                target.hurt(this.damageSources().mobAttack((LivingEntity)this), damage);
+                target.hurtOrSimulate(this.damageSources().mobAttack((LivingEntity)this), damage);
             }
         }
     }

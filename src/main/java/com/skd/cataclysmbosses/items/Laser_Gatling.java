@@ -40,7 +40,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -79,7 +79,7 @@ extends Item {
         return stack.getDamageValue() < stack.getMaxDamage() - 1;
     }
 
-    public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand handIn) {
+    public InteractionResult use(Level worldIn, Player playerIn, InteractionHand handIn) {
         ItemStack itemstack = playerIn.getItemInHand(handIn);
         playerIn.startUsingItem(handIn);
         if (!Laser_Gatling.isUsable(itemstack)) {
@@ -93,7 +93,7 @@ extends Item {
                 itemstack.setDamageValue(0);
             }
         }
-        return InteractionResultHolder.consume((Object)itemstack);
+        return InteractionResult.CONSUME;
     }
 
     public ItemStack findAmmo(Player entity) {
@@ -140,7 +140,7 @@ extends Item {
                 flag = true;
             }
             if (flag) {
-                ((Player)livingEntityIn).getCooldowns().addCooldown((Item)this, 20);
+                ((Player)livingEntityIn).getCooldowns().addCooldown(this.getDefaultInstance(), 20);
                 stack.setDamageValue(0);
             }
             livingEntityIn.stopUsingItem();

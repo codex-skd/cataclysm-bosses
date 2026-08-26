@@ -34,10 +34,11 @@ import net.minecraft.world.entity.Entity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Quaternionf;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Abyss_Mine_Renderer
-extends EntityRenderer<Abyss_Mine_Entity> {
+extends EntityRenderer<Abyss_Mine_Entity, EntityRenderState> {
     private static final Identifier ABYSS_MINE_TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/leviathan/abyss_mine.png");
     private static final float SIN_45 = (float)Math.sin(0.7853981633974483);
     public Abyss_Mine_Model model = new Abyss_Mine_Model();

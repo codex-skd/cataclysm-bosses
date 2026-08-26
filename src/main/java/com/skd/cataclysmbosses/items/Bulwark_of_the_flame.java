@@ -31,7 +31,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.player.Player;
@@ -87,15 +87,15 @@ extends Item {
             charge.setdx(f1 * 0.1f);
             charge.setdZ(f3 * 0.1f);
             if (!level.isClientSide()) {
-                ((Player)entityLiving).getCooldowns().addCooldown((Item)this, CMCommonConfig.BulwarkOfTheFlame.cooldown);
+                ((Player)entityLiving).getCooldowns().addCooldown(this.getDefaultInstance(), CMCommonConfig.BulwarkOfTheFlame.cooldown);
             }
         }
     }
 
-    public InteractionResultHolder<ItemStack> use(Level p_77659_1_, Player p_77659_2_, InteractionHand p_77659_3_) {
+    public InteractionResult use(Level p_77659_1_, Player p_77659_2_, InteractionHand p_77659_3_) {
         ItemStack lvt_4_1_ = p_77659_2_.getItemInHand(p_77659_3_);
         p_77659_2_.startUsingItem(p_77659_3_);
-        return InteractionResultHolder.consume((Object)lvt_4_1_);
+        return InteractionResult.CONSUME;
     }
 
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltips, TooltipFlag flags) {

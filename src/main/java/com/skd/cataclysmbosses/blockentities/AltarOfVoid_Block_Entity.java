@@ -10,7 +10,7 @@
  *  net.minecraft.world.Difficulty
  *  net.minecraft.world.entity.Entity
  *  net.minecraft.world.entity.EntityType
- *  net.minecraft.world.entity.SpawnReason
+ *  net.minecraft.world.entity.EntitySpawnReason
  *  net.minecraft.world.level.Level
  *  net.minecraft.world.level.ServerLevelAccessor
  *  net.minecraft.world.level.block.entity.BlockEntity
@@ -74,7 +74,7 @@ extends BlockEntity {
         Ender_Guardian_Entity entity = (Ender_Guardian_Entity)((EntityType)ModEntities.ENDER_GUARDIAN.get()).create((Level)serverLevel);
         if (entity != null) {
             entity.setPos(vec3);
-            // entity.finalizeSpawn((ServerLevelAccessor)serverLevel, serverLevel.getCurrentDifficultyAt(this.worldPosition), SpawnReason.SPAWNER, null);
+            // entity.finalizeSpawn((ServerLevelAccessor)serverLevel, serverLevel.getCurrentDifficultyAt(this.worldPosition), EntitySpawnReason.SPAWNER, null);
             entity.setUsedMassDestruction(false);
             entity.setHomePos(GlobalPos.of((ResourceKey)serverLevel.dimension(), (BlockPos)pos));
             return serverLevel.addFreshEntity((Entity)entity);

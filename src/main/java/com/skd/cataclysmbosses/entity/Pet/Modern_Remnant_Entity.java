@@ -132,6 +132,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Modern_Remnant_Entity
 extends LLibraryAnimationPet
@@ -203,19 +205,19 @@ implements Bucketable {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(FROM_BUCKET, (Object)false);
+        p_326229_.define(FROM_BUCKET, false);
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         compound.putBoolean("FromBucket", this.fromBucket());
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        this.setFromBucket(compound.getBoolean("FromBucket"));
+        this.setFromBucket(compound.getBooleanOr("FromBucket", false));
     }
 
     @Override
@@ -228,7 +230,7 @@ implements Bucketable {
     }
 
     public void setFromBucket(boolean sit) {
-        this.entityData.set(FROM_BUCKET, (Object)sit);
+        this.entityData.set(FROM_BUCKET, sit);
     }
 
     public void saveToBucketTag(@Nonnull ItemStack bucket) {
@@ -458,7 +460,7 @@ implements Bucketable {
                 }
                 if (this.mob.getAnimation() == MODERN_REMNANT_BITE && this.mob.getAnimationTick() == 5 && this.mob.distanceTo((Entity)target) < this.mob.getBbWidth() * 2.5f * this.mob.getBbWidth() * 2.5f + target.getBbWidth()) {
                     float damage = (float)this.mob.getAttributeValue(Attributes.ATTACK_DAMAGE);
-                    target.hurt(Modern_Remnant_Entity.this.damageSources().mobAttack((LivingEntity)this.mob), damage);
+                    target.hurtOrSimulate(Modern_Remnant_Entity.this.damageSources().mobAttack((LivingEntity)this.mob), damage);
                 }
             }
         }

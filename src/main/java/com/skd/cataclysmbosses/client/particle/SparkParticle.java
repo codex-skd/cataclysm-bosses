@@ -34,7 +34,7 @@ extends SingleQuadParticle {
         this.zd += zSpeed;
         this.yd = this.random.nextFloat() * 0.4f + 0.05f;
         this.quadSize *= this.random.nextFloat() * 2.0f + 0.2f;
-        this.lifetime = 6 + level.random.nextInt(3);
+        this.lifetime = 6 + level.getRandom().nextInt(3);
     }
 
     public ParticleRenderType getRenderType() {

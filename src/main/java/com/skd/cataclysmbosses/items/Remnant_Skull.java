@@ -36,7 +36,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.EntityType;
@@ -60,11 +60,11 @@ extends Item {
         super(properties);
     }
 
-    public InteractionResultHolder<ItemStack> use(Level p_40622_, Player p_40623_, InteractionHand p_40624_) {
+    public InteractionResult use(Level p_40622_, Player p_40623_, InteractionHand p_40624_) {
         ItemStack itemstack = p_40623_.getItemInHand(p_40624_);
         BlockHitResult hitresult = Remnant_Skull.getPlayerPOVHitResult((Level)p_40622_, (Player)p_40623_, (ClipContext.Fluid)ClipContext.Fluid.ANY);
         if (hitresult.getType() == HitResult.Type.MISS) {
-            return InteractionResultHolder.pass((Object)itemstack);
+            return InteractionResult.PASS;
         }
         Vec3 vec3 = p_40623_.getViewVector(1.0f);
         Vec3 vec31 = hitresult.getLocation();
@@ -74,14 +74,14 @@ extends Item {
             for (Entity entity : list) {
                 AABB aabb = entity.getBoundingBox().inflate((double)entity.getPickRadius());
                 if (!aabb.contains(vec31)) continue;
-                return InteractionResultHolder.pass((Object)itemstack);
+                return InteractionResult.PASS;
             }
         }
         if (hitresult.getType() == HitResult.Type.BLOCK) {
             Modern_Remnant_Entity remnantEntity = (Modern_Remnant_Entity)((EntityType)ModEntities.MODERN_REMNANT.get()).create(p_40622_);
             remnantEntity.setPos(vec31.x, vec31.y, vec31.z);
             if (!p_40622_.noCollision((Entity)remnantEntity, remnantEntity.getBoundingBox())) {
-                return InteractionResultHolder.fail((Object)itemstack);
+                return InteractionResult.FAIL;
             }
             if (!p_40622_.isClientSide()) {
                 p_40622_.addFreshEntity((Entity)remnantEntity);
@@ -91,9 +91,9 @@ extends Item {
                 }
             }
             p_40623_.awardStat(Stats.ITEM_USED.get((Object)this));
-            return InteractionResultHolder.sidedSuccess((Object)itemstack, (boolean)p_40622_.isClientSide());
+            return p_40622_.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.SUCCESS_SERVER;
         }
-        return InteractionResultHolder.pass((Object)itemstack);
+        return InteractionResult.PASS;
     }
 
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flags) {

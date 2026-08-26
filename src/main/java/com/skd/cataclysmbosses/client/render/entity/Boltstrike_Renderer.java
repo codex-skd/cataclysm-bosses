@@ -33,10 +33,11 @@ import net.minecraft.util.Mth;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Vector4f;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Boltstrike_Renderer
-extends EntityRenderer<Bolt_strike_Entity> {
+extends EntityRenderer<Bolt_strike_Entity, EntityRenderState> {
     private Map<UUID, LightningRender> lightningRenderMap = new HashMap<UUID, LightningRender>();
     private static final int MAX_HEIGHT = 15;
     private static final double START_MIN_RADIUS = 0.7;

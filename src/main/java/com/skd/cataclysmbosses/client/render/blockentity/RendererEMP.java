@@ -19,6 +19,7 @@ import com.skd.cataclysmbosses.client.model.block.EMP_Model;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
@@ -46,7 +47,7 @@ implements BlockEntityRenderer<T> {
         matrixStackIn.translate(0.0f, 0.15f, 0.0f);
         matrixStackIn.scale(0.9f, 0.9f, 0.9f);
         MODEL_EMP.animate((EMP_Block_Entity)((Object)tileEntityIn), partialTicks);
-        MODEL_EMP.renderToBuffer(matrixStackIn, bufferIn.getBuffer(RenderType.entityCutoutNoCull((Identifier)TEXTURE)), combinedLightIn, combinedOverlayIn);
+        MODEL_EMP.renderToBuffer(matrixStackIn, bufferIn.getBuffer(RenderTypes.entityCutoutNoCull((Identifier)TEXTURE)), combinedLightIn, combinedOverlayIn, -1);
         matrixStackIn.popPose();
         matrixStackIn.popPose();
     }

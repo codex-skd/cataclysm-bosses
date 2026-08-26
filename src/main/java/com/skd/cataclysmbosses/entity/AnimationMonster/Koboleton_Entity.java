@@ -20,7 +20,7 @@
  *  net.minecraft.world.entity.EquipmentSlot
  *  net.minecraft.world.entity.LivingEntity
  *  net.minecraft.world.entity.Mob
- *  net.minecraft.world.entity.SpawnReason
+ *  net.minecraft.world.entity.EntitySpawnReason
  *  net.minecraft.world.entity.PathfinderMob
  *  net.minecraft.world.entity.SpawnGroupData
  *  net.minecraft.world.entity.ai.attributes.AttributeSupplier$Builder
@@ -75,7 +75,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.SpawnReason;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -99,6 +99,8 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.PathType;
 import top.theillusivec4.curios.api.CuriosApi;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Koboleton_Entity
 extends Animation_Monster {
@@ -136,7 +138,7 @@ extends Animation_Monster {
         if (entity instanceof Poison_Dart_Entity) {
             return false;
         }
-        return super.hurt(source, damage);
+        return super.hurtOrSimulate(source, damage);
     }
 
     protected int decreaseAirSupply(int air) {
@@ -163,11 +165,11 @@ extends Animation_Monster {
         super.defineSynchedData(p_326229_);
     }
 
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
     }
 
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
     }
 
@@ -176,7 +178,7 @@ extends Animation_Monster {
     }
 
     @Nullable
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_34088_, DifficultyInstance p_34089_, SpawnReason p_34090_, @Nullable SpawnGroupData p_34091_) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_34088_, DifficultyInstance p_34089_, EntitySpawnReason p_34090_, @Nullable SpawnGroupData p_34091_) {
         SpawnGroupData spawngroupdata = super.finalizeSpawn(p_34088_, p_34089_, p_34090_, p_34091_);
         RandomSource randomsource = p_34088_.getRandom();
         this.populateDefaultEquipmentSlots(randomsource, p_34089_);
@@ -198,7 +200,7 @@ extends Animation_Monster {
             this.playSound(SoundEvents.PLAYER_ATTACK_SWEEP, 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
             if (target != null && this.distanceTo((Entity)target) < this.getBbWidth() * 2.5f * this.getBbWidth() * 2.5f + target.getBbWidth()) {
                 float damage = (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE);
-                target.hurt(this.damageSources().mobAttack((LivingEntity)this), damage);
+                target.hurtOrSimulate(this.damageSources().mobAttack((LivingEntity)this), damage);
                 ItemStack offhand = target.getOffhandItem();
                 ItemStack mainhand = target.getMainHandItem();
                 Optional slot = CuriosApi.getCuriosHelper().findFirstCurio(target, stack -> stack.is((Item)ModItems.STICKY_GLOVES.get()));
@@ -241,12 +243,12 @@ extends Animation_Monster {
         return itementity;
     }
 
-    public boolean checkSpawnRules(LevelAccessor worldIn, SpawnReason spawnReasonIn) {
+    public boolean checkSpawnRules(LevelAccessor worldIn, EntitySpawnReason spawnReasonIn) {
         return ModEntities.rollSpawn(CMCommonConfig.Spawning.KoboletonSpawnRolls, this.getRandom(), spawnReasonIn);
     }
 
-    public static boolean checkKoboletonSpawnRules(EntityType<Koboleton_Entity> husk, ServerLevelAccessor level, SpawnReason spawnType, BlockPos pos, RandomSource random) {
-        return Koboleton_Entity.checkMonsterSpawnRules(husk, (ServerLevelAccessor)level, (SpawnReason)spawnType, (BlockPos)pos, (RandomSource)random) && (SpawnReason.isSpawner((SpawnReason)spawnType) || level.canSeeSky(pos));
+    public static boolean checkKoboletonSpawnRules(EntityType<Koboleton_Entity> husk, ServerLevelAccessor level, EntitySpawnReason spawnType, BlockPos pos, RandomSource random) {
+        return Koboleton_Entity.checkMonsterSpawnRules(husk, (ServerLevelAccessor)level, (EntitySpawnReason)spawnType, (BlockPos)pos, (RandomSource)random) && (EntitySpawnReason.isSpawner((EntitySpawnReason)spawnType) || level.canSeeSky(pos));
     }
 
     public boolean isAlliedTo(Entity entityIn) {

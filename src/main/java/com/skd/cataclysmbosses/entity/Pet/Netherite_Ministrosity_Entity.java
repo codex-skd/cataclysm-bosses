@@ -143,6 +143,8 @@ import net.neoforged.bus.api.Event;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.event.entity.player.PlayerContainerEvent;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Netherite_Ministrosity_Entity
 extends InternalAnimationPet
@@ -201,7 +203,7 @@ HasCustomInventoryScreen {
     }
 
     public void setIsAwaken(boolean isAwaken) {
-        this.entityData.set(IS_AWAKEN, (Object)isAwaken);
+        this.entityData.set(IS_AWAKEN, isAwaken);
     }
 
     public boolean getIsAwaken() {
@@ -315,12 +317,12 @@ HasCustomInventoryScreen {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(FROM_BUCKET, (Object)false);
-        p_326229_.define(IS_AWAKEN, (Object)false);
+        p_326229_.define(FROM_BUCKET, false);
+        p_326229_.define(IS_AWAKEN, false);
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         compound.putBoolean("FromBucket", this.fromBucket());
         compound.putBoolean("is_Awaken", this.getIsAwaken());
@@ -336,10 +338,10 @@ HasCustomInventoryScreen {
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        this.setFromBucket(compound.getBoolean("FromBucket"));
-        this.setIsAwaken(compound.getBoolean("is_Awaken"));
+        this.setFromBucket(compound.getBooleanOr("FromBucket", false));
+        this.setIsAwaken(compound.getBooleanOr("is_Awaken", false));
         this.createInventory();
         ListTag listtag = compound.getList("Items", 10);
         for (int i = 0; i < listtag.size(); ++i) {
@@ -421,7 +423,7 @@ HasCustomInventoryScreen {
     }
 
     public void setFromBucket(boolean sit) {
-        this.entityData.set(FROM_BUCKET, (Object)sit);
+        this.entityData.set(FROM_BUCKET, sit);
     }
 
     public void saveToBucketTag(@Nonnull ItemStack bucket) {

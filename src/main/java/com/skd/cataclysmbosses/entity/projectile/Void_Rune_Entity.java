@@ -30,6 +30,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -45,6 +46,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Void_Rune_Entity
 extends Entity {
@@ -73,8 +76,8 @@ extends Entity {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(ACTIVATE, (Object)false);
-        p_326229_.define(DAMAGE, (Object)Float.valueOf(0.0f));
+        p_326229_.define(ACTIVATE, false);
+        p_326229_.define(DAMAGE, Float.valueOf(0.0f));
     }
 
     public float getDamage() {
@@ -82,7 +85,7 @@ extends Entity {
     }
 
     public void setDamage(float damage) {
-        this.entityData.set(DAMAGE, (Object)Float.valueOf(damage));
+        this.entityData.set(DAMAGE, Float.valueOf(damage));
     }
 
     public void setCaster(@Nullable LivingEntity p_190549_1_) {
@@ -99,18 +102,18 @@ extends Entity {
         return this.caster;
     }
 
-    protected void readAdditionalSaveData(CompoundTag compound) {
-        this.warmupDelayTicks = compound.getInt("Warmup");
-        if (compound.hasUUID("Owner")) {
-            this.casterUuid = compound.getUUID("Owner");
+    protected void readAdditionalSaveData(ValueInput compound) {
+        this.warmupDelayTicks = compound.getIntOr("Warmup", 0);
+        if (compound.read("Owner", UUIDUtil.CODEC).isPresent()) {
+            this.casterUuid = compound.read("Owner", UUIDUtil.CODEC).orElse(null);
         }
-        this.setDamage(compound.getFloat("damage"));
+        this.setDamage(compound.getFloatOr("damage", 0.0f));
     }
 
-    protected void addAdditionalSaveData(CompoundTag compound) {
+    protected void addAdditionalSaveData(ValueOutput compound) {
         compound.putInt("Warmup", this.warmupDelayTicks);
         if (this.casterUuid != null) {
-            compound.putUUID("Owner", this.casterUuid);
+            compound.store("Owner", UUIDUtil.CODEC, this.casterUuid);
         }
         compound.putFloat("damage", this.getDamage());
     }
@@ -177,16 +180,16 @@ extends Entity {
     }
 
     public void setActivate(boolean Activate) {
-        this.entityData.set(ACTIVATE, (Object)Activate);
+        this.entityData.set(ACTIVATE, Activate);
     }
 
     private void damage(LivingEntity Hitentity) {
         LivingEntity livingentity = this.getCaster();
         if (Hitentity.isAlive() && !Hitentity.isInvulnerable() && Hitentity != livingentity && this.tickCount % 5 == 0) {
             if (livingentity == null) {
-                Hitentity.hurt(this.damageSources().magic(), this.getDamage());
+                Hitentity.hurtOrSimulate(this.damageSources().magic(), this.getDamage());
             } else if (!livingentity.isAlliedTo((Entity)Hitentity) && !Hitentity.isAlliedTo((Entity)livingentity)) {
-                Hitentity.hurt(this.damageSources().indirectMagic((Entity)this, (Entity)livingentity), this.getDamage());
+                Hitentity.hurtOrSimulate(this.damageSources().indirectMagic((Entity)this, (Entity)livingentity), this.getDamage());
             }
         }
     }

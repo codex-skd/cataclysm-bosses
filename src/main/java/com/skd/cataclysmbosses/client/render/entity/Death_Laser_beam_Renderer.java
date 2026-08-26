@@ -50,10 +50,11 @@ import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 import org.joml.Vector4f;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Death_Laser_beam_Renderer
-extends EntityRenderer<Death_Laser_Beam_Entity> {
+extends EntityRenderer<Death_Laser_Beam_Entity, EntityRenderState> {
     private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/harbinger/death_laser_beam.png");
     private static final float TEXTURE_WIDTH = 256.0f;
     private static final float TEXTURE_HEIGHT = 32.0f;

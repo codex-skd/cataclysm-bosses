@@ -42,7 +42,7 @@ extends RenderLayer<Ender_Guardian_Entity, Ender_Guardian_Model> {
         if (entity.deathTime < 100) {
             RenderType eyes = RenderType.eyes((Identifier)ENDER_GUARDIAN_LAYER_TEXTURES);
             VertexConsumer VertexConsumer2 = bufferIn.getBuffer(eyes);
-            ((Ender_Guardian_Model)this.getParentModel()).renderToBuffer(matrixStackIn, VertexConsumer2, packedLightIn, OverlayTexture.NO_OVERLAY);
+            ((Ender_Guardian_Model)this.getParentModel()).renderToBuffer(matrixStackIn, VertexConsumer2, packedLightIn, OverlayTexture.NO_OVERLAY, -1);
         }
     }
 }

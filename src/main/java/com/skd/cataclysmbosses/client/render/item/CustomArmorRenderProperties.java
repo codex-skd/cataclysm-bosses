@@ -42,9 +42,10 @@ import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ArmorItem;
@@ -125,10 +126,10 @@ implements IClientItemExtensions {
 
     public static void renderCustomArmor(PoseStack poseStack, MultiBufferSource multiBufferSource, int light, ItemStack itemStack, ArmorItem armorItem, Model armorModel, boolean legs, Identifier texture) {
         if (armorItem.getMaterial() == Armortier.CURSIUM) {
-            VertexConsumer vertexconsumer1 = itemStack.hasFoil() ? VertexMultiConsumer.create((VertexConsumer)multiBufferSource.getBuffer(RenderType.entityGlintDirect()), (VertexConsumer)multiBufferSource.getBuffer(RenderType.entityTranslucent((Identifier)texture))) : multiBufferSource.getBuffer(RenderType.entityTranslucent((Identifier)texture));
-            armorModel.renderToBuffer(poseStack, vertexconsumer1, light, OverlayTexture.NO_OVERLAY);
+            VertexConsumer vertexconsumer1 = itemStack.hasFoil() ? VertexMultiConsumer.create((VertexConsumer)multiBufferSource.getBuffer(RenderType.entityGlintDirect()), (VertexConsumer)multiBufferSource.getBuffer(RenderTypes.entityTranslucent((Identifier)texture))) : multiBufferSource.getBuffer(RenderTypes.entityTranslucent((Identifier)texture));
+            armorModel.renderToBuffer(poseStack, vertexconsumer1, light, OverlayTexture.NO_OVERLAY, -1);
             VertexConsumer vertexconsumer2 = multiBufferSource.getBuffer(CMRenderTypes.getGhost(CURSIUM_ARMOR_GHOST));
-            int i = FastColor.ARGB32.color((int)125, (int)255, (int)255, (int)255);
+            int i = ARGB.color((int)125, (int)255, (int)255, (int)255);
             armorModel.renderToBuffer(poseStack, vertexconsumer2, light, OverlayTexture.NO_OVERLAY, i);
         }
     }

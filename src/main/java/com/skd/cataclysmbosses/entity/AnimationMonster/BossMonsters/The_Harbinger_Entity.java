@@ -155,6 +155,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class The_Harbinger_Entity
 extends LLibrary_Boss_Monster
@@ -271,25 +273,25 @@ PowerableMob {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(LASER_MODE, (Object)false);
-        p_326229_.define(ISCHARGE, (Object)false);
-        p_326229_.define(IS_ACT, (Object)true);
-        p_326229_.define(FIRST_HEAD_TARGET, (Object)0);
-        p_326229_.define(SECOND_HEAD_TARGET, (Object)0);
-        p_326229_.define(THIRD_HEAD_TARGET, (Object)0);
-        p_326229_.define(OVERLOAD, (Object)0);
+        p_326229_.define(LASER_MODE, false);
+        p_326229_.define(ISCHARGE, false);
+        p_326229_.define(IS_ACT, true);
+        p_326229_.define(FIRST_HEAD_TARGET, 0);
+        p_326229_.define(SECOND_HEAD_TARGET, 0);
+        p_326229_.define(THIRD_HEAD_TARGET, 0);
+        p_326229_.define(OVERLOAD, 0);
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         compound.putBoolean("Is_Act", this.getIsAct());
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        this.setIsAct(compound.getBoolean("Is_Act"));
+        this.setIsAct(compound.getBooleanOr("Is_Act", false));
         if (this.hasCustomName()) {
             this.bossEvent.setName(this.getDisplayName());
         }
@@ -319,7 +321,7 @@ PowerableMob {
         if (this.deactivateProgress > 0.0f && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
             return false;
         }
-        return super.hurt(source, damage);
+        return super.hurtOrSimulate(source, damage);
     }
 
     public boolean canBeSeenAsEnemy() {
@@ -506,7 +508,7 @@ PowerableMob {
             if (this.tickCount % 4 == 0) {
                 for (LivingEntity Lentity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(1.5))) {
                     boolean flag;
-                    if (this.isAlliedTo((Entity)Lentity) || Lentity instanceof The_Harbinger_Entity || Lentity == this || !(flag = Lentity.hurt(this.damageSources().mobAttack((LivingEntity)this), (float)((double)((float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) + (float)this.random.nextInt(5)) + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE), (double)(Lentity.getMaxHealth() * (float)CMCommonConfig.Harbinger.ChargeHpDamage))))) || !Lentity.onGround()) continue;
+                    if (this.isAlliedTo((Entity)Lentity) || Lentity instanceof The_Harbinger_Entity || Lentity == this || !(flag = Lentity.hurtOrSimulate(this.damageSources().mobAttack((LivingEntity)this), (float)((double)((float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) + (float)this.random.nextInt(5)) + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE), (double)(Lentity.getMaxHealth() * (float)CMCommonConfig.Harbinger.ChargeHpDamage))))) || !Lentity.onGround()) continue;
                     double d0 = Lentity.getX() - this.getX();
                     double d1 = Lentity.getZ() - this.getZ();
                     double d2 = Math.max(d0 * d0 + d1 * d1, 0.001);
@@ -794,11 +796,11 @@ PowerableMob {
     }
 
     public void setAlternativeTarget(int targetOffset, int newId) {
-        this.entityData.set(HEAD_TARGETS.get(targetOffset), (Object)newId);
+        this.entityData.set(HEAD_TARGETS.get(targetOffset), newId);
     }
 
     public void setIsLaserMode(boolean isLaserMode) {
-        this.entityData.set(LASER_MODE, (Object)isLaserMode);
+        this.entityData.set(LASER_MODE, isLaserMode);
     }
 
     public boolean getIsLaserMode() {
@@ -806,7 +808,7 @@ PowerableMob {
     }
 
     public void setIsAct(boolean isAct) {
-        this.entityData.set(IS_ACT, (Object)isAct);
+        this.entityData.set(IS_ACT, isAct);
         this.bossEvent.setVisible(isAct);
     }
 
@@ -815,7 +817,7 @@ PowerableMob {
     }
 
     public void setIsCharge(boolean isCharge) {
-        this.entityData.set(ISCHARGE, (Object)isCharge);
+        this.entityData.set(ISCHARGE, isCharge);
     }
 
     public boolean getIsCharge() {
@@ -823,7 +825,7 @@ PowerableMob {
     }
 
     public void setOverload(int Overload) {
-        this.entityData.set(OVERLOAD, (Object)Overload);
+        this.entityData.set(OVERLOAD, Overload);
     }
 
     public int getOverload() {

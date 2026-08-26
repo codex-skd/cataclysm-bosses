@@ -87,13 +87,13 @@ extends ThrowableProjectile {
                 if (entity2 instanceof LivingEntity) {
                     LivingEntity livingentity = (LivingEntity)entity2;
                     DamageSource damagesource = this.damageSources().mobProjectile((Entity)this, livingentity);
-                    boolean flag = entity.hurt(damagesource, 7.0f);
+                    boolean flag = entity.hurtOrSimulate(damagesource, 7.0f);
                     if (flag && entity.isAlive()) {
                         entity.igniteForSeconds(5.0f);
                         EnchantmentHelper.doPostAttackEffects((ServerLevel)serverlevel, (Entity)entity, (DamageSource)damagesource);
                     }
                 } else {
-                    entity.hurt(this.damageSources().magic(), 7.0f);
+                    entity.hurtOrSimulate(this.damageSources().magic(), 7.0f);
                 }
             }
         }

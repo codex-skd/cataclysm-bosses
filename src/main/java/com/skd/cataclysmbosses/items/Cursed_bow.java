@@ -50,7 +50,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -75,18 +75,18 @@ extends ProjectileWeaponItem {
         super(group);
     }
 
-    public InteractionResultHolder<ItemStack> use(Level p_40672_, Player p_40673_, InteractionHand p_40674_) {
+    public InteractionResult use(Level p_40672_, Player p_40673_, InteractionHand p_40674_) {
         ItemStack itemstack;
         boolean flag = !p_40673_.getProjectile(itemstack = p_40673_.getItemInHand(p_40674_)).isEmpty();
-        InteractionResultHolder ret = EventHooks.onArrowNock((ItemStack)itemstack, (Level)p_40672_, (Player)p_40673_, (InteractionHand)p_40674_, (boolean)flag);
+        InteractionResult ret = EventHooks.onArrowNock((ItemStack)itemstack, (Level)p_40672_, (Player)p_40673_, (InteractionHand)p_40674_, (boolean)flag);
         if (ret != null) {
             return ret;
         }
         if (!p_40673_.hasInfiniteMaterials() && !flag) {
-            return InteractionResultHolder.fail((Object)itemstack);
+            return InteractionResult.FAIL;
         }
         p_40673_.startUsingItem(p_40674_);
-        return InteractionResultHolder.consume((Object)itemstack);
+        return InteractionResult.CONSUME;
     }
 
     public int getUseDuration(ItemStack stack, LivingEntity pEntity) {

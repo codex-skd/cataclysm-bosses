@@ -77,6 +77,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Spike_Entity
 extends Monster
@@ -144,10 +146,10 @@ implements IAnimatedEntity {
         if (this.level().isClientSide()) {
             return false;
         }
-        if (!p_32820_.is(DamageTypeTags.AVOIDS_GUARDIAN_THORNS) && !p_32820_.is(DamageTypes.THORNS) && (entity = p_32820_.getDirectEntity()) instanceof LivingEntity && (livingentity = (LivingEntity)entity).hurt(this.damageSources().thorns((Entity)this), 1.0f)) {
+        if (!p_32820_.is(DamageTypeTags.AVOIDS_GUARDIAN_THORNS) && !p_32820_.is(DamageTypes.THORNS) && (entity = p_32820_.getDirectEntity()) instanceof LivingEntity && (livingentity = (LivingEntity)entity).hurtOrSimulate(this.damageSources().thorns((Entity)this), 1.0f)) {
             livingentity.addEffect(new MobEffectInstance(MobEffects.POISON, 40, 0), (Entity)this);
         }
-        return super.hurt(p_32820_, p_32821_);
+        return super.hurtOrSimulate(p_32820_, p_32821_);
     }
 
     public void tick() {
@@ -175,7 +177,7 @@ implements IAnimatedEntity {
                 this.playSound(SoundEvents.PHANTOM_BITE, 0.4f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
                 if (target != null) {
                     float damage = (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE);
-                    target.hurt(this.damageSources().mobAttack((LivingEntity)this), damage);
+                    target.hurtOrSimulate(this.damageSources().mobAttack((LivingEntity)this), damage);
                 }
             }
         }
@@ -186,7 +188,7 @@ implements IAnimatedEntity {
             this.setAirSupply(p_30344_ - 1);
             if (this.getAirSupply() == -20) {
                 this.setAirSupply(0);
-                this.hurt(this.damageSources().drown(), 0.01f);
+                this.hurtOrSimulate(this.damageSources().drown(), 0.01f);
             }
         } else {
             this.setAirSupply(1000);
@@ -225,11 +227,11 @@ implements IAnimatedEntity {
         }
     }
 
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
     }
 
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
     }
 

@@ -55,7 +55,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.EquipmentSlotGroup;
@@ -149,21 +149,21 @@ implements ProjectileItem {
         }
     }
 
-    public InteractionResultHolder<ItemStack> use(Level p_43405_, Player p_43406_, InteractionHand p_43407_) {
+    public InteractionResult use(Level p_43405_, Player p_43406_, InteractionHand p_43407_) {
         ItemStack itemstack = p_43406_.getItemInHand(p_43407_);
         InteractionHand otherhand = p_43407_ == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
         ItemStack otheritem = p_43406_.getItemInHand(otherhand);
         if (otheritem.canPerformAction(ItemAbilities.SHIELD_BLOCK) && !p_43406_.getCooldowns().isOnCooldown(otheritem.getItem())) {
-            return InteractionResultHolder.fail((Object)itemstack);
+            return InteractionResult.FAIL;
         }
         if (Coral_Spear.isTooDamagedToUse(itemstack)) {
-            return InteractionResultHolder.fail((Object)itemstack);
+            return InteractionResult.FAIL;
         }
         if (EnchantmentHelper.getTridentSpinAttackStrength((ItemStack)itemstack, (LivingEntity)p_43406_) > 0.0f && !p_43406_.isInWaterOrRain()) {
-            return InteractionResultHolder.fail((Object)itemstack);
+            return InteractionResult.FAIL;
         }
         p_43406_.startUsingItem(p_43407_);
-        return InteractionResultHolder.consume((Object)itemstack);
+        return InteractionResult.CONSUME;
     }
 
     private static boolean isTooDamagedToUse(ItemStack p_353073_) {

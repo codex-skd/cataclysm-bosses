@@ -34,6 +34,7 @@ import com.skd.cataclysmbosses.init.ModEffect;
 import com.skd.cataclysmbosses.init.ModEntities;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
@@ -53,6 +54,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Sandstorm_Entity
 extends Entity {
@@ -122,12 +125,12 @@ extends Entity {
         if (Hitentity.isAlive() && !Hitentity.isInvulnerable() && Hitentity != livingentity && this.tickCount % 3 == 0) {
             boolean flag;
             if (livingentity == null) {
-                boolean flag2 = Hitentity.hurt(this.damageSources().magic(), 7.0f);
+                boolean flag2 = Hitentity.hurtOrSimulate(this.damageSources().magic(), 7.0f);
                 if (flag2) {
                     MobEffectInstance effectinstance = new MobEffectInstance(ModEffect.EFFECTCURSE_OF_DESERT, 200, 0);
                     Hitentity.addEffect(effectinstance);
                 }
-            } else if (!livingentity.isAlliedTo((Entity)Hitentity) && !Hitentity.isAlliedTo((Entity)livingentity) && (flag = Hitentity.hurt(this.damageSources().indirectMagic((Entity)this, (Entity)livingentity), 7.0f))) {
+            } else if (!livingentity.isAlliedTo((Entity)Hitentity) && !Hitentity.isAlliedTo((Entity)livingentity) && (flag = Hitentity.hurtOrSimulate(this.damageSources().indirectMagic((Entity)this, (Entity)livingentity), 7.0f))) {
                 MobEffectInstance effectinstance = new MobEffectInstance(ModEffect.EFFECTCURSE_OF_DESERT, 200, 0);
                 Hitentity.addEffect(effectinstance);
             }
@@ -139,7 +142,7 @@ extends Entity {
     }
 
     public void setLifespan(int i) {
-        this.entityData.set(LIFESPAN, (Object)i);
+        this.entityData.set(LIFESPAN, i);
     }
 
     public float getOffset() {
@@ -147,7 +150,7 @@ extends Entity {
     }
 
     public void setOffset(float i) {
-        this.entityData.set(OFFSET, (Object)Float.valueOf(i));
+        this.entityData.set(OFFSET, Float.valueOf(i));
     }
 
     public void setCaster(@Nullable LivingEntity p_190549_1_) {
@@ -178,7 +181,7 @@ extends Entity {
                 speed = (float)this.tickCount * 0.04f;
                 offset = this.getOffset();
                 orbit = new Vec3(center.x + Math.cos(speed + offset) * (double)radius, center.y, center.z + Math.sin(speed + offset) * (double)radius);
-                this.moveTo(orbit);
+                this.setPos(orbit);
             }
             if (owner instanceof Player) {
                 center = owner.position().add(0.0, 0.0, 0.0);
@@ -186,15 +189,15 @@ extends Entity {
                 speed = (float)this.tickCount * 0.04f;
                 offset = this.getOffset();
                 orbit = new Vec3(center.x + Math.cos(speed + offset) * (double)radius, center.y, center.z + Math.sin(speed + offset) * (double)radius);
-                this.moveTo(orbit);
+                this.setPos(orbit);
             }
         }
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(LIFESPAN, (Object)300);
-        p_326229_.define(OFFSET, (Object)Float.valueOf(0.0f));
-        p_326229_.define(STATE, (Object)0);
+        p_326229_.define(LIFESPAN, 300);
+        p_326229_.define(OFFSET, Float.valueOf(0.0f));
+        p_326229_.define(STATE, 0);
     }
 
     public AnimationState getAnimationState(String input) {
@@ -238,20 +241,20 @@ extends Entity {
     }
 
     public void setState(int state) {
-        this.entityData.set(STATE, (Object)state);
+        this.entityData.set(STATE, state);
     }
 
-    protected void readAdditionalSaveData(CompoundTag compound) {
-        this.setLifespan(compound.getInt("Lifespan"));
-        if (compound.hasUUID("Owner")) {
-            this.casterUuid = compound.getUUID("Owner");
+    protected void readAdditionalSaveData(ValueInput compound) {
+        this.setLifespan(compound.getIntOr("Lifespan", 0));
+        if (compound.read("Owner", UUIDUtil.CODEC).isPresent()) {
+            this.casterUuid = compound.read("Owner", UUIDUtil.CODEC).orElse(null);
         }
     }
 
-    protected void addAdditionalSaveData(CompoundTag compound) {
+    protected void addAdditionalSaveData(ValueOutput compound) {
         compound.putInt("Lifespan", this.getLifespan());
         if (this.casterUuid != null) {
-            compound.putUUID("Owner", this.casterUuid);
+            compound.store("Owner", UUIDUtil.CODEC, this.casterUuid);
         }
     }
 }

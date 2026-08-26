@@ -30,10 +30,11 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Void_Vortex_Renderer
-extends EntityRenderer<Void_Vortex_Entity> {
+extends EntityRenderer<Void_Vortex_Entity, EntityRenderState> {
     private static final Identifier TEXTURE_1 = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/void_vortex/void_vortex_idle1.png");
     private static final Identifier TEXTURE_2 = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/void_vortex/void_vortex_idle2.png");
     private static final Identifier TEXTURE_3 = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/void_vortex/void_vortex_idle3.png");

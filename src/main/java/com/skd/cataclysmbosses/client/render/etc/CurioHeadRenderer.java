@@ -30,7 +30,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HeadedModel;
-import net.minecraft.client.model.SkullModelBase;
+import net.minecraft.client.model.object.skull.SkullModelBase;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;

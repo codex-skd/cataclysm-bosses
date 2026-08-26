@@ -13,7 +13,7 @@
  *  net.minecraft.world.entity.Entity
  *  net.minecraft.world.entity.EntityType
  *  net.minecraft.world.entity.Mob
- *  net.minecraft.world.entity.MobSpawnType
+ *  net.minecraft.world.entity.EntitySpawnReason
  *  net.minecraft.world.level.Level
  *  net.minecraft.world.level.ServerLevelAccessor
  *  net.minecraft.world.level.block.Blocks

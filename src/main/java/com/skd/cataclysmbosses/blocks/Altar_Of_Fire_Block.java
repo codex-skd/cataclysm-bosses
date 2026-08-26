@@ -89,7 +89,7 @@ extends BaseEntityBlock {
 
     protected void entityInside(BlockState p_51269_, Level p_51270_, BlockPos p_51271_, Entity p_51272_) {
         if (p_51272_ instanceof LivingEntity) {
-            p_51272_.hurt(p_51270_.damageSources().campfire(), 3.0f);
+            p_51272_.hurtOrSimulate(p_51270_.damageSources().campfire(), 3.0f);
         }
         super.entityInside(p_51269_, p_51270_, p_51271_, p_51272_);
     }

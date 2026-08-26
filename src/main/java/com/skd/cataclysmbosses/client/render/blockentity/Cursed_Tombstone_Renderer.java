@@ -25,6 +25,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
@@ -50,7 +51,7 @@ implements BlockEntityRenderer<Cursed_tombstone_Entity> {
         poseStack.translate(0.5f, 1.5f, 0.5f);
         poseStack.mulPose(dir.getRotation());
         poseStack.mulPose(Axis.XP.rotationDegrees(90.0f));
-        MODEL.renderToBuffer(poseStack, (Boolean)entity.getBlockState().getValue((Property)Cursed_Tombstone_Block.POWERED) != false ? buffer.getBuffer(RenderType.entityCutoutNoCull((Identifier)TEXTURE2)) : buffer.getBuffer(RenderType.entityCutoutNoCull((Identifier)TEXTURE)), packedLight, overlay);
+        MODEL.renderToBuffer(poseStack, (Boolean)entity.getBlockState().getValue((Property)Cursed_Tombstone_Block.POWERED) != false ? buffer.getBuffer(RenderTypes.entityCutoutNoCull((Identifier)TEXTURE2)) : buffer.getBuffer(RenderTypes.entityCutoutNoCull((Identifier)TEXTURE)), packedLight, overlay, -1);
         if (entity.tickCount > 0) {
             float f5 = ((float)entity.tickCount + delta) / 63.0f;
             float f7 = Math.min(f5 > 0.8f ? (f5 - 0.8f) / 0.2f : 0.0f, 1.0f);

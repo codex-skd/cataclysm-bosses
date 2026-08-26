@@ -41,7 +41,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -74,7 +74,7 @@ extends Cataclysm_Weapon {
             if (i >= 40) {
                 this.yall(p_43395_, p_43396_);
                 if (!p_43395_.isClientSide()) {
-                    player.getCooldowns().addCooldown((Item)this, 100);
+                    player.getCooldowns().addCooldown(this.getDefaultInstance(), 100);
                 }
             }
         }
@@ -123,15 +123,15 @@ extends Cataclysm_Weapon {
         }
     }
 
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack otherHand;
         ItemStack itemstack = player.getItemInHand(hand);
         ItemStack itemStack = otherHand = hand == InteractionHand.MAIN_HAND ? player.getItemInHand(InteractionHand.OFF_HAND) : player.getItemInHand(InteractionHand.MAIN_HAND);
         if (otherHand.is((Item)ModItems.THE_ANNIHILATOR.get())) {
             player.startUsingItem(hand);
-            return InteractionResultHolder.consume((Object)itemstack);
+            return InteractionResult.CONSUME;
         }
-        return InteractionResultHolder.fail((Object)itemstack);
+        return InteractionResult.FAIL;
     }
 
     public boolean canDisableShield(ItemStack stack, ItemStack shield, LivingEntity entity, LivingEntity attacker) {

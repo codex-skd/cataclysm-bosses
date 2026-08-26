@@ -85,7 +85,7 @@ extends PickaxeItem {
             ScreenShake_Entity.ScreenShake(world, player.position(), 30.0f, 0.1f, 0, 30);
             for (Vec3 vector3d : all) {
                 float f = (float)Mth.atan2((double)vector3d.z, (double)vector3d.x);
-                player.getCooldowns().addCooldown((Item)this, CMCommonConfig.VoidForge.cooldown);
+                player.getCooldowns().addCooldown(this.getDefaultInstance(), CMCommonConfig.VoidForge.cooldown);
                 for (int i = 0; i < 5; ++i) {
                     double d2 = 1.75 * (double)(i + 1);
                     int j = 1 * i;

@@ -27,7 +27,7 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
@@ -45,7 +45,7 @@ extends RenderLayer<Ender_Golem_Entity, Ender_Golem_Model> {
             int f = (int)(255.0f - entity.deactivateProgress * 255.0f / 30.0f);
             RenderType eyes = RenderType.eyes((Identifier)ENDER_GOLEM_LAYER_TEXTURES);
             VertexConsumer VertexConsumer2 = bufferIn.getBuffer(eyes);
-            int i = FastColor.ARGB32.color((int)f, (int)f, (int)f);
+            int i = ARGB.color((int)f, (int)f, (int)f);
             ((Ender_Golem_Model)this.getParentModel()).renderToBuffer(matrixStackIn, VertexConsumer2, packedLightIn, OverlayTexture.NO_OVERLAY, i);
         }
     }

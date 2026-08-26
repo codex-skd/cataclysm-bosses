@@ -45,6 +45,7 @@ import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
@@ -185,7 +186,7 @@ extends Particle {
             return RenderType.itemEntityTranslucentCull((Identifier)resourcelocation);
         }
         if (p_230496_2_) {
-            return this.ghost && !CMClientConfig.shadersCompat ? CMRenderTypes.getGhost(resourcelocation) : RenderType.entityTranslucent((Identifier)resourcelocation);
+            return this.ghost && !CMClientConfig.shadersCompat ? CMRenderTypes.getGhost(resourcelocation) : RenderTypes.entityTranslucent((Identifier)resourcelocation);
         }
         return p_230496_4_ ? RenderType.outline((Identifier)resourcelocation) : null;
     }

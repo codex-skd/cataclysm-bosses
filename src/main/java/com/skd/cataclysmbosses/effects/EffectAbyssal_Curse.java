@@ -20,7 +20,7 @@ extends MobEffect {
     }
 
     public boolean applyEffectTick(LivingEntity LivingEntityIn, int amplifier) {
-        LivingEntityIn.hurt(LivingEntityIn.damageSources().source(CMDamageTypes.ABYSSAL_BURN), 1.0f);
+        LivingEntityIn.hurtOrSimulate(LivingEntityIn.damageSources().source(CMDamageTypes.ABYSSAL_BURN), 1.0f);
         return true;
     }
 

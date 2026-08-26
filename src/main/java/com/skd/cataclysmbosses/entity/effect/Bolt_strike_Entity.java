@@ -29,6 +29,7 @@ import com.skd.cataclysmbosses.init.ModSounds;
 import java.util.List;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -44,6 +45,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Bolt_strike_Entity
 extends Entity {
@@ -75,11 +78,11 @@ extends Entity {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(DAMAGE, (Object)Float.valueOf(0.0f));
-        p_326229_.define(HPDAMAGE, (Object)Float.valueOf(0.0f));
-        p_326229_.define(R, (Object)0);
-        p_326229_.define(G, (Object)0);
-        p_326229_.define(B, (Object)0);
+        p_326229_.define(DAMAGE, Float.valueOf(0.0f));
+        p_326229_.define(HPDAMAGE, Float.valueOf(0.0f));
+        p_326229_.define(R, 0);
+        p_326229_.define(G, 0);
+        p_326229_.define(B, 0);
     }
 
     public int getR() {
@@ -87,7 +90,7 @@ extends Entity {
     }
 
     public void setR(int r) {
-        this.entityData.set(R, (Object)r);
+        this.entityData.set(R, r);
     }
 
     public int getG() {
@@ -95,7 +98,7 @@ extends Entity {
     }
 
     public void setG(int g) {
-        this.entityData.set(G, (Object)g);
+        this.entityData.set(G, g);
     }
 
     public int getB() {
@@ -103,7 +106,7 @@ extends Entity {
     }
 
     public void setB(int b) {
-        this.entityData.set(B, (Object)b);
+        this.entityData.set(B, b);
     }
 
     public void setCaster(@Nullable LivingEntity p_190549_1_) {
@@ -125,7 +128,7 @@ extends Entity {
     }
 
     public void setDamage(float damage) {
-        this.entityData.set(DAMAGE, (Object)Float.valueOf(damage));
+        this.entityData.set(DAMAGE, Float.valueOf(damage));
     }
 
     public boolean shouldRenderAtSqrDistance(double distance) {
@@ -194,9 +197,9 @@ extends Entity {
         LivingEntity livingentity = this.getCaster();
         if (Hitentity.isAlive() && !Hitentity.isInvulnerable() && Hitentity != livingentity) {
             if (livingentity == null) {
-                Hitentity.hurt(this.damageSources().magic(), this.getDamage());
+                Hitentity.hurtOrSimulate(this.damageSources().magic(), this.getDamage());
             } else if (!livingentity.isAlliedTo((Entity)Hitentity) && !Hitentity.isAlliedTo((Entity)livingentity)) {
-                Hitentity.hurt(this.damageSources().indirectMagic((Entity)this, (Entity)livingentity), this.getDamage());
+                Hitentity.hurtOrSimulate(this.damageSources().indirectMagic((Entity)this, (Entity)livingentity), this.getDamage());
             }
         }
     }
@@ -222,9 +225,9 @@ extends Entity {
         }
     }
 
-    protected void addAdditionalSaveData(CompoundTag compound) {
+    protected void addAdditionalSaveData(ValueOutput compound) {
         if (this.ownerUUID != null) {
-            compound.putUUID("Owner", this.ownerUUID);
+            compound.store("Owner", UUIDUtil.CODEC, this.ownerUUID);
         }
         compound.putFloat("damage", this.getDamage());
         compound.putInt("r", this.getR());
@@ -232,14 +235,14 @@ extends Entity {
         compound.putInt("b", this.getB());
     }
 
-    protected void readAdditionalSaveData(CompoundTag compound) {
-        if (compound.hasUUID("Owner")) {
-            this.ownerUUID = compound.getUUID("Owner");
+    protected void readAdditionalSaveData(ValueInput compound) {
+        if (compound.read("Owner", UUIDUtil.CODEC).isPresent()) {
+            this.ownerUUID = compound.read("Owner", UUIDUtil.CODEC).orElse(null);
         }
-        this.setDamage(compound.getFloat("damage"));
-        this.setR(compound.getInt("r"));
-        this.setG(compound.getInt("g"));
-        this.setB(compound.getInt("b"));
+        this.setDamage(compound.getFloatOr("damage", 0.0f));
+        this.setR(compound.getIntOr("r", 0));
+        this.setG(compound.getIntOr("g", 0));
+        this.setB(compound.getIntOr("b", 0));
     }
 }
 

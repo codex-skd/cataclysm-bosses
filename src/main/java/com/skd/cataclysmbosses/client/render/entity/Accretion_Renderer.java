@@ -43,10 +43,11 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Accretion_Renderer
-extends EntityRenderer<Accretion_Entity> {
+extends EntityRenderer<Accretion_Entity, EntityRenderState> {
     private final BlockRenderDispatcher blockRenderer;
     private final EntityRenderDispatcher entityRenderer;
     private final RandomSource rnd = RandomSource.create();

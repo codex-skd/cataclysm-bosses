@@ -25,9 +25,10 @@ import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
-public class Maledictus_Renderer extends EntityRenderer<Maledictus_Entity> {
+public class Maledictus_Renderer extends EntityRenderer<Maledictus_Entity, EntityRenderState> {
     private static final Identifier MALEDICTUS_TEXTURES = new ResourceLocation("cataclysm_bosses", "textures/entity/maledictus/maledictus.png");
 
     public Maledictus_Renderer(EntityRendererProvider.Context renderManagerIn) {

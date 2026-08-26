@@ -19,7 +19,7 @@
  *  net.minecraft.world.entity.Entity
  *  net.minecraft.world.entity.EntityType
  *  net.minecraft.world.entity.Mob
- *  net.minecraft.world.entity.SpawnReason
+ *  net.minecraft.world.entity.EntitySpawnReason
  *  net.minecraft.world.item.ItemStack
  *  net.minecraft.world.level.Level
  *  net.minecraft.world.level.ServerLevelAccessor
@@ -132,7 +132,7 @@ extends BlockEntity {
             entity.setPos(vec3);
             if (entity instanceof Mob) {
                 Mob living = (Mob)entity;
-                // living.finalizeSpawn((ServerLevelAccessor)serverLevel, serverLevel.getCurrentDifficultyAt(this.worldPosition), SpawnReason.SPAWNER, null);
+                // living.finalizeSpawn((ServerLevelAccessor)serverLevel, serverLevel.getCurrentDifficultyAt(this.worldPosition), EntitySpawnReason.SPAWNER, null);
                 if (living instanceof IHomeEntity) {
                     IHomeEntity homeEntity = (IHomeEntity)living;
                     homeEntity.setHomePos(GlobalPos.of((ResourceKey)serverLevel.dimension(), (BlockPos)BlockPos.containing((Position)vec3)));

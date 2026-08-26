@@ -51,6 +51,8 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Void_Howitzer_Entity
 extends ThrowableProjectile {
@@ -75,7 +77,7 @@ extends ThrowableProjectile {
             if (entity2 instanceof LivingEntity) {
                 LivingEntity livingentity = (LivingEntity)entity2;
                 DamageSource damagesource = this.damageSources().indirectMagic((Entity)this, (Entity)livingentity);
-                boolean flag = entity.hurt(damagesource, 8.0f);
+                boolean flag = entity.hurtOrSimulate(damagesource, 8.0f);
                 if (flag) {
                     if (entity.isAlive()) {
                         EnchantmentHelper.doPostAttackEffects((ServerLevel)serverlevel, (Entity)entity, (DamageSource)damagesource);
@@ -84,7 +86,7 @@ extends ThrowableProjectile {
                     }
                 }
             } else {
-                entity.hurt(this.damageSources().magic(), 5.0f);
+                entity.hurtOrSimulate(this.damageSources().magic(), 5.0f);
             }
         }
     }
@@ -143,11 +145,11 @@ extends ThrowableProjectile {
         }
     }
 
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
     }
 
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
     }
 

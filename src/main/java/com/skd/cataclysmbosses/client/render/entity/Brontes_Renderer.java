@@ -36,10 +36,11 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Brontes_Renderer
-extends EntityRenderer<Brontes_Entity> {
+extends EntityRenderer<Brontes_Entity, EntityRenderState> {
     private final Brontes_Model model = new Brontes_Model();
     private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/item/brontes.png");
     private static final Identifier TEXTURE_LAYER = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/item/brontes_layer.png");
@@ -53,9 +54,9 @@ extends EntityRenderer<Brontes_Entity> {
         poseStack.mulPose(Axis.YP.rotationDegrees(Mth.lerp((float)partialTicks, (float)entity.yRotO, (float)entity.getYRot())));
         poseStack.mulPose(Axis.XP.rotationDegrees(((float)entity.tickCount + partialTicks) * 40.0f));
         VertexConsumer vertexconsumer = ItemRenderer.getFoilBufferDirect((MultiBufferSource)buffer, (RenderType)this.model.renderType(this.getTextureLocation(entity)), (boolean)false, (boolean)false);
-        this.model.renderToBuffer(poseStack, vertexconsumer, packedLight, OverlayTexture.NO_OVERLAY);
+        this.model.renderToBuffer(poseStack, vertexconsumer, packedLight, OverlayTexture.NO_OVERLAY, -1);
         VertexConsumer vertexconsumer2 = ItemRenderer.getFoilBuffer((MultiBufferSource)buffer, (RenderType)CMRenderTypes.CMEyes(TEXTURE_LAYER), (boolean)false, (boolean)false);
-        this.model.renderToBuffer(poseStack, vertexconsumer2, packedLight, OverlayTexture.NO_OVERLAY);
+        this.model.renderToBuffer(poseStack, vertexconsumer2, packedLight, OverlayTexture.NO_OVERLAY, -1);
         poseStack.popPose();
         super.render((Entity)entity, entityYaw, partialTicks, poseStack, buffer, packedLight);
     }

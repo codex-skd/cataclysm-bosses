@@ -48,6 +48,8 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Blazing_Bone_Entity
 extends ThrowableItemProjectile {
@@ -64,7 +66,7 @@ extends ThrowableItemProjectile {
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(DAMAGE, (Object)Float.valueOf(0.0f));
+        p_326229_.define(DAMAGE, Float.valueOf(0.0f));
     }
 
     public float getDamage() {
@@ -72,17 +74,17 @@ extends ThrowableItemProjectile {
     }
 
     public void setDamage(float damage) {
-        this.entityData.set(DAMAGE, (Object)Float.valueOf(damage));
+        this.entityData.set(DAMAGE, Float.valueOf(damage));
     }
 
-    public void addAdditionalSaveData(CompoundTag tag) {
+    public void addAdditionalSaveData(ValueOutput tag) {
         super.addAdditionalSaveData(tag);
         tag.putFloat("damage", this.getDamage());
     }
 
-    public void readAdditionalSaveData(CompoundTag tag) {
+    public void readAdditionalSaveData(ValueInput tag) {
         super.readAdditionalSaveData(tag);
-        this.setDamage(tag.getFloat("damage"));
+        this.setDamage(tag.getFloatOr("damage", 0.0f));
     }
 
     protected Item getDefaultItem() {
@@ -95,10 +97,10 @@ extends ThrowableItemProjectile {
         Entity entity = result.getEntity();
         if (shooter instanceof LivingEntity) {
             if (entity != shooter && !shooter.isAlliedTo(entity)) {
-                entity.hurt(this.damageSources().mobProjectile((Entity)this, (LivingEntity)shooter), this.getDamage());
+                entity.hurtOrSimulate(this.damageSources().mobProjectile((Entity)this, (LivingEntity)shooter), this.getDamage());
             }
         } else {
-            entity.hurt(this.damageSources().magic(), this.getDamage());
+            entity.hurtOrSimulate(this.damageSources().magic(), this.getDamage());
         }
     }
 

@@ -32,7 +32,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -64,7 +64,7 @@ extends Item {
             float f = Void_Assault_SHoulder_Weapon.getPowerForTime(i);
             if (!((double)f < 0.5)) {
                 p_43395_.playSound((Player)null, player.getX(), player.getY(), player.getZ(), (SoundEvent)ModSounds.ROCKET_LAUNCH.get(), SoundSource.PLAYERS, 1.0f, 0.7f);
-                player.getCooldowns().addCooldown((Item)this, CMCommonConfig.WASW.howitzerCooldown);
+                player.getCooldowns().addCooldown(this.getDefaultInstance(), CMCommonConfig.WASW.howitzerCooldown);
                 if (!p_43395_.isClientSide()) {
                     Void_Howitzer_Entity rocket = new Void_Howitzer_Entity((EntityType<Void_Howitzer_Entity>)((EntityType)ModEntities.VOID_HOWITZER.get()), p_43395_, (LivingEntity)player);
                     rocket.shootFromRotation((Entity)player, player.getXRot(), player.getYRot(), 0.0f, f * 1.0f, 1.0f);
@@ -82,10 +82,10 @@ extends Item {
         return f;
     }
 
-    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+    public InteractionResult use(Level world, Player player, InteractionHand hand) {
         ItemStack itemstack = player.getItemInHand(hand);
         player.startUsingItem(hand);
-        return InteractionResultHolder.consume((Object)itemstack);
+        return InteractionResult.CONSUME;
     }
 
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltips, TooltipFlag flags) {

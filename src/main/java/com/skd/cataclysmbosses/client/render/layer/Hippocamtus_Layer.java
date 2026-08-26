@@ -28,7 +28,7 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
@@ -48,7 +48,7 @@ extends RenderLayer<Hippocamtus_Entity, Hippocamtus_Model> {
     public void render(PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn, Hippocamtus_Entity entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         if (entity.getAttackState() == 4) {
             int f = entity.attackTicks < 7 ? entity.attackTicks * 255 / 12 : (entity.attackTicks <= 17 ? 255 : Math.max(0, 255 - (entity.attackTicks - 17) * 255 / 21));
-            int i = FastColor.ARGB32.color((int)255, (int)f, (int)f, (int)f);
+            int i = ARGB.color((int)255, (int)f, (int)f, (int)f);
             RenderType eyes = CMRenderTypes.CMEyes(this.getTextureLocation(entity));
             VertexConsumer vertexConsumer = bufferIn.getBuffer(eyes);
             ((Hippocamtus_Model)this.getParentModel()).renderToBuffer(matrixStackIn, vertexConsumer, packedLightIn, OverlayTexture.NO_OVERLAY, i);

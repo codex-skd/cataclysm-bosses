@@ -26,7 +26,7 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 
 public class Netherite_Monstrosity_Flare
 extends RenderLayer<Netherite_Monstrosity_Entity, Netherite_Monstrosity_Model> {
@@ -39,7 +39,7 @@ extends RenderLayer<Netherite_Monstrosity_Entity, Netherite_Monstrosity_Model> {
     public void render(PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn, Netherite_Monstrosity_Entity entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         RenderType eyes2 = CMRenderTypes.CMEyes(NETHERITE_MONSTRISITY_OUTER);
         VertexConsumer VertexConsumer2 = bufferIn.getBuffer(eyes2);
-        int i = FastColor.ARGB32.color((int)255, (int)255, (int)255, (int)102);
+        int i = ARGB.color((int)255, (int)255, (int)255, (int)102);
         ((Netherite_Monstrosity_Model)this.getParentModel()).renderToBuffer(matrixStackIn, VertexConsumer2, packedLightIn, OverlayTexture.NO_OVERLAY, i);
     }
 }

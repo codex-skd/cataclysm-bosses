@@ -31,10 +31,11 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Lightning_Spear_Renderer
-extends EntityRenderer<Lightning_Spear_Entity> {
+extends EntityRenderer<Lightning_Spear_Entity, EntityRenderState> {
     private static final Identifier[] TEXTURE_PROGRESS = new Identifier[6];
     public Elemental_Spear_Model model;
 
@@ -53,7 +54,7 @@ extends EntityRenderer<Lightning_Spear_Entity> {
         float f1 = Mth.lerp((float)partialTicks, (float)entity.xRotO, (float)entity.getXRot());
         this.model.setupAnim(entity, 0.0f, 0.0f, (float)entity.tickCount + partialTicks, f, f1);
         VertexConsumer vertexconsumer = buffer.getBuffer(CMRenderTypes.CMEyes(this.getTextureLocation(entity)));
-        this.model.renderToBuffer(poseStack, vertexconsumer, packedLight, OverlayTexture.NO_OVERLAY);
+        this.model.renderToBuffer(poseStack, vertexconsumer, packedLight, OverlayTexture.NO_OVERLAY, -1);
         poseStack.popPose();
         super.render((Entity)entity, entityYaw, partialTicks, poseStack, buffer, packedLight);
     }

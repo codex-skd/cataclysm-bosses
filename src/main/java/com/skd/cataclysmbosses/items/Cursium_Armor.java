@@ -122,7 +122,7 @@ implements KeybindUsingArmor {
                 living.addEffect(new MobEffectInstance(MobEffects.GLOWING, 160));
             }
             if (targetFound) {
-                player.getCooldowns().addCooldown((Item)ModItems.CURSIUM_HELMET.get(), 200);
+                player.getCooldowns().addCooldown(ModItems.CURSIUM_HELMET.get().getDefaultInstance(), 200);
             }
         }
         if (type == 7 && player.onGround() && !player.getCooldowns().isOnCooldown((Item)ModItems.CURSIUM_BOOTS.get())) {
@@ -133,7 +133,7 @@ implements KeybindUsingArmor {
             Vec3 currentVel = player.getDeltaMovement();
             player.setDeltaMovement(currentVel.x + velX, 0.4, currentVel.z + velZ);
             player.hurtMarked = true;
-            player.getCooldowns().addCooldown((Item)ModItems.CURSIUM_BOOTS.get(), 200);
+            player.getCooldowns().addCooldown(ModItems.CURSIUM_BOOTS.get().getDefaultInstance(), 200);
         }
     }
 

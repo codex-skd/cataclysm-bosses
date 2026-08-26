@@ -20,9 +20,10 @@ import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
-public class Symbiocto_Renderer extends EntityRenderer<Symbiocto_Entity> {
+public class Symbiocto_Renderer extends EntityRenderer<Symbiocto_Entity, EntityRenderState> {
     private static final Identifier SYMbiocto_OPEN = new ResourceLocation("cataclysm_bosses", "textures/entity/sea/symbiocto_open.png");
     private static final Identifier SYMbiocto_CLOSE = new ResourceLocation("cataclysm_bosses", "textures/entity/sea/symbiocto_close.png");
 

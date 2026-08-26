@@ -26,7 +26,7 @@
  *  net.minecraft.world.entity.EntityType
  *  net.minecraft.world.entity.LivingEntity
  *  net.minecraft.world.entity.Mob
- *  net.minecraft.world.entity.SpawnReason
+ *  net.minecraft.world.entity.EntitySpawnReason
  *  net.minecraft.world.entity.NeutralMob
  *  net.minecraft.world.entity.PathfinderMob
  *  net.minecraft.world.entity.ai.attributes.AttributeSupplier$Builder
@@ -92,7 +92,7 @@ import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.SpawnReason;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.NeutralMob;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -115,6 +115,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.level.pathfinder.PathType;
 import org.jetbrains.annotations.Nullable;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Amethyst_Crab_Entity
 extends LLibrary_Boss_Monster
@@ -177,13 +179,13 @@ implements NeutralMob {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         this.addPersistentAngerSaveData(compound);
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
         this.readPersistentAngerSaveData(this.level(), compound);
     }
@@ -194,15 +196,15 @@ implements NeutralMob {
             this.playSound(SoundEvents.ANVIL_LAND, 0.4f, 2.0f);
             return false;
         }
-        return super.hurt(source, damage);
+        return super.hurtOrSimulate(source, damage);
     }
 
-    public boolean checkSpawnRules(LevelAccessor worldIn, SpawnReason spawnReasonIn) {
+    public boolean checkSpawnRules(LevelAccessor worldIn, EntitySpawnReason spawnReasonIn) {
         return ModEntities.rollSpawn(CMCommonConfig.Spawning.AmethystCrabSpawnRolls, this.getRandom(), spawnReasonIn);
     }
 
-    public static boolean canCrabSpawnSpawnRules(EntityType<? extends Amethyst_Crab_Entity> p_219020_, LevelAccessor p_219021_, SpawnReason p_219022_, BlockPos p_219023_, RandomSource p_219024_) {
-        return Amethyst_Crab_Entity.checkAnyLightMonsterSpawnRules(p_219020_, (LevelAccessor)p_219021_, (SpawnReason)p_219022_, (BlockPos)p_219023_, (RandomSource)p_219024_);
+    public static boolean canCrabSpawnSpawnRules(EntityType<? extends Amethyst_Crab_Entity> p_219020_, LevelAccessor p_219021_, EntitySpawnReason p_219022_, BlockPos p_219023_, RandomSource p_219024_) {
+        return Amethyst_Crab_Entity.checkAnyLightMonsterSpawnRules(p_219020_, (LevelAccessor)p_219021_, (EntitySpawnReason)p_219022_, (BlockPos)p_219023_, (RandomSource)p_219024_);
     }
 
     @Override
@@ -284,7 +286,7 @@ implements NeutralMob {
                 float entityRelativeAngle = entityHitAngle - entityAttackingAngle;
                 float entityHitDistance = (float)Math.sqrt((entityHit.getZ() - this.getZ()) * (entityHit.getZ() - this.getZ()) + (entityHit.getX() - this.getX()) * (entityHit.getX() - this.getX()));
                 if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || entityHit instanceof Amethyst_Crab_Entity) continue;
-                entityHit.hurt(damagesource, (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) * damage);
+                entityHit.hurtOrSimulate(damagesource, (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) * damage);
                 if (!entityHit.isDamageSourceBlocked(damagesource) || !(entityHit instanceof Player)) continue;
                 Player player = (Player)entityHit;
                 if (shieldbreakticks <= 0) continue;

@@ -46,7 +46,7 @@ extends RenderLayer<Aptrgangr_Entity, Aptrgangr_Model> {
     public void render(PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn, Aptrgangr_Entity entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         RenderType eyes = CMRenderTypes.CMEyes(this.getLayerTextureLocation());
         VertexConsumer VertexConsumer2 = bufferIn.getBuffer(eyes);
-        ((Aptrgangr_Model)this.getParentModel()).renderToBuffer(matrixStackIn, VertexConsumer2, packedLightIn, OverlayTexture.NO_OVERLAY);
+        ((Aptrgangr_Model)this.getParentModel()).renderToBuffer(matrixStackIn, VertexConsumer2, packedLightIn, OverlayTexture.NO_OVERLAY, -1);
     }
 }
 

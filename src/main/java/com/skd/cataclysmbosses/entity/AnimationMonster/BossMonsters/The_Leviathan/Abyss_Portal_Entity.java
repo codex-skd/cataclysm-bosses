@@ -38,6 +38,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
@@ -52,6 +53,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Abyss_Portal_Entity
 extends Entity {
@@ -115,7 +118,7 @@ extends Entity {
     }
 
     public void setLifespan(int i) {
-        this.entityData.set(LIFESPAN, (Object)i);
+        this.entityData.set(LIFESPAN, i);
     }
 
     public boolean getEntrance() {
@@ -123,7 +126,7 @@ extends Entity {
     }
 
     public void setEntrance(boolean entrance) {
-        this.entityData.set(ENTRANCE, (Object)entrance);
+        this.entityData.set(ENTRANCE, entrance);
     }
 
     public void setDestination(@Nullable BlockPos destination) {
@@ -163,27 +166,27 @@ extends Entity {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(LIFESPAN, (Object)300);
+        p_326229_.define(LIFESPAN, 300);
         p_326229_.define(SISTER_UUID, Optional.empty());
         p_326229_.define(DESTINATION, Optional.empty());
-        p_326229_.define(ENTRANCE, (Object)true);
+        p_326229_.define(ENTRANCE, true);
     }
 
-    protected void readAdditionalSaveData(CompoundTag compound) {
-        this.setLifespan(compound.getInt("Lifespan"));
+    protected void readAdditionalSaveData(ValueInput compound) {
+        this.setLifespan(compound.getIntOr("Lifespan", 0));
         NbtUtils.readBlockPos((CompoundTag)compound, (String)"Destination").ifPresent(this::setDestination);
-        if (compound.hasUUID("SisterUUID")) {
-            this.setSisterId(compound.getUUID("SisterUUID"));
+        if (compound.read("SisterUUID", UUIDUtil.CODEC).isPresent()) {
+            this.setSisterId(compound.read("SisterUUID", UUIDUtil.CODEC).orElse(null));
         }
     }
 
-    protected void addAdditionalSaveData(CompoundTag compound) {
+    protected void addAdditionalSaveData(ValueOutput compound) {
         compound.putInt("Lifespan", this.getLifespan());
         if (this.getDestination() != null) {
             compound.put("Destination", NbtUtils.writeBlockPos((BlockPos)this.getDestination()));
         }
         if (this.getSisterId() != null) {
-            compound.putUUID("SisterUUID", this.getSisterId());
+            compound.store("SisterUUID", UUIDUtil.CODEC, this.getSisterId());
         }
     }
 

@@ -118,7 +118,7 @@ implements Clearable {
                         leviathan.setHomePos(GlobalPos.of((ResourceKey)serverLevel.dimension(), (BlockPos)pos));
                         boolean flag = level.addFreshEntity((Entity)leviathan);
                         if (flag) {
-                            this.items.set(0, (Object)ItemStack.EMPTY);
+                            this.items.set(0, ItemStack.EMPTY);
                             this.setChanged();
                             level.sendBlockUpdated(pos, state, state, 3);
                         }
@@ -190,14 +190,14 @@ implements Clearable {
     }
 
     public void setItem(int index, ItemStack stack) {
-        this.getItems().set(index, (Object)stack);
+        this.getItems().set(index, stack);
         if (!stack.isEmpty() && stack.getCount() > this.getMaxStackSize()) {
             stack.setCount(this.getMaxStackSize());
         }
     }
 
     public void placeItem(@Nullable LivingEntity entity, int index, ItemStack stack) {
-        this.getItems().set(index, (Object)stack);
+        this.getItems().set(index, stack);
         if (!stack.isEmpty() && stack.getCount() > this.getMaxStackSize()) {
             stack.setCount(this.getMaxStackSize());
         }
@@ -247,7 +247,7 @@ implements Clearable {
 
     protected void collectImplicitComponents(DataComponentMap.Builder p_338620_) {
         super.collectImplicitComponents(p_338620_);
-        p_338620_.set(DataComponents.CONTAINER, (Object)ItemContainerContents.fromItems(this.getItems()));
+        p_338620_.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(this.getItems()));
     }
 
     public void removeComponentsFromTag(CompoundTag p_332690_) {

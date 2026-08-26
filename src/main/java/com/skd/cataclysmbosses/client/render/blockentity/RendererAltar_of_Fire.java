@@ -29,6 +29,7 @@ import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -58,7 +59,7 @@ implements BlockEntityRenderer<T> {
         matrixStackIn.translate(0.5f, 1.5f, 0.5f);
         matrixStackIn.scale(1.0f, -1.0f, -1.0f);
         MODEL.animate((AltarOfFire_Block_Entity)((Object)tileEntityIn), partialTicks);
-        MODEL.renderToBuffer(matrixStackIn, bufferIn.getBuffer(RenderType.entityCutoutNoCull((Identifier)TEXTURE)), combinedLightIn, combinedOverlayIn);
+        MODEL.renderToBuffer(matrixStackIn, bufferIn.getBuffer(RenderTypes.entityCutoutNoCull((Identifier)TEXTURE)), combinedLightIn, combinedOverlayIn, -1);
         this.renderFlamePart(f2, matrixStackIn, bufferIn, 15);
         matrixStackIn.popPose();
         this.renderItem(tileEntityIn, partialTicks, matrixStackIn, bufferIn, combinedLightIn);
@@ -91,7 +92,7 @@ implements BlockEntityRenderer<T> {
             float f2 = (float)((AltarOfFire_Block_Entity)((Object)tileEntityIn)).tickCount + delta;
             float f3 = Mth.clamp((int)((AltarOfFire_Block_Entity)((Object)tileEntityIn)).summoningticks, (int)0, (int)25);
             matrixStackIn.pushPose();
-            VertexConsumer ivertexbuilder = bufferIn.getBuffer(RenderType.entityTranslucentEmissive((Identifier)FLAME_STRIKE));
+            VertexConsumer ivertexbuilder = bufferIn.getBuffer(RenderTypes.entityTranslucentEmissive((Identifier)FLAME_STRIKE));
             matrixStackIn.translate(0.5, 0.001, 0.5);
             matrixStackIn.scale(f3 * 0.1f, f3 * 0.1f, f3 * 0.1f);
             matrixStackIn.mulPose(Axis.YP.rotationDegrees(90.0f + f2));

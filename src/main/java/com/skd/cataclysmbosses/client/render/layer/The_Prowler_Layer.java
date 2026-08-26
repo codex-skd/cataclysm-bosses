@@ -30,7 +30,7 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.WalkAnimationState;
 import net.neoforged.api.distmarker.Dist;
@@ -63,7 +63,7 @@ extends RenderLayer<The_Prowler_Entity, The_Prowler_Model> {
         int f = 255 - entity.deathTime * 255 / entity.deathtimer();
         RenderType eyes = CMRenderTypes.CMEyes(this.getTextureLocation(entity));
         VertexConsumer VertexConsumer2 = bufferIn.getBuffer(eyes);
-        int i = FastColor.ARGB32.color((int)255, (int)f, (int)f, (int)f);
+        int i = ARGB.color((int)255, (int)f, (int)f, (int)f);
         ((The_Prowler_Model)this.getParentModel()).renderToBuffer(matrixStackIn, VertexConsumer2, packedLightIn, OverlayTexture.NO_OVERLAY, i);
     }
 }

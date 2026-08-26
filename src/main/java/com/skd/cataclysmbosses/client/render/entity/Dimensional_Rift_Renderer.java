@@ -32,10 +32,11 @@ import net.minecraft.world.entity.Entity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Matrix4f;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Dimensional_Rift_Renderer
-extends EntityRenderer<Dimensional_Rift_Entity> {
+extends EntityRenderer<Dimensional_Rift_Entity, EntityRenderState> {
     private static final Identifier TEXTURE_IDLE_1 = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/leviathan/dimensional_rift/dimensional_rift_idle1.png");
     private static final Identifier TEXTURE_IDLE_2 = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/leviathan/dimensional_rift/dimensional_rift_idle2.png");
     private static final Identifier TEXTURE_IDLE_3 = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/leviathan/dimensional_rift/dimensional_rift_idle3.png");

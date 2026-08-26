@@ -26,11 +26,12 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -50,11 +51,11 @@ extends RenderLayer<Cindaria_Entity, Cindaria_Model> {
 
     public void render(PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn, Cindaria_Entity entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         if (!entity.isInvisible()) {
-            RenderType ghost = CMClientConfig.shadersCompat ? RenderType.entityTranslucent((Identifier)this.getLayerTextureLocation()) : CMRenderTypes.jelly(this.getLayerTextureLocation());
+            RenderType ghost = CMClientConfig.shadersCompat ? RenderTypes.entityTranslucent((Identifier)this.getLayerTextureLocation()) : CMRenderTypes.jelly(this.getLayerTextureLocation());
             VertexConsumer VertexConsumer2 = bufferIn.getBuffer(ghost);
             float alpha = 0.65f;
             boolean hurt = Math.max(entity.hurtTime, entity.deathTime) > 0;
-            int i1 = FastColor.ARGB32.colorFromFloat((float)alpha, (float)1.0f, (float)(hurt ? 0.49803922f : 1.0f), (float)(hurt ? 0.49803922f : 1.0f));
+            int i1 = ARGB.colorFromFloat((float)alpha, (float)1.0f, (float)(hurt ? 0.49803922f : 1.0f), (float)(hurt ? 0.49803922f : 1.0f));
             ((Cindaria_Model)this.getParentModel()).renderToBuffer(matrixStackIn, VertexConsumer2, packedLightIn, LivingEntityRenderer.getOverlayCoords((LivingEntity)entity, (float)0.0f), i1);
         }
     }

@@ -39,10 +39,11 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Matrix4f;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Wither_Homing_Missile_Renderer
-extends EntityRenderer<Wither_Homing_Missile_Entity> {
+extends EntityRenderer<Wither_Homing_Missile_Entity, EntityRenderState> {
     private static final Identifier WITHER_MISSILE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/harbinger/wither_homing_missile.png");
     private static final Identifier TRAIL_TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/particle/amogus.png");
     protected final EntityRenderDispatcher entityRenderDispatcher;
@@ -65,7 +66,7 @@ extends EntityRenderer<Wither_Homing_Missile_Entity> {
         float f1 = Mth.lerp((float)partialTicks, (float)entityIn.xRotO, (float)entityIn.getXRot());
         VertexConsumer vertexconsumer = bufferIn.getBuffer(this.model.renderType(this.getTextureLocation(entityIn)));
         this.model.setupAnim(entityIn, 0.0f, 0.0f, 0.0f, f, f1);
-        this.model.renderToBuffer(matrixStackIn, vertexconsumer, packedLightIn, OverlayTexture.NO_OVERLAY);
+        this.model.renderToBuffer(matrixStackIn, vertexconsumer, packedLightIn, OverlayTexture.NO_OVERLAY, -1);
         matrixStackIn.popPose();
         if (entityIn.hasTrail()) {
             double x = Mth.lerp((double)partialTicks, (double)entityIn.xOld, (double)entityIn.getX());

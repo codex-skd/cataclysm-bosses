@@ -42,10 +42,11 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Portal_Abyss_Blast_Renderer
-extends EntityRenderer<Portal_Abyss_Blast_Entity> {
+extends EntityRenderer<Portal_Abyss_Blast_Entity, EntityRenderState> {
     private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/abyss_laser_beam.png");
     private static final float TEXTURE_WIDTH = 256.0f;
     private static final float TEXTURE_HEIGHT = 32.0f;

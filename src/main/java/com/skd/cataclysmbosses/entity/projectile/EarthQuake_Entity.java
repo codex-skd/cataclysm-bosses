@@ -118,7 +118,7 @@ extends ThrowableProjectile {
         Entity entity1 = this.getOwner();
         LivingEntity livingonwer = entity1 instanceof LivingEntity ? (LivingEntity)entity1 : null;
         for (LivingEntity livingentity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(0.5, 0.5, 0.5))) {
-            if (this.getOwner() == null || this.tickCount % 5 != 0 || livingentity == this.getOwner() || !livingentity.onGround() || this.getOwner().isAlliedTo((Entity)livingentity) || !livingentity.isAlive() || !livingentity.hurt(this.damageSources().mobProjectile((Entity)this, livingonwer), this.getDamage())) continue;
+            if (this.getOwner() == null || this.tickCount % 5 != 0 || livingentity == this.getOwner() || !livingentity.onGround() || this.getOwner().isAlliedTo((Entity)livingentity) || !livingentity.isAlive() || !livingentity.hurtOrSimulate(this.damageSources().mobProjectile((Entity)this, livingonwer), this.getDamage())) continue;
             this.strongKnockback((Entity)livingentity, 0.5);
         }
         if (this.level().isClientSide()) {
@@ -141,7 +141,7 @@ extends ThrowableProjectile {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(DAMAGE, (Object)Float.valueOf(0.0f));
+        p_326229_.define(DAMAGE, Float.valueOf(0.0f));
     }
 
     public float getDamage() {
@@ -149,7 +149,7 @@ extends ThrowableProjectile {
     }
 
     public void setDamage(float damage) {
-        this.entityData.set(DAMAGE, (Object)Float.valueOf(damage));
+        this.entityData.set(DAMAGE, Float.valueOf(damage));
     }
 }
 

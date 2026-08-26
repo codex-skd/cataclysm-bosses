@@ -37,7 +37,7 @@ import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
@@ -84,7 +84,7 @@ extends MobRenderer<Ignited_Revenant_Entity, Ignited_Revenant_Model> {
         public void render(PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn, Ignited_Revenant_Entity entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
             VertexConsumer ivertexbuilder = bufferIn.getBuffer(CMRenderTypes.getFlickering(IGNITED_REVENANT_LAYER_TEXTURES));
             float alpha = 0.5f + (Mth.cos((float)(ageInTicks * 0.2f)) + 1.0f) * 0.2f;
-            int i = FastColor.ARGB32.color((int)Mth.floor((float)(alpha * 255.0f)), (int)255, (int)255, (int)255);
+            int i = ARGB.color((int)Mth.floor((float)(alpha * 255.0f)), (int)255, (int)255, (int)255);
             ((Ignited_Revenant_Model)this.getParentModel()).renderToBuffer(matrixStackIn, ivertexbuilder, 240, LivingEntityRenderer.getOverlayCoords((LivingEntity)entitylivingbaseIn, (float)0.0f), i);
         }
     }

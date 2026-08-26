@@ -68,14 +68,14 @@ extends BlockEntity {
                 }
                 if (this.level.isClientSide()) {
                     for (int i = 0; i < 3; ++i) {
-                        int j = this.level.random.nextInt(2) * 2 - 1;
-                        int k = this.level.random.nextInt(2) * 2 - 1;
+                        int j = this.level.getRandom().nextInt(2) * 2 - 1;
+                        int k = this.level.getRandom().nextInt(2) * 2 - 1;
                         double d0 = (double)this.worldPosition.getX() + 0.5 + 0.25 * (double)j;
-                        double d1 = (float)this.worldPosition.getY() + this.level.random.nextFloat();
+                        double d1 = (float)this.worldPosition.getY() + this.level.getRandom().nextFloat();
                         double d2 = (double)this.worldPosition.getZ() + 0.5 + 0.25 * (double)k;
-                        double d3 = this.level.random.nextFloat() * (float)j;
-                        double d4 = ((double)this.level.random.nextFloat() - 0.5) * 0.125;
-                        double d5 = this.level.random.nextFloat() * (float)k;
+                        double d3 = this.level.getRandom().nextFloat() * (float)j;
+                        double d4 = ((double)this.level.getRandom().nextFloat() - 0.5) * 0.125;
+                        double d5 = this.level.getRandom().nextFloat() * (float)k;
                         this.level.addParticle((ParticleOptions)ParticleTypes.PORTAL, d0, d1, d2, d3, d4, d5);
                     }
                 }

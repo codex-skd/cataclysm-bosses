@@ -36,6 +36,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Wall_Watcher_Entity
 extends Entity {
@@ -55,7 +57,7 @@ extends Entity {
     public Wall_Watcher_Entity(Level level, BlockPos pos, int timer, int effectiveChargeTime, double knockbackSpeedIndex, float damagePerEffectiveCharge, double dx, double dz, LivingEntity source) {
         super((EntityType)ModEntities.WALL_WATCHER.get(), level);
         this.setPos(pos.getX(), pos.getY(), pos.getZ());
-        this.entityData.set(TIMER, (Object)timer);
+        this.entityData.set(TIMER, timer);
         this.effectiveChargeTime = effectiveChargeTime;
         this.knockbackSpeedIndex = knockbackSpeedIndex;
         this.damagePerEffectiveCharge = damagePerEffectiveCharge;
@@ -89,7 +91,7 @@ extends Entity {
                             if (!entity.livingEntity.isAlliedTo((Entity)this.source)) {
                                 entity.livingEntity.invulnerableTime = 0;
                                 float realDamageApplied = this.damagePerEffectiveCharge * (float)this.effectiveChargeTime + 1.0f;
-                                boolean flag = entity.livingEntity.hurt(this.damageSources().mobProjectile((Entity)this, this.source), realDamageApplied);
+                                boolean flag = entity.livingEntity.hurtOrSimulate(this.damageSources().mobProjectile((Entity)this, this.source), realDamageApplied);
                                 if (flag) {
                                     entity.livingEntity.playSound((SoundEvent)ModSounds.EXPLOSION.get(), 0.3f, 1.0f);
                                     entity.livingEntity.addEffect(new MobEffectInstance(ModEffect.EFFECTSTUN, 50));
@@ -107,12 +109,12 @@ extends Entity {
                         this.watchedEntities.clear();
                         this.remove(Entity.RemovalReason.DISCARDED);
                     } else {
-                        this.entityData.set(TIMER, (Object)(temp - 1));
+                        this.entityData.set(TIMER, (temp - 1));
                     }
                 } else if (temp - 1 == 0) {
                     this.remove(Entity.RemovalReason.DISCARDED);
                 } else {
-                    this.entityData.set(TIMER, (Object)(temp - 1));
+                    this.entityData.set(TIMER, (temp - 1));
                 }
             } else {
                 this.remove(Entity.RemovalReason.DISCARDED);
@@ -124,15 +126,15 @@ extends Entity {
         return true;
     }
 
-    protected void readAdditionalSaveData(CompoundTag p_20052_) {
+    protected void readAdditionalSaveData(ValueInput p_20052_) {
         this.source = null;
     }
 
-    protected void addAdditionalSaveData(CompoundTag p_20139_) {
+    protected void addAdditionalSaveData(ValueOutput p_20139_) {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(TIMER, (Object)0);
+        p_326229_.define(TIMER, 0);
     }
 
     static class YUnchangedLivingEntity {

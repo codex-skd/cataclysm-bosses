@@ -24,6 +24,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -31,10 +32,11 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Flame_Strike_Renderer
-extends EntityRenderer<Flame_Strike_Entity> {
+extends EntityRenderer<Flame_Strike_Entity, EntityRenderState> {
     public static final Identifier FLAME_STRIKE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/flame_strike_sigil.png");
     public static final Identifier SOUL_FLAME_STRIKE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/soul_flame_strike_sigil.png");
 
@@ -49,7 +51,7 @@ extends EntityRenderer<Flame_Strike_Entity> {
     public void render(Flame_Strike_Entity flameStrike, float entityYaw, float delta, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
         matrixStackIn.pushPose();
         float f2 = (float)flameStrike.tickCount + delta;
-        VertexConsumer ivertexbuilder = bufferIn.getBuffer(RenderType.entityTranslucentEmissive((Identifier)this.getTextureLocation(flameStrike)));
+        VertexConsumer ivertexbuilder = bufferIn.getBuffer(RenderTypes.entityTranslucentEmissive((Identifier)this.getTextureLocation(flameStrike)));
         matrixStackIn.scale(flameStrike.getRadius(), flameStrike.getRadius(), flameStrike.getRadius());
         matrixStackIn.translate(0.0, 0.001, 0.0);
         if (flameStrike.isSoul()) {

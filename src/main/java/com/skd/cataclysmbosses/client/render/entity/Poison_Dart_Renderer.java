@@ -25,6 +25,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -33,10 +34,11 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Poison_Dart_Renderer
-extends EntityRenderer<Poison_Dart_Entity> {
+extends EntityRenderer<Poison_Dart_Entity, EntityRenderState> {
     private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/poison_dart.png");
 
     public Poison_Dart_Renderer(EntityRendererProvider.Context renderManagerIn) {
@@ -69,7 +71,7 @@ extends EntityRenderer<Poison_Dart_Entity> {
         p_113842_.mulPose(Axis.XP.rotationDegrees(45.0f));
         p_113842_.scale(0.05625f, 0.05625f, 0.05625f);
         p_113842_.translate(-1.0f, 0.0f, 0.0f);
-        VertexConsumer vertexconsumer = p_113843_.getBuffer(RenderType.entityCutout((Identifier)this.getTextureLocation(p_113839_)));
+        VertexConsumer vertexconsumer = p_113843_.getBuffer(RenderTypes.entityCutout((Identifier)this.getTextureLocation(p_113839_)));
         PoseStack.Pose posestack$pose = p_113842_.last();
         this.vertex(posestack$pose, vertexconsumer, -7, -2, -2, 0.0f, 0.15625f, -1, 0, 0, p_113844_);
         this.vertex(posestack$pose, vertexconsumer, -7, -2, 2, 0.15625f, 0.15625f, -1, 0, 0, p_113844_);

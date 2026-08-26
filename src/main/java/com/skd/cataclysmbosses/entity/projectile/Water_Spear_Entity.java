@@ -54,6 +54,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Water_Spear_Entity
 extends Elemental_Spear_Entity {
@@ -81,7 +83,7 @@ extends Elemental_Spear_Entity {
 
     public Water_Spear_Entity(EntityType<? extends Water_Spear_Entity> type, LivingEntity p_36827_, double getX, double gety, double getz, Vec3 vec3, float damage, Level level) {
         this(type, level);
-        this.moveTo(getX, gety, getz, this.getYRot(), this.getXRot());
+        this.setPos(getX, gety, getz, this.getYRot(), this.getXRot());
         this.setOwner((Entity)p_36827_);
         this.setDamage(damage);
         this.reapplyPosition();
@@ -91,7 +93,7 @@ extends Elemental_Spear_Entity {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(BOUNCES, (Object)0);
+        p_326229_.define(BOUNCES, 0);
     }
 
     public int getTotalBounces() {
@@ -99,7 +101,7 @@ extends Elemental_Spear_Entity {
     }
 
     public void setTotalBounces(int bounces) {
-        this.entityData.set(BOUNCES, (Object)bounces);
+        this.entityData.set(BOUNCES, bounces);
     }
 
     @Override
@@ -114,11 +116,11 @@ extends Elemental_Spear_Entity {
             if (entity2 instanceof LivingEntity) {
                 DamageSource damagesource;
                 LivingEntity livingentity = (LivingEntity)entity2;
-                if (!entity.isAlliedTo((Entity)livingentity) && !livingentity.equals((Object)entity) && !livingentity.isAlliedTo(entity) && (flag = entity.hurt(damagesource = this.damageSources().mobProjectile((Entity)this, livingentity), this.getDamage())) && entity.isAlive()) {
+                if (!entity.isAlliedTo((Entity)livingentity) && !livingentity.equals((Object)entity) && !livingentity.isAlliedTo(entity) && (flag = entity.hurtOrSimulate(damagesource = this.damageSources().mobProjectile((Entity)this, livingentity), this.getDamage())) && entity.isAlive()) {
                     EnchantmentHelper.doPostAttackEffects((ServerLevel)serverlevel, (Entity)entity, (DamageSource)damagesource);
                 }
             } else {
-                flag = entity.hurt(this.damageSources().magic(), 5.0f);
+                flag = entity.hurtOrSimulate(this.damageSources().magic(), 5.0f);
             }
             if (flag && entity instanceof LivingEntity) {
                 LivingEntity livingentity1 = (LivingEntity)entity;
@@ -191,19 +193,19 @@ extends Elemental_Spear_Entity {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         compound.putDouble("acceleration_power", this.accelerationPower);
         compound.putInt("totalBounces", this.getTotalBounces());
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
         if (compound.contains("acceleration_power", 6)) {
-            this.accelerationPower = compound.getDouble("acceleration_power");
+            this.accelerationPower = compound.getDoubleOr("acceleration_power", 0.0);
         }
-        this.setTotalBounces(compound.getInt("totalBounces"));
+        this.setTotalBounces(compound.getIntOr("totalBounces", 0));
     }
 }
 

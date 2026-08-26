@@ -91,6 +91,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Hippocamtus_Entity
 extends Internal_Animation_Monster {
@@ -164,7 +166,7 @@ extends Internal_Animation_Monster {
             @Override
             public void stop() {
                 super.stop();
-                Hippocamtus_Entity.this.setStab(Hippocamtus_Entity.this.random.nextBoolean());
+                Hippocamtus_Entity.this.setStab(Hippocamtus_Entity.this.getRandom().nextBoolean());
             }
         });
         this.goalSelector.addGoal(2, (Goal)new InternalAttackGoal(this, 0, 2, 0, 39, 8, 4.0f){
@@ -177,7 +179,7 @@ extends Internal_Animation_Monster {
             @Override
             public void stop() {
                 super.stop();
-                Hippocamtus_Entity.this.setStab(Hippocamtus_Entity.this.random.nextBoolean());
+                Hippocamtus_Entity.this.setStab(Hippocamtus_Entity.this.getRandom().nextBoolean());
             }
         });
         this.goalSelector.addGoal(1, (Goal)new InternalStateGoal(this, 5, 5, 0, 64, 64){
@@ -263,10 +265,10 @@ extends Internal_Animation_Monster {
                     }
                     return false;
                 }
-                return super.hurt(source, damage);
+                return super.hurtOrSimulate(source, damage);
             }
         }
-        return super.hurt(source, damage);
+        return super.hurtOrSimulate(source, damage);
     }
 
     protected int decreaseAirSupply(int air) {
@@ -304,11 +306,11 @@ extends Internal_Animation_Monster {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(STAB, (Object)false);
+        p_326229_.define(STAB, false);
     }
 
     public void setStab(boolean stab) {
-        this.entityData.set(STAB, (Object)stab);
+        this.entityData.set(STAB, stab);
     }
 
     public boolean getStab() {
@@ -394,11 +396,11 @@ extends Internal_Animation_Monster {
         return (SoundEvent)ModSounds.HIPPOCAMTUS_IDLE.get();
     }
 
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
     }
 
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
     }
 
@@ -465,7 +467,7 @@ extends Internal_Animation_Monster {
                 float entityRelativeAngle = entityHitAngle - entityAttackingAngle;
                 float entityHitDistance = (float)Math.sqrt((entityHit.getZ() - this.getZ()) * (entityHit.getZ() - this.getZ()) + (entityHit.getX() - this.getX()) * (entityHit.getX() - this.getX()));
                 if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || this.isAlliedTo((Entity)entityHit) || entityHit instanceof Hippocamtus_Entity || entityHit == this) continue;
-                boolean hurt = entityHit.hurt(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
+                boolean hurt = entityHit.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
                 if (entityHit.isDamageSourceBlocked(damagesource) && entityHit instanceof Player) {
                     Player player = (Player)entityHit;
                     if (shieldbreakticks > 0) {

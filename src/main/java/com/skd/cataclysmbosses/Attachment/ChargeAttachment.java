@@ -39,10 +39,10 @@ public class ChargeAttachment {
                     impact.remove(entity);
                     for (LivingEntity target : impact) {
                         if (target.isAlliedTo((Entity)entity)) continue;
-                        // Entity.hurt(...) returns void in 26.2.0.45-beta (was boolean) -- no
+                        // Entity.hurtOrSimulate(...) returns void in 26.2.0.45-beta (was boolean) -- no
                         // longer tells us whether the hit actually connected, so the sound now
                         // plays unconditionally instead of being gated on a success flag.
-                        target.hurt(entity.damageSources().mobProjectile((Entity)entity, entity), this.damagePerEffectiveCharge * (float)this.effectiveChargeTime);
+                        target.hurtOrSimulate(entity.damageSources().mobProjectile((Entity)entity, entity), this.damagePerEffectiveCharge * (float)this.effectiveChargeTime);
                         watchEntity.watch(target);
                         target.playSound(SoundEvents.ANVIL_LAND, 1.5f, 0.8f);
                     }

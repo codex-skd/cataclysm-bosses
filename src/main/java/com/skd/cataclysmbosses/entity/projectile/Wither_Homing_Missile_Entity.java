@@ -42,6 +42,7 @@ import com.skd.cataclysmbosses.init.ModEntities;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
@@ -68,6 +69,8 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Wither_Homing_Missile_Entity
 extends Projectile {
@@ -87,7 +90,7 @@ extends Projectile {
 
     public Wither_Homing_Missile_Entity(EntityType<? extends Wither_Homing_Missile_Entity> type, double getX, double gety, double getz, Vec3 vec3, Level level) {
         this(type, level);
-        this.moveTo(getX, gety, getz, this.getYRot(), this.getXRot());
+        this.setPos(getX, gety, getz, this.getYRot(), this.getXRot());
         this.reapplyPosition();
         this.assignDirectionalMovement(vec3, this.accelerationPower);
     }
@@ -102,8 +105,8 @@ extends Projectile {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(DAMAGE, (Object)Float.valueOf(0.0f));
-        p_326229_.define(FUSE, (Object)80);
+        p_326229_.define(DAMAGE, Float.valueOf(0.0f));
+        p_326229_.define(FUSE, 80);
     }
 
     public float getDamage() {
@@ -111,11 +114,11 @@ extends Projectile {
     }
 
     public void setDamage(float damage) {
-        this.entityData.set(DAMAGE, (Object)Float.valueOf(damage));
+        this.entityData.set(DAMAGE, Float.valueOf(damage));
     }
 
     public void setFuse(int life) {
-        this.entityData.set(FUSE, (Object)life);
+        this.entityData.set(FUSE, life);
     }
 
     public int getFuse() {
@@ -130,23 +133,23 @@ extends Projectile {
         return p_36837_ < (d0 *= 64.0) * d0;
     }
 
-    public void addAdditionalSaveData(CompoundTag p_37357_) {
+    public void addAdditionalSaveData(ValueOutput p_37357_) {
         super.addAdditionalSaveData(p_37357_);
         if (this.finalTarget != null) {
-            p_37357_.putUUID("Target", this.finalTarget.getUUID());
+            p_37357_.store("Target", UUIDUtil.CODEC, this.finalTarget.getUUID());
         }
         p_37357_.putDouble("acceleration_power", this.accelerationPower);
         p_37357_.putShort("fuse", (short)this.getFuse());
     }
 
-    public void readAdditionalSaveData(CompoundTag p_37353_) {
+    public void readAdditionalSaveData(ValueInput p_37353_) {
         super.readAdditionalSaveData(p_37353_);
-        this.setFuse(p_37353_.getShort("fuse"));
-        if (p_37353_.hasUUID("Target")) {
-            this.targetId = p_37353_.getUUID("Target");
+        this.setFuse(p_37353_.getShortOr("fuse", 0));
+        if (p_37353_.read("Target", UUIDUtil.CODEC).isPresent()) {
+            this.targetId = p_37353_.read("Target", UUIDUtil.CODEC).orElse(null);
         }
         if (p_37353_.contains("acceleration_power", 6)) {
-            this.accelerationPower = p_37353_.getDouble("acceleration_power");
+            this.accelerationPower = p_37353_.getDoubleOr("acceleration_power", 0.0D);
         }
     }
 
@@ -231,7 +234,7 @@ extends Projectile {
             if (entity2 instanceof LivingEntity) {
                 LivingEntity livingentity = (LivingEntity)entity2;
                 DamageSource damagesource = this.damageSources().mobProjectile((Entity)this, livingentity);
-                flag = entity.hurt(damagesource, this.getDamage());
+                flag = entity.hurtOrSimulate(damagesource, this.getDamage());
                 if (flag) {
                     if (entity.isAlive()) {
                         EnchantmentHelper.doPostAttackEffects((ServerLevel)serverlevel, (Entity)entity, (DamageSource)damagesource);
@@ -245,7 +248,7 @@ extends Projectile {
                     }
                 }
             } else {
-                flag = entity.hurt(this.damageSources().magic(), 3.0f);
+                flag = entity.hurtOrSimulate(this.damageSources().magic(), 3.0f);
             }
             if (flag && entity instanceof LivingEntity) {
                 LivingEntity livingentity1 = (LivingEntity)entity;

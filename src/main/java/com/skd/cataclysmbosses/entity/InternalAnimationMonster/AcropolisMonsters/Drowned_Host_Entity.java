@@ -22,7 +22,7 @@
  *  net.minecraft.world.entity.EquipmentSlot
  *  net.minecraft.world.entity.LivingEntity
  *  net.minecraft.world.entity.Mob
- *  net.minecraft.world.entity.MobSpawnType
+ *  net.minecraft.world.entity.EntitySpawnReason
  *  net.minecraft.world.entity.MoverType
  *  net.minecraft.world.entity.PathfinderMob
  *  net.minecraft.world.entity.SpawnGroupData
@@ -92,7 +92,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.SpawnGroupData;
@@ -110,7 +110,7 @@ import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.navigation.WaterBoundPathNavigation;
 import net.minecraft.world.entity.ai.util.DefaultRandomPos;
-import net.minecraft.world.entity.animal.IronGolem;
+import net.minecraft.world.entity.animal.golem.IronGolem;
 import net.minecraft.world.entity.animal.Turtle;
 import net.minecraft.world.entity.animal.axolotl.Axolotl;
 import net.minecraft.world.entity.monster.Monster;
@@ -179,11 +179,11 @@ implements RangedAttackMob {
         this.goalSelector.setControlFlag(Goal.Flag.TARGET, flag);
     }
 
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor accessor, DifficultyInstance difficulty, MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor accessor, DifficultyInstance difficulty, EntitySpawnReason spawnType, @Nullable SpawnGroupData spawnGroupData) {
         spawnGroupData = super.finalizeSpawn(accessor, difficulty, spawnType, spawnGroupData);
         Symbiocto_Entity upper = new Symbiocto_Entity((EntityType)ModEntities.SYMBIOCTO.get(), this.level());
         upper.moveTo(this.getX(), this.getY() + 1.3125, this.getZ(), this.getYRot(), 0.0f);
-        EventHooks.finalizeMobSpawn((Mob)upper, (ServerLevelAccessor)accessor, (DifficultyInstance)difficulty, (MobSpawnType)spawnType, (SpawnGroupData)spawnGroupData);
+        EventHooks.finalizeMobSpawn((Mob)upper, (ServerLevelAccessor)accessor, (DifficultyInstance)difficulty, (EntitySpawnReason)spawnType, (SpawnGroupData)spawnGroupData);
         upper.setYBodyRot(this.yBodyRot);
         upper.setYHeadRot(this.getYHeadRot());
         upper.setYRot(this.getYRot());
@@ -191,14 +191,14 @@ implements RangedAttackMob {
         return spawnGroupData;
     }
 
-    public static boolean checkDrownedSpawnRules(EntityType<Drowned_Host_Entity> drowned, ServerLevelAccessor serverLevel, MobSpawnType mobSpawnType, BlockPos pos, RandomSource random) {
+    public static boolean checkDrownedSpawnRules(EntityType<Drowned_Host_Entity> drowned, ServerLevelAccessor serverLevel, EntitySpawnReason mobSpawnType, BlockPos pos, RandomSource random) {
         boolean flag;
-        if (!serverLevel.getFluidState(pos.below()).is(FluidTags.WATER) && !MobSpawnType.isSpawner((MobSpawnType)mobSpawnType)) {
+        if (!serverLevel.getFluidState(pos.below()).is(FluidTags.WATER) && !EntitySpawnReason.isSpawner((EntitySpawnReason)mobSpawnType)) {
             return false;
         }
         Holder holder = serverLevel.getBiome(pos);
-        boolean bl = flag = !(serverLevel.getDifficulty() == Difficulty.PEACEFUL || !MobSpawnType.ignoresLightRequirements((MobSpawnType)mobSpawnType) && !Drowned_Host_Entity.isDarkEnoughToSpawn((ServerLevelAccessor)serverLevel, (BlockPos)pos, (RandomSource)random) || !MobSpawnType.isSpawner((MobSpawnType)mobSpawnType) && !serverLevel.getFluidState(pos).is(FluidTags.WATER));
-        if (flag && MobSpawnType.isSpawner((MobSpawnType)mobSpawnType)) {
+        boolean bl = flag = !(serverLevel.getDifficulty() == Difficulty.PEACEFUL || !EntitySpawnReason.ignoresLightRequirements((EntitySpawnReason)mobSpawnType) && !Drowned_Host_Entity.isDarkEnoughToSpawn((ServerLevelAccessor)serverLevel, (BlockPos)pos, (RandomSource)random) || !EntitySpawnReason.isSpawner((EntitySpawnReason)mobSpawnType) && !serverLevel.getFluidState(pos).is(FluidTags.WATER));
+        if (flag && EntitySpawnReason.isSpawner((EntitySpawnReason)mobSpawnType)) {
             return true;
         }
         return holder.is(BiomeTags.MORE_FREQUENT_DROWNED_SPAWNS) ? random.nextInt(15) == 0 && flag : random.nextInt(40) == 0 && Drowned_Host_Entity.isDeepEnoughToSpawn((LevelAccessor)serverLevel, pos) && flag;

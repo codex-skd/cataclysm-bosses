@@ -29,9 +29,10 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 public class Laser_Beam_Renderer
-extends EntityRenderer<Laser_Beam_Entity> {
+extends EntityRenderer<Laser_Beam_Entity, EntityRenderState> {
     private static final Identifier TEXTURE_RED = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/harbinger/laser_beam.png");
     private static final RenderType RENDER_TYPE_RED = CMRenderTypes.CMEyes(TEXTURE_RED);
     public Laser_Beam_Model model;
@@ -48,7 +49,7 @@ extends EntityRenderer<Laser_Beam_Entity> {
         float f1 = Mth.lerp((float)partialTicks, (float)entity.xRotO, (float)entity.getXRot());
         this.model.setupAnim(f, f1);
         VertexConsumer vertexconsumer = buffer.getBuffer(RENDER_TYPE_RED);
-        this.model.renderToBuffer(poseStack, vertexconsumer, packedLight, OverlayTexture.NO_OVERLAY);
+        this.model.renderToBuffer(poseStack, vertexconsumer, packedLight, OverlayTexture.NO_OVERLAY, -1);
         poseStack.popPose();
         super.render((Entity)entity, entityYaw, partialTicks, poseStack, buffer, packedLight);
     }

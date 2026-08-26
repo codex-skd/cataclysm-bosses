@@ -93,6 +93,8 @@ import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Ignited_Revenant_Entity
 extends LLibrary_Boss_Monster {
@@ -168,7 +170,7 @@ extends LLibrary_Boss_Monster {
             this.playSound(SoundEvents.ANVIL_PLACE, 0.3f, 0.5f);
             return false;
         }
-        return super.hurt(source, damage);
+        return super.hurtOrSimulate(source, damage);
     }
 
     private double getApproximateAttackDamageWithItem(LivingEntity living, ItemStack p_330413_) {
@@ -197,22 +199,22 @@ extends LLibrary_Boss_Monster {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(ANGER, (Object)false);
-        p_326229_.define(SHIELD_DURABILITY, (Object)0);
+        p_326229_.define(ANGER, false);
+        p_326229_.define(SHIELD_DURABILITY, 0);
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
     }
 
     public void setIsAnger(boolean isAnger) {
-        this.entityData.set(ANGER, (Object)isAnger);
+        this.entityData.set(ANGER, isAnger);
     }
 
     public boolean getIsAnger() {
@@ -220,7 +222,7 @@ extends LLibrary_Boss_Monster {
     }
 
     public void setShieldDurability(int ShieldDurability) {
-        this.entityData.set(SHIELD_DURABILITY, (Object)ShieldDurability);
+        this.entityData.set(SHIELD_DURABILITY, ShieldDurability);
     }
 
     public int getShieldDurability() {
@@ -262,7 +264,7 @@ extends LLibrary_Boss_Monster {
             if (this.getAnimation() == NO_ANIMATION && this.getIsAnger() && this.getShieldDurability() < 4 && this.tickCount % (6 + this.getShieldDurability() * 2) == 0) {
                 for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(1.25))) {
                     boolean flag;
-                    if (this.isAlliedTo((Entity)entity) || entity instanceof Ignited_Revenant_Entity || entity == this || !(flag = entity.hurt(this.damageSources().mobAttack((LivingEntity)this), (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE)))) continue;
+                    if (this.isAlliedTo((Entity)entity) || entity instanceof Ignited_Revenant_Entity || entity == this || !(flag = entity.hurtOrSimulate(this.damageSources().mobAttack((LivingEntity)this), (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE)))) continue;
                     double d0 = entity.getX() - this.getX();
                     double d1 = entity.getZ() - this.getZ();
                     double d2 = Math.max(d0 * d0 + d1 * d1, 0.001);
@@ -409,7 +411,7 @@ extends LLibrary_Boss_Monster {
                 ((Ignited_Revenant_Entity)this.entity).getLookControl().setLookAt((Entity)target, 30.0f, 30.0f);
             }
             if (((Ignited_Revenant_Entity)this.entity).getAnimationTick() == 5) {
-                switch (Ignited_Revenant_Entity.this.random.nextInt(3)) {
+                switch (Ignited_Revenant_Entity.this.getRandom().nextInt(3)) {
                     case 0: {
                         Ignited_Revenant_Entity.this.launchbone1();
                         break;
@@ -425,7 +427,7 @@ extends LLibrary_Boss_Monster {
                 }
             }
             if (((Ignited_Revenant_Entity)this.entity).getAnimationTick() == 10) {
-                switch (Ignited_Revenant_Entity.this.random.nextInt(3)) {
+                switch (Ignited_Revenant_Entity.this.getRandom().nextInt(3)) {
                     case 0: {
                         Ignited_Revenant_Entity.this.launchbone1();
                         break;
@@ -441,7 +443,7 @@ extends LLibrary_Boss_Monster {
                 }
             }
             if (((Ignited_Revenant_Entity)this.entity).getAnimationTick() == 15) {
-                switch (Ignited_Revenant_Entity.this.random.nextInt(3)) {
+                switch (Ignited_Revenant_Entity.this.getRandom().nextInt(3)) {
                     case 0: {
                         Ignited_Revenant_Entity.this.launchbone1();
                         break;
@@ -457,7 +459,7 @@ extends LLibrary_Boss_Monster {
                 }
             }
             if (((Ignited_Revenant_Entity)this.entity).getAnimationTick() == 20) {
-                switch (Ignited_Revenant_Entity.this.random.nextInt(3)) {
+                switch (Ignited_Revenant_Entity.this.getRandom().nextInt(3)) {
                     case 0: {
                         Ignited_Revenant_Entity.this.launchbone1();
                         break;

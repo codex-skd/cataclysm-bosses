@@ -55,6 +55,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Wither_Howitzer_Entity
 extends ThrowableProjectile {
@@ -69,12 +71,12 @@ extends ThrowableProjectile {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(RADIUS, (Object)Float.valueOf(0.5f));
+        p_326229_.define(RADIUS, Float.valueOf(0.5f));
     }
 
     public void setRadius(float p_19713_) {
         if (!this.level().isClientSide()) {
-            this.getEntityData().set(RADIUS, (Object)Float.valueOf(Mth.clamp((float)p_19713_, (float)0.0f, (float)32.0f)));
+            this.getEntityData().set(RADIUS, Float.valueOf(Mth.clamp((float)p_19713_, (float)0.0f, (float)32.0f)));
         }
     }
 
@@ -93,7 +95,7 @@ extends ThrowableProjectile {
             if (entity1 instanceof LivingEntity) {
                 LivingEntity livingentity = (LivingEntity)entity1;
                 DamageSource damagesource = this.damageSources().mobProjectile((Entity)this, livingentity);
-                flag = entity.hurt(damagesource, 11.0f);
+                flag = entity.hurtOrSimulate(damagesource, 11.0f);
                 if (flag) {
                     if (entity.isAlive()) {
                         EnchantmentHelper.doPostAttackEffects((ServerLevel)serverlevel, (Entity)entity, (DamageSource)damagesource);
@@ -104,7 +106,7 @@ extends ThrowableProjectile {
                     }
                 }
             } else {
-                flag = entity.hurt(this.damageSources().magic(), 5.0f);
+                flag = entity.hurtOrSimulate(this.damageSources().magic(), 5.0f);
             }
             if (flag && entity instanceof LivingEntity) {
                 int i = 10;
@@ -136,14 +138,14 @@ extends ThrowableProjectile {
         }
     }
 
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         compound.putFloat("radius", this.getRadius());
     }
 
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        this.setRadius(compound.getFloat("radius"));
+        this.setRadius(compound.getFloatOr("radius", 0.0f));
     }
 
     public void tick() {

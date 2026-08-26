@@ -42,7 +42,7 @@ extends RenderLayer<Ancient_Remnant_Entity, Ancient_Remnant_Rework_Model> {
         if (entity.getIsPower() && entity.isAlive()) {
             RenderType eyes = RenderType.eyes((Identifier)LAYER_TEXTURES);
             VertexConsumer VertexConsumer2 = bufferIn.getBuffer(eyes);
-            ((Ancient_Remnant_Rework_Model)this.getParentModel()).renderToBuffer(matrixStackIn, VertexConsumer2, packedLightIn, OverlayTexture.NO_OVERLAY);
+            ((Ancient_Remnant_Rework_Model)this.getParentModel()).renderToBuffer(matrixStackIn, VertexConsumer2, packedLightIn, OverlayTexture.NO_OVERLAY, -1);
         }
     }
 }

@@ -21,9 +21,10 @@ import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
-public class Modern_Remnant_Renderer extends EntityRenderer<Modern_Remnant_Entity> {
+public class Modern_Remnant_Renderer extends EntityRenderer<Modern_Remnant_Entity, EntityRenderState> {
     private static final Identifier MODERN_REMNANT_TEXTURES = new ResourceLocation("cataclysm_bosses", "textures/entity/ancient_remnant/modern_remnant.png");
 
     public Modern_Remnant_Renderer(EntityRendererProvider.Context renderManagerIn) {

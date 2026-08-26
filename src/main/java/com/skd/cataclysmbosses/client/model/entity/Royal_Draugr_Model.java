@@ -137,7 +137,7 @@ implements ArmedModel {
             ModelPart childPart = (ModelPart)entry.getValue();
             this.partCache.putIfAbsent(partName, childPart);
             this.optionalPartCache.putIfAbsent(partName, Optional.of(childPart));
-            if (childPart.children.isEmpty()) continue;
+            if (getChildrenMap(childPart).isEmpty()) continue;
             this.buildPartCache(childPart);
         }
     }
@@ -152,6 +152,17 @@ implements ArmedModel {
 
     public ModelPart root() {
         return this.root;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<String, ModelPart> getChildrenMap(ModelPart part) {
+        try {
+            java.lang.reflect.Field f = ModelPart.class.getDeclaredField("children");
+            f.setAccessible(true);
+            return (Map<String, ModelPart>) f.get(part);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }
 

@@ -83,7 +83,7 @@ extends PartEntity<T> {
     }
 
     public final void updateLastPos() {
-        this.moveTo(this.getX(), this.getY(), this.getZ());
+        this.setPos(this.getX(), this.getY(), this.getZ());
         this.yRotO = this.getYRot();
         this.xRotO = this.getXRot();
         ++this.tickCount;

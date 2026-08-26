@@ -27,7 +27,7 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 
 public class Netherite_Monstrosity_Layer
@@ -43,7 +43,7 @@ extends RenderLayer<Netherite_Monstrosity_Entity, Netherite_Monstrosity_Model> {
         f = (float)((double)f - Mth.clamp((double)((float)entity.deathTime / (float)entity.deathtimer()), (double)0.0, (double)0.5));
         RenderType eyes = CMRenderTypes.CMEyes(NETHERITE_MONSTRISITY_LAYER_TEXTURES);
         VertexConsumer VertexConsumer2 = bufferIn.getBuffer(eyes);
-        int i = FastColor.ARGB32.color((int)((int)(255.0f * f)), (int)((int)(255.0f * f)), (int)((int)(255.0f * f)), (int)((int)(255.0f * f)));
+        int i = ARGB.color((int)((int)(255.0f * f)), (int)((int)(255.0f * f)), (int)((int)(255.0f * f)), (int)((int)(255.0f * f)));
         ((Netherite_Monstrosity_Model)this.getParentModel()).renderToBuffer(matrixStackIn, VertexConsumer2, packedLightIn, OverlayTexture.NO_OVERLAY, i);
     }
 }

@@ -93,7 +93,7 @@ extends Projectile {
             DamageSource damagesource;
             LivingEntity livingentity = (LivingEntity)entity;
             Entity entity2 = result.getEntity();
-            if (entity2.hurt(damagesource = this.damageSources().spit((Entity)this, livingentity), 4.0f) && (level = this.level()) instanceof ServerLevel) {
+            if (entity2.hurtOrSimulate(damagesource = this.damageSources().spit((Entity)this, livingentity), 4.0f) && (level = this.level()) instanceof ServerLevel) {
                 ServerLevel serverlevel = (ServerLevel)level;
                 EnchantmentHelper.doPostAttackEffects((ServerLevel)serverlevel, (Entity)entity2, (DamageSource)damagesource);
             }

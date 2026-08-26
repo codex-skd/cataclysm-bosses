@@ -75,7 +75,7 @@ extends ArmorItem {
                     double d2 = Math.max(d0 * d0 + d1 * d1, 0.001);
                     entitys.push(d0 / d2 * 1.5, 0.15, d1 / d2 * 1.5);
                 }
-                player.getCooldowns().addCooldown((Item)this, 350);
+                player.getCooldowns().addCooldown(this.getDefaultInstance(), 350);
                 player.addEffect(new MobEffectInstance(ModEffect.EFFECTMONSTROUS, 200, 0, false, true));
             }
         }

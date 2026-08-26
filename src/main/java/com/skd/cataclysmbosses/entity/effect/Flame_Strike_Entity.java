@@ -43,6 +43,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
@@ -68,6 +69,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Flame_Strike_Entity
 extends Entity {
@@ -107,17 +110,17 @@ extends Entity {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(DATA_RADIUS, (Object)Float.valueOf(0.5f));
-        p_326229_.define(DAMAGE, (Object)Float.valueOf(0.0f));
-        p_326229_.define(HPDAMAGE, (Object)Float.valueOf(0.0f));
-        p_326229_.define(DATA_WAITING, (Object)true);
-        p_326229_.define(DATA_SEE, (Object)false);
-        p_326229_.define(SOUL, (Object)false);
+        p_326229_.define(DATA_RADIUS, Float.valueOf(0.5f));
+        p_326229_.define(DAMAGE, Float.valueOf(0.0f));
+        p_326229_.define(HPDAMAGE, Float.valueOf(0.0f));
+        p_326229_.define(DATA_WAITING, true);
+        p_326229_.define(DATA_SEE, false);
+        p_326229_.define(SOUL, false);
     }
 
     public void setRadius(float p_19713_) {
         if (!this.level().isClientSide()) {
-            this.getEntityData().set(DATA_RADIUS, (Object)Float.valueOf(Mth.clamp((float)p_19713_, (float)0.0f, (float)32.0f)));
+            this.getEntityData().set(DATA_RADIUS, Float.valueOf(Mth.clamp((float)p_19713_, (float)0.0f, (float)32.0f)));
         }
     }
 
@@ -126,7 +129,7 @@ extends Entity {
     }
 
     public void setDamage(float damage) {
-        this.entityData.set(DAMAGE, (Object)Float.valueOf(damage));
+        this.entityData.set(DAMAGE, Float.valueOf(damage));
     }
 
     public float getHpDamage() {
@@ -134,7 +137,7 @@ extends Entity {
     }
 
     public void setHpDamage(float damage) {
-        this.entityData.set(HPDAMAGE, (Object)Float.valueOf(damage));
+        this.entityData.set(HPDAMAGE, Float.valueOf(damage));
     }
 
     public void refreshDimensions() {
@@ -150,7 +153,7 @@ extends Entity {
     }
 
     protected void setWaiting(boolean p_19731_) {
-        this.getEntityData().set(DATA_WAITING, (Object)p_19731_);
+        this.getEntityData().set(DATA_WAITING, p_19731_);
     }
 
     public boolean isWaiting() {
@@ -158,7 +161,7 @@ extends Entity {
     }
 
     protected void setSee(boolean p_19731_) {
-        this.getEntityData().set(DATA_SEE, (Object)p_19731_);
+        this.getEntityData().set(DATA_SEE, p_19731_);
     }
 
     public boolean isSee() {
@@ -166,7 +169,7 @@ extends Entity {
     }
 
     public void setSoul(boolean Soul) {
-        this.getEntityData().set(SOUL, (Object)Soul);
+        this.getEntityData().set(SOUL, Soul);
     }
 
     public boolean isSoul() {
@@ -246,7 +249,7 @@ extends Entity {
         if (Hitentity.isAlive() && !Hitentity.isInvulnerable() && Hitentity != caster && this.tickCount % 2 == 0) {
             boolean flag;
             if (caster == null) {
-                boolean flag2 = Hitentity.hurt(this.damageSources().magic(), this.getDamage() + Hitentity.getMaxHealth() * 0.01f * this.getHpDamage());
+                boolean flag2 = Hitentity.hurtOrSimulate(this.damageSources().magic(), this.getDamage() + Hitentity.getMaxHealth() * 0.01f * this.getHpDamage());
                 if (flag2) {
                     MobEffectInstance effectinstance1 = Hitentity.getEffect(ModEffect.EFFECTBLAZING_BRAND);
                     int i = 1;
@@ -260,7 +263,7 @@ extends Entity {
                     MobEffectInstance effectinstance = new MobEffectInstance(ModEffect.EFFECTBLAZING_BRAND, 200, i, false, false, true);
                     Hitentity.addEffect(effectinstance);
                 }
-            } else if (!caster.isAlliedTo((Entity)Hitentity) && !Hitentity.isAlliedTo((Entity)caster) && (flag = Hitentity.hurt(CMDamageTypes.causeFlameStrikeDamage(this, (Entity)caster), this.getDamage() + Hitentity.getMaxHealth() * 0.01f * this.getHpDamage()))) {
+            } else if (!caster.isAlliedTo((Entity)Hitentity) && !Hitentity.isAlliedTo((Entity)caster) && (flag = Hitentity.hurtOrSimulate(CMDamageTypes.causeFlameStrikeDamage(this, (Entity)caster), this.getDamage() + Hitentity.getMaxHealth() * 0.01f * this.getHpDamage()))) {
                 MobEffectInstance effectinstance1 = Hitentity.getEffect(ModEffect.EFFECTBLAZING_BRAND);
                 int i = 1;
                 if (effectinstance1 != null) {
@@ -298,28 +301,28 @@ extends Entity {
         return this.owner;
     }
 
-    protected void readAdditionalSaveData(CompoundTag p_19727_) {
-        this.tickCount = p_19727_.getInt("Age");
-        this.duration = p_19727_.getInt("Duration");
-        this.waitTime = p_19727_.getInt("WaitTime");
-        this.warmupDelayTicks = p_19727_.getInt("Delay");
-        this.setRadius(p_19727_.getFloat("Radius"));
-        if (p_19727_.hasUUID("Owner")) {
-            this.ownerUUID = p_19727_.getUUID("Owner");
+    protected void readAdditionalSaveData(ValueInput p_19727_) {
+        this.tickCount = p_19727_.getIntOr("Age", 0);
+        this.duration = p_19727_.getIntOr("Duration", 0);
+        this.waitTime = p_19727_.getIntOr("WaitTime", 0);
+        this.warmupDelayTicks = p_19727_.getIntOr("Delay", 0);
+        this.setRadius(p_19727_.getFloatOr("Radius", 0.0F));
+        if (p_19727_.read("Owner", UUIDUtil.CODEC).isPresent()) {
+            this.ownerUUID = p_19727_.read("Owner", UUIDUtil.CODEC).orElse(null);
         }
-        this.setSoul(p_19727_.getBoolean("is_soul"));
-        this.setDamage(p_19727_.getFloat("damage"));
-        this.setHpDamage(p_19727_.getFloat("Hpdamage"));
+        this.setSoul(p_19727_.getBooleanOr("is_soul", false));
+        this.setDamage(p_19727_.getFloatOr("damage", 0.0F));
+        this.setHpDamage(p_19727_.getFloatOr("Hpdamage", 0.0F));
     }
 
-    protected void addAdditionalSaveData(CompoundTag p_19737_) {
+    protected void addAdditionalSaveData(ValueOutput p_19737_) {
         p_19737_.putInt("Age", this.tickCount);
         p_19737_.putInt("Duration", this.duration);
         p_19737_.putInt("WaitTime", this.waitTime);
         p_19737_.putInt("Delay", this.warmupDelayTicks);
         p_19737_.putFloat("Radius", this.getRadius());
         if (this.ownerUUID != null) {
-            p_19737_.putUUID("Owner", this.ownerUUID);
+            p_19737_.store("Owner", UUIDUtil.CODEC, this.ownerUUID);
         }
         p_19737_.putBoolean("is_soul", this.isSoul());
         p_19737_.putFloat("damage", this.getDamage());

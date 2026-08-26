@@ -40,8 +40,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import java.util.Map;
 import javax.annotation.Nullable;
-import net.minecraft.Util;
-import net.minecraft.client.model.SkullModelBase;
+import net.minecraft.util.Util;
+import net.minecraft.client.model.object.skull.SkullModelBase;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -114,7 +114,7 @@ implements BlockEntityRenderer<Cataclysm_Skull_BlockEntity> {
         }
         VertexConsumer vertexconsumer = p_173668_.getBuffer(p_173671_);
         p_173670_.setupAnim(p_173666_, p_173665_, 0.0f);
-        p_173670_.renderToBuffer(p_173667_, vertexconsumer, p_173669_, OverlayTexture.NO_OVERLAY);
+        p_173670_.renderToBuffer(p_173667_, vertexconsumer, p_173669_, OverlayTexture.NO_OVERLAY, -1);
         p_173667_.popPose();
     }
 

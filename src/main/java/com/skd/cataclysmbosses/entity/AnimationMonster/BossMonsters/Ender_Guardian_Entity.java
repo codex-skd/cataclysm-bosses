@@ -151,7 +151,7 @@ import net.minecraft.world.entity.ai.goal.RandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.animal.AbstractGolem;
-import net.minecraft.world.entity.animal.IronGolem;
+import net.minecraft.world.entity.animal.golem.IronGolem;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
@@ -173,6 +173,8 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Ender_Guardian_Entity
 extends LLibrary_Boss_Monster {
@@ -260,9 +262,9 @@ extends LLibrary_Boss_Monster {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(IS_HELMETLESS, (Object)false);
+        p_326229_.define(IS_HELMETLESS, false);
         p_326229_.define(TELEPORT_POS, Optional.empty());
-        p_326229_.define(USED_MASS_DESTRUCTION, (Object)true);
+        p_326229_.define(USED_MASS_DESTRUCTION, true);
     }
 
     private static Animation getRandomAttack(RandomSource rand) {
@@ -284,7 +286,7 @@ extends LLibrary_Boss_Monster {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         Optional<BlockPos> restPos = this.getTeleportPos();
         if (restPos.isPresent()) {
@@ -295,11 +297,11 @@ extends LLibrary_Boss_Monster {
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
         NbtUtils.readBlockPos((CompoundTag)compound, (String)"TeleportPos").ifPresent(this::setTeleportPos);
-        this.setIsHelmetless(compound.getBoolean("is_Helmetless"));
-        this.setUsedMassDestruction(compound.getBoolean("used_mass_destruction"));
+        this.setIsHelmetless(compound.getBooleanOr("is_Helmetless", false));
+        this.setUsedMassDestruction(compound.getBooleanOr("used_mass_destruction", false));
         if (this.hasCustomName()) {
             this.bossInfo.setName(this.getDisplayName());
         }
@@ -313,7 +315,7 @@ extends LLibrary_Boss_Monster {
             this.getAttribute(Attributes.ARMOR).setBaseValue(20.0);
             this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue((double)0.27f);
         }
-        this.entityData.set(IS_HELMETLESS, (Object)isHelmetless);
+        this.entityData.set(IS_HELMETLESS, isHelmetless);
     }
 
     public boolean getIsHelmetless() {
@@ -321,7 +323,7 @@ extends LLibrary_Boss_Monster {
     }
 
     public void setUsedMassDestruction(boolean usedMassDestruction) {
-        this.entityData.set(USED_MASS_DESTRUCTION, (Object)usedMassDestruction);
+        this.entityData.set(USED_MASS_DESTRUCTION, usedMassDestruction);
     }
 
     public boolean getUsedMassDestruction() {
@@ -361,7 +363,7 @@ extends LLibrary_Boss_Monster {
         if (entity instanceof AbstractGolem) {
             damage = (float)((double)damage * 0.5);
         }
-        if ((attack = super.hurt(source, damage)) && this.getIsHelmetless()) {
+        if ((attack = super.hurtOrSimulate(source, damage)) && this.getIsHelmetless()) {
             this.playSound(SoundEvents.SHULKER_HURT, 1.0f, 0.8f);
         }
         return attack;
@@ -701,7 +703,7 @@ extends LLibrary_Boss_Monster {
                 float entityRelativeAngle = entityHitAngle - entityAttackingAngle;
                 float entityHitDistance = (float)Math.sqrt((entityHit.getZ() - this.getZ()) * (entityHit.getZ() - this.getZ()) + (entityHit.getX() - this.getX()) * (entityHit.getX() - this.getX()));
                 if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || entityHit instanceof Ender_Guardian_Entity) continue;
-                boolean flag = entityHit.hurt(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage, (double)(entityHit.getMaxHealth() * hpdamage))));
+                boolean flag = entityHit.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage, (double)(entityHit.getMaxHealth() * hpdamage))));
                 if (entityHit.isDamageSourceBlocked(damagesource) && entityHit instanceof Player) {
                     Player player = (Player)entityHit;
                     if (shieldbreakticks > 0) {
@@ -725,7 +727,7 @@ extends LLibrary_Boss_Monster {
             DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
             for (LivingEntity entityHit : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate((double)grow))) {
                 if (this.isAlliedTo((Entity)entityHit) || entityHit instanceof Ender_Guardian_Entity || entityHit == this) continue;
-                entityHit.hurt(damagesource, (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) * damage);
+                entityHit.hurtOrSimulate(damagesource, (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) * damage);
                 if (entityHit.isDamageSourceBlocked(damagesource) && entityHit instanceof Player) {
                     Player player = (Player)entityHit;
                     if (ticks > 0) {
@@ -1193,7 +1195,7 @@ extends LLibrary_Boss_Monster {
                 } else {
                     Ender_Guardian_Entity.this.setYRot(Ender_Guardian_Entity.this.yRotO);
                 }
-                if (Ender_Guardian_Entity.this.getAnimationTick() == 24 && target != null && Ender_Guardian_Entity.this.random.nextInt(2) == 0 && Ender_Guardian_Entity.this.distanceTo((Entity)target) <= 4.0f) {
+                if (Ender_Guardian_Entity.this.getAnimationTick() == 24 && target != null && Ender_Guardian_Entity.this.getRandom().nextInt(2) == 0 && Ender_Guardian_Entity.this.distanceTo((Entity)target) <= 4.0f) {
                     AnimationHandler.INSTANCE.sendAnimationMessage((Entity)Ender_Guardian_Entity.this, GUARDIAN_LEFT_SWING);
                 }
             }
@@ -1204,7 +1206,7 @@ extends LLibrary_Boss_Monster {
                 } else {
                     Ender_Guardian_Entity.this.setYRot(Ender_Guardian_Entity.this.yRotO);
                 }
-                if (Ender_Guardian_Entity.this.getAnimationTick() == 26 && target != null && Ender_Guardian_Entity.this.random.nextInt(2) == 0 && Ender_Guardian_Entity.this.distanceTo((Entity)target) <= 4.0f) {
+                if (Ender_Guardian_Entity.this.getAnimationTick() == 26 && target != null && Ender_Guardian_Entity.this.getRandom().nextInt(2) == 0 && Ender_Guardian_Entity.this.distanceTo((Entity)target) <= 4.0f) {
                     AnimationHandler.INSTANCE.sendAnimationMessage((Entity)Ender_Guardian_Entity.this, GUARDIAN_RIGHT_SWING);
                 }
             }

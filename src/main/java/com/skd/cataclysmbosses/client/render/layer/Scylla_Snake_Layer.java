@@ -28,7 +28,7 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
@@ -49,7 +49,7 @@ extends RenderLayer<Scylla_Entity, Scylla_Model> {
         RenderType ghost = CMRenderTypes.getGhost(this.getLayerTextureLocation());
         VertexConsumer VertexConsumer2 = bufferIn.getBuffer(ghost);
         float alpha = 0.35f;
-        int i1 = FastColor.ARGB32.color((int)((int)(alpha * 255.0f)), (int)255, (int)255, (int)255);
+        int i1 = ARGB.color((int)((int)(alpha * 255.0f)), (int)255, (int)255, (int)255);
         ((Scylla_Model)this.getParentModel()).renderToBuffer(matrixStackIn, VertexConsumer2, packedLightIn, OverlayTexture.NO_OVERLAY, i1);
     }
 }

@@ -11,7 +11,7 @@
  *  net.minecraft.world.entity.EntityType$Builder
  *  net.minecraft.world.entity.LivingEntity
  *  net.minecraft.world.entity.MobCategory
- *  net.minecraft.world.entity.MobSpawnType
+ *  net.minecraft.world.entity.EntitySpawnReason
  *  net.minecraft.world.entity.SpawnPlacementTypes
  *  net.minecraft.world.entity.monster.Monster
  *  net.minecraft.world.level.block.Block
@@ -140,7 +140,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.SpawnPlacementTypes;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.block.Block;
@@ -267,8 +267,8 @@ public class ModEntities {
         return e -> e.isAlive() && e.getType().is(entityTag);
     }
 
-    public static boolean rollSpawn(int rolls, RandomSource random, MobSpawnType reason) {
-        if (MobSpawnType.isSpawner((MobSpawnType)reason)) {
+    public static boolean rollSpawn(int rolls, RandomSource random, EntitySpawnReason reason) {
+        if (EntitySpawnReason.isSpawner((EntitySpawnReason)reason)) {
             return true;
         }
         return rolls <= 0 || random.nextInt(rolls) == 0;

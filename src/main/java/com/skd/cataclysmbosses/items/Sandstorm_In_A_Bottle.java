@@ -26,7 +26,7 @@ import javax.annotation.Nonnull;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -42,7 +42,7 @@ extends Item {
     }
 
     @Nonnull
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, @Nonnull InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, @Nonnull InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         if (!level.isClientSide()) {
             for (int i = 0; i < 2; ++i) {
@@ -53,10 +53,10 @@ extends Item {
                 Sandstorm_Entity projectile = new Sandstorm_Entity(level, sx, sy = player.getY(), sz = player.getZ() + (double)(Mth.sin((float)angle) * 6.0f), 200, angle, (LivingEntity)player);
                 boolean flag = level.addFreshEntity((Entity)projectile);
                 if (!flag) continue;
-                player.getCooldowns().addCooldown((Item)this, CMCommonConfig.SandstormInABottle.cooldown);
+                player.getCooldowns().addCooldown(this.getDefaultInstance(), CMCommonConfig.SandstormInABottle.cooldown);
             }
         }
-        return InteractionResultHolder.success((Object)stack);
+        return InteractionResult.SUCCESS;
     }
 
     public boolean isEnchantable(ItemStack stack) {

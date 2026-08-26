@@ -42,7 +42,7 @@ extends RenderLayer<Wadjet_Entity, Wadjet_Model> {
         if (entity.getAttackState() != 1 && entity.isAlive()) {
             RenderType eyes = RenderType.eyes((Identifier)LAYER_TEXTURES);
             VertexConsumer VertexConsumer2 = bufferIn.getBuffer(eyes);
-            ((Wadjet_Model)this.getParentModel()).renderToBuffer(matrixStackIn, VertexConsumer2, packedLightIn, OverlayTexture.NO_OVERLAY);
+            ((Wadjet_Model)this.getParentModel()).renderToBuffer(matrixStackIn, VertexConsumer2, packedLightIn, OverlayTexture.NO_OVERLAY, -1);
         }
     }
 }

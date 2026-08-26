@@ -41,7 +41,7 @@
  *  net.minecraft.world.entity.EntityType
  *  net.minecraft.world.entity.LivingEntity
  *  net.minecraft.world.entity.Mob
- *  net.minecraft.world.entity.SpawnReason
+ *  net.minecraft.world.entity.EntitySpawnReason
  *  net.minecraft.world.entity.PathfinderMob
  *  net.minecraft.world.entity.SpawnGroupData
  *  net.minecraft.world.entity.ai.attributes.AttributeSupplier$Builder
@@ -147,7 +147,7 @@ import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.SpawnReason;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -159,7 +159,7 @@ import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.RandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
-import net.minecraft.world.entity.animal.IronGolem;
+import net.minecraft.world.entity.animal.golem.IronGolem;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -179,6 +179,8 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Ignis_Entity
 extends LLibrary_Boss_Monster
@@ -399,7 +401,7 @@ implements IHoldEntity {
             this.destroyBlocksTick = 20;
         }
         Crackiness irongolem$crackiness = this.getCrackiness();
-        boolean attack = super.hurt(source, damage);
+        boolean attack = super.hurtOrSimulate(source, damage);
         if (attack && this.getCrackiness() != irongolem$crackiness) {
             this.playSound((SoundEvent)ModSounds.IGNIS_ARMOR_BREAK.get(), 1.0f, 0.8f);
         }
@@ -425,18 +427,18 @@ implements IHoldEntity {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(IS_BLOCKING, (Object)false);
-        p_326229_.define(IS_SHIELD, (Object)false);
-        p_326229_.define(IS_SHIELD_BREAK, (Object)false);
-        p_326229_.define(SHIELD_DURABILITY, (Object)0);
-        p_326229_.define(IS_SWORD, (Object)false);
-        p_326229_.define(SHOW_SHIELD, (Object)true);
-        p_326229_.define(BOSS_PHASE, (Object)0);
+        p_326229_.define(IS_BLOCKING, false);
+        p_326229_.define(IS_SHIELD, false);
+        p_326229_.define(IS_SHIELD_BREAK, false);
+        p_326229_.define(SHIELD_DURABILITY, 0);
+        p_326229_.define(IS_SWORD, false);
+        p_326229_.define(SHOW_SHIELD, true);
+        p_326229_.define(BOSS_PHASE, 0);
         p_326229_.define(TARGET_VEC, Optional.empty());
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         compound.putInt("BossPhase", this.getBossPhase());
         compound.putBoolean("Is_Shield_Break", this.getIsShieldBreak());
@@ -444,11 +446,11 @@ implements IHoldEntity {
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        this.setBossPhase(compound.getInt("BossPhase"));
-        this.setIsShieldBreak(compound.getBoolean("Is_Shield_Break"));
-        this.setShieldDurability(compound.getInt("Shield_Durability"));
+        this.setBossPhase(compound.getIntOr("BossPhase", 0));
+        this.setIsShieldBreak(compound.getBooleanOr("Is_Shield_Break", false));
+        this.setShieldDurability(compound.getIntOr("Shield_Durability", 0));
         if (this.hasCustomName()) {
             this.bossInfo.setName(this.getDisplayName());
         }
@@ -467,7 +469,7 @@ implements IHoldEntity {
         if (isBlocking && this.getIsSword()) {
             this.setIsSword(false);
         }
-        this.entityData.set(IS_BLOCKING, (Object)isBlocking);
+        this.entityData.set(IS_BLOCKING, isBlocking);
     }
 
     public boolean getIsBlocking() {
@@ -475,7 +477,7 @@ implements IHoldEntity {
     }
 
     public void setIsShield(boolean isShield) {
-        this.entityData.set(IS_SHIELD, (Object)isShield);
+        this.entityData.set(IS_SHIELD, isShield);
     }
 
     public boolean getIsShield() {
@@ -486,7 +488,7 @@ implements IHoldEntity {
         if (isSword && this.getIsBlocking()) {
             this.setIsBlocking(false);
         }
-        this.entityData.set(IS_SWORD, (Object)isSword);
+        this.entityData.set(IS_SWORD, isSword);
     }
 
     public boolean getIsSword() {
@@ -502,7 +504,7 @@ implements IHoldEntity {
             this.setShieldDurability(3);
             this.setShowShield(false);
         }
-        this.entityData.set(IS_SHIELD_BREAK, (Object)isShieldBreak);
+        this.entityData.set(IS_SHIELD_BREAK, isShieldBreak);
     }
 
     public boolean getIsShieldBreak() {
@@ -510,7 +512,7 @@ implements IHoldEntity {
     }
 
     public void setShieldDurability(int ShieldDurability) {
-        this.entityData.set(SHIELD_DURABILITY, (Object)ShieldDurability);
+        this.entityData.set(SHIELD_DURABILITY, ShieldDurability);
     }
 
     public int getShieldDurability() {
@@ -518,7 +520,7 @@ implements IHoldEntity {
     }
 
     public void setShowShield(boolean showShield) {
-        this.entityData.set(SHOW_SHIELD, (Object)showShield);
+        this.entityData.set(SHOW_SHIELD, showShield);
     }
 
     public boolean getShowShield() {
@@ -526,7 +528,7 @@ implements IHoldEntity {
     }
 
     public void setBossPhase(int bossPhase) {
-        this.entityData.set(BOSS_PHASE, (Object)bossPhase);
+        this.entityData.set(BOSS_PHASE, bossPhase);
     }
 
     public int getBossPhase() {
@@ -1045,7 +1047,7 @@ implements IHoldEntity {
                     DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
                     for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(1.25))) {
                         if (this.isAlliedTo((Entity)entity) || entity instanceof Ignis_Entity || entity == this) continue;
-                        entity.hurt(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * 1.5 + (double)(entity.getMaxHealth() * 0.15f)));
+                        entity.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * 1.5 + (double)(entity.getMaxHealth() * 0.15f)));
                         if (!entity.isDamageSourceBlocked(damagesource) || !(entity instanceof Player)) continue;
                         Player player = (Player)entity;
                         EntityUtil.disableShield(player, 200);
@@ -1151,7 +1153,7 @@ implements IHoldEntity {
                     DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
                     for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(1.25))) {
                         if (this.isAlliedTo((Entity)entity) || entity instanceof Ignis_Entity || entity == this) continue;
-                        boolean flag = entity.hurt(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * 1.5 + (double)(entity.getMaxHealth() * 0.15f)));
+                        boolean flag = entity.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * 1.5 + (double)(entity.getMaxHealth() * 0.15f)));
                         if (!entity.isDamageSourceBlocked(damagesource) || !(entity instanceof Player)) continue;
                         Player player = (Player)entity;
                         EntityUtil.disableShield(player, 200);
@@ -1735,7 +1737,7 @@ implements IHoldEntity {
                 float entityRelativeAngle = entityHitAngle - entityAttackingAngle;
                 float entityHitDistance = (float)Math.sqrt((entityHit.getZ() - this.getZ()) * (entityHit.getZ() - this.getZ()) + (entityHit.getX() - this.getX()) * (entityHit.getX() - this.getX()));
                 if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || entityHit instanceof Ignis_Entity) continue;
-                boolean flag = entityHit.hurt(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage + (double)(entityHit.getMaxHealth() * hpdamage)));
+                boolean flag = entityHit.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage + (double)(entityHit.getMaxHealth() * hpdamage)));
                 if (entityHit.isDamageSourceBlocked(damagesource) && entityHit instanceof Player) {
                     Player player = (Player)entityHit;
                     if (shieldbreakticks > 0) {
@@ -1784,7 +1786,7 @@ implements IHoldEntity {
                 float entityRelativeAngle = entityHitAngle - entityAttackingAngle;
                 float entityHitDistance = (float)Math.sqrt((entityHit.getZ() - this.getZ()) * (entityHit.getZ() - this.getZ()) + (entityHit.getX() - this.getX()) * (entityHit.getX() - this.getX()));
                 if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || this.isAlliedTo((Entity)entityHit) || entityHit instanceof Ignis_Entity) continue;
-                boolean flag = entityHit.hurt(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage + (double)(entityHit.getMaxHealth() * hpdamage)));
+                boolean flag = entityHit.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage + (double)(entityHit.getMaxHealth() * hpdamage)));
                 if (entityHit.isDamageSourceBlocked(damagesource) && entityHit instanceof Player) {
                     Player player = (Player)entityHit;
                     if (shieldbreakticks > 0) {
@@ -1818,7 +1820,7 @@ implements IHoldEntity {
                 }
                 float entityRelativeAngle = entityHitAngle - entityAttackingAngle;
                 if (!(this.distanceTo((Entity)entityHit) <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || this.isAlliedTo((Entity)entityHit) || entityHit instanceof Ignis_Entity) continue;
-                boolean flag = entityHit.hurt(damagesource, (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) + entityHit.getMaxHealth() * 0.1f);
+                boolean flag = entityHit.hurtOrSimulate(damagesource, (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) + entityHit.getMaxHealth() * 0.1f);
                 if (entityHit.isDamageSourceBlocked(damagesource) && entityHit instanceof Player) {
                     Player player = (Player)entityHit;
                     if (shieldbreakticks > 0) {
@@ -1854,7 +1856,7 @@ implements IHoldEntity {
             if ((tick - 10) % 4 == 0 && passenger instanceof LivingEntity) {
                 boolean flag;
                 LivingEntity living = (LivingEntity)passenger;
-                if (!this.level().isClientSide() && (flag = living.hurt(this.damageSources().mobAttack((LivingEntity)this), 4.0f + living.getMaxHealth() * 0.02f))) {
+                if (!this.level().isClientSide() && (flag = living.hurtOrSimulate(this.damageSources().mobAttack((LivingEntity)this), 4.0f + living.getMaxHealth() * 0.02f))) {
                     MobEffectInstance effectinstance1 = living.getEffect(ModEffect.EFFECTBLAZING_BRAND);
                     int i = 1;
                     if (effectinstance1 != null) {
@@ -2057,7 +2059,7 @@ implements IHoldEntity {
                 for (LivingEntity entity : hit) {
                     if (this.isAlliedTo((Entity)entity) || entity instanceof Ignis_Entity || entity == this) continue;
                     float finalDamage = baseDamage + entity.getMaxHealth() * hpdamage;
-                    boolean flag = entity.hurt(damagesource, finalDamage);
+                    boolean flag = entity.hurtOrSimulate(damagesource, finalDamage);
                     if (entity.isDamageSourceBlocked(damagesource) && entity instanceof Player) {
                         Player player = (Player)entity;
                         if (shieldbreakticks > 0) {
@@ -2117,7 +2119,7 @@ implements IHoldEntity {
                 for (LivingEntity entity : hit) {
                     if (this.isAlliedTo((Entity)entity) || entity instanceof Ignis_Entity || entity == this) continue;
                     float finalDamage = baseDamage + entity.getMaxHealth() * hpdamage;
-                    boolean flag = entity.hurt(damagesource, finalDamage);
+                    boolean flag = entity.hurtOrSimulate(damagesource, finalDamage);
                     if (entity.isDamageSourceBlocked(damagesource) && entity instanceof Player) {
                         Player player = (Player)entity;
                         if (shieldbreakticks > 0) {
@@ -2250,7 +2252,7 @@ implements IHoldEntity {
                 DamageSource damagesource = this.damageSources().indirectMagic((Entity)this, (Entity)this);
                 for (LivingEntity entityHit : entitiesHit) {
                     boolean flag;
-                    if (this.isAlliedTo((Entity)entityHit) || entityHit instanceof Ignis_Entity || entityHit == this || !(flag = entityHit.hurt(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage + (double)(entityHit.getMaxHealth() * hpdamage))))) continue;
+                    if (this.isAlliedTo((Entity)entityHit) || entityHit instanceof Ignis_Entity || entityHit == this || !(flag = entityHit.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage + (double)(entityHit.getMaxHealth() * hpdamage))))) continue;
                     entityHit.igniteForSeconds((float)firetime);
                     if (brandticks <= 0) continue;
                     MobEffectInstance effectinstance1 = entityHit.getEffect(ModEffect.EFFECTBLAZING_BRAND);
@@ -2288,7 +2290,7 @@ implements IHoldEntity {
     }
 
     @Override
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_29678_, DifficultyInstance p_29679_, SpawnReason p_29680_, @Nullable SpawnGroupData p_29681_) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_29678_, DifficultyInstance p_29679_, EntitySpawnReason p_29680_, @Nullable SpawnGroupData p_29681_) {
         return super.finalizeSpawn(p_29678_, p_29679_, p_29680_, p_29681_);
     }
 
@@ -2462,7 +2464,7 @@ implements IHoldEntity {
                     Ignis_Entity.this.push((double)f1 * 0.3 * (double)r, 0.0, (double)f2 * 0.3 * (double)r);
                 }
             }
-            if (Ignis_Entity.this.getAnimationTick() == this.bodycheck && Ignis_Entity.this.shouldFollowUp(3.5f) && Ignis_Entity.this.random.nextInt(3) == 0 && Ignis_Entity.this.body_check_cooldown <= 0) {
+            if (Ignis_Entity.this.getAnimationTick() == this.bodycheck && Ignis_Entity.this.shouldFollowUp(3.5f) && Ignis_Entity.this.getRandom().nextInt(3) == 0 && Ignis_Entity.this.body_check_cooldown <= 0) {
                 Ignis_Entity.this.body_check_cooldown = 200;
                 Animation bodycheck = Ignis_Entity.this.getBossPhase() > 0 ? BODY_CHECK_ATTACK_SOUL2 : BODY_CHECK_ATTACK2;
                 AnimationHandler.INSTANCE.sendAnimationMessage((Entity)Ignis_Entity.this, bodycheck);
@@ -2509,7 +2511,7 @@ implements IHoldEntity {
                     Ignis_Entity.this.push(f1, 0.0, f2);
                 }
             }
-            if (Ignis_Entity.this.getAnimationTick() == this.bodycheck && Ignis_Entity.this.shouldFollowUp(3.0f) && Ignis_Entity.this.random.nextInt(2) == 0 && Ignis_Entity.this.body_check_cooldown <= 0) {
+            if (Ignis_Entity.this.getAnimationTick() == this.bodycheck && Ignis_Entity.this.shouldFollowUp(3.0f) && Ignis_Entity.this.getRandom().nextInt(2) == 0 && Ignis_Entity.this.body_check_cooldown <= 0) {
                 Ignis_Entity.this.body_check_cooldown = 200;
                 Animation bodycheck = Ignis_Entity.this.getBossPhase() > 0 ? BODY_CHECK_ATTACK_SOUL4 : BODY_CHECK_ATTACK4;
                 AnimationHandler.INSTANCE.sendAnimationMessage((Entity)Ignis_Entity.this, bodycheck);
@@ -2699,7 +2701,7 @@ implements IHoldEntity {
                 Ignis_Entity.this.setYRot(Ignis_Entity.this.yRotO);
             }
             Ignis_Entity.this.setDeltaMovement(0.0, Ignis_Entity.this.getDeltaMovement().y, 0.0);
-            if (Ignis_Entity.this.getAnimationTick() == 45 && Ignis_Entity.this.shouldFollowUp(4.0f) && Ignis_Entity.this.random.nextInt(3) == 0 && Ignis_Entity.this.body_check_cooldown <= 0) {
+            if (Ignis_Entity.this.getAnimationTick() == 45 && Ignis_Entity.this.shouldFollowUp(4.0f) && Ignis_Entity.this.getRandom().nextInt(3) == 0 && Ignis_Entity.this.body_check_cooldown <= 0) {
                 Ignis_Entity.this.body_check_cooldown = 200;
                 Animation bodycheck = Ignis_Entity.this.getBossPhase() > 0 ? BODY_CHECK_ATTACK_SOUL3 : BODY_CHECK_ATTACK3;
                 AnimationHandler.INSTANCE.sendAnimationMessage((Entity)Ignis_Entity.this, bodycheck);
@@ -2769,7 +2771,7 @@ implements IHoldEntity {
             } else {
                 Ignis_Entity.this.setYRot(Ignis_Entity.this.yRotO);
             }
-            if (Ignis_Entity.this.getAnimationTick() == this.follow_through_tick && Ignis_Entity.this.random.nextInt(2) == 0 && target != null) {
+            if (Ignis_Entity.this.getAnimationTick() == this.follow_through_tick && Ignis_Entity.this.getRandom().nextInt(2) == 0 && target != null) {
                 if (Ignis_Entity.this.distanceTo((Entity)target) <= 6.0f) {
                     AnimationHandler.INSTANCE.sendAnimationMessage((Entity)Ignis_Entity.this, SWING_UPPERSLASH);
                 } else {

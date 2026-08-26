@@ -24,7 +24,7 @@
  *  net.minecraft.world.entity.Entity
  *  net.minecraft.world.entity.EntityType
  *  net.minecraft.world.entity.LivingEntity
- *  net.minecraft.world.entity.MobSpawnType
+ *  net.minecraft.world.entity.EntitySpawnReason
  *  net.minecraft.world.entity.SpawnGroupData
  *  net.minecraft.world.entity.monster.Enemy
  *  net.minecraft.world.entity.player.Player
@@ -63,7 +63,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
@@ -72,6 +72,8 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.Vec3;
 import org.apache.logging.log4j.Logger;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class IABoss_monster
 extends Internal_Animation_Monster
@@ -100,7 +102,7 @@ IHomeEntity {
     }
 
     public void setLife(int life) {
-        this.entityData.set(LIFE, (Object)life);
+        this.entityData.set(LIFE, life);
     }
 
     public int getLife() {
@@ -111,10 +113,10 @@ IHomeEntity {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(HOME_POS, Optional.empty());
-        builder.define(LIFE, (Object)0);
+        builder.define(LIFE, 0);
     }
 
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         compound.putInt("LifeRemain", this.getLife());
         if (this.getHomePos() != null) {
@@ -123,17 +125,17 @@ IHomeEntity {
         this.addAdditionalHomePoint(compound);
     }
 
-    public void readAdditionalSaveData(CompoundTag compound) {
-        this.setLife(compound.getInt("LifeRemain"));
+    public void readAdditionalSaveData(ValueInput compound) {
+        this.setLife(compound.getIntOr("LifeRemain", 0));
         this.readAdditionalHomePoint(compound);
         super.readAdditionalSaveData(compound);
     }
 
     @Nullable
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, MobSpawnType spawnType, @Nullable SpawnGroupData spawnGroupData) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor level, DifficultyInstance difficulty, EntitySpawnReason spawnType, @Nullable SpawnGroupData spawnGroupData) {
         spawnGroupData = super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
         this.homeTicks = this.HOME_COOLDOWN;
-        if (spawnType == MobSpawnType.SPAWNER) {
+        if (spawnType == EntitySpawnReason.SPAWNER) {
             // empty if block
         }
         return spawnGroupData;
@@ -165,7 +167,7 @@ IHomeEntity {
             return false;
         }
         if (source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
-            return super.hurt(source, amount);
+            return super.hurtOrSimulate(source, amount);
         }
         amount = Math.min(this.DamageCap(), amount);
         double distSqr = this.calculateRange(source);
@@ -199,7 +201,7 @@ IHomeEntity {
                 this.damageBucket += amount;
             }
         }
-        if (flag = super.hurt(source, amount)) {
+        if (flag = super.hurtOrSimulate(source, amount)) {
             if (source.is(ModTag.BLOCK_SELF_REGEN)) {
                 this.self_regen = this.HealCooldown();
             }
@@ -280,7 +282,7 @@ IHomeEntity {
                 return;
             }
             if (!homeBlockPos.closerToCenterThan((Position)this.position(), 16.0)) {
-                this.moveTo(homeVec.x, homeVec.y, homeVec.z, this.getYRot(), this.getXRot());
+                this.setPos(homeVec.x, homeVec.y, homeVec.z, this.getYRot(), this.getXRot());
                 this.homeTicks = this.HOME_COOLDOWN;
             }
         }

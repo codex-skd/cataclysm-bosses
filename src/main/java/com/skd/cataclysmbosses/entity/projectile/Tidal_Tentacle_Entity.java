@@ -53,6 +53,8 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Tidal_Tentacle_Entity
 extends Entity {
@@ -75,13 +77,13 @@ extends Entity {
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         p_326229_.define(CREATOR_ID, Optional.empty());
-        p_326229_.define(FROM_ID, (Object)-1);
-        p_326229_.define(TARGET_COUNT, (Object)0);
-        p_326229_.define(CURRENT_TARGET_ID, (Object)-1);
-        p_326229_.define(PROGRESS, (Object)Float.valueOf(0.0f));
-        p_326229_.define(DAMAGE, (Object)Float.valueOf(3.0f));
-        p_326229_.define(RETRACTING, (Object)false);
-        p_326229_.define(HAS_CLAW, (Object)true);
+        p_326229_.define(FROM_ID, -1);
+        p_326229_.define(TARGET_COUNT, 0);
+        p_326229_.define(CURRENT_TARGET_ID, -1);
+        p_326229_.define(PROGRESS, Float.valueOf(0.0f));
+        p_326229_.define(DAMAGE, Float.valueOf(3.0f));
+        p_326229_.define(RETRACTING, false);
+        p_326229_.define(HAS_CLAW, true);
     }
 
     public void tick() {
@@ -117,7 +119,7 @@ extends Entity {
             this.setDeltaMovement(lerp.scale(0.5));
             if (!this.level().isClientSide() && progress >= 5.0f && this.tickCount % 2 == 0 && (entity = this.getCreatorEntity()) instanceof LivingEntity) {
                 DamageSource damagesource = this.damageSources().mobProjectile((Entity)this, (LivingEntity)entity);
-                if (current != creator && current.hurt(damagesource, this.getBaseDamage())) {
+                if (current != creator && current.hurtOrSimulate(damagesource, this.getBaseDamage())) {
                     MobEffectInstance effectinstance1 = ((LivingEntity)current).getEffect(ModEffect.EFFECTABYSSAL_CURSE);
                     int i = 1;
                     if (effectinstance1 != null) {
@@ -187,7 +189,7 @@ extends Entity {
     }
 
     private void createChain(Entity closestValid) {
-        this.entityData.set(HAS_CLAW, (Object)false);
+        this.entityData.set(HAS_CLAW, false);
         Tidal_Tentacle_Entity child = (Tidal_Tentacle_Entity)((EntityType)ModEntities.TIDAL_TENTACLE.get()).create(this.level());
         child.previouslyTouched = new ArrayList<Entity>(this.previouslyTouched);
         child.previouslyTouched.add(closestValid);
@@ -225,7 +227,7 @@ extends Entity {
     }
 
     public void setFromEntityID(int id) {
-        this.entityData.set(FROM_ID, (Object)id);
+        this.entityData.set(FROM_ID, id);
     }
 
     public Entity getFromEntity() {
@@ -237,7 +239,7 @@ extends Entity {
     }
 
     public void setToEntityID(int id) {
-        this.entityData.set(CURRENT_TARGET_ID, (Object)id);
+        this.entityData.set(CURRENT_TARGET_ID, id);
     }
 
     public Entity getToEntity() {
@@ -249,7 +251,7 @@ extends Entity {
     }
 
     public void setTargetsHit(int i) {
-        this.entityData.set(TARGET_COUNT, (Object)i);
+        this.entityData.set(TARGET_COUNT, i);
     }
 
     public float getProgress() {
@@ -257,7 +259,7 @@ extends Entity {
     }
 
     public void setProgress(float progress) {
-        this.entityData.set(PROGRESS, (Object)Float.valueOf(progress));
+        this.entityData.set(PROGRESS, Float.valueOf(progress));
     }
 
     public boolean isRetracting() {
@@ -265,17 +267,17 @@ extends Entity {
     }
 
     public void setRetracting(boolean retract) {
-        this.entityData.set(RETRACTING, (Object)retract);
+        this.entityData.set(RETRACTING, retract);
     }
 
     public boolean hasClaw() {
         return (Boolean)this.entityData.get(HAS_CLAW);
     }
 
-    protected void readAdditionalSaveData(CompoundTag p_20052_) {
+    protected void readAdditionalSaveData(ValueInput p_20052_) {
     }
 
-    protected void addAdditionalSaveData(CompoundTag p_20139_) {
+    protected void addAdditionalSaveData(ValueOutput p_20139_) {
     }
 
     public boolean isCreator(Entity mob) {

@@ -39,7 +39,7 @@ implements Enemy {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(ATTACK_STATE, (Object)0);
+        p_326229_.define(ATTACK_STATE, 0);
     }
 
     public int getAttackState() {
@@ -48,7 +48,7 @@ implements Enemy {
 
     public void setAttackState(int input) {
         this.attackTicks = 0;
-        this.entityData.set(ATTACK_STATE, (Object)input);
+        this.entityData.set(ATTACK_STATE, input);
         this.level().broadcastEntityEvent((Entity)this, (byte)(-input));
     }
 

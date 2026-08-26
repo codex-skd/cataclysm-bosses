@@ -17,6 +17,7 @@ import com.skd.cataclysmbosses.client.render.CMRenderTypes;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.resources.Identifier;
@@ -35,8 +36,8 @@ implements BlockEntityRenderer<Abyssal_Egg_Block_Entity> {
         matrixStackIn.translate(0.5f, 1.5f, 0.5f);
         matrixStackIn.scale(1.0f, -1.0f, -1.0f);
         MODEL.animate(tileEntityIn, partialTicks);
-        MODEL.renderToBuffer(matrixStackIn, bufferIn.getBuffer(RenderType.entityCutoutNoCull((Identifier)TEXTURE)), combinedLightIn, combinedOverlayIn);
-        MODEL.renderToBuffer(matrixStackIn, bufferIn.getBuffer(CMRenderTypes.getGhost(LAYER_TEXTURE)), combinedLightIn, combinedOverlayIn);
+        MODEL.renderToBuffer(matrixStackIn, bufferIn.getBuffer(RenderTypes.entityCutoutNoCull((Identifier)TEXTURE)), combinedLightIn, combinedOverlayIn, -1);
+        MODEL.renderToBuffer(matrixStackIn, bufferIn.getBuffer(CMRenderTypes.getGhost(LAYER_TEXTURE)), combinedLightIn, combinedOverlayIn, -1);
         matrixStackIn.popPose();
     }
 }

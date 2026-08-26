@@ -34,9 +34,10 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
-public class Octo_Ink_Renderer extends EntityRenderer<Octo_Ink_Entity> {
+public class Octo_Ink_Renderer extends EntityRenderer<Octo_Ink_Entity, EntityRenderState> {
     private static final Identifier OCTO_INK_TEXTURE = new ResourceLocation("cataclysm_bosses", "textures/entity/sea/octo_ink.png");
     private final com.skd.cataclysmbosses.client.model.entity.Octo_Ink_Model model;
 
@@ -53,7 +54,7 @@ public class Octo_Ink_Renderer extends EntityRenderer<Octo_Ink_Entity> {
         poseStack.mulPose(Axis.ZP.rotationDegrees(Mth.lerp(partialTicks, entity.xRotO, entity.getXRot())));
         this.model.setupAnim(entity, partialTicks, 0.0f, -0.1f, 0.0f, 0.0f);
         buffer.getBuffer(this.model.renderType(OCTO_INK_TEXTURE)).ifPresent(vertexconsumer -> {
-            this.model.renderToBuffer(poseStack, vertexconsumer, packedLight, OverlayTexture.NO_OVERLAY);
+            this.model.renderToBuffer(poseStack, vertexconsumer, packedLight, OverlayTexture.NO_OVERLAY, -1);
         });
         poseStack.popPose();
     }

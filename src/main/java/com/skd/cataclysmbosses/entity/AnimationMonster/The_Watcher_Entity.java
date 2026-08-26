@@ -69,6 +69,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class The_Watcher_Entity
 extends LLibrary_Monster {
@@ -105,10 +107,10 @@ extends LLibrary_Monster {
 
     public boolean hurt(DamageSource source, float damage) {
         if (source.is(CMDamageTypes.EMP)) {
-            super.hurt(source, 1000.0f);
+            super.hurtOrSimulate(source, 1000.0f);
             return true;
         }
-        return super.hurt(source, damage);
+        return super.hurtOrSimulate(source, damage);
     }
 
     protected int decreaseAirSupply(int air) {
@@ -120,11 +122,11 @@ extends LLibrary_Monster {
         super.defineSynchedData(p_326229_);
     }
 
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
     }
 
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
     }
 
@@ -135,7 +137,7 @@ extends LLibrary_Monster {
         LivingEntity target = this.getTarget();
         if (this.getAnimation() == WATCHER_BITE && this.getAnimationTick() == 13 && target != null && this.distanceTo((Entity)target) < 3.0f && this.hasLineOfSight((Entity)target)) {
             float damage = (int)this.getAttributeValue(Attributes.ATTACK_DAMAGE);
-            target.hurt(this.damageSources().mobAttack((LivingEntity)this), damage);
+            target.hurtOrSimulate(this.damageSources().mobAttack((LivingEntity)this), damage);
         }
         if (this.getAnimation() == WATCHER_EXTRA_SHOT && this.getAnimationTick() == 9) {
             if (!this.isSilent()) {

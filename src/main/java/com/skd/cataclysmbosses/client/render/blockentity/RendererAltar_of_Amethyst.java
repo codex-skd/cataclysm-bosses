@@ -37,6 +37,7 @@ import com.mojang.math.Axis;
 import java.util.Random;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
@@ -98,7 +99,7 @@ implements BlockEntityRenderer<AltarOfAmethyst_Block_Entity> {
         }
         matrixStackIn.mulPose(dir.getOpposite().getRotation());
         matrixStackIn.mulPose(Axis.XP.rotationDegrees(90.0f));
-        MODEL.renderToBuffer(matrixStackIn, bufferIn.getBuffer(RenderType.entityCutoutNoCull((Identifier)TEXTURE)), combinedLightIn, combinedOverlayIn);
+        MODEL.renderToBuffer(matrixStackIn, bufferIn.getBuffer(RenderTypes.entityCutoutNoCull((Identifier)TEXTURE)), combinedLightIn, combinedOverlayIn, -1);
         matrixStackIn.popPose();
         this.renderItem(tileEntityIn, partialTicks, matrixStackIn, bufferIn, combinedLightIn);
     }

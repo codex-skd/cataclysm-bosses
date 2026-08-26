@@ -26,9 +26,10 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 public class Abyss_Portal_Renderer
-extends EntityRenderer<Abyss_Portal_Entity> {
+extends EntityRenderer<Abyss_Portal_Entity, EntityRenderState> {
     private static final Identifier TEXTURE_0 = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/leviathan/portal/abyss_portal_idle_0.png");
     private static final Identifier TEXTURE_1 = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/leviathan/portal/abyss_portal_idle_1.png");
     private static final Identifier TEXTURE_2 = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/leviathan/portal/abyss_portal_idle_2.png");

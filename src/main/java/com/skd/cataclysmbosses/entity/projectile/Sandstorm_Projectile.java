@@ -75,6 +75,8 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Sandstorm_Projectile
 extends Projectile {
@@ -94,7 +96,7 @@ extends Projectile {
 
     public Sandstorm_Projectile(EntityType<? extends Sandstorm_Projectile> type, double getX, double gety, double getz, double p_36821_, double p_36822_, double p_36823_, Level level) {
         this(type, level);
-        this.moveTo(getX, gety, getz, this.getYRot(), this.getXRot());
+        this.setPos(getX, gety, getz, this.getYRot(), this.getXRot());
         this.reapplyPosition();
         double d0 = Math.sqrt(p_36821_ * p_36821_ + p_36822_ * p_36822_ + p_36823_ * p_36823_);
         if (d0 != 0.0) {
@@ -113,7 +115,7 @@ extends Projectile {
 
     public Sandstorm_Projectile(EntityType<? extends Sandstorm_Projectile> type, LivingEntity p_36827_, double getX, double gety, double getz, double p_36821_, double p_36822_, double p_36823_, float damage, Level level) {
         this(type, level);
-        this.moveTo(getX, gety, getz, this.getYRot(), this.getXRot());
+        this.setPos(getX, gety, getz, this.getYRot(), this.getXRot());
         this.setOwner((Entity)p_36827_);
         this.setDamage(damage);
         this.reapplyPosition();
@@ -126,8 +128,8 @@ extends Projectile {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(DAMAGE, (Object)Float.valueOf(0.0f));
-        p_326229_.define(STATE, (Object)0);
+        p_326229_.define(DAMAGE, Float.valueOf(0.0f));
+        p_326229_.define(STATE, 0);
     }
 
     public AnimationState getAnimationState(String input) {
@@ -171,7 +173,7 @@ extends Projectile {
     }
 
     public void setState(int state) {
-        this.entityData.set(STATE, (Object)state);
+        this.entityData.set(STATE, state);
     }
 
     public float getDamage() {
@@ -179,7 +181,7 @@ extends Projectile {
     }
 
     public void setDamage(float damage) {
-        this.entityData.set(DAMAGE, (Object)Float.valueOf(damage));
+        this.entityData.set(DAMAGE, Float.valueOf(damage));
     }
 
     public boolean shouldRenderAtSqrDistance(double p_36837_) {
@@ -246,13 +248,13 @@ extends Projectile {
             if (entity1 instanceof LivingEntity) {
                 if (!entity.getType().is(ModTag.TEAM_ANCIENT_REMNANT) || !entity1.getType().is(ModTag.TEAM_ANCIENT_REMNANT)) {
                     LivingEntity livingentity = (LivingEntity)entity1;
-                    flag = entity.hurt(this.damageSources().mobProjectile((Entity)this, livingentity), this.getDamage());
+                    flag = entity.hurtOrSimulate(this.damageSources().mobProjectile((Entity)this, livingentity), this.getDamage());
                     if (flag && !entity.isAlive()) {
                         // empty if block
                     }
                 }
             } else {
-                flag = entity.hurt(this.damageSources().magic(), this.getDamage());
+                flag = entity.hurtOrSimulate(this.damageSources().magic(), this.getDamage());
             }
             if (flag && entity instanceof LivingEntity) {
                 ((LivingEntity)entity).addEffect(new MobEffectInstance(ModEffect.EFFECTCURSE_OF_DESERT, 100, 1), this.getEffectSource());
@@ -288,14 +290,14 @@ extends Projectile {
         return 0.9f;
     }
 
-    public void addAdditionalSaveData(CompoundTag p_36848_) {
+    public void addAdditionalSaveData(ValueOutput p_36848_) {
         super.addAdditionalSaveData(p_36848_);
         p_36848_.put("power", (Tag)this.newDoubleList(new double[]{this.xPower, this.yPower, this.zPower}));
         p_36848_.putInt("state", this.getState());
         p_36848_.putFloat("damage", this.getDamage());
     }
 
-    public void readAdditionalSaveData(CompoundTag p_36844_) {
+    public void readAdditionalSaveData(ValueInput p_36844_) {
         ListTag listtag;
         super.readAdditionalSaveData(p_36844_);
         if (p_36844_.contains("power", 9) && (listtag = p_36844_.getList("power", 6)).size() == 3) {
@@ -303,8 +305,8 @@ extends Projectile {
             this.yPower = listtag.getDouble(1);
             this.zPower = listtag.getDouble(2);
         }
-        this.setState(p_36844_.getInt("state"));
-        this.setDamage(p_36844_.getFloat("damage"));
+        this.setState(p_36844_.getIntOr("state", 0));
+        this.setDamage(p_36844_.getFloatOr("damage", 0.0F));
     }
 
     public boolean isPickable() {

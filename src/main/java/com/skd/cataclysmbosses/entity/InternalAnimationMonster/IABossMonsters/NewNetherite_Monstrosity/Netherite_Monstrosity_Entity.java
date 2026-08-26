@@ -37,7 +37,7 @@
  *  net.minecraft.world.entity.EntityType
  *  net.minecraft.world.entity.LivingEntity
  *  net.minecraft.world.entity.Mob
- *  net.minecraft.world.entity.MobSpawnType
+ *  net.minecraft.world.entity.EntitySpawnReason
  *  net.minecraft.world.entity.PathfinderMob
  *  net.minecraft.world.entity.SpawnGroupData
  *  net.minecraft.world.entity.ai.attributes.AttributeSupplier$Builder
@@ -143,7 +143,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -157,7 +157,7 @@ import net.minecraft.world.entity.ai.goal.RandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.animal.AbstractGolem;
-import net.minecraft.world.entity.animal.IronGolem;
+import net.minecraft.world.entity.animal.golem.IronGolem;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.npc.AbstractVillager;
@@ -181,6 +181,8 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.entity.PartEntity;
 import net.neoforged.neoforge.event.EventHooks;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Netherite_Monstrosity_Entity
 extends IABoss_monster {
@@ -298,7 +300,7 @@ extends IABoss_monster {
     }
 
     public boolean attackEntityFromPart(Netherite_Monstrosity_Part netherite_monstrosity_part, DamageSource source, float amount) {
-        return this.hurt(source, amount);
+        return this.hurtOrSimulate(source, amount);
     }
 
     @Override
@@ -311,7 +313,7 @@ extends IABoss_monster {
         if (entity instanceof AbstractGolem) {
             damage *= 0.5f;
         }
-        if ((attack = super.hurt(source, damage)) && !this.getIsAwaken() && this.isAlive()) {
+        if ((attack = super.hurtOrSimulate(source, damage)) && !this.getIsAwaken() && this.isAlive()) {
             this.setIsAwaken(true);
         }
         return attack;
@@ -321,7 +323,7 @@ extends IABoss_monster {
         if (part == this.headPart) {
             damage = Math.min(Float.MAX_VALUE, damage * 1.5f);
         }
-        boolean attack = super.hurt(source, damage);
+        boolean attack = super.hurtOrSimulate(source, damage);
         return attack;
     }
 
@@ -397,9 +399,9 @@ extends IABoss_monster {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(IS_BERSERK, (Object)false);
-        p_326229_.define(IS_AWAKEN, (Object)false);
-        p_326229_.define(MAGAZINE, (Object)0);
+        p_326229_.define(IS_BERSERK, false);
+        p_326229_.define(IS_AWAKEN, false);
+        p_326229_.define(MAGAZINE, 0);
     }
 
     public boolean isSleep() {
@@ -411,7 +413,7 @@ extends IABoss_monster {
     }
 
     public void setIsBerserk(boolean isBerserk) {
-        this.entityData.set(IS_BERSERK, (Object)isBerserk);
+        this.entityData.set(IS_BERSERK, isBerserk);
     }
 
     public boolean getIsBerserk() {
@@ -427,7 +429,7 @@ extends IABoss_monster {
     }
 
     public void setIsAwaken(boolean isAwaken) {
-        this.entityData.set(IS_AWAKEN, (Object)isAwaken);
+        this.entityData.set(IS_AWAKEN, isAwaken);
         this.bossInfo.setVisible(isAwaken);
         if (isAwaken) {
             this.PlayerCounter(this.level());
@@ -439,7 +441,7 @@ extends IABoss_monster {
     }
 
     public void setMagazine(int isAwaken) {
-        this.entityData.set(MAGAZINE, (Object)isAwaken);
+        this.entityData.set(MAGAZINE, isAwaken);
     }
 
     public int getMagazine() {
@@ -556,7 +558,7 @@ extends IABoss_monster {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         compound.putBoolean("is_Berserk", this.getIsBerserk());
         compound.putBoolean("is_Awaken", this.getIsAwaken());
@@ -564,11 +566,11 @@ extends IABoss_monster {
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        this.setIsBerserk(compound.getBoolean("is_Berserk"));
-        this.setIsAwaken(compound.getBoolean("is_Awaken"));
-        this.setMagazine(compound.getInt("Magazine"));
+        this.setIsBerserk(compound.getBooleanOr("is_Berserk", false));
+        this.setIsAwaken(compound.getBooleanOr("is_Awaken", false));
+        this.setMagazine(compound.getIntOr("Magazine", 0));
         if (this.hasCustomName()) {
             this.bossInfo.setName(this.getDisplayName());
         }
@@ -678,8 +680,8 @@ extends IABoss_monster {
     }
 
     @Override
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_29678_, DifficultyInstance p_29679_, MobSpawnType spawnType, @Nullable SpawnGroupData p_29681_) {
-        if (spawnType == MobSpawnType.COMMAND || spawnType == MobSpawnType.SPAWN_EGG || MobSpawnType.isSpawner((MobSpawnType)spawnType) || spawnType == MobSpawnType.DISPENSER) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_29678_, DifficultyInstance p_29679_, EntitySpawnReason spawnType, @Nullable SpawnGroupData p_29681_) {
+        if (spawnType == EntitySpawnReason.COMMAND || spawnType == EntitySpawnReason.SPAWN_ITEM_USE || EntitySpawnReason.isSpawner((EntitySpawnReason)spawnType) || spawnType == EntitySpawnReason.DISPENSER) {
             this.setIsAwaken(true);
         }
         return super.finalizeSpawn(p_29678_, p_29679_, spawnType, p_29681_);
@@ -759,7 +761,7 @@ extends IABoss_monster {
                 DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
                 for (LivingEntity Lentity : this.level().getEntitiesOfClass(LivingEntity.class, attackRange)) {
                     boolean flag;
-                    if (this.isAlliedTo((Entity)Lentity) || Lentity instanceof Netherite_Monstrosity_Entity || Lentity == this || !(flag = Lentity.hurt(damagesource, (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) * 0.4f))) continue;
+                    if (this.isAlliedTo((Entity)Lentity) || Lentity instanceof Netherite_Monstrosity_Entity || Lentity == this || !(flag = Lentity.hurtOrSimulate(damagesource, (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) * 0.4f))) continue;
                     double theta = (double)this.yBodyRot * (Math.PI / 180);
                     double vec = -2.5;
                     double vecX = Math.cos(theta += 1.5707963267948966);
@@ -950,7 +952,7 @@ extends IABoss_monster {
         if (!hit.isEmpty()) {
             for (LivingEntity entity : hit) {
                 if (this.isAlliedTo((Entity)entity) || entity instanceof Kobolediator_Entity || entity == this) continue;
-                boolean flag = entity.hurt(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
+                boolean flag = entity.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
                 if (entity.isDamageSourceBlocked(damagesource) && entity instanceof Player) {
                     Player player = (Player)entity;
                     if (shieldbreakticks > 0) {
@@ -1000,7 +1002,7 @@ extends IABoss_monster {
             DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
             for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(area))) {
                 if (this.isAlliedTo((Entity)entity) || entity instanceof Netherite_Monstrosity_Entity || entity == this) continue;
-                boolean flag = entity.hurt(damagesource, (float)((double)((float)this.getAttributeValue(Attributes.ATTACK_DAMAGE)) + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE), (double)(entity.getMaxHealth() * (float)CMCommonConfig.NetheriteMonstrosity.SmashHpdamage))));
+                boolean flag = entity.hurtOrSimulate(damagesource, (float)((double)((float)this.getAttributeValue(Attributes.ATTACK_DAMAGE)) + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE), (double)(entity.getMaxHealth() * (float)CMCommonConfig.NetheriteMonstrosity.SmashHpdamage))));
                 if (entity.isDamageSourceBlocked(damagesource) && entity instanceof Player) {
                     Player player = (Player)entity;
                     EntityUtil.disableShield(player, 120);

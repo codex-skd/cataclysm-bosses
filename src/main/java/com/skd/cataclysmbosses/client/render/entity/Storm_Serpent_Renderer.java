@@ -32,15 +32,16 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Storm_Serpent_Renderer
-extends EntityRenderer<Storm_Serpent_Entity> {
+extends EntityRenderer<Storm_Serpent_Entity, EntityRenderState> {
     private static final Identifier SNAKE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/scylla/storm_serpent.png");
     private final Storm_Serpent_Model model;
 
@@ -58,7 +59,7 @@ extends EntityRenderer<Storm_Serpent_Entity> {
         float f1 = Mth.lerp((float)partialTicks, (float)entityIn.xRotO, (float)entityIn.getXRot());
         this.model.setupAnim(entityIn, 0.0f, 0.0f, (float)entityIn.tickCount + partialTicks, f, f1);
         float alpha = 0.8f;
-        int i1 = FastColor.ARGB32.color((int)((int)(alpha * 255.0f)), (int)255, (int)255, (int)255);
+        int i1 = ARGB.color((int)((int)(alpha * 255.0f)), (int)255, (int)255, (int)255);
         VertexConsumer vertexConsumer = bufferIn.getBuffer(CMRenderTypes.getGhost(this.getTextureLocation(entityIn)));
         this.model.renderToBuffer(matrixStackIn, vertexConsumer, packedLightIn, OverlayTexture.NO_OVERLAY, i1);
         matrixStackIn.popPose();

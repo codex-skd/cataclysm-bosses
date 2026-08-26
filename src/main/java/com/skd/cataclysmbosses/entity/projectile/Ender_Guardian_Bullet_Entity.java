@@ -53,6 +53,8 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Ender_Guardian_Bullet_Entity
 extends AbstractHurtingProjectile {
@@ -87,7 +89,7 @@ extends AbstractHurtingProjectile {
                 Entity Shooter = this.getOwner();
                 LivingEntity livingentity = Shooter instanceof LivingEntity ? (LivingEntity)Shooter : null;
                 DamageSource damagesource = this.damageSources().mobProjectile((Entity)this, livingentity);
-                boolean flag = entity.hurt(damagesource, 6.0f);
+                boolean flag = entity.hurtOrSimulate(damagesource, 6.0f);
                 if (flag) {
                     EnchantmentHelper.doPostAttackEffects((ServerLevel)serverlevel, (Entity)entity, (DamageSource)damagesource);
                     if (entity instanceof LivingEntity) {
@@ -172,7 +174,7 @@ extends AbstractHurtingProjectile {
         }
     }
 
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         compound.putDouble("DX", this.dirX);
         compound.putDouble("DY", this.dirY);
@@ -184,16 +186,16 @@ extends AbstractHurtingProjectile {
         compound.putBoolean("Fired", this.fired);
     }
 
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        this.dirX = compound.getDouble("DX");
-        this.dirY = compound.getDouble("DY");
-        this.dirZ = compound.getDouble("DZ");
-        this.startX = compound.getDouble("SX");
-        this.startY = compound.getDouble("SY");
-        this.startZ = compound.getDouble("SZ");
-        this.timer = compound.getInt("Timer");
-        this.fired = compound.getBoolean("Fired");
+        this.dirX = compound.getDoubleOr("DX", 0.0);
+        this.dirY = compound.getDoubleOr("DY", 0.0);
+        this.dirZ = compound.getDoubleOr("DZ", 0.0);
+        this.startX = compound.getDoubleOr("SX", 0.0);
+        this.startY = compound.getDoubleOr("SY", 0.0);
+        this.startZ = compound.getDoubleOr("SZ", 0.0);
+        this.timer = compound.getIntOr("Timer", 0);
+        this.fired = compound.getBooleanOr("Fired", false);
     }
 
     public SoundSource getSoundSource() {

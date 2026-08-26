@@ -123,7 +123,7 @@ public class LightningRender {
 
         private void addBolt(BoltInstance instance, Timestamp timestamp) {
             this.bolts.add(instance);
-            this.lastBoltDelay = instance.bolt.getSpawnFunction().getSpawnDelay(LightningRender.this.random);
+            this.lastBoltDelay = instance.bolt.getSpawnFunction().getSpawnDelay(LightningRender.this.getRandom());
             this.lastBoltTimestamp = timestamp;
         }
     }

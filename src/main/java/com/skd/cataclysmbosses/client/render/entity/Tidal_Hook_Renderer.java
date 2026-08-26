@@ -34,6 +34,7 @@ import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -47,9 +48,10 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 public class Tidal_Hook_Renderer
-extends EntityRenderer<Tidal_Hook_Entity> {
+extends EntityRenderer<Tidal_Hook_Entity, EntityRenderState> {
     private final Tidal_Hook_Model model = new Tidal_Hook_Model();
     private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/tidal_hook.png");
     private static final Identifier CHAIN_TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/tidal_hook_chain.png");
@@ -66,7 +68,7 @@ extends EntityRenderer<Tidal_Hook_Entity> {
         matrices.mulPose(Axis.YP.rotationDegrees(yRot - 90.0f));
         matrices.mulPose(Axis.ZP.rotationDegrees(xRot + 90.0f));
         VertexConsumer vertexConsumer = provider.getBuffer(this.model.renderType(this.getTextureLocation(entity)));
-        this.model.renderToBuffer(matrices, vertexConsumer, light, OverlayTexture.NO_OVERLAY);
+        this.model.renderToBuffer(matrices, vertexConsumer, light, OverlayTexture.NO_OVERLAY, -1);
         matrices.popPose();
         Entity fromEntity = entity.getOwner();
         if (fromEntity != null) {
@@ -80,7 +82,7 @@ extends EntityRenderer<Tidal_Hook_Entity> {
             Vec3 chainBase = modelOffset;
             matrices.pushPose();
             matrices.translate(chainBase.x, chainBase.y, chainBase.z);
-            VertexConsumer chainBuffer = provider.getBuffer(RenderType.entityCutoutNoCull((Identifier)CHAIN_TEXTURE));
+            VertexConsumer chainBuffer = provider.getBuffer(RenderTypes.entityCutoutNoCull((Identifier)CHAIN_TEXTURE));
             Tidal_Hook_Renderer.renderChainCube(chainTo.subtract(chainBase), matrices, chainBuffer, light, OverlayTexture.NO_OVERLAY);
             matrices.popPose();
         }

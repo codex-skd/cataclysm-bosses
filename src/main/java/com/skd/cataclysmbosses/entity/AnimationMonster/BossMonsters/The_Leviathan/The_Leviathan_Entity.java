@@ -177,6 +177,8 @@ import net.neoforged.neoforge.entity.PartEntity;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class The_Leviathan_Entity
 extends LLibrary_Boss_Monster
@@ -307,11 +309,11 @@ IHoldEntity {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(BLAST_CHANCE, (Object)0);
-        p_326229_.define(MODE_CHANCE, (Object)0);
-        p_326229_.define(MELT_DOWN, (Object)false);
+        p_326229_.define(BLAST_CHANCE, 0);
+        p_326229_.define(MODE_CHANCE, 0);
+        p_326229_.define(MELT_DOWN, false);
         p_326229_.define(TONGUE_UUID, Optional.empty());
-        p_326229_.define(TONGUE_ID, (Object)-1);
+        p_326229_.define(TONGUE_ID, -1);
     }
 
     protected void registerGoals() {
@@ -422,7 +424,7 @@ IHoldEntity {
         if (this.getAnimation() == LEVIATHAN_PHASE2 && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
             return false;
         }
-        boolean attack = super.hurt(source, damage);
+        boolean attack = super.hurtOrSimulate(source, damage);
         if (this.getAnimation() == LEVIATHAN_RUSH && this.getAnimationTick() >= 38 && this.getAnimationTick() <= 54 && attack) {
             AnimationHandler.INSTANCE.sendAnimationMessage((Entity)this, LEVIATHAN_STUN);
         }
@@ -459,7 +461,7 @@ IHoldEntity {
     }
 
     public boolean attackEntityFromPart(The_Leviathan_Part leviathan_part, DamageSource source, float amount) {
-        return this.hurt(source, amount);
+        return this.hurtOrSimulate(source, amount);
     }
 
     @Override
@@ -475,7 +477,7 @@ IHoldEntity {
         }
         if ((weapon = this.getTongue()) instanceof The_Leviathan_Tongue_Entity) {
             The_Leviathan_Tongue_Entity magneticWeapon = (The_Leviathan_Tongue_Entity)weapon;
-            this.entityData.set(TONGUE_ID, (Object)magneticWeapon.getId());
+            this.entityData.set(TONGUE_ID, magneticWeapon.getId());
             magneticWeapon.setControllerUUID(this.getUUID());
         }
         if (!this.getPassengers().isEmpty() && ((Entity)this.getPassengers().get(0)).isShiftKeyDown() && this.getAnimation() == LEVIATHAN_TENTACLE_HOLD_BLAST) {
@@ -950,7 +952,7 @@ IHoldEntity {
             for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(7.0, 7.0, 7.0))) {
                 if (this.isAlliedTo((Entity)entity) || entity instanceof The_Leviathan_Entity || entity == this) continue;
                 DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
-                boolean flag = entity.hurt(damagesource, (float)((double)((float)this.getAttributeValue(Attributes.ATTACK_DAMAGE)) + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE), (double)(entity.getMaxHealth() * (float)CMCommonConfig.Leviathan.TailSwingHpDamage))));
+                boolean flag = entity.hurtOrSimulate(damagesource, (float)((double)((float)this.getAttributeValue(Attributes.ATTACK_DAMAGE)) + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE), (double)(entity.getMaxHealth() * (float)CMCommonConfig.Leviathan.TailSwingHpDamage))));
                 if (entity.isDamageSourceBlocked(damagesource) && entity instanceof Player) {
                     Player player = (Player)entity;
                     EntityUtil.disableShield(player, 120);
@@ -1090,7 +1092,7 @@ IHoldEntity {
             for (LivingEntity Lentity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(3.0))) {
                 if (this.isAlliedTo((Entity)Lentity) || Lentity instanceof The_Leviathan_Entity || Lentity == this) continue;
                 DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
-                boolean flag = Lentity.hurt(damagesource, (float)((double)((float)this.getAttributeValue(Attributes.ATTACK_DAMAGE)) + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE), (double)(Lentity.getMaxHealth() * (float)CMCommonConfig.Leviathan.RushHpDamage))));
+                boolean flag = Lentity.hurtOrSimulate(damagesource, (float)((double)((float)this.getAttributeValue(Attributes.ATTACK_DAMAGE)) + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE), (double)(Lentity.getMaxHealth() * (float)CMCommonConfig.Leviathan.RushHpDamage))));
                 if (Lentity instanceof Player) {
                     Player player = (Player)Lentity;
                     if (Lentity.isDamageSourceBlocked(damagesource)) {
@@ -1118,7 +1120,7 @@ IHoldEntity {
             for (LivingEntity target : hit) {
                 if (this.isAlliedTo((Entity)target) || target instanceof The_Leviathan_Entity || target == this) continue;
                 DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
-                boolean flag = target.hurt(damagesource, (float)((double)((float)this.getAttributeValue(Attributes.ATTACK_DAMAGE)) * 1.5 + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * 1.5, (double)(target.getMaxHealth() * (float)CMCommonConfig.Leviathan.TentacleHpDamage))));
+                boolean flag = target.hurtOrSimulate(damagesource, (float)((double)((float)this.getAttributeValue(Attributes.ATTACK_DAMAGE)) * 1.5 + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * 1.5, (double)(target.getMaxHealth() * (float)CMCommonConfig.Leviathan.TentacleHpDamage))));
                 if (target instanceof Player) {
                     Player player = (Player)target;
                     if (target.isDamageSourceBlocked(damagesource)) {
@@ -1144,7 +1146,7 @@ IHoldEntity {
                 for (LivingEntity target : hit) {
                     if (this.isAlliedTo((Entity)target) || target instanceof The_Leviathan_Entity || target == this) continue;
                     DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
-                    boolean flag = target.hurt(damagesource, (float)((double)((float)this.getAttributeValue(Attributes.ATTACK_DAMAGE)) + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE), (double)(target.getMaxHealth() * (float)CMCommonConfig.Leviathan.TentacleHpDamage))));
+                    boolean flag = target.hurtOrSimulate(damagesource, (float)((double)((float)this.getAttributeValue(Attributes.ATTACK_DAMAGE)) + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE), (double)(target.getMaxHealth() * (float)CMCommonConfig.Leviathan.TentacleHpDamage))));
                     if (target instanceof Player) {
                         Player player = (Player)target;
                         if (target.isDamageSourceBlocked(damagesource)) {
@@ -1172,7 +1174,7 @@ IHoldEntity {
             for (LivingEntity target : hit) {
                 if (this.isAlliedTo((Entity)target) || target instanceof The_Leviathan_Entity || target == this) continue;
                 DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
-                boolean flag = target.hurt(damagesource, (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) + target.getMaxHealth() * 0.1f);
+                boolean flag = target.hurtOrSimulate(damagesource, (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) + target.getMaxHealth() * 0.1f);
                 if (target instanceof Player) {
                     Player player = (Player)target;
                     if (target.isDamageSourceBlocked(damagesource) && shieldbreakticks > 0) {
@@ -1253,7 +1255,7 @@ IHoldEntity {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         compound.putInt("BlastChance", this.getBlastChance());
         compound.putBoolean("MeltDown", this.getMeltDown());
@@ -1261,11 +1263,11 @@ IHoldEntity {
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        this.setBlastChance(compound.getInt("BlastChance"));
-        this.setModeChance(compound.getInt("ModeChance"));
-        this.setMeltDown(compound.getBoolean("MeltDown"));
+        this.setBlastChance(compound.getIntOr("BlastChance", 0));
+        this.setModeChance(compound.getIntOr("ModeChance", 0));
+        this.setMeltDown(compound.getBooleanOr("MeltDown", false));
         if (this.hasCustomName()) {
             this.bossInfo.setName(this.getDisplayName());
         }
@@ -1291,7 +1293,7 @@ IHoldEntity {
     }
 
     public void setMeltDown(boolean chance) {
-        this.entityData.set(MELT_DOWN, (Object)chance);
+        this.entityData.set(MELT_DOWN, chance);
     }
 
     public int getBlastChance() {
@@ -1299,7 +1301,7 @@ IHoldEntity {
     }
 
     public void setBlastChance(int chance) {
-        this.entityData.set(BLAST_CHANCE, (Object)chance);
+        this.entityData.set(BLAST_CHANCE, chance);
     }
 
     public int getModeChance() {
@@ -1307,7 +1309,7 @@ IHoldEntity {
     }
 
     public void setModeChance(int chance) {
-        this.entityData.set(MODE_CHANCE, (Object)chance);
+        this.entityData.set(MODE_CHANCE, chance);
     }
 
     @Nullable
