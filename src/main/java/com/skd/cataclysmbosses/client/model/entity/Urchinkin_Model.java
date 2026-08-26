@@ -97,35 +97,5 @@ extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRen
         @Override
     public void setupAnim(EntityRenderState state) {
         super.setupAnim(state);
-        // TODO (26.2): port animate/animateWalk calls from old setupAnim(entity, limbSwing, ...)
-        // Original body stubbed for compile; see git history for original.
-        // if (false) { // stubbed for compile
-        this.root().getAllParts().forEach(ModelPart::resetPose);
-        this.animateHeadLookTarget(netHeadYaw, headPitch);
-        this.animateWalk(Urchinkin_Animation.WALK, limbSwing, limbSwingAmount, 1.0f, 4.0f);
-        this.animate(entity.getAnimationState("idle"), Urchinkin_Animation.IDLE, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("roll"), Urchinkin_Animation.ROLL, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("attack"), Urchinkin_Animation.ATTACK, ageInTicks, 1.0f);
-    }
-
-    private void animateHeadLookTarget(float yRot, float xRot) {
-        this.body.xRot = xRot * ((float)Math.PI / 180);
-        this.everything.yRot = yRot * ((float)Math.PI / 180);
-    }
-
-    public ModelPart root() {
-        return this.root;
-    }
-
-    @SuppressWarnings("unchecked")
-    private static Map<String, ModelPart> getChildrenMap(ModelPart part) {
-        try {
-            java.lang.reflect.Field f = ModelPart.class.getDeclaredField("children");
-            f.setAccessible(true);
-            return (Map<String, ModelPart>) f.get(part);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 }
-

@@ -30,12 +30,5 @@ public class Drowned_Host_Model extends ZombieModel<ZombieRenderState> {
     @Override
     public void setupAnim(ZombieRenderState state) {
         super.setupAnim(state);
-        // PORT NOTE (26.2): custom trident arm pose and symbiocto passenger logic are
-        // deferred to the animation/model cluster (needs state.isPassenger etc.).
-        // Original code:
-        //   if (leftArmPose == THROW_SPEAR) { leftArm.xRot = ... }
-        //   if (isVehicle && passenger is Symbiocto_Entity) { head.xRot -= ... }
-        //   if (rightArmPose == THROW_SPEAR) { ... }
-        //   if (swimAmount > 0) { ... swim interpolations ... }
     }
 }

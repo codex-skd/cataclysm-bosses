@@ -51,30 +51,5 @@ extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRen
         @Override
     public void setupAnim(EntityRenderState state) {
         super.setupAnim(state);
-        // TODO (26.2): port animate/animateWalk calls from old setupAnim(entity, limbSwing, ...)
-        // Original body stubbed for compile; see git history for original.
-        // if (false) { // stubbed for compile
-        float delta = ageInTicks - (float)entity.tickCount;
-        this.root().getAllParts().forEach(ModelPart::resetPose);
-        Vec3 prevV = new Vec3(entity.prevDeltaMovementX, entity.prevDeltaMovementY, entity.prevDeltaMovementZ);
-        Vec3 dv = prevV.add(entity.getDeltaMovement().subtract(prevV).scale((double)delta));
-        double d = Math.sqrt(dv.x * dv.x + dv.y * dv.y + dv.z * dv.z);
-        if (d != 0.0) {
-            double a = dv.y / d;
-            a = Math.max(-10.0, Math.min(1.0, a));
-            float pitch = -((float)Math.asin(a));
-            this.root.xRot = pitch + 1.5707964f;
-        }
-        this.inner.yRot = ageInTicks * 20.0f * ((float)Math.PI / 180);
-        this.inner.xRot = ageInTicks * 20.0f * ((float)Math.PI / 180);
-        this.inner.zRot = ageInTicks * 20.0f * ((float)Math.PI / 180);
-        this.outer.yRot = ageInTicks * -10.0f * ((float)Math.PI / 180);
-        this.outer.xRot = ageInTicks * -10.0f * ((float)Math.PI / 180);
-        this.outer.zRot = ageInTicks * -10.0f * ((float)Math.PI / 180);
-    }
-
-    public ModelPart root() {
-        return this.root;
     }
 }
-

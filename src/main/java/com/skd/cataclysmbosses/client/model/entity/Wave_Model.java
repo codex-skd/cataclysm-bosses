@@ -49,17 +49,5 @@ extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRen
         @Override
     public void setupAnim(EntityRenderState state) {
         super.setupAnim(state);
-        // TODO (26.2): port animate/animateWalk calls from old setupAnim(entity, limbSwing, ...)
-        // Original body stubbed for compile; see git history for original.
-        // if (false) { // stubbed for compile
-        this.root().getAllParts().forEach(ModelPart::resetPose);
-        this.animate(entity.getAnimationState("spawn"), Wave_Animation.SPAWN, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("idle"), Wave_Animation.LOOP, ageInTicks, 0.75f);
-        this.animate(entity.getAnimationState("despawn"), Wave_Animation.END, ageInTicks, 1.0f);
-    }
-
-    public ModelPart root() {
-        return this.root;
     }
 }
-

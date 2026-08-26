@@ -84,19 +84,5 @@ extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRen
         @Override
     public void setupAnim(EntityRenderState state) {
         super.setupAnim(state);
-        // TODO (26.2): port animate/animateWalk calls from old setupAnim(entity, limbSwing, ...)
-        // Original body stubbed for compile; see git history for original.
-        // if (false) { // stubbed for compile
-        this.root().getAllParts().forEach(ModelPart::resetPose);
-        this.root.visible = entity.getState() != 0;
-        this.animate(entity.getAnimationState("spawn"), Storm_Serpent_Animation.STORM_SERPENT, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("spawn2"), Storm_Serpent_Animation.STORM_SERPENT2, ageInTicks, 1.0f);
-        this.root.yRot = netHeadYaw * ((float)Math.PI / 180);
-        this.root.xRot = headPitch * ((float)Math.PI / 180);
-    }
-
-    public ModelPart root() {
-        return this.root;
     }
 }
-

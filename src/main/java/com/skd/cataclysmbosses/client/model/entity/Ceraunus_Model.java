@@ -115,21 +115,5 @@ extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRen
         @Override
     public void setupAnim(EntityRenderState state) {
         super.setupAnim(state);
-        // TODO (26.2): port animate/animateWalk calls from old setupAnim(entity, limbSwing, ...)
-        // Original body stubbed for compile; see git history for original.
-        // if (false) { // stubbed for compile
-        this.root().getAllParts().forEach(ModelPart::resetPose);
-    }
-
-    @SuppressWarnings("unchecked")
-    private static Map<String, ModelPart> getChildrenMap(ModelPart part) {
-        try {
-            java.lang.reflect.Field f = ModelPart.class.getDeclaredField("children");
-            f.setAccessible(true);
-            return (Map<String, ModelPart>) f.get(part);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
     }
 }
-

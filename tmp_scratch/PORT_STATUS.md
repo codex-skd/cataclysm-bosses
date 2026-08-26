@@ -2,7 +2,8 @@ SESSION STATUS — NeoForge 26.2.0.45-beta -> 26.2.0.57 compile port
 ================================================================
 Date: 2026-08-26
 Compile baseline: ./gradlew compileJava  (Xmaxerrs 20000)
-Error count: start 5548 -> 5010 -> 3782 (items) -> 3524 -> 3381 (CMItemstackRenderer) -> 3207 -> 3162 -> 3257 -> now 2997
+Error count: start 5548 -> 5010 -> 3782 (items) -> 3524 -> 3381 (CMItemstackRenderer) -> 3207 -> 3162 (MobRenderer) -> 3257 -> 2997 -> now 2488
+# Models hierarchical batch fixed (23 files via CmHierarchicalModel, Drowned_Host vanilla, 44 layers stubbed)
 # Note: 3257 is after partial model WIP (23 HierarchicalModel files stubbed, Drowned_Host vanilla model fixed); count temporarily up due to new bridge stubs (expected to drop after follow-up fixes)
 Item/data-driven cluster DONE (~258). Custom item renderer DONE (~143). Simple EntityRenderers batch DONE (~174, 56 files). MobRenderer bosses batch DONE (~45, 34 files):
 see "CLUSTER FIXED (CMItemstackRenderer / custom item rendering)" below.
@@ -133,7 +134,7 @@ Items cluster is DONE. Dominant blockers now (root-cause classes must be fixed f
 many child errors are cascades):
 - Rendering rewrite: MultiBufferSource -> SubmitNodeCollector (submitModel / submitCustomGeometry).
   CMItemstackRenderer DONE; simple EntityRenderers batch DONE (56 files via CmEntityRenderer bridge);
-  remaining ~600+ errors in MobRenderer bosses (now via CmMobRenderer bridge, 23->2 for Scylla), 44 RenderLayer stubs, plus 13 files
+  remaining ~400+ errors in MobRenderer bosses (now via CmMobRenderer, Scylla 38->2), 44 RenderLayer stubs, 23 HierarchicalModel stubs (Maledictus 38->0, Scylla 32->0), plus 13 files
   with missing entity/model bases (e.g. Lionfish_Entity).
 - RenderType/CompositeState/RenderStateShard removal (CMRenderTypes.java, 209 errors):
   RenderStateShard/RenderType.CompositeState gone. New custom render types are built with

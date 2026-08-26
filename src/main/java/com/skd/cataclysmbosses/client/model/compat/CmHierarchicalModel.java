@@ -1,7 +1,7 @@
 package com.skd.cataclysmbosses.client.model.compat;
 
 import net.minecraft.client.animation.AnimationDefinition;
-import net.minecraft.client.animation.AnimationState;
+import net.minecraft.world.entity.AnimationState;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;

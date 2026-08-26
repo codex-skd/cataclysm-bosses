@@ -45,29 +45,8 @@ extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRen
         return LayerDefinition.create((MeshDefinition)meshdefinition, (int)128, (int)128);
     }
 
-        @Override
+            @Override
     public void setupAnim(EntityRenderState state) {
         super.setupAnim(state);
-        // TODO (26.2): port animate/animateWalk calls from old setupAnim(entity, limbSwing, ...)
-        // Original body stubbed for compile; see git history for original.
-        // if (false) { // stubbed for compile
-        this.root().getAllParts().forEach(ModelPart::resetPose);
-        this.root.yRot = netHeadYaw * ((float)Math.PI / 180);
-        this.root.xRot = headPitch * ((float)Math.PI / 180);
-        this.animate(entity.getAnimationState("idle"), Elemental_Spear_Animation.IDLE, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("spawn"), Elemental_Spear_Animation.SPAWN, ageInTicks, 1.0f);
-    }
-
-        @Override
-    public void setupAnim(EntityRenderState state) {
-        super.setupAnim(state);
-        // TODO (26.2): port animate/animateWalk calls from old setupAnim(entity, limbSwing, ...)
-        // Original body stubbed for compile; see git history for original.
-        // if (false) { // stubbed for compile
-    }
-
-    public ModelPart root() {
-        return this.root;
     }
 }
-
