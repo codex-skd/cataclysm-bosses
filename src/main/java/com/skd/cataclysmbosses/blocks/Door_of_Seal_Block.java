@@ -84,6 +84,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.properties.Property;
@@ -98,9 +99,9 @@ import org.jetbrains.annotations.Nullable;
 public class Door_of_Seal_Block
 extends BaseEntityBlock {
     public static final MapCodec<Door_of_Seal_Block> CODEC = Door_of_Seal_Block.simpleCodec(Door_of_Seal_Block::new);
-    // public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
-    // public static final BooleanProperty OPEN = BlockStateProperties.OPEN;
-    // public static final BooleanProperty LIT = BlockStateProperties.LIT;
+    public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
+    public static final BooleanProperty OPEN = BlockStateProperties.OPEN;
+    public static final BooleanProperty LIT = BlockStateProperties.LIT;
     public static final EnumProperty<Door_Of_Seal_Part> PART = EnumProperty.create((String)"door_part", Door_Of_Seal_Part.class);
     public static final IntegerProperty Y_OFFSET = IntegerProperty.create((String)"y_offset", (int)0, (int)7);
     private static final VoxelShape CLOSED_SHAPE = Block.box((double)0.0, (double)0.0, (double)0.0, (double)16.0, (double)16.0, (double)16.0);

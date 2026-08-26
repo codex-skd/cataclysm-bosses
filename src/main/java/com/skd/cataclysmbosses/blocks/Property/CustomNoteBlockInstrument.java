@@ -15,22 +15,27 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 
 public enum CustomNoteBlockInstrument {
-    KOBOLEDIATOR("kobolediator", (Holder)ModSounds.NOTE_BLOCK_IMITATE_KOBOLEDIATOR, NoteBlockInstrument.Type.MOB_HEAD),
-    APTRGANGR("aptrgangr", (Holder)ModSounds.NOTE_BLOCK_IMITATE_APTRGANGR, NoteBlockInstrument.Type.MOB_HEAD),
-    DRAUGR("draugr", (Holder)ModSounds.NOTE_BLOCK_IMITATE_DRAUGR, NoteBlockInstrument.Type.MOB_HEAD);
+    KOBOLEDIATOR("kobolediator", (Holder)ModSounds.NOTE_BLOCK_IMITATE_KOBOLEDIATOR),
+    APTRGANGR("aptrgangr", (Holder)ModSounds.NOTE_BLOCK_IMITATE_APTRGANGR),
+    DRAUGR("draugr", (Holder)ModSounds.NOTE_BLOCK_IMITATE_DRAUGR);
 
     private final String string;
     private final Holder<SoundEvent> soundEvent;
-    private final NoteBlockInstrument.Type type;
 
-    private CustomNoteBlockInstrument(String string2, Holder sound, NoteBlockInstrument.Type type) {
+    private CustomNoteBlockInstrument(String string2, Holder sound) {
         this.string = string2;
         this.soundEvent = sound;
-        this.type = type;
     }
 
-    public NoteBlockInstrument.Type getType() {
-        return this.type;
+    public Object getType() {
+        try {
+            Class<?> typeClass = Class.forName("net.minecraft.world.level.block.state.properties.NoteBlockInstrument$Type");
+            @SuppressWarnings("unchecked")
+            Object mobHead = Enum.valueOf((Class<Enum>) typeClass, "MOB_HEAD");
+            return mobHead;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public Holder<SoundEvent> getSoundEvent() {
