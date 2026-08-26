@@ -2,8 +2,9 @@ SESSION STATUS — NeoForge 26.2.0.45-beta -> 26.2.0.57 compile port
 ================================================================
 Date: 2026-08-26
 Compile baseline: ./gradlew compileJava  (Xmaxerrs 20000)
-Error count: start 5548  ->  5010  ->  3782 (start of items cluster)  ->  now 3524
-Item/data-driven cluster DONE (~258 errors): see "CLUSTER FIXED (items)" below.
+Error count: start 5548 -> 5010 -> 3782 (items cluster) -> 3524 -> now 3381
+Item/data-driven cluster DONE (~258 errors). Custom item renderer port DONE (~143):
+see "CLUSTER FIXED (CMItemstackRenderer / custom item rendering)" below.
 
 Resumes: local branch minecraft/26.2/neoforge-26.2.0.57/production
 
@@ -34,6 +35,35 @@ Resumes: local branch minecraft/26.2/neoforge-26.2.0.57/production
   checks Cataclysm_Armor.getMaterial()==Armortier.CURSIUM.
   HumanoidArmorLayerMixin NEUTRALIZED (old renderArmorPiece pipeline gone; must be re-implemented
   against SubmitNodeCollector/EquipmentLayerRenderer in the client render cluster).
+
+== CLUSTER FIXED (CMItemstackRenderer / custom item rendering) ==
+- BlockEntityWithoutLevelRenderer + ItemRenderer REMOVED in 26.2. Items render via
+  ItemModel/SpecialModelRenderer + SubmitNodeCollector; wiring is data-driven from
+  assets/<ns>/items/<item>.json (NOT yet written — assets phase).
+- CMItemstackRenderer rewritten as SpecialModelRenderer<ItemStack> (+ record Unbaked with
+  MAP_CODEC). Registered as "cataclysm:cm_item" in ClientSetup via
+  RegisterSpecialModelRendererEvent (NOT RegisterItemModelsEvent — that one is for ItemModel codecs).
+  Runtime JSON needed per item:
+    assets/cataclysm/items/<name>.json -> {"model":{"type":"minecraft:special","base":"minecraft:item/...","renderer":{"type":"cataclysm:cm_item"}}}
+  All ~40 branches preserved: geometry now submitted via collector.order(n).submitCustomGeometry(
+  pose, renderType, lambda) where the lambda receives PoseStack.Pose -> wrap into new PoseStack()
+  + mulPose(pose.pose()) to call BasicEntityModel.renderToBuffer. Foil = extra pass with
+  RenderTypes.entityGlint() (old ItemRenderer.getArmorFoilBuffer behavior).
+- Skull items: Cataclysm_Skull_Block_Renderer ported to BlockEntityRenderer<T,SkullBlockRenderState>
+  (extractRenderState uses vanilla TRANSFORMATIONS; submit delegates to vanilla static
+  SkullBlockRenderer.submitSkull). New helper renderItemSkull(...) for the CMItemstackRenderer path.
+  EntityRenderersEvent.CreateSkullModels new sig: registerSkullModel(Type, ModelLayerLocation,
+  Function<ModelPart,SkullModelBase>, @Nullable Identifier).
+- ItemProperties.register REMOVED in 26.2 (data-driven item model properties): the 11
+  registrations (blocking/throwing/using/chunk predicates) deleted from doClientStuff.
+  Data-driven equivalents (range_dispatch/dispatch in item model JSONs) pending assets phase.
+  Cursed_bow.getPullingAmount / Wrath_of_the_desert.getPullingAmount still read stack state
+  directly, unaffected at compile level.
+- CMItemRenderProperties.java DELETED (getCustomRenderer hook no longer exists).
+- Lionfish_Renderer created as Entity-based placeholder (Lionfish_Entity class itself is
+  MISSING from the port — referenced by ModEntities + Deepling_Angler_Entity; must be ported).
+  LionFish_Layer/Spike_Renderer remain old-API (entity renderer cluster).
+- net.minecraft.Util -> net.minecraft.util.Util.
 
 == PREVIOUS SESSION CLUSTERS (mechanical) ==
 Local checkpoint commits (NOT pushed, local-only):
@@ -69,9 +99,9 @@ Local checkpoint commits (NOT pushed, local-only):
 == REMAINING CLUSTERS (deep/architectural rewrites — NOT done, need real porting) ==
 Items cluster is DONE. Dominant blockers now (root-cause classes must be fixed first;
 many child errors are cascades):
-- Rendering rewrite: MultiBufferSource -> SubmitNodeCollector (SubmitNodeCollector /
-  submitModel / submitModelPart / submitCustomGeometry). ~180+ errors, ~134 files. This is
-  the single biggest blocker (renderers, layers, models, CMItemstackRenderer, ItemRenderer).
+- Rendering rewrite: MultiBufferSource -> SubmitNodeCollector (submitModel / submitCustomGeometry).
+  CMItemstackRenderer DONE; remaining ~130+ errors in entity renderers/layers/models
+  (~40 renderer classes with old EntityRenderer<T>/MobRenderer ctors + RenderLayer entity-based).
 - RenderType/CompositeState/RenderStateShard removal (CMRenderTypes.java, 209 errors):
   RenderStateShard/RenderType.CompositeState gone. New custom render types are built with
   RenderType.create(name, RenderSetup) + RenderSetup.builder(RenderPipeline) +
