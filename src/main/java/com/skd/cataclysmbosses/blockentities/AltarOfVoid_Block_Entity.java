@@ -71,7 +71,7 @@ extends BlockEntity {
 
     protected boolean spawnMyBoss(ServerLevel serverLevel, BlockPos pos) {
         Vec3 vec3 = Vec3.atLowerCornerWithOffset((Vec3i)pos, (double)0.5, (double)0.0, (double)0.5);
-        Ender_Guardian_Entity entity = (Ender_Guardian_Entity)((EntityType)ModEntities.ENDER_GUARDIAN.get()).create((Level)serverLevel);
+        Ender_Guardian_Entity entity = (Ender_Guardian_Entity)((EntityType)ModEntities.ENDER_GUARDIAN.get()).create((Level)serverLevel, EntitySpawnReason.EVENT);
         if (entity != null) {
             entity.setPos(vec3);
             // entity.finalizeSpawn((ServerLevelAccessor)serverLevel, serverLevel.getCurrentDifficultyAt(this.worldPosition), EntitySpawnReason.SPAWNER, null);

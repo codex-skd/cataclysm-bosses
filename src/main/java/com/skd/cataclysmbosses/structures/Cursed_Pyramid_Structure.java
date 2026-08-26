@@ -209,7 +209,7 @@ extends CataclysmStructure {
                     break;
                 }
                 case "koboleton": {
-                    Koboleton_Entity koboleton = (Koboleton_Entity)((EntityType)ModEntities.KOBOLETON.get()).create((Level)worldIn.getLevel());
+                    Koboleton_Entity koboleton = (Koboleton_Entity)((EntityType)ModEntities.KOBOLETON.get()).create((Level)worldIn.getLevel(), EntitySpawnReason.STRUCTURE);
                     if (koboleton == null) break;
                     koboleton.setPersistenceRequired();
                     koboleton.moveTo(pos, 0.0f, 0.0f);
@@ -219,7 +219,7 @@ extends CataclysmStructure {
                     break;
                 }
                 case "wadjet": {
-                    Wadjet_Entity wadjet = (Wadjet_Entity)((EntityType)ModEntities.WADJET.get()).create((Level)worldIn.getLevel());
+                    Wadjet_Entity wadjet = (Wadjet_Entity)((EntityType)ModEntities.WADJET.get()).create((Level)worldIn.getLevel(), EntitySpawnReason.STRUCTURE);
                     if (wadjet == null) break;
                     wadjet.setPersistenceRequired();
                     wadjet.moveTo(pos, 0.0f, 0.0f);
@@ -229,7 +229,7 @@ extends CataclysmStructure {
                     break;
                 }
                 case "kobolediator": {
-                    Kobolediator_Entity kobolediator = (Kobolediator_Entity)((EntityType)ModEntities.KOBOLEDIATOR.get()).create((Level)worldIn.getLevel());
+                    Kobolediator_Entity kobolediator = (Kobolediator_Entity)((EntityType)ModEntities.KOBOLEDIATOR.get()).create((Level)worldIn.getLevel(), EntitySpawnReason.STRUCTURE);
                     if (kobolediator == null) break;
                     kobolediator.setPersistenceRequired();
                     kobolediator.moveTo(pos, 0.0f, 0.0f);
@@ -240,7 +240,7 @@ extends CataclysmStructure {
                     break;
                 }
                 case "remnant": {
-                    Ancient_Remnant_Entity remnant = (Ancient_Remnant_Entity)((EntityType)ModEntities.ANCIENT_REMNANT.get()).create((Level)worldIn.getLevel());
+                    Ancient_Remnant_Entity remnant = (Ancient_Remnant_Entity)((EntityType)ModEntities.ANCIENT_REMNANT.get()).create((Level)worldIn.getLevel(), EntitySpawnReason.STRUCTURE);
                     if (remnant == null) break;
                     remnant.setNecklace(false);
                     remnant.setPersistenceRequired();

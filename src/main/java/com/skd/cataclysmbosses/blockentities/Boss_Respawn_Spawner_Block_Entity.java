@@ -122,7 +122,7 @@ extends BlockEntity {
         Entity entity;
         Vec3 vec3 = Vec3.atLowerCornerWithOffset((Vec3i)pos, (double)0.5, (double)0.0, (double)0.5);
         try {
-            entity = this.spawnType.create((Level)serverLevel);
+            entity = this.spawnType.create((Level)serverLevel, EntitySpawnReason.EVENT);
         }
         catch (Exception exception) {
             Cataclysm.LOGGER.warn("Failed to create mob", (Throwable)exception);
@@ -201,7 +201,7 @@ extends BlockEntity {
 
     public Entity getDisplayEntity(Level level) {
         if (this.displayEntity == null && this.spawnType != null || this.displayEntity != null && this.displayEntity.getType() != this.spawnType) {
-            this.displayEntity = this.spawnType.create(level);
+            this.displayEntity = this.spawnType.create(level, EntitySpawnReason.EVENT);
         }
         return this.displayEntity;
     }

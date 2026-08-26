@@ -29,6 +29,7 @@
  */
 package com.skd.cataclysmbosses.items;
 
+import net.minecraft.world.entity.EntitySpawnReason;
 import com.skd.cataclysmbosses.Attachment.TidalTentacleAttachment;
 import com.skd.cataclysmbosses.entity.projectile.Tidal_Hook_Entity;
 import com.skd.cataclysmbosses.entity.projectile.Tidal_Tentacle_Entity;
@@ -113,7 +114,7 @@ implements ILeftClick {
         if (!charge.hasTentacle() && TidalTentacleUtil.canLaunchTentacles(worldIn, playerIn)) {
             TidalTentacleUtil.retractFarTentacles(worldIn, playerIn);
             if (!worldIn.isClientSide() && closestValid != null) {
-                Tidal_Tentacle_Entity segment = (Tidal_Tentacle_Entity)((EntityType)ModEntities.TIDAL_TENTACLE.get()).create(worldIn);
+                Tidal_Tentacle_Entity segment = (Tidal_Tentacle_Entity)((EntityType)ModEntities.TIDAL_TENTACLE.get()).create(worldIn, EntitySpawnReason.EVENT);
                 segment.copyPosition((Entity)playerIn);
                 worldIn.addFreshEntity((Entity)segment);
                 segment.setCreatorEntityUUID(playerIn.getUUID());

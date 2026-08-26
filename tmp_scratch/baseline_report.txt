@@ -1,0 +1,177 @@
+TOTAL_ERROR_LINES: 5614
+UNIQUE_FILES: 632
+UNIQUE_MSGS: 728
+
+=== TOP FILES ===
+  209 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\client\render\CMRenderTypes.java
+  143 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\entity\InternalAnimationMonster\AcropolisMonsters\Drowned_Host_Entity.java
+  139 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\entity\Deepling\Deepling_Brute_Entity.java
+  126 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\init\ModEntities.java
+  125 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\init\ModItems.java
+  119 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\client\render\CMItemstackRenderer.java
+  106 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\entity\Deepling\Deepling_Entity.java
+  105 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\entity\Deepling\AbstractDeepling.java
+  102 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\entity\Deepling\Deepling_Angler_Entity.java
+   73 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\client\event\ClientSetup.java
+   71 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\entity\InternalAnimationMonster\AcropolisMonsters\Clawdian_Entity.java
+   66 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\client\event\ClientEvent.java
+   56 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\entity\Deepling\Deepling_Warlock_Entity.java
+   55 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\entity\Deepling\Deepling_Priest_Entity.java
+   51 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\entity\projectile\Ender_Guardian_Bullet_Entity.java
+   45 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\blocks\Door_of_Seal_Block.java
+   43 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\client\model\entity\Drowned_Host_Model.java
+   43 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\entity\projectile\Void_Shard_Entity.java
+   38 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\entity\AnimationMonster\BossMonsters\Ignis_Entity.java
+   38 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\client\model\entity\Maledictus_Model.java
+   38 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\client\render\entity\Scylla_Renderer.java
+   33 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\entity\Pet\Netherite_Ministrosity_Entity.java
+   32 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\client\model\entity\Scylla_Model.java
+   31 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\entity\projectile\Blazing_Bone_Entity.java
+   30 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\entity\InternalAnimationMonster\IABossMonsters\Scylla\Scylla_Entity.java
+   30 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\entity\projectile\Urchin_Spike_Entity.java
+   30 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\entity\projectile\Spike_Entity.java
+   30 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\items\Armortier.java
+   29 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\entity\AnimationMonster\BossMonsters\The_Leviathan\The_Leviathan_Entity.java
+   27 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\entity\AnimationMonster\BossMonsters\Ender_Guardian_Entity.java
+   27 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\entity\InternalAnimationMonster\Draugar\Royal_Draugr_Entity.java
+   25 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\client\particle\AfterImageParticle.java
+   25 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\client\particle\EM_PulseParticle.java
+   25 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\client\particle\Shock_WaveParticle.java
+   24 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\entity\InternalAnimationMonster\Draugar\Aptrgangr_Entity.java
+   24 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\structures\jisaw\assembler\JigsawStructureAssembler.java
+   23 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\entity\InternalAnimationMonster\IABossMonsters\Maledictus\Maledictus_Entity.java
+   22 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\client\model\entity\Ancient_Remnant_Rework_Model.java
+   22 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\entity\AnimationMonster\BossMonsters\Ignited_Revenant_Entity.java
+   22 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\entity\InternalAnimationMonster\IABossMonsters\NewNetherite_Monstrosity\Netherite_Monstrosity_Entity.java
+   22 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\jei\LEnderCataclysmJEIPlugin.java
+   21 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\entity\InternalAnimationMonster\IABossMonsters\Ancient_Remnant\Ancient_Remnant_Entity.java
+   21 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\entity\AnimationMonster\BossMonsters\The_Harbinger_Entity.java
+   21 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\jei\AltarOfAmethystRecipeCategory.java
+   19 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\client\render\entity\Deepling_Brute_Renderer.java
+   19 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\items\Cursium_Armor.java
+   19 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\jei\WeaponfusionRecipeCategory.java
+   18 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\entity\Pet\Modern_Remnant_Entity.java
+   18 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\entity\projectile\Sandstorm_Projectile.java
+   17 \Proyectos\Mods_Minecraft\cataclysm_bosses\neoforge\26.2\src\main\java\com\skd\cataclysmbosses\structures\jisaw\CataclysmJigsawStructure.java
+
+=== TOP UNIQUE (msg/symbol/loc) ===
+  178 [cannot find symbol] symbol=method animate(AnimationState,AnimationDefinition,float,float) loc=
+  129 [cannot find symbol] symbol=class MultiBufferSource loc=package net.minecraft.client.renderer
+  108 [cannot find symbol] symbol=class ValueInput loc=package net.minecraft.nbt
+  108 [cannot find symbol] symbol=class ValueOutput loc=package net.minecraft.nbt
+   92 [incompatible types: inference variable E has incompatible bounds]
+   83 [package ArmorItem does not exist]
+   51 [cannot find symbol] symbol=method is(TagKey<EntityType<?>>) loc=class EntityType<CAP#1>
+   48 [incompatible types: cannot infer type-variable(s) T]
+   47 [incompatible types: String cannot be converted to ResourceKey<EntityType<?>>]
+   46 [cannot find symbol] symbol=method level() loc=
+   45 [method does not override or implement a method from a supertype]
+   44 [cannot find symbol] symbol=method entityCutoutNoCull(Identifier) loc=class RenderTypes
+   42 [method registerEntityRenderer in class RegisterRenderers cannot be applied to given types;]
+   41 [cannot find symbol] symbol=class MultiBufferSource loc=class CMItemstackRenderer
+   40 [cannot find symbol] symbol=variable ItemRenderer loc=class CMItemstackRenderer
+   35 [wrong number of type arguments; required 3]
+   34 [cannot find symbol] symbol=variable FACING loc=class Door_of_Seal_Block
+   33 [cannot find symbol] symbol=variable goalSelector loc=
+   31 [random has protected access in Level]
+   31 [incompatible types: Level cannot be converted to ServerLevel]
+   28 [cannot find symbol] symbol=class InteractionResultHolder loc=package net.minecraft.world
+   27 [no suitable method found for create(Level)]
+   27 [cannot find symbol] symbol=method getX() loc=
+   27 [cannot find symbol] symbol=method getZ() loc=
+   27 [cannot find symbol] symbol=class CompositeState loc=class RenderType
+   26 [package RenderStateShard does not exist]
+   24 [cannot find symbol] symbol=method getY() loc=
+   23 [cannot find symbol] symbol=class HierarchicalModel loc=package net.minecraft.client.model
+   23 [cannot find symbol] symbol=class HierarchicalModel loc=
+   19 [cannot find symbol] symbol=method isDamageSourceBlocked(DamageSource) loc=variable entityHit of type LivingEntity
+   19 [no suitable constructor found for SingleQuadParticle(ClientLevel,double,double,double,double,double,double)]
+   18 [incompatible types: Optional<Double> cannot be converted to double]
+   18 [children has private access in ModelPart]
+   18 [cannot find symbol] symbol=method damageSources() loc=
+   18 [cannot find symbol] symbol=variable rCol loc=
+   18 [cannot find symbol] symbol=variable gCol loc=
+   18 [cannot find symbol] symbol=variable bCol loc=
+   17 [incompatible types: Object cannot be converted to LivingEntity]
+   17 [cannot find symbol] symbol=method getPosition() loc=variable camera of type Camera
+   17 [cannot find symbol] symbol=variable r loc=variable p of type Object
+   17 [cannot find symbol] symbol=variable g loc=variable p of type Object
+   17 [cannot find symbol] symbol=variable b loc=variable p of type Object
+   16 [no suitable method found for setPos(double,double,double,float,float)]
+   16 [cannot find symbol] symbol=method animateWalk(AnimationDefinition,float,float,float,float) loc=
+   16 [cannot find symbol] symbol=method isDamageSourceBlocked(DamageSource) loc=variable entity of type LivingEntity
+   16 [cannot find symbol] symbol=method getRandom() loc=
+   16 [cannot find symbol] symbol=method getDeltaMovement() loc=
+   15 [cannot find symbol] symbol=class Mode loc=class VertexFormat
+   15 [cannot find symbol] symbol=variable Mode loc=class VertexFormat
+   15 [incompatible types: Object cannot be converted to Boolean]
+   15 [cannot find symbol] symbol=variable type loc=
+   14 [cannot find symbol] symbol=variable PARTICLE_SHEET_TRANSLUCENT loc=class ParticleRenderType
+   14 [cannot find symbol] symbol=variable alpha loc=
+   14 [cannot find symbol] symbol=variable CompositeState loc=class RenderType
+   14 [cannot find symbol] symbol=variable Builder loc=class BlockEntityType
+   13 [wrong number of type arguments; required 2]
+   13 [cannot find symbol] symbol=class Layer loc=class ArmorMaterial
+   13 [no suitable method found for spawnAtLocation(ItemStack,float)]
+   13 [cannot find symbol] symbol=method isInWater() loc=
+   13 [cannot find symbol] symbol=variable random loc=
+   13 [cannot find symbol] symbol=method getTarget() loc=
+   13 [incompatible types: Object cannot be converted to Entity]
+   13 [cannot find symbol] symbol=variable NO_CULL loc=class CMRenderTypes
+   13 [cannot find symbol] symbol=variable NEW_ENTITY loc=class DefaultVertexFormat
+   13 [package ArmorItem.Type does not exist]
+   12 [package MultiBufferSource does not exist]
+   12 [cannot find symbol] symbol=class ArmorItem loc=package net.minecraft.world.item
+   12 [method setValue in class StateHolder<O,S> cannot be applied to given types;]
+   12 [cannot find symbol] symbol=method checkInsideBlocks() loc=
+   12 [cannot find symbol] symbol=variable targetSelector loc=
+   12 [cannot find symbol] symbol=method getLightColor(float) loc=
+   12 [cannot find symbol] symbol=variable OVERLAY loc=class CMRenderTypes
+   12 [cannot find symbol] symbol=class Tier loc=class ModItems
+   12 [incompatible types: net.minecraft.core.component.DataComponentMap.Builder cannot be converted to net.minecraft.core.component.DataComponentPatch.Builder]
+   11 [cannot find symbol] symbol=variable ItemProperties loc=class ClientSetup
+   11 [cannot find symbol] symbol=method getAnimationTick() loc=
+   11 [cannot find symbol] symbol=variable SHIELD_BLOCK loc=class ItemAbilities
+   10 [cannot find symbol] symbol=class HumanoidRenderState loc=package net.minecraft.client.model
+   10 [cannot find symbol] symbol=class HumanoidRenderState loc=
+   10 [cannot find symbol] symbol=method add(DeferredBlock<Block>) loc=variable list of type Object
+   10 [package Axis does not exist]
+   10 [type argument T is not within bounds of type-variable S]
+   10 [cannot find symbol] symbol=class Unbreakable loc=class ModItems
+    9 [incompatible types: Optional<String> cannot be converted to String]
+    9 [cannot find symbol] symbol=method getAnimation() loc=
+    9 [cannot find symbol] symbol=variable swimAmount loc=
+    9 [cannot find symbol] symbol=method renderBuffers() loc=class Minecraft
+    9 [Factory is not abstract and does not override abstract method createParticle(SimpleParticleType,ClientLevel,double,double,double,double,double,double,RandomSource) in ParticleProvider]
+    9 [cannot find symbol] symbol=method eyes(Identifier) loc=class CMRenderTypes
+    9 [cannot find symbol] symbol=variable LIGHTMAP loc=class CMRenderTypes
+    9 [cannot find symbol] symbol=variable TRANSLUCENT_TRANSPARENCY loc=class CMRenderTypes
+    9 [cannot find symbol] symbol=method cameraOrientation() loc=variable entityRenderDispatcher of type EntityRenderDispatcher
+    9 [cannot find symbol] symbol=method getItemInHandRenderer() loc=variable renderManagerIn of type Context
+    9 [cannot find symbol] symbol=variable model loc=
+    9 [cannot find symbol] symbol=method eyes(Identifier) loc=class RenderType
+    9 [incompatible types: Object cannot be converted to Integer]
+    9 [incompatible types: Object cannot be converted to Item]
+    9 [constructor SpawnerData in record SpawnerData cannot be applied to given types;]
+    8 [cannot find symbol] symbol=class Coralssus_Entity loc=class RidingCoralssus
+    8 [cannot find symbol] symbol=variable OVERLOAD loc=class EMP_Block
+    8 [cannot find symbol] symbol=variable FACING loc=class Statue_Block
+    8 [method isInvulnerableTo in class LivingEntity cannot be applied to given types;]
+    8 [cannot find symbol] symbol=variable OPTIONAL_UUID loc=class EntityDataSerializers
+    8 [incompatible types: Object cannot be converted to UUID]
+    8 [type argument T#1 is not within bounds of type-variable T#2]
+    8 [cannot find symbol] symbol=variable i loc=class Clawdian_Entity
+    8 [cannot find symbol] symbol=variable entityData loc=
+    8 [cannot find symbol] symbol=method getAttributeValue(Holder<Attribute>) loc=
+    8 [cannot find symbol] symbol=variable CUSTOM loc=class ParticleRenderType
+    8 [cannot find symbol] symbol=method getMainCamera() loc=variable gameRenderer of type GameRenderer
+    8 [incompatible types: Drowned_Host_Entity cannot be converted to Mob]
+    8 [incompatible types: Item cannot be converted to ItemStack]
+    7 [Type has private access in NoteBlockInstrument]
+    7 [cannot find symbol] symbol=class ItemRenderer loc=package net.minecraft.client.renderer.entity
+    7 [cannot find symbol] symbol=class Tier loc=package net.minecraft.world.item
+    7 [package mezz.jei.api.recipe does not exist]
+    7 [cannot find symbol] symbol=variable LIT loc=class Door_of_Seal_Block
+    7 [cannot find symbol] symbol=variable OPEN loc=class Door_of_Seal_Block
+    7 [cannot find symbol] symbol=variable POWERED loc=class EMP_Block
+    7 [cannot find symbol] symbol=variable FACING loc=class FacingPillarBlock

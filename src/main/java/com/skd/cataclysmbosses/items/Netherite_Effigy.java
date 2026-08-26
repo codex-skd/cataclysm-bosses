@@ -27,6 +27,7 @@
  */
 package com.skd.cataclysmbosses.items;
 
+import net.minecraft.world.entity.EntitySpawnReason;
 import com.skd.cataclysmbosses.entity.Pet.Netherite_Ministrosity_Entity;
 import com.skd.cataclysmbosses.init.ModEntities;
 import java.util.List;
@@ -78,7 +79,7 @@ extends Item {
             }
         }
         if (hitresult.getType() == HitResult.Type.BLOCK) {
-            Netherite_Ministrosity_Entity remnantEntity = (Netherite_Ministrosity_Entity)((EntityType)ModEntities.NETHERITE_MINISTROSITY.get()).create(p_40622_);
+            Netherite_Ministrosity_Entity remnantEntity = (Netherite_Ministrosity_Entity)((EntityType)ModEntities.NETHERITE_MINISTROSITY.get()).create(p_40622_, EntitySpawnReason.EVENT);
             remnantEntity.setPos(vec31.x, vec31.y, vec31.z);
             remnantEntity.setIsAwaken(false);
             if (!p_40622_.noCollision((Entity)remnantEntity, remnantEntity.getBoundingBox())) {

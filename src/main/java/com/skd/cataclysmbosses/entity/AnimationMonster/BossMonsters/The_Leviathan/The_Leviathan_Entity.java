@@ -75,6 +75,7 @@
  */
 package com.skd.cataclysmbosses.entity.AnimationMonster.BossMonsters.The_Leviathan;
 
+import net.minecraft.world.entity.EntitySpawnReason;
 import com.skd.cataclysmbosses.client.particle.Options.RoarParticleOptions;
 import com.skd.cataclysmbosses.config.CMCommonConfig;
 import com.skd.cataclysmbosses.entity.AI.AnimalAIRandomSwimming;
@@ -1339,7 +1340,7 @@ IHoldEntity {
 
     public void createPortal2(double x, double y, double z, Vec3 to) {
         if (!this.level().isClientSide() && this.portalTarget == null) {
-            Abyss_Portal_Entity portal = (Abyss_Portal_Entity)((EntityType)ModEntities.ABYSS_PORTAL.get()).create(this.level());
+            Abyss_Portal_Entity portal = (Abyss_Portal_Entity)((EntityType)ModEntities.ABYSS_PORTAL.get()).create(this.level(), EntitySpawnReason.EVENT);
             portal.setPos(x, y, z);
             portal.setLifespan(10000);
             portal.setEntrance(true);

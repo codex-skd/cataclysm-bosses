@@ -187,7 +187,7 @@ extends AbstractDeepling {
         SpawnGroupData spawngroupdata = super.finalizeSpawn(p_34088_, p_34089_, p_34090_, p_34091_);
         RandomSource randomsource = p_34088_.getRandom();
         this.populateDefaultEquipmentSlots(randomsource, p_34089_);
-        Lionfish_Entity drowned = (Lionfish_Entity)ModEntities.LIONFISH.get().create(this.level());
+        Lionfish_Entity drowned = (Lionfish_Entity)ModEntities.LIONFISH.get().create(this.level(), EntitySpawnReason.EVENT);
         drowned.finalizeSpawn(p_34088_, p_34089_, p_34090_, p_34091_);
         drowned.copyPosition((Entity)this);
         drowned.setLeashedTo((Entity)this, true);

@@ -1,0 +1,497 @@
+NeoForge 26.2.0.57 API Changes Report (vs 26.2.0.45-beta)
+==========================================================
+Extracted from: minecraft-patched-26.2.0.57-merged.jar
+NeoForge sources: neoforge-26.2.0.57-sources.jar
+Curios: curios-neoforge-15.0.0-beta.2+26.2.jar
+
+===============================================================================
+1. GuiGraphics - REMOVED
+===============================================================================
+Status: REMOVED entirely. No GuiGraphics class exists.
+Replacement: net.minecraft.client.gui.GuiGraphicsExtractor
+  - Package: net.minecraft.client.gui
+  - Class: public class GuiGraphicsExtractor implements GuiGraphicsExtractorExtension
+  - Constructor: GuiGraphicsExtractor(Minecraft minecraft, GuiRenderState guiRenderState, int mouseX, int mouseY)
+  - Also: GuiGraphicsExtractor(Minecraft minecraft, Matrix3x2fStack pose, GuiRenderState guiRenderState, int mouseX, int mouseY)
+  - Key methods: fill(), horizontalLine(), verticalLine(), enableScissor(), disableScissor()
+  - pose() returns Matrix3x2fStack (not PoseStack!)
+  - guiWidth(), guiHeight() for dimensions
+  - NO renderItem, blit, drawString methods on this class (rendering has changed to state-based extraction)
+
+NOTE: Gui.java exists but is completely different:
+  - Package: net.minecraft.client.gui
+  - Class: public class Gui (NOT abstract, no longer has GuiGraphics parameter in render methods)
+  - Has field: public final Hud hud
+  - GuiRenderState-based rendering
+
+===============================================================================
+2. EntityRenderDispatcher
+===============================================================================
+Package: net.minecraft.client.renderer.entity
+Class: public class EntityRenderDispatcher implements ResourceManagerReloadListener
+Constructor signature:
+  EntityRenderDispatcher(Minecraft, TextureManager, BlockModelResolver, ItemModelResolver, MapRenderer, AtlasManager, Font, Options, Supplier<EntityModelSet>, EquipmentAssetManager, PlayerSkinRenderCache)
+
+Key changes:
+  - NO registerEntityRenderer method on EntityRenderDispatcher itself
+  - Entity renderers are registered via EntityRenderers.register() or NeoForge events
+  - Renderer registration happens in onResourceManagerReload via EntityRenderers.createEntityRenderers(context)
+  - renderers field: Map<EntityType<?>, EntityRenderer<?, ?>>
+  - submit() method: <S extends EntityRenderState> void submit(S renderState, CameraRenderState camera, double x, double y, double z, PoseStack poseStack, SubmitNodeCollector submitNodeCollector)
+  - extractEntity() method: <E extends Entity> EntityRenderState extractEntity(E entity, float partialTicks)
+  - getRenderer() methods:
+      <T extends Entity> EntityRenderer<? super T, ?> getRenderer(T entity)
+      <S extends EntityRenderState> EntityRenderer<?, ? super S> getRenderer(S entityRenderState)
+
+===============================================================================
+3. Model & EntityModel hierarchy
+===============================================================================
+net.minecraft.client.model.Model<S> (abstract, generic):
+  - Package: net.minecraft.client.model
+  - Class: public abstract class Model<S>
+  - Fields: protected final ModelPart root; protected final Function<Identifier, RenderType> renderType;
+  - Constructor: Model(ModelPart root, Function<Identifier, RenderType> renderType)
+  - Methods:
+      renderToBuffer(PoseStack, VertexConsumer, int lightCoords, int overlayCoords, int color)
+      setupAnim(S state)  // takes state parameter!
+      resetPose()
+      renderType() / renderType(Identifier texture)
+      root() / allParts()
+  - Static inner class: Simple extends Model<Unit>
+
+net.minecraft.client.model.EntityModel<T extends EntityRenderState> extends Model<T>:
+  - Package: net.minecraft.client.model
+  - Class: public abstract class EntityModel<T extends EntityRenderState> extends Model<T>
+  - Fields: static float MODEL_Y_OFFSET = -1.501F
+  - Constructor: EntityModel(ModelPart root) [uses RenderTypes::entityCutout]
+  - Constructor: EntityModel(ModelPart root, Function<Identifier, RenderType> renderType)
+
+net.minecraft.client.model.HumanoidModel<T extends HumanoidRenderState> extends EntityModel<T> implements ArmedModel<T>, HeadedModel:
+  - Package: net.minecraft.client.model
+  - Extends: EntityModel<T>
+  - Implements: ArmedModel<T>, HeadedModel
+  - Has inner enum: ArmPose (EMPTY, ITEM, BLOCK, BOW_AND_ARROW, etc.)
+  - setupAnim(T state) method
+
+===============================================================================
+4. RenderType - MOVED
+===============================================================================
+OLD: net.minecraft.client.renderer.RenderType
+NEW: net.minecraft.client.renderer.rendertype.RenderType
+
+And factory methods moved to: net.minecraft.client.renderer.rendertype.RenderTypes
+
+entityTranslucent STILL EXISTS:
+  - RenderTypes.entityTranslucent(Identifier texture) -> RenderType
+  - RenderTypes.entityTranslucent(Identifier texture, boolean affectsOutline) -> RenderType
+
+Other entity render types:
+  - RenderTypes.entitySolid(Identifier)
+  - RenderTypes.entityCutout(Identifier)
+  - RenderTypes.entityCutout(Identifier, boolean)
+  - RenderTypes.entityCutoutCull(Identifier)
+  - RenderTypes.entityTranslucentEmissive(Identifier)
+
+RenderType class itself:
+  - Package: net.minecraft.client.renderer.rendertype
+  - Class: public class RenderType (not abstract anymore)
+  - Static factory: RenderType.create(String name, RenderSetup state)
+  - Methods: prepare() returns PreparedRenderType, format(), hasBlending(), etc.
+
+RenderStateShard: REMOVED (no longer exists)
+  - The render setup system is now RenderSetup + RenderPipelines based
+
+===============================================================================
+5. MultiBufferSource - REMOVED
+===============================================================================
+Status: REMOVED entirely. No MultiBufferSource or VertexConsumerProvider.
+Replacement: net.minecraft.client.renderer.SubmitNodeCollector
+  - Package: net.minecraft.client.renderer
+  - Used as parameter in render methods instead of MultiBufferSource
+  - Also exists: net.minecraft.client.renderer.OrderedSubmitNodeCollector
+
+All render methods now take SubmitNodeCollector instead of MultiBufferSource:
+  - EntityRenderer.submit(state, poseStack, submitNodeCollector, camera)
+  - RenderLayer.submit(poseStack, submitNodeCollector, lightCoords, state, yRot, xRot)
+  - Model.renderToBuffer(PoseStack, VertexConsumer, int, int, int) still takes VertexConsumer
+
+===============================================================================
+6. SingleQuadParticle (TextureSheetParticle REMOVED)
+===============================================================================
+net.minecraft.client.particle.SingleQuadParticle extends Particle:
+  - Package: net.minecraft.client.particle
+  - Class: public abstract class SingleQuadParticle extends Particle
+  - Constructors:
+      SingleQuadParticle(ClientLevel level, double x, double y, double z, TextureAtlasSprite sprite)
+      SingleQuadParticle(ClientLevel level, double x, double y, double z, double xa, double ya, double za, TextureAtlasSprite sprite)
+  - Fields: quadSize, rCol, gCol, bCol, alpha, roll, oRoll, sprite (TextureAtlasSprite)
+  - Uses TextureAtlasSprite directly (not a texture identifier)
+  - extract() method instead of render()
+  - Inner enum: FacingCameraMode (LOOKAT_XYZ, etc.)
+  - Inner enum: Layer
+
+TextureSheetParticle: REMOVED (replaced by SingleQuadParticle)
+
+===============================================================================
+7. ParticleProvider
+===============================================================================
+Package: net.minecraft.client.particle
+Interface: public interface ParticleProvider<T extends ParticleOptions>
+  - Method: Particle createParticle(T options, ClientLevel level, double x, double y, double z, double xAux, double yAux, double zAux, RandomSource random)
+  - Inner interface: Sprite<T extends ParticleOptions>
+    - Method: SingleQuadParticle createParticle(T options, ClientLevel level, double x, double y, double z, double xAux, double yAux, double zAux, RandomSource random)
+
+Particle base class:
+  - Package: net.minecraft.client.particle
+  - Constructors:
+      Particle(ClientLevel level, double x, double y, double z)
+      Particle(ClientLevel level, double x, double y, double z, double xa, double ya, double za)
+
+===============================================================================
+8. Entity - hurt/hurtOrSimulate/moveTo
+===============================================================================
+net.minecraft.world.entity.Entity:
+  - Package: net.minecraft.world.entity
+
+hurt() - DEPRECATED + FINAL:
+  @Deprecated public final void hurt(DamageSource source, float damage)
+  // Delegates to hurtServer() on server, no-op on client
+
+hurtOrSimulate() - DEPRECATED + FINAL:
+  @Deprecated public final boolean hurtOrSimulate(DamageSource source, float damage)
+  // On server: calls hurtServer(), on client: calls hurtClient()
+
+NEW abstract method:
+  public abstract boolean hurtServer(ServerLevel level, DamageSource source, float damage)
+
+NEW method:
+  public boolean hurtClient(DamageSource source) // returns false by default
+
+moveTo() - REMOVED:
+  There is NO moveTo() method anymore.
+  Use setPos() instead:
+    public final void setPos(Vec3 pos)
+    public void setPos(double x, double y, double z)
+    public final void setPosRaw(double x, double y, double z)
+
+teleportTo() still exists:
+  public boolean teleportTo(ServerLevel level, double x, double y, double z, Set<Relative> relatives, float newYRot, float newXRot, boolean resetCamera)
+  public void teleportTo(double x, double y, double z)
+
+===============================================================================
+9. BlockEntity - saveAdditional/loadAdditional
+===============================================================================
+net.minecraft.world.level.block.entity.BlockEntity:
+  - Package: net.minecraft.world.level.block.entity
+  - Extends: net.neoforged.neoforge.attachment.AttachmentHolder
+
+loadAdditional - NEW SIGNATURE:
+  protected void loadAdditional(ValueInput input)
+  // ValueInput is new interface at net.minecraft.world.level.storage.ValueInput
+  // NOT CompoundTag! NOT HolderLookup.Provider!
+
+saveAdditional - NEW SIGNATURE:
+  protected void saveAdditional(ValueOutput output)
+  // ValueOutput is new interface at net.minecraft.world.level.storage.ValueOutput
+  // NOT CompoundTag! NOT HolderLookup.Provider!
+
+ValueInput interface (net.minecraft.world.level.storage.ValueInput):
+  - read(String name, Codec<T> codec) -> Optional<T>
+  - child(String name) -> Optional<ValueInput>
+  - getIntOr(String name, int defaultValue)
+  - getStringOr(String name, String defaultValue)
+  - getBooleanOr(String name, boolean defaultValue)
+  - getLongOr(String name, long defaultValue)
+  - getFloatOr(String name, float defaultValue)
+  - getDoubleOr(String name, double defaultValue)
+
+ValueOutput interface (net.minecraft.world.level.storage.ValueOutput):
+  - store(String name, Codec<T> codec, T value)
+  - putInt(String name, int value)
+  - putString(String name, String value)
+  - putBoolean(String name, boolean value)
+  - putLong(String name, long value)
+  - putFloat(String name, float value)
+  - putDouble(String name, double value)
+  - child(String name) -> ValueOutput
+  - discard(String name)
+
+Related methods on BlockEntity:
+  public final void loadWithComponents(ValueInput input)
+  public final void loadCustomOnly(ValueInput input)
+  public final void saveWithFullMetadata(ValueOutput output)
+  public final void saveWithoutMetadata(ValueOutput output)
+  public final void saveCustomOnly(ValueOutput output)
+
+NOTE: CompoundTag save methods still exist but for legacy compat:
+  public final CompoundTag saveWithFullMetadata(HolderLookup.Provider registries)
+  public final CompoundTag saveWithoutMetadata(HolderLookup.Provider registries)
+  public final CompoundTag saveCustomOnly(HolderLookup.Provider registries)
+
+===============================================================================
+10. Vec3
+===============================================================================
+Package: net.minecraft.world.phys
+Status: UNCHANGED
+  - net.minecraft.world.phys.Vec3
+
+===============================================================================
+11. BlockPos
+===============================================================================
+Package: net.minecraft.core
+Status: UNCHANGED
+  - net.minecraft.core.BlockPos
+
+===============================================================================
+12. Bucketable
+===============================================================================
+Package: net.minecraft.world.entity
+Status: STILL EXISTS
+  - net.minecraft.world.entity.Bucketable (interface)
+  - Methods: fromBucket(), setFromBucket(), saveToBucketTag(), loadFromBucketTag(), getBucketItemStack(), getPickupSound()
+
+===============================================================================
+13. VariantHolder - REMOVED
+===============================================================================
+Status: REMOVED. Does not exist in 26.2.0.57.
+No direct replacement found.
+
+===============================================================================
+14. RenderLayer - submit method
+===============================================================================
+net.minecraft.client.renderer.entity.layers.RenderLayer:
+  - Package: net.minecraft.client.renderer.entity.layers
+  - Class: public abstract class RenderLayer<S extends EntityRenderState, M extends EntityModel<? super S>>
+  - Constructor: RenderLayer(RenderLayerParent<S, M> renderer)
+
+submit method signature:
+  public abstract void submit(
+      final PoseStack poseStack,
+      final SubmitNodeCollector submitNodeCollector,
+      final int lightCoords,
+      S state,
+      float yRot,
+      float xRot
+  )
+
+NOTE: No more MultiBufferSource parameter! Uses SubmitNodeCollector instead.
+
+Static helper methods:
+  - coloredCutoutModelCopyLayerRender(Model, Identifier texture, PoseStack, SubmitNodeCollector, int lightCoords, S state, int color, int order)
+  - renderColoredCutoutModel(Model, Identifier texture, PoseStack, SubmitNodeCollector, int lightCoords, S state, int color, int order)
+
+===============================================================================
+15. HierarchicalModel - REMOVED
+===============================================================================
+Status: REMOVED. Does not exist in 26.2.0.57.
+No direct replacement found. Model hierarchy is now Model<S> -> EntityModel<T>.
+
+===============================================================================
+16. CriteriaTriggers
+===============================================================================
+Package: net.minecraft.advancements.triggers
+Status: UNCHANGED
+  - net.minecraft.advancements.triggers.CriteriaTriggers
+
+===============================================================================
+17. Mob.doHurtTarget
+===============================================================================
+net.minecraft.world.entity.Mob:
+  - Package: net.minecraft.world.entity
+  - Class: public abstract class Mob extends LivingEntity implements Targeting, EquipmentUser, Leashable
+
+doHurtTarget - NEW SIGNATURE:
+  public boolean doHurtTarget(ServerLevel level, Entity target)
+  // Now takes ServerLevel as first parameter!
+  // Old signature was: doHurtTarget(Entity target)
+
+===============================================================================
+18. DripstoneThickness & BooleanProperty
+===============================================================================
+DripstoneThickness: RENAMED to SpeleothemThickness
+  OLD: net.minecraft.world.level.block.state.properties.DripstoneThickness
+  NEW: net.minecraft.world.level.block.state.properties.SpeleothemThickness
+
+BooleanProperty: UNCHANGED
+  - net.minecraft.world.level.block.state.properties.BooleanProperty
+
+===============================================================================
+19. SimpleParticleType & Particle
+===============================================================================
+SimpleParticleType:
+  - Package: net.minecraft.core.particles
+  - Class: public class SimpleParticleType extends ParticleType<SimpleParticleType> implements ParticleOptions
+  - Status: UNCHANGED
+
+Particle:
+  - Package: net.minecraft.client.particle
+  - Class: public abstract class Particle
+  - Constructors:
+      Particle(ClientLevel level, double x, double y, double z)
+      Particle(ClientLevel level, double x, double y, double z, double xa, double ya, double za)
+
+===============================================================================
+20. Camera access via GameRenderer
+===============================================================================
+net.minecraft.client.renderer.GameRenderer:
+  - Package: net.minecraft.client.renderer
+  - Field: private final Camera mainCamera (PRIVATE!)
+
+Access pattern:
+  - gameRenderer.mainCamera is PRIVATE, not directly accessible
+  - Camera is set up via: this.mainCamera.setEntity(player) and this.mainCamera.tick()
+  - Camera update: this.mainCamera.update(deltaTracker)
+  - Camera class: net.minecraft.client.Camera
+
+The render state extraction pattern:
+  this.mainCamera.extractRenderState(cameraState, cameraEntityPartialTicks);
+
+For entity renderers, camera is passed as CameraRenderState parameter:
+  void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera)
+
+To get camera position in render code:
+  - Use camera parameter (CameraRenderState) passed to submit/extract methods
+  - CameraRenderState has orientation field (Quaternionf)
+
+===============================================================================
+21. FastColor - REMOVED
+===============================================================================
+Status: REMOVED. No net.minecraft.client.renderer.FastColor exists.
+Replacement: net.minecraft.util.ARGB
+  - Package: net.minecraft.util
+  - Class: public class ARGB
+  - Key method: ARGB.colorFromFloat(float alpha, float r, float g, float b) -> int
+
+===============================================================================
+22. ArmorItem - REMOVED
+===============================================================================
+Status: REMOVED entirely. No ArmorItem class exists.
+Replacement: Equippable data component at net.minecraft.world.item.equipment.Equippable
+  - Package: net.minecraft.world.item.equipment
+  - Type: public record Equippable(...)
+  - Fields: slot (EquipmentSlot), equipSound, assetId, cameraOverlay, allowedEntities, dispensable, swappable, damageOnHurt, equipOnInteract, canBeSheared, shearingSound
+  - Codec: Equippable.CODEC
+
+Related classes:
+  - net.minecraft.world.item.equipment.ArmorMaterial (record)
+  - net.minecraft.world.item.equipment.ArmorMaterials
+  - net.minecraft.world.item.equipment.ArmorType
+  - net.minecraft.world.item.equipment.EquipmentAsset
+  - net.minecraft.world.item.equipment.EquipmentAssets
+
+ShieldItem still exists: net.minecraft.world.item.ShieldItem
+
+===============================================================================
+23. ItemProperties - REMOVED
+===============================================================================
+Status: REMOVED. No ItemProperties or ItemModelsProperties class.
+Replacement: Data-driven item model properties system:
+  - net.minecraft.client.renderer.item.properties.conditional.ConditionalItemModelProperties
+  - net.minecraft.client.renderer.item.properties.numeric.RangeSelectItemModelProperties
+  - net.minecraft.client.renderer.item.properties.select.SelectItemModelProperties
+
+Individual property classes:
+  - net.minecraft.client.renderer.item.properties.conditional.Broken
+  - net.minecraft.client.renderer.item.properties.conditional.Damaged
+  - net.minecraft.client.renderer.item.properties.conditional.FishingRodCast
+  - net.minecraft.client.renderer.item.properties.conditional.HasComponent
+  - net.minecraft.client.renderer.item.properties.conditional.IsCarried
+  - net.minecraft.client.renderer.item.properties.conditional.IsSelected
+  - net.minecraft.client.renderer.item.properties.conditional.IsUsingItem
+  - net.minecraft.client.renderer.item.properties.numeric.BundleFullness
+  - net.minecraft.client.renderer.item.properties.numeric.CompassAngle
+  - net.minecraft.client.renderer.item.properties.numeric.Cooldown
+
+===============================================================================
+24. ThrownItemRenderer
+===============================================================================
+Package: net.minecraft.client.renderer.entity
+Status: STILL EXISTS
+  - net.minecraft.client.renderer.entity.ThrownItemRenderer
+  - Class: public class ThrownItemRenderer<T extends Entity & ItemSupplier> extends EntityRenderer<T, ThrownItemRenderState>
+  - Constructor: ThrownItemRenderer(EntityRendererProvider.Context context, float scale, boolean fullBright)
+  - Constructor: ThrownItemRenderer(EntityRendererProvider.Context context)
+  - submit() method: void submit(ThrownItemRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera)
+
+===============================================================================
+25. NeoForge EntityRenderersEvent.RegisterRenderers
+===============================================================================
+Package: net.neoforged.neoforge.client.event
+Class: EntityRenderersEvent.RegisterRenderers extends EntityRenderersEvent
+
+registerEntityRenderer method:
+  public <T extends Entity> void registerEntityRenderer(EntityType<? extends T> entityType, EntityRendererProvider<T> entityRendererProvider)
+  // Delegates to EntityRenderers.register(entityType, entityRendererProvider)
+
+registerBlockEntityRenderer method:
+  public <T extends BlockEntity, S extends BlockEntityRenderState> void registerBlockEntityRenderer(
+      BlockEntityType<? extends T> blockEntityType, BlockEntityRendererProvider<T, S> blockEntityRendererProvider)
+
+Other events:
+  - EntityRenderersEvent.RegisterLayerDefinitions
+      registerLayerDefinition(ModelLayerLocation, Supplier<LayerDefinition>)
+  - EntityRenderersEvent.AddLayers
+      Fired after renderers are registered, for adding render layers
+  - EntityRenderersEvent.CreateSkullModels
+
+===============================================================================
+26. SpawnGroupData
+===============================================================================
+Package: net.minecraft.world.entity
+Status: STILL EXISTS (empty interface)
+  - net.minecraft.world.entity.SpawnGroupData (interface)
+
+===============================================================================
+27. RenderStateShard - REMOVED
+===============================================================================
+Status: REMOVED. Does not exist in 26.2.0.57.
+Replaced by the RenderSetup + RenderPipeline system:
+  - net.minecraft.client.renderer.rendertype.RenderSetup
+  - net.minecraft.client.renderer.RenderPipelines (contains static pipeline constants)
+  - net.minecraft.client.renderer.rendertype.RenderType.create(String, RenderSetup)
+
+===============================================================================
+CURIOS API (curios-neoforge-15.0.0-beta.2+26.2.jar)
+===============================================================================
+Classes (all .class files, no .java sources):
+  top.theillusivec4.curios.api.CuriosApi
+  top.theillusivec4.curios.api.CurioAttributeModifiers
+  top.theillusivec4.curios.api.CuriosCapability
+  top.theillusivec4.curios.api.CuriosDataComponents
+  top.theillusivec4.curios.api.SlotContext
+  top.theillusivec4.curios.api.SlotAttribute
+  top.theillusivec4.curios.api.CuriosTriggers
+
+Client:
+  top.theillusivec4.curios.api.client.CuriosRendererRegistry
+  top.theillusivec4.curios.api.client.ICurioRenderer (with inner: HumanoidRender, ModelRender)
+
+Events:
+  top.theillusivec4.curios.api.event.CurioAttributeModifierEvent
+  top.theillusivec4.curios.api.event.CurioCanEquipEvent
+  top.theillusivec4.curios.api.event.CurioCanUnequipEvent
+  top.theillusivec4.curios.api.event.CurioChangeEvent
+  top.theillusivec4.curios.api.event.CurioDropsEvent
+  top.theillusivec4.curios.api.event.DropRulesEvent
+  top.theillusivec4.curios.api.event.SlotModifiersUpdatedEvent
+  top.theillusivec4.curios.api.extensions.RegisterCuriosExtensionsEvent
+
+===============================================================================
+SUMMARY OF CRITICAL CHANGES
+===============================================================================
+1. GuiGraphics -> GuiGraphicsExtractor (different API, Matrix3x2fStack based)
+2. MultiBufferSource -> SubmitNodeCollector (everywhere)
+3. RenderType moved to net.minecraft.client.renderer.rendertype
+4. RenderStateShard REMOVED, replaced by RenderSetup/RenderPipeline
+5. Entity.hurt() is final, use hurtServer() for override
+6. Entity.moveTo() REMOVED, use setPos()
+7. Mob.doHurtTarget now takes ServerLevel parameter
+8. BlockEntity loadAdditional/saveAdditional use ValueInput/ValueOutput (not CompoundTag)
+9. ArmorItem REMOVED, replaced by Equippable data component
+10. FastColor REMOVED, replaced by ARGB utility
+11. HierarchicalModel REMOVED
+12. TextureSheetParticle REMOVED, use SingleQuadParticle
+13. VariantHolder REMOVED
+14. DripstoneThickness RENAMED to SpeleothemThickness
+15. ItemProperties REMOVED, replaced by data-driven property system
+16. Camera in GameRenderer is private, use CameraRenderState parameter

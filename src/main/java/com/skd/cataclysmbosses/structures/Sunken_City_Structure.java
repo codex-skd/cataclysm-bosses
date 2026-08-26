@@ -284,27 +284,27 @@ extends Structure {
             ArrayList<Mob> list = new ArrayList<Mob>();
             switch (function) {
                 case "deepling_brute": {
-                    list.add((Mob)((EntityType)ModEntities.DEEPLING_BRUTE.get()).create((Level)worldIn.getLevel()));
+                    list.add((Mob)((EntityType)ModEntities.DEEPLING_BRUTE.get()).create((Level)worldIn.getLevel(), EntitySpawnReason.STRUCTURE));
                     break;
                 }
                 case "deepling_angler": {
-                    list.add((Mob)((EntityType)ModEntities.DEEPLING_ANGLER.get()).create((Level)worldIn.getLevel()));
+                    list.add((Mob)((EntityType)ModEntities.DEEPLING_ANGLER.get()).create((Level)worldIn.getLevel(), EntitySpawnReason.STRUCTURE));
                     break;
                 }
                 case "deepling": {
-                    list.add((Mob)((EntityType)ModEntities.DEEPLING.get()).create((Level)worldIn.getLevel()));
+                    list.add((Mob)((EntityType)ModEntities.DEEPLING.get()).create((Level)worldIn.getLevel(), EntitySpawnReason.STRUCTURE));
                     break;
                 }
                 case "sus": {
-                    list.add((Mob)((EntityType)ModEntities.CORALSSUS.get()).create((Level)worldIn.getLevel()));
+                    list.add((Mob)((EntityType)ModEntities.CORALSSUS.get()).create((Level)worldIn.getLevel(), EntitySpawnReason.STRUCTURE));
                     break;
                 }
                 case "deepling_priest": {
                     if (rand.nextBoolean()) {
-                        list.add((Mob)((EntityType)ModEntities.DEEPLING_PRIEST.get()).create((Level)worldIn.getLevel()));
+                        list.add((Mob)((EntityType)ModEntities.DEEPLING_PRIEST.get()).create((Level)worldIn.getLevel(), EntitySpawnReason.STRUCTURE));
                         break;
                     }
-                    list.add((Mob)((EntityType)ModEntities.DEEPLING_WARLOCK.get()).create((Level)worldIn.getLevel()));
+                    list.add((Mob)((EntityType)ModEntities.DEEPLING_WARLOCK.get()).create((Level)worldIn.getLevel(), EntitySpawnReason.STRUCTURE));
                     break;
                 }
                 default: {

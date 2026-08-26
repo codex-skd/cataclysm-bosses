@@ -106,7 +106,7 @@ extends BlockEntity {
                     }
                 }
                 if (entity.tickCount > 63) {
-                    Maledictus_Entity maledictus = (Maledictus_Entity)((EntityType)ModEntities.MALEDICTUS.get()).create(level);
+                    Maledictus_Entity maledictus = (Maledictus_Entity)((EntityType)ModEntities.MALEDICTUS.get()).create(level, EntitySpawnReason.EVENT);
                     if (level instanceof ServerLevel) {
                         ServerLevel serverLevel = (ServerLevel)level;
                         if (maledictus != null) {

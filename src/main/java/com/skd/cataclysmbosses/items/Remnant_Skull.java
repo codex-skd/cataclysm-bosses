@@ -27,6 +27,7 @@
  */
 package com.skd.cataclysmbosses.items;
 
+import net.minecraft.world.entity.EntitySpawnReason;
 import com.skd.cataclysmbosses.entity.Pet.Modern_Remnant_Entity;
 import com.skd.cataclysmbosses.init.ModEntities;
 import java.util.List;
@@ -78,7 +79,7 @@ extends Item {
             }
         }
         if (hitresult.getType() == HitResult.Type.BLOCK) {
-            Modern_Remnant_Entity remnantEntity = (Modern_Remnant_Entity)((EntityType)ModEntities.MODERN_REMNANT.get()).create(p_40622_);
+            Modern_Remnant_Entity remnantEntity = (Modern_Remnant_Entity)((EntityType)ModEntities.MODERN_REMNANT.get()).create(p_40622_, EntitySpawnReason.EVENT);
             remnantEntity.setPos(vec31.x, vec31.y, vec31.z);
             if (!p_40622_.noCollision((Entity)remnantEntity, remnantEntity.getBoundingBox())) {
                 return InteractionResult.FAIL;

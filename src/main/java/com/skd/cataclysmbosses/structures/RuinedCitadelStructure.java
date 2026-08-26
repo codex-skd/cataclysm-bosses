@@ -42,6 +42,7 @@
  */
 package com.skd.cataclysmbosses.structures;
 
+import net.minecraft.world.entity.EntitySpawnReason;
 import com.skd.cataclysmbosses.entity.AnimationMonster.BossMonsters.Ender_Golem_Entity;
 import com.skd.cataclysmbosses.init.ModEntities;
 import com.skd.cataclysmbosses.init.ModStructures;
@@ -224,17 +225,17 @@ extends Structure {
             if (sbb.isInside((Vec3i)pos) && Level.isInSpawnableBounds((BlockPos)pos)) {
                 if (function.startsWith("sentry")) {
                     worldIn.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
-                    Shulker shulker = (Shulker)EntityType.SHULKER.create((Level)worldIn.getLevel());
+                    Shulker shulker = (Shulker)EntityType.SHULKER.create((Level)worldIn.getLevel(), EntitySpawnReason.STRUCTURE);
                     shulker.setPos((double)pos.getX() + 0.5, (double)pos.getY(), (double)pos.getZ() + 0.5);
                     worldIn.addFreshEntity((Entity)shulker);
                 } else if (function.startsWith("mimic")) {
                     worldIn.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
-                    Shulker Silentshulkerentity = (Shulker)EntityType.SHULKER.create((Level)worldIn.getLevel());
+                    Shulker Silentshulkerentity = (Shulker)EntityType.SHULKER.create((Level)worldIn.getLevel(), EntitySpawnReason.STRUCTURE);
                     Silentshulkerentity.setPos((double)pos.getX() + 0.5, (double)pos.getY(), (double)pos.getZ() + 0.5);
                     Silentshulkerentity.setSilent(true);
                     worldIn.addFreshEntity((Entity)Silentshulkerentity);
                 } else if ("golem".equals(function)) {
-                    Ender_Golem_Entity golem = (Ender_Golem_Entity)((EntityType)ModEntities.ENDER_GOLEM.get()).create((Level)worldIn.getLevel());
+                    Ender_Golem_Entity golem = (Ender_Golem_Entity)((EntityType)ModEntities.ENDER_GOLEM.get()).create((Level)worldIn.getLevel(), EntitySpawnReason.STRUCTURE);
                     worldIn.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
                     golem.moveTo(pos, 180.0f, 180.0f);
                     worldIn.addFreshEntity((Entity)golem);

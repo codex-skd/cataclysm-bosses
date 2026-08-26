@@ -38,6 +38,7 @@
  */
 package com.skd.cataclysmbosses.blockentities;
 
+import net.minecraft.world.entity.EntitySpawnReason;
 import com.skd.cataclysmbosses.entity.AnimationMonster.BossMonsters.The_Leviathan.The_Leviathan_Entity;
 import com.skd.cataclysmbosses.entity.effect.ScreenShake_Entity;
 import com.skd.cataclysmbosses.init.ModEntities;
@@ -110,7 +111,7 @@ implements Clearable {
             }
             if (this.summoningticks > 121) {
                 this.BlockBreaking(3, 6, 3);
-                The_Leviathan_Entity leviathan = (The_Leviathan_Entity)((EntityType)ModEntities.THE_LEVIATHAN.get()).create(level);
+                The_Leviathan_Entity leviathan = (The_Leviathan_Entity)((EntityType)ModEntities.THE_LEVIATHAN.get()).create(level, EntitySpawnReason.EVENT);
                 if (level instanceof ServerLevel) {
                     ServerLevel serverLevel = (ServerLevel)level;
                     if (leviathan != null) {

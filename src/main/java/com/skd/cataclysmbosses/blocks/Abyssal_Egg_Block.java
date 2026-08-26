@@ -44,6 +44,7 @@
  */
 package com.skd.cataclysmbosses.blocks;
 
+import net.minecraft.world.entity.EntitySpawnReason;
 import com.skd.cataclysmbosses.blockentities.Abyssal_Egg_Block_Entity;
 import com.skd.cataclysmbosses.entity.Pet.The_Baby_Leviathan_Entity;
 import com.skd.cataclysmbosses.init.ModEntities;
@@ -146,7 +147,7 @@ implements SimpleWaterloggedBlock {
         } else {
             p_277739_.playSound((Player)null, p_277692_, SoundEvents.TURTLE_EGG_HATCH, SoundSource.BLOCKS, 0.7f, 0.9f + p_277973_.nextFloat() * 0.2f);
             p_277739_.destroyBlock(p_277692_, false);
-            The_Baby_Leviathan_Entity levia = (The_Baby_Leviathan_Entity)((EntityType)ModEntities.THE_BABY_LEVIATHAN.get()).create((Level)p_277739_);
+            The_Baby_Leviathan_Entity levia = (The_Baby_Leviathan_Entity)((EntityType)ModEntities.THE_BABY_LEVIATHAN.get()).create((Level)p_277739_, EntitySpawnReason.EVENT);
             if (levia != null) {
                 levia.moveTo((double)p_277692_.getX() + 0.5, (double)p_277692_.getY() + 0.5, (double)p_277692_.getZ() + 0.5, Mth.wrapDegrees((float)(p_277739_.getRandom().nextFloat() * 360.0f)), 0.0f);
                 p_277739_.addFreshEntity((Entity)levia);

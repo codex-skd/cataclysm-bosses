@@ -15,6 +15,7 @@
  */
 package com.skd.cataclysmbosses.blocks;
 
+import net.minecraft.world.entity.EntitySpawnReason;
 import com.skd.cataclysmbosses.blocks.TrapBlock;
 import com.skd.cataclysmbosses.entity.projectile.Void_Rune_Entity;
 import com.skd.cataclysmbosses.init.ModEntities;
@@ -43,7 +44,7 @@ extends TrapBlock {
 
     private static void activate(BlockState state, Level world, BlockPos pos, Entity entity) {
         if (!((Boolean)state.getValue((Property)LIT)).booleanValue() && PurpurVoidRuneTrapBlock.shouldTrigger(entity)) {
-            Void_Rune_Entity voidrune = (Void_Rune_Entity)((EntityType)ModEntities.VOID_RUNE.get()).create(world);
+            Void_Rune_Entity voidrune = (Void_Rune_Entity)((EntityType)ModEntities.VOID_RUNE.get()).create(world, EntitySpawnReason.EVENT);
             if (voidrune != null) {
                 voidrune.moveTo((double)pos.getX() + 0.5, pos.getY() + 1, (double)pos.getZ() + 0.5, 0.0f, 0.0f);
                 voidrune.setDamage(7.0f);

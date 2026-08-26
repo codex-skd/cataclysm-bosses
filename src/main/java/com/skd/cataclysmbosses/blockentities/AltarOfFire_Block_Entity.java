@@ -39,6 +39,7 @@
  */
 package com.skd.cataclysmbosses.blockentities;
 
+import net.minecraft.world.entity.EntitySpawnReason;
 import com.skd.cataclysmbosses.entity.AnimationMonster.BossMonsters.Ignis_Entity;
 import com.skd.cataclysmbosses.entity.effect.ScreenShake_Entity;
 import com.skd.cataclysmbosses.init.ModEntities;
@@ -110,7 +111,7 @@ implements Clearable {
             if (this.summoningticks > 121) {
                 this.BlockBreaking(3, 3, 3);
                 this.BasaltBreaking(16, 8, 16);
-                Ignis_Entity ignis = (Ignis_Entity)((EntityType)ModEntities.IGNIS.get()).create(level);
+                Ignis_Entity ignis = (Ignis_Entity)((EntityType)ModEntities.IGNIS.get()).create(level, EntitySpawnReason.EVENT);
                 if (level instanceof ServerLevel) {
                     ServerLevel serverLevel = (ServerLevel)level;
                     if (ignis != null) {

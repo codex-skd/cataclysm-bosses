@@ -27,6 +27,7 @@
  */
 package com.skd.cataclysmbosses.entity.AnimationMonster.BossMonsters.The_Leviathan;
 
+import net.minecraft.world.entity.EntitySpawnReason;
 import com.skd.cataclysmbosses.entity.AnimationMonster.BossMonsters.The_Leviathan.The_Leviathan_Entity;
 import com.skd.cataclysmbosses.init.ModEntities;
 import java.util.ArrayList;
@@ -142,7 +143,7 @@ extends Entity {
     }
 
     public void createAndSetSister(Level world, Direction dir) {
-        Abyss_Portal_Entity portal = (Abyss_Portal_Entity)((EntityType)ModEntities.ABYSS_PORTAL.get()).create(world);
+        Abyss_Portal_Entity portal = (Abyss_Portal_Entity)((EntityType)ModEntities.ABYSS_PORTAL.get()).create(world, EntitySpawnReason.EVENT);
         BlockPos safeDestination = this.getDestination();
         portal.teleportTo((float)safeDestination.getX() + 0.5f, (float)safeDestination.getY() + 0.5f, (float)safeDestination.getZ() + 0.5f);
         portal.link(this);

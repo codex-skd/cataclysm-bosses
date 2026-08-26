@@ -27,6 +27,7 @@
  */
 package com.skd.cataclysmbosses.entity.projectile;
 
+import net.minecraft.world.entity.EntitySpawnReason;
 import com.skd.cataclysmbosses.entity.util.TidalTentacleUtil;
 import com.skd.cataclysmbosses.init.ModEffect;
 import com.skd.cataclysmbosses.init.ModEntities;
@@ -190,7 +191,7 @@ extends Entity {
 
     private void createChain(Entity closestValid) {
         this.entityData.set(HAS_CLAW, false);
-        Tidal_Tentacle_Entity child = (Tidal_Tentacle_Entity)((EntityType)ModEntities.TIDAL_TENTACLE.get()).create(this.level());
+        Tidal_Tentacle_Entity child = (Tidal_Tentacle_Entity)((EntityType)ModEntities.TIDAL_TENTACLE.get()).create(this.level(), EntitySpawnReason.EVENT);
         child.previouslyTouched = new ArrayList<Entity>(this.previouslyTouched);
         child.previouslyTouched.add(closestValid);
         child.setCreatorEntityUUID(this.getCreatorEntityUUID());

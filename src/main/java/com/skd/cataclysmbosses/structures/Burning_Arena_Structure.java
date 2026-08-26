@@ -40,6 +40,7 @@
  */
 package com.skd.cataclysmbosses.structures;
 
+import net.minecraft.world.entity.EntitySpawnReason;
 import com.skd.cataclysmbosses.entity.AnimationMonster.BossMonsters.Ignited_Revenant_Entity;
 import com.skd.cataclysmbosses.init.ModEntities;
 import com.skd.cataclysmbosses.init.ModStructures;
@@ -180,7 +181,7 @@ extends Structure {
         protected void handleDataMarker(String function, BlockPos pos, ServerLevelAccessor worldIn, RandomSource rand, BoundingBox sbb) {
             if ("revenant".equals(function)) {
                 worldIn.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
-                Ignited_Revenant_Entity revenant = (Ignited_Revenant_Entity)((EntityType)ModEntities.IGNITED_REVENANT.get()).create((Level)worldIn.getLevel());
+                Ignited_Revenant_Entity revenant = (Ignited_Revenant_Entity)((EntityType)ModEntities.IGNITED_REVENANT.get()).create((Level)worldIn.getLevel(), EntitySpawnReason.STRUCTURE);
                 revenant.moveTo(pos, 180.0f, 180.0f);
                 worldIn.addFreshEntity((Entity)revenant);
             }
