@@ -277,9 +277,9 @@ implements IHoldEntity {
         this.setPathfindingMalus(PathType.UNPASSABLE_RAIL, 0.0f);
         this.setPathfindingMalus(PathType.WATER, -1.0f);
         this.setPathfindingMalus(PathType.LAVA, 8.0f);
-        this.setPathfindingMalus(PathType.DANGER_FIRE, 0.0f);
-        this.setPathfindingMalus(PathType.DAMAGE_FIRE, 0.0f);
-        this.setPathfindingMalus(PathType.DAMAGE_FIRE, 0.0f);
+        this.setPathfindingMalus(PathType.FIRE, 0.0f);
+        this.setPathfindingMalus(PathType.DAMAGING, 0.0f);
+        this.setPathfindingMalus(PathType.DAMAGING, 0.0f);
         this.setConfigattribute((LivingEntity)this, CMCommonConfig.Ignis.healthMultiplier, CMCommonConfig.Ignis.attackMultiplier);
         if (world.isClientSide()) {
             this.socketPosArray = new Vec3[]{new Vec3(0.0, 0.0, 0.0)};

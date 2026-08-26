@@ -134,7 +134,7 @@ extends Monster {
     }
 
     public void travel(Vec3 travelVector) {
-        if (this.isControlledByLocalInstance() && this.isInWater() && this.wantsToSwim()) {
+        if (this.isLocalInstanceAuthoritative() && this.isInWater() && this.wantsToSwim()) {
             this.moveRelative(0.01f, travelVector);
             this.move(MoverType.SELF, this.getDeltaMovement());
             this.setDeltaMovement(this.getDeltaMovement().scale(0.9));

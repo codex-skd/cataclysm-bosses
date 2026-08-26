@@ -350,7 +350,7 @@ implements IHoldEntity {
     }
 
     public void travel(Vec3 travelVector) {
-        if (this.isControlledByLocalInstance() && this.isInWater() && this.wantsToSwim()) {
+        if (this.isLocalInstanceAuthoritative() && this.isInWater() && this.wantsToSwim()) {
             this.moveRelative(0.01f, travelVector);
             this.move(MoverType.SELF, this.getDeltaMovement());
             this.setDeltaMovement(this.getDeltaMovement().scale(0.9));
@@ -366,7 +366,7 @@ implements IHoldEntity {
             return false;
         }
         PathType pathTypeAtTarget = evaluator.getPathType((Mob)mob, (BlockPos)pos.mutable());
-        if (pathTypeAtTarget == PathType.DAMAGE_CAUTIOUS || pathTypeAtTarget == PathType.DAMAGE_FIRE || pathTypeAtTarget == PathType.DAMAGE_OTHER || pathTypeAtTarget == PathType.DANGER_FIRE || pathTypeAtTarget == PathType.DANGER_OTHER) {
+        if (pathTypeAtTarget == PathType.DAMAGE_CAUTIOUS || pathTypeAtTarget == PathType.DAMAGING || pathTypeAtTarget == PathType.DAMAGING || pathTypeAtTarget == PathType.FIRE || pathTypeAtTarget == PathType.BLOCKED) {
             return true;
         }
         BlockPos.MutableBlockPos checkPos = pos.mutable().move(Direction.DOWN);

@@ -227,7 +227,7 @@ extends IABoss_monster {
         this.setPathfindingMalus(PathType.UNPASSABLE_RAIL, 0.0f);
         this.setPathfindingMalus(PathType.LAVA, 0.0f);
         this.setPathfindingMalus(PathType.WATER, -1.0f);
-        this.setPathfindingMalus(PathType.DANGER_FIRE, 0.0f);
+        this.setPathfindingMalus(PathType.FIRE, 0.0f);
         this.setConfigattribute((LivingEntity)this, CMCommonConfig.NetheriteMonstrosity.healthMultiplier, CMCommonConfig.NetheriteMonstrosity.attackMultiplier);
     }
 

@@ -153,7 +153,7 @@ extends Abstract_Summoned_Entity {
     }
 
     public void travel(Vec3 travelVector) {
-        if (this.isControlledByLocalInstance()) {
+        if (this.isLocalInstanceAuthoritative()) {
             if (this.isInWater()) {
                 this.moveRelative(0.02f, travelVector);
                 this.move(MoverType.SELF, this.getDeltaMovement());

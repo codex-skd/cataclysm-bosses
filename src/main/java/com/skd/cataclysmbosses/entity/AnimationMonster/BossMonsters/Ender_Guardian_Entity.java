@@ -216,8 +216,8 @@ extends LLibrary_Boss_Monster {
         this.xpReward = 300;
         this.setPathfindingMalus(PathType.UNPASSABLE_RAIL, 0.0f);
         this.setPathfindingMalus(PathType.WATER, -1.0f);
-        this.setPathfindingMalus(PathType.DANGER_FIRE, 0.0f);
-        this.setPathfindingMalus(PathType.DAMAGE_FIRE, 0.0f);
+        this.setPathfindingMalus(PathType.FIRE, 0.0f);
+        this.setPathfindingMalus(PathType.DAMAGING, 0.0f);
         this.setConfigattribute((LivingEntity)this, CMCommonConfig.EnderGuardian.healthMultiplier, CMCommonConfig.EnderGuardian.attackMultiplier);
     }
 
