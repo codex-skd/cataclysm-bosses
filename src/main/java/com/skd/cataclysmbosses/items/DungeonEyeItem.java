@@ -26,7 +26,7 @@
 package com.skd.cataclysmbosses.items;
 
 import com.skd.cataclysmbosses.entity.projectile.Eye_Of_Dungeon_Entity;
-import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.advancements.triggers.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;

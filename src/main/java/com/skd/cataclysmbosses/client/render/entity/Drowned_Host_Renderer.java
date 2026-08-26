@@ -24,7 +24,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.monster.zombie.Zombie;
 
 public class Drowned_Host_Renderer
 extends AbstractZombieRenderer<Drowned_Host_Entity, Drowned_Host_Model<Drowned_Host_Entity>> {

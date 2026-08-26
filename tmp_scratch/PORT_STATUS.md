@@ -2,9 +2,40 @@ SESSION STATUS — NeoForge 26.2.0.45-beta -> 26.2.0.57 compile port
 ================================================================
 Date: 2026-08-26
 Compile baseline: ./gradlew compileJava  (Xmaxerrs 20000)
-Error count: start 5548  ->  now 5010   (538 errors fixed this session)
+Error count: start 5548  ->  5010  ->  3782 (start of items cluster)  ->  now 3524
+Item/data-driven cluster DONE (~258 errors): see "CLUSTER FIXED (items)" below.
 
 Resumes: local branch minecraft/26.2/neoforge-26.2.0.57/production
+
+== CLUSTER FIXED (items data-driven rewrite) ==
+- Tooltier.java: Tier+SimpleTier -> record ToolMaterial(tag,dur,speed,dmgBonus,ench,
+  repairTagKey). Repair tags are cataclysm:repairs_*_tools TagKeys (no JSON yet).
+- Armortier.java: new ArmorMaterial(durabilityMultiplier, defenseMap<ArmorType,int>,
+  ench, equipSound, toughness, kbRes, repairTagKey, assetId ResourceKey<EquipmentAsset>
+  under EquipmentAssets.ROOT_ID w/ ns cataclysm). Durabilities 45/45/35/30.
+- Cataclysm_Armor extends Item now; keeps material/type fields + getDefaultAttributeModifiers;
+  createAttributes/createArmorAttributes take ArmorType. Subclasses only changed ctor sigs.
+- Monstrous_Helm / Ignitium_Elytra_ChestPlate extend Item directly. Elytra glider is now
+  DataComponents.GLIDER=Unit.INSTANCE; use() -> Equippable.swapWithEquipmentSlot(stack,player).
+  canElytraFly/elytraFlightTick removed (vanilla handles via GLIDER component).
+- Athame/Khopesh extend Item (SwordItem gone); Brontes/Void_forge/Infernal_forge extend Item
+  (PickaxeItem gone). Tools via properties.sword/pickaxe/shovel/axe/hoe(ToolMaterial,...);
+  ShovelItem/AxeItem/HoeItem classes still exist with (ToolMaterial,dmg,speed,props) ctors.
+- ModItems: armor registrations use properties.humanoidArmor(Armortier.X.value(), ArmorType.Y)
+  (sets durability/enchantable/equippable/repairable) + explicit .attributes(createAttributes...).
+  Spawn eggs: new SpawnEggItem(props.spawnEgg(ModEntities.X.get())) — REQUIRED for runtime.
+  NOTE: octohost_spawn_egg spawns DROWNED_HOST (verified vs original jar bytecode);
+  there was never an OCTOHOST entity.
+- Unbreakable component class REMOVED in 26.2: DataComponents.UNBREAKABLE is Unit ->
+  components.set(..., Unit.INSTANCE). modifyComponents Initializer receives
+  DataComponentMap.Builder -> AttributeUtils.mergeAttributes retyped to DataComponentMap.Builder.
+- CLIENT side of this cluster: CustomArmorRenderProperties.getHumanoidArmorModel new sig
+  (ItemStack, EquipmentClientInfo.LayerType, Model)->Model; renderCustomArmor takes Item and
+  checks Cataclysm_Armor.getMaterial()==Armortier.CURSIUM.
+  HumanoidArmorLayerMixin NEUTRALIZED (old renderArmorPiece pipeline gone; must be re-implemented
+  against SubmitNodeCollector/EquipmentLayerRenderer in the client render cluster).
+
+== PREVIOUS SESSION CLUSTERS (mechanical) ==
 Local checkpoint commits (NOT pushed, local-only):
   944e3bf ValueInput/Output namespace, addCooldown ItemStack, value-io bodies
   (next)    EntityType.is->builtInRegistryHolder, build(ResourceKey)
@@ -36,7 +67,8 @@ Local checkpoint commits (NOT pushed, local-only):
    (also dropped many "method does not override" errors for those helpers)
 
 == REMAINING CLUSTERS (deep/architectural rewrites — NOT done, need real porting) ==
-Dominant blockers (root-cause classes must be fixed first; many child errors are cascades):
+Items cluster is DONE. Dominant blockers now (root-cause classes must be fixed first;
+many child errors are cascades):
 - Rendering rewrite: MultiBufferSource -> SubmitNodeCollector (SubmitNodeCollector /
   submitModel / submitModelPart / submitCustomGeometry). ~180+ errors, ~134 files. This is
   the single biggest blocker (renderers, layers, models, CMItemstackRenderer, ItemRenderer).
@@ -52,7 +84,6 @@ Dominant blockers (root-cause classes must be fixed first; many child errors are
   setupAnim(EntityRenderState) (KeyframeAnimations.animate removed).
   ~178 animate + 16 animateWalk + ~46 HierarchicalModel errors. Also ModelPart.children
   private, HumanoidRenderState missing.
-- Item data-driven rewrite: ArmorItem / Tier / SwordItem.createAttributes removed.
   ArmorMaterial now net.minecraft.world.item.equipment.ArmorMaterial; items use
   properties.humanoidArmor(material,type) + DataComponents.EQUIPPABLE + ItemAttributeModifiers.
   ~164 errors in ModItems + item classes (Armortier, Cursium_Armor, Ignitium_Armor...).

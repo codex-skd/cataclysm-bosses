@@ -46,8 +46,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.PickaxeItem;
-import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.level.Level;
@@ -57,9 +55,9 @@ import net.neoforged.neoforge.common.ItemAbility;
 import org.jetbrains.annotations.Nullable;
 
 public class Brontes
-extends PickaxeItem {
-    public Brontes(Tier toolMaterial, Item.Properties props) {
-        super(toolMaterial, props);
+extends Item {
+    public Brontes(Item.Properties props) {
+        super(props);
     }
 
     public void hurtEnemy(ItemStack heldItemStack, LivingEntity target, LivingEntity attacker) {

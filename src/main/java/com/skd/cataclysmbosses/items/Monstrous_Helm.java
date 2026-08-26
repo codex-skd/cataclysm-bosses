@@ -41,7 +41,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -50,9 +50,9 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 
 public class Monstrous_Helm
-extends ArmorItem {
-    public Monstrous_Helm(Holder<ArmorMaterial> material, ArmorItem.Type slot, Item.Properties properties) {
-        super(material, slot, properties);
+extends Item {
+    public Monstrous_Helm(Holder<ArmorMaterial> material, ArmorType slot, Item.Properties properties) {
+        super(properties);
     }
 
     public boolean isValidRepairItem(ItemStack p_41134_, ItemStack p_41135_) {
@@ -81,7 +81,7 @@ extends ArmorItem {
         }
     }
 
-    public Identifier getArmorTexture(@Nonnull ItemStack stack, @Nonnull Entity entity, @Nonnull EquipmentSlot slot, @Nonnull ArmorMaterial.Layer layer, boolean isInnerModel) {
+    public Identifier getArmorTexture(@Nonnull ItemStack stack, @Nonnull Entity entity, @Nonnull EquipmentSlot slot, @Nonnull net.minecraft.world.item.equipment.EquipmentClientInfo.Layer layer, boolean isInnerModel) {
         return Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/armor/monstrous_helm.png");
     }
 

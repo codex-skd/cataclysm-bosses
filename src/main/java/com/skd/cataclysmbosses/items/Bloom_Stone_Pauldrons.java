@@ -48,7 +48,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -59,7 +59,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 public class Bloom_Stone_Pauldrons
 extends Cataclysm_Armor
 implements KeybindUsingArmor {
-    public Bloom_Stone_Pauldrons(Holder<ArmorMaterial> material, ArmorItem.Type slot, Item.Properties properties, AttributeContainer ... attributes) {
+    public Bloom_Stone_Pauldrons(Holder<ArmorMaterial> material, ArmorType slot, Item.Properties properties, AttributeContainer ... attributes) {
         super(material, slot, properties, attributes);
     }
 
@@ -78,7 +78,7 @@ implements KeybindUsingArmor {
             }
             return;
         }
-        if (this.type == ArmorItem.Type.CHESTPLATE && player.getItemBySlot(EquipmentSlot.CHEST) == stack && ModKeybind.CHESTPLATE_KEY_ABILITY.consumeClick()) {
+        if (this.type == ArmorType.CHESTPLATE && player.getItemBySlot(EquipmentSlot.CHEST) == stack && ModKeybind.CHESTPLATE_KEY_ABILITY.consumeClick()) {
             PacketDistributor.sendToServer((CustomPacketPayload)new MessageArmorKey(EquipmentSlot.CHEST.ordinal(), player.getId(), 6), (CustomPacketPayload[])new CustomPacketPayload[0]);
             this.onKeyPacket(player, stack, 6);
         }
@@ -109,7 +109,7 @@ implements KeybindUsingArmor {
         }
     }
 
-    public Identifier getArmorTexture(@Nonnull ItemStack stack, @Nonnull Entity entity, @Nonnull EquipmentSlot slot, @Nonnull ArmorMaterial.Layer layer, boolean isInnerModel) {
+    public Identifier getArmorTexture(@Nonnull ItemStack stack, @Nonnull Entity entity, @Nonnull EquipmentSlot slot, @Nonnull net.minecraft.world.item.equipment.EquipmentClientInfo.Layer layer, boolean isInnerModel) {
         return Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/armor/bloom_stone_pauldrons.png");
     }
 }

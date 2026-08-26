@@ -1,32 +1,24 @@
-/*
- * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  net.minecraft.resources.Identifier
- *  net.minecraft.tags.BlockTags
- *  net.minecraft.world.item.Tier
- *  net.minecraft.world.item.crafting.Ingredient
- *  net.minecraft.world.level.ItemLike
- *  net.neoforged.neoforge.common.SimpleTier
- */
 package com.skd.cataclysmbosses.items;
 
-import com.skd.cataclysmbosses.init.ModItems;
 import java.util.Locale;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.world.item.Tier;
-import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.level.ItemLike;
-import net.neoforged.neoforge.common.SimpleTier;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.ToolMaterial;
 
 public class Tooltier {
-    public static final Tier ANCIENT_METAL = new SimpleTier(BlockTags.create((Identifier)Tooltier.prefix("needs_ancient_metal_tool")), 750, 8.0f, 2.0f, 25, () -> Ingredient.of((ItemLike[])new ItemLike[]{(ItemLike)ModItems.ANCIENT_METAL_INGOT.get()}));
-    public static final Tier BLACK_STEEL = new SimpleTier(BlockTags.create((Identifier)Tooltier.prefix("needs_black_steel_tool")), 750, 8.0f, 2.0f, 25, () -> Ingredient.of((ItemLike[])new ItemLike[]{(ItemLike)ModItems.BLACK_STEEL_INGOT.get()}));
-    public static final Tier MONSTROSITY = new SimpleTier(BlockTags.create((Identifier)Tooltier.prefix("needs_monstrosity_tool")), 2800, 9.0f, 4.0f, 25, () -> Ingredient.of((ItemLike[])new ItemLike[]{(ItemLike)ModItems.MONSTROUS_HORN.get()}));
+    public static final ToolMaterial ANCIENT_METAL = new ToolMaterial(
+        BlockTags.create(Tooltier.prefix("needs_ancient_metal_tool")), 750, 8.0F, 2.0F, 25,
+        TagKey.create(Registries.ITEM, Tooltier.prefix("repairs_ancient_metal_tools")));
+    public static final ToolMaterial BLACK_STEEL = new ToolMaterial(
+        BlockTags.create(Tooltier.prefix("needs_black_steel_tool")), 750, 8.0F, 2.0F, 25,
+        TagKey.create(Registries.ITEM, Tooltier.prefix("repairs_black_steel_tools")));
+    public static final ToolMaterial MONSTROSITY = new ToolMaterial(
+        BlockTags.create(Tooltier.prefix("needs_monstrosity_tool")), 2800, 9.0F, 4.0F, 25,
+        TagKey.create(Registries.ITEM, Tooltier.prefix("repairs_monstrosity_tools")));
 
     private static Identifier prefix(String name) {
-        return Identifier.fromNamespaceAndPath((String)"cataclysm", (String)name.toLowerCase(Locale.ROOT));
+        return Identifier.fromNamespaceAndPath("cataclysm", name.toLowerCase(Locale.ROOT));
     }
 }
-

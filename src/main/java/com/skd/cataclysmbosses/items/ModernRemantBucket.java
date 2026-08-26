@@ -27,7 +27,7 @@
 package com.skd.cataclysmbosses.items;
 
 import javax.annotation.Nullable;
-import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.advancements.triggers.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;

@@ -47,7 +47,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -59,7 +59,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 public class Cursium_Armor
 extends Cataclysm_Armor
 implements KeybindUsingArmor {
-    public Cursium_Armor(Holder<ArmorMaterial> material, ArmorItem.Type slot, Item.Properties properties) {
+    public Cursium_Armor(Holder<ArmorMaterial> material, ArmorType slot, Item.Properties properties) {
         super(material, slot, properties, new AttributeContainer[0]);
     }
 
@@ -78,29 +78,29 @@ implements KeybindUsingArmor {
             }
             return;
         }
-        if (this.type == ArmorItem.Type.HELMET && player.getItemBySlot(EquipmentSlot.HEAD) == stack) {
+        if (this.type == ArmorType.HELMET && player.getItemBySlot(EquipmentSlot.HEAD) == stack) {
             if (ModKeybind.HELMET_KEY_ABILITY.consumeClick()) {
                 PacketDistributor.sendToServer((CustomPacketPayload)new MessageArmorKey(EquipmentSlot.HEAD.ordinal(), player.getId(), 5), (CustomPacketPayload[])new CustomPacketPayload[0]);
                 this.onKeyPacket(player, stack, 5);
             }
-        } else if (this.type == ArmorItem.Type.BOOTS && player.getItemBySlot(EquipmentSlot.FEET) == stack && ModKeybind.BOOTS_KEY_ABILITY.consumeClick()) {
+        } else if (this.type == ArmorType.BOOTS && player.getItemBySlot(EquipmentSlot.FEET) == stack && ModKeybind.BOOTS_KEY_ABILITY.consumeClick()) {
             PacketDistributor.sendToServer((CustomPacketPayload)new MessageArmorKey(EquipmentSlot.FEET.ordinal(), player.getId(), 7), (CustomPacketPayload[])new CustomPacketPayload[0]);
             this.onKeyPacket(player, stack, 7);
         }
     }
 
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flags) {
-        if (this.type == ArmorItem.Type.HELMET) {
+        if (this.type == ArmorType.HELMET) {
             tooltip.add((Component)Component.translatable((String)"item.cataclysm.cursium_helmet.desc").withStyle(ChatFormatting.DARK_GREEN));
             tooltip.add((Component)Component.translatable((String)"item.cataclysm.cursium_helmet.desc2", (Object[])new Object[]{ModKeybind.HELMET_KEY_ABILITY.getTranslatedKeyMessage()}).withStyle(ChatFormatting.DARK_GREEN));
-        } else if (this.type == ArmorItem.Type.CHESTPLATE) {
+        } else if (this.type == ArmorType.CHESTPLATE) {
             tooltip.add((Component)Component.translatable((String)"item.cataclysm.cursium_chestplate.desc").withStyle(ChatFormatting.DARK_GREEN));
             tooltip.add((Component)Component.translatable((String)"item.cataclysm.cursium_chestplate.desc2").withStyle(ChatFormatting.DARK_GREEN));
             tooltip.add((Component)Component.translatable((String)"item.cataclysm.cursium_chestplate.desc3").withStyle(ChatFormatting.DARK_GREEN));
-        } else if (this.type == ArmorItem.Type.LEGGINGS) {
+        } else if (this.type == ArmorType.LEGGINGS) {
             tooltip.add((Component)Component.translatable((String)"item.cataclysm.cursium_leggings.desc").withStyle(ChatFormatting.DARK_GREEN));
             tooltip.add((Component)Component.translatable((String)"item.cataclysm.cursium_leggings.desc2").withStyle(ChatFormatting.DARK_GREEN));
-        } else if (this.type == ArmorItem.Type.BOOTS) {
+        } else if (this.type == ArmorType.BOOTS) {
             tooltip.add((Component)Component.translatable((String)"item.cataclysm.cursium_boots.desc").withStyle(ChatFormatting.DARK_GREEN));
             tooltip.add((Component)Component.translatable((String)"item.cataclysm.cursium_boots.desc2", (Object[])new Object[]{ModKeybind.BOOTS_KEY_ABILITY.getTranslatedKeyMessage()}).withStyle(ChatFormatting.DARK_GREEN));
         }
@@ -137,7 +137,7 @@ implements KeybindUsingArmor {
         }
     }
 
-    public Identifier getArmorTexture(@Nonnull ItemStack stack, @Nonnull Entity entity, @Nonnull EquipmentSlot slot, @Nonnull ArmorMaterial.Layer layer, boolean isInnerModel) {
+    public Identifier getArmorTexture(@Nonnull ItemStack stack, @Nonnull Entity entity, @Nonnull EquipmentSlot slot, @Nonnull net.minecraft.world.item.equipment.EquipmentClientInfo.Layer layer, boolean isInnerModel) {
         return Identifier.fromNamespaceAndPath((String)"cataclysm", (String)("textures/armor/cursium_armor" + (slot == EquipmentSlot.LEGS ? "_legs.png" : ".png")));
     }
 }

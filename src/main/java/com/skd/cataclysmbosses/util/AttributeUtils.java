@@ -16,7 +16,7 @@
  */
 package com.skd.cataclysmbosses.util;
 
-import net.minecraft.core.component.DataComponentPatch;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -27,7 +27,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 
 public class AttributeUtils {
-    public static void mergeAttributes(DataComponentPatch.Builder builder, Item item, ItemAttributeModifiers newModifiers) {
+    public static void mergeAttributes(DataComponentMap.Builder builder, Item item, ItemAttributeModifiers newModifiers) {
         ItemAttributeModifiers existingModifiers = (ItemAttributeModifiers)item.components().getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, (Object)ItemAttributeModifiers.EMPTY);
         ItemAttributeModifiers.Builder combinedBuilder = ItemAttributeModifiers.builder();
         for (ItemAttributeModifiers.Entry existingEntry : existingModifiers.modifiers()) {

@@ -48,8 +48,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.PickaxeItem;
-import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockGetter;
@@ -59,9 +57,9 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class Void_forge
-extends PickaxeItem {
-    public Void_forge(Tier toolMaterial, Item.Properties props) {
-        super(toolMaterial, props);
+extends Item {
+    public Void_forge(Item.Properties props) {
+        super(props);
     }
 
     public void hurtEnemy(ItemStack heldItemStack, LivingEntity target, LivingEntity attacker) {

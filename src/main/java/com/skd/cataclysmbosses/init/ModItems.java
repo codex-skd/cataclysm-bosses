@@ -133,9 +133,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.food.FoodProperties;
-import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.equipment.ArmorMaterial;
-import net.minecraft.world.item.ArmorMaterials;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DispensibleContainerItem;
@@ -143,13 +141,13 @@ import net.minecraft.world.item.HoeItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.PickaxeItem;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.item.ShovelItem;
 import net.minecraft.world.item.SpawnEggItem;
-import net.minecraft.world.item.SwordItem;
-import net.minecraft.world.item.Tier;
-import net.minecraft.world.item.component.Unbreakable;
+import net.minecraft.util.Unit;
+import net.minecraft.world.item.ToolMaterial;
+import net.minecraft.world.item.equipment.ArmorMaterials;
+import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -296,12 +294,12 @@ public class ModItems {
     public static final DeferredItem<Item> CORAL_SPEAR = ITEMS.register("coral_spear", () -> new Coral_Spear(new Item.Properties().durability(110).attributes(Coral_Spear.createAttributes())));
     public static final DeferredItem<Item> CORAL_BARDICHE = ITEMS.register("coral_bardiche", () -> new Coral_Bardiche(new Item.Properties().durability(160).attributes(Coral_Bardiche.createAttributes())));
     public static final DeferredItem<Item> ATHAME = ITEMS.register("athame", () -> new Athame(new Item.Properties().durability(250).attributes(Athame.createAttributes())));
-    public static final DeferredItem<Item> KHOPESH = ITEMS.register("khopesh", () -> new SwordItem(Tooltier.ANCIENT_METAL, new Item.Properties().attributes(SwordItem.createAttributes((Tier)Tooltier.ANCIENT_METAL, (int)3, (float)-2.4f))));
-    public static final DeferredItem<Item> BLACK_STEEL_SWORD = ITEMS.register("black_steel_sword", () -> new SwordItem(Tooltier.BLACK_STEEL, new Item.Properties().attributes(SwordItem.createAttributes((Tier)Tooltier.BLACK_STEEL, (int)3, (float)-2.4f))));
-    public static final DeferredItem<Item> BLACK_STEEL_SHOVEL = ITEMS.register("black_steel_shovel", () -> new ShovelItem(Tooltier.BLACK_STEEL, new Item.Properties().attributes(ShovelItem.createAttributes((Tier)Tooltier.BLACK_STEEL, (float)1.5f, (float)-3.0f))));
-    public static final DeferredItem<Item> BLACK_STEEL_PICKAXE = ITEMS.register("black_steel_pickaxe", () -> new PickaxeItem(Tooltier.BLACK_STEEL, new Item.Properties().attributes(PickaxeItem.createAttributes((Tier)Tooltier.BLACK_STEEL, (float)1.0f, (float)-2.8f))));
-    public static final DeferredItem<Item> BLACK_STEEL_AXE = ITEMS.register("black_steel_axe", () -> new AxeItem(Tooltier.BLACK_STEEL, new Item.Properties().attributes(AxeItem.createAttributes((Tier)Tooltier.BLACK_STEEL, (float)6.0f, (float)-3.1f))));
-    public static final DeferredItem<Item> BLACK_STEEL_HOE = ITEMS.register("black_steel_hoe", () -> new HoeItem(Tooltier.BLACK_STEEL, new Item.Properties().attributes(HoeItem.createAttributes((Tier)Tooltier.BLACK_STEEL, (float)-2.0f, (float)-1.0f))));
+    public static final DeferredItem<Item> KHOPESH = ITEMS.register("khopesh", () -> new Khopesh(new Item.Properties().sword(Tooltier.ANCIENT_METAL, 3.0F, -2.4F)));
+    public static final DeferredItem<Item> BLACK_STEEL_SWORD = ITEMS.register("black_steel_sword", () -> new Item(new Item.Properties().sword(Tooltier.BLACK_STEEL, 3.0F, -2.4F)));
+    public static final DeferredItem<Item> BLACK_STEEL_SHOVEL = ITEMS.register("black_steel_shovel", () -> new ShovelItem(Tooltier.BLACK_STEEL, 1.5F, -3.0F, new Item.Properties()));
+    public static final DeferredItem<Item> BLACK_STEEL_PICKAXE = ITEMS.register("black_steel_pickaxe", () -> new Item(new Item.Properties().pickaxe(Tooltier.BLACK_STEEL, 1.0F, -2.8F)));
+    public static final DeferredItem<Item> BLACK_STEEL_AXE = ITEMS.register("black_steel_axe", () -> new AxeItem(Tooltier.BLACK_STEEL, 6.0F, -3.1F, new Item.Properties()));
+    public static final DeferredItem<Item> BLACK_STEEL_HOE = ITEMS.register("black_steel_hoe", () -> new HoeItem(Tooltier.BLACK_STEEL, -2.0F, -1.0F, new Item.Properties()));
     public static final DeferredItem<Item> BLACK_STEEL_TARGE = ITEMS.register("black_steel_targe", () -> new Black_Steel_Targe(new Item.Properties().durability(840)));
     public static final DeferredItem<Item> AZURE_SEA_SHIELD = ITEMS.register("azure_sea_shield", () -> new Azure_sea_Shield(new Item.Properties().durability(514)));
     public static final DeferredItem<Item> BULWARK_OF_THE_FLAME = ITEMS.register("bulwark_of_the_flame", () -> new Bulwark_of_the_flame(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
@@ -324,15 +322,15 @@ public class ModItems {
     public static final DeferredItem<Item> THE_ANNIHILATOR = ITEMS.register("the_annihilator", () -> new The_Annihilator(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC).attributes(Cataclysm_Weapon.createAttributes(6.5f, -2.4f, new AttributeContainer((Holder<Attribute>)ModAttribute.ADDITIONAL_CRITICAL_DAMAGE, 75.0, AttributeModifier.Operation.ADD_VALUE)))));
     public static final DeferredItem<Item> ASTRAPE = ITEMS.register("astrape", () -> new Astrape(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant().attributes(Cataclysm_Weapon.createAttributes(9.5f, -2.6f, new AttributeContainer((Holder<Attribute>)Attributes.ENTITY_INTERACTION_RANGE, 2.0, AttributeModifier.Operation.ADD_VALUE)))));
     public static final DeferredItem<Item> CERAUNUS = ITEMS.register("ceraunus", () -> new Ceraunus(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant().attributes(Cataclysm_Weapon.createAttributes(15.0f, -3.3f, new AttributeContainer((Holder<Attribute>)Attributes.ENTITY_INTERACTION_RANGE, 1.0, AttributeModifier.Operation.ADD_VALUE)))));
-    public static final DeferredItem<Item> BRONTES = ITEMS.register("brontes", () -> new Brontes(Tooltier.MONSTROSITY, new Item.Properties().fireResistant().rarity(Rarity.EPIC).attributes(PickaxeItem.createAttributes((Tier)Tooltier.MONSTROSITY, (float)8.0f, (float)-3.0f))));
+    public static final DeferredItem<Item> BRONTES = ITEMS.register("brontes", () -> new Brontes(new Item.Properties().fireResistant().rarity(Rarity.EPIC).pickaxe(Tooltier.MONSTROSITY, 8.0F, -3.0F)));
     public static final DeferredItem<Item> THE_IMMOLATOR = ITEMS.register("the_immolator", () -> new The_Immolator(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC).attributes(Cataclysm_Weapon.createAttributes(7.5f, -2.4f, new AttributeContainer((Holder<Attribute>)ModAttribute.ADDITIONAL_CRITICAL_DAMAGE, 60.0, AttributeModifier.Operation.ADD_VALUE)))));
     public static final DeferredItem<Item> MEAT_SHREDDER = ITEMS.register("meat_shredder", () -> new Meat_Shredder(new Item.Properties().stacksTo(1).fireResistant().rarity(Rarity.EPIC).attributes(Cataclysm_Weapon.createAttributes(7.5f, -2.6f, new AttributeContainer[0]))));
     public static final DeferredItem<Item> LASER_GATLING = ITEMS.register("laser_gatling", () -> new Laser_Gatling(new Item.Properties().stacksTo(1).fireResistant().durability(50).rarity(Rarity.EPIC)));
     public static final DeferredItem<Item> WITHER_ASSULT_SHOULDER_WEAPON = ITEMS.register("wither_assault_shoulder_weapon", () -> new Wither_Assault_SHoulder_Weapon(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
     public static final DeferredItem<Item> VOID_ASSULT_SHOULDER_WEAPON = ITEMS.register("void_assault_shoulder_weapon", () -> new Void_Assault_SHoulder_Weapon(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
-    public static final DeferredItem<Item> VOID_FORGE = ITEMS.register("void_forge", () -> new Void_forge(Tooltier.MONSTROSITY, new Item.Properties().fireResistant().rarity(Rarity.EPIC).attributes(PickaxeItem.createAttributes((Tier)Tooltier.MONSTROSITY, (float)8.0f, (float)-3.0f))));
+    public static final DeferredItem<Item> VOID_FORGE = ITEMS.register("void_forge", () -> new Void_forge(new Item.Properties().fireResistant().rarity(Rarity.EPIC).pickaxe(Tooltier.MONSTROSITY, 8.0F, -3.0F)));
     public static final DeferredItem<Item> TIDAL_CLAWS = ITEMS.register("tidal_claws", () -> new Tidal_Claws(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant().attributes(Cataclysm_Weapon.createAttributes(7.0f, -2.4f, new AttributeContainer[0]))));
-    public static final DeferredItem<Item> INFERNAL_FORGE = ITEMS.register("infernal_forge", () -> new Infernal_forge(Tooltier.MONSTROSITY, new Item.Properties().fireResistant().rarity(Rarity.EPIC).attributes(PickaxeItem.createAttributes((Tier)Tooltier.MONSTROSITY, (float)8.0f, (float)-3.0f))));
+    public static final DeferredItem<Item> INFERNAL_FORGE = ITEMS.register("infernal_forge", () -> new Infernal_forge(new Item.Properties().fireResistant().rarity(Rarity.EPIC).pickaxe(Tooltier.MONSTROSITY, 8.0F, -3.0F)));
     public static final DeferredItem<Item> SANDSTORM_IN_A_BOTTLE = ITEMS.register("sandstorm_in_a_bottle", () -> new Sandstorm_In_A_Bottle(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant()));
     public static final DeferredItem<Item> ANCIENT_SPEAR = ITEMS.register("ancient_spear", () -> new Ancient_Spear(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant().durability(1800).attributes(Cataclysm_Weapon.createAttributes(8.5f, -2.6f, new AttributeContainer((Holder<Attribute>)Attributes.ENTITY_INTERACTION_RANGE, 2.0, AttributeModifier.Operation.ADD_VALUE)))));
     public static final DeferredItem<Item> STICKY_GLOVES = ITEMS.register("sticky_gloves", () -> new Sticky_Gloves(new Item.Properties().stacksTo(1)));
@@ -353,21 +351,21 @@ public class ModItems {
     public static final DeferredItem<Item> APTRGANGR_HEAD = ITEMS.register("aptrgangr_head", () -> new CataclysmSkullItem((Block)ModBlocks.APTRGANGR_HEAD.get(), (Block)ModBlocks.APTRGANGR_WALL_HEAD.get(), new Item.Properties().rarity(Rarity.UNCOMMON)));
     public static final DeferredItem<Item> DRAUGR_HEAD = ITEMS.register("draugr_head", () -> new CataclysmSkullItem((Block)ModBlocks.DRAUGR_HEAD.get(), (Block)ModBlocks.DRAUGR_WALL_HEAD.get(), new Item.Properties().rarity(Rarity.UNCOMMON)));
     public static final DeferredItem<Item> KOBOLEDIATOR_SKULL = ITEMS.register("kobolediator_skull", () -> new CataclysmSkullItem((Block)ModBlocks.KOBOLEDIATOR_SKULL.get(), (Block)ModBlocks.KOBOLEDIATOR_WALL_SKULL.get(), new Item.Properties().rarity(Rarity.UNCOMMON)));
-    public static final DeferredItem<Item> BONE_REPTILE_HELMET = ITEMS.register("bone_reptile_helmet", () -> new Bone_Reptile_Armor((Holder<ArmorMaterial>)Armortier.BONE_REPTILE, ArmorItem.Type.HELMET, new Item.Properties().attributes(Cataclysm_Armor.createAttributes(Armortier.BONE_REPTILE, ArmorItem.Type.HELMET, new AttributeContainer[0])).durability(ArmorItem.Type.HELMET.getDurability(35))));
-    public static final DeferredItem<Item> BONE_REPTILE_CHESTPLATE = ITEMS.register("bone_reptile_chestplate", () -> new Bone_Reptile_Armor((Holder<ArmorMaterial>)Armortier.BONE_REPTILE, ArmorItem.Type.CHESTPLATE, new Item.Properties().attributes(Cataclysm_Armor.createAttributes(Armortier.BONE_REPTILE, ArmorItem.Type.CHESTPLATE, new AttributeContainer[0])).durability(ArmorItem.Type.CHESTPLATE.getDurability(35))));
-    public static final DeferredItem<Item> IGNITIUM_HELMET = ITEMS.register("ignitium_helmet", () -> new Ignitium_Armor((Holder<ArmorMaterial>)Armortier.IGNITIUM, ArmorItem.Type.HELMET, new Item.Properties().fireResistant().rarity(Rarity.EPIC).attributes(Cataclysm_Armor.createAttributes(Armortier.IGNITIUM, ArmorItem.Type.HELMET, new AttributeContainer[0])).durability(ArmorItem.Type.HELMET.getDurability(45))));
-    public static final DeferredItem<Item> IGNITIUM_CHESTPLATE = ITEMS.register("ignitium_chestplate", () -> new Ignitium_Armor((Holder<ArmorMaterial>)Armortier.IGNITIUM, ArmorItem.Type.CHESTPLATE, new Item.Properties().fireResistant().rarity(Rarity.EPIC).attributes(Cataclysm_Armor.createAttributes(Armortier.IGNITIUM, ArmorItem.Type.CHESTPLATE, new AttributeContainer[0])).durability(ArmorItem.Type.CHESTPLATE.getDurability(45))));
-    public static final DeferredItem<Item> IGNITIUM_ELYTRA_CHESTPLATE = ITEMS.register("ignitium_elytra_chestplate", () -> new Ignitium_Elytra_ChestPlate(new Item.Properties().fireResistant().rarity(Rarity.EPIC).attributes(Cataclysm_Armor.createAttributes(Armortier.IGNITIUM, ArmorItem.Type.CHESTPLATE, new AttributeContainer[0])).durability(ArmorItem.Type.CHESTPLATE.getDurability(45)), (Holder<ArmorMaterial>)Armortier.IGNITIUM));
-    public static final DeferredItem<Item> IGNITIUM_LEGGINGS = ITEMS.register("ignitium_leggings", () -> new Ignitium_Armor((Holder<ArmorMaterial>)Armortier.IGNITIUM, ArmorItem.Type.LEGGINGS, new Item.Properties().fireResistant().rarity(Rarity.EPIC).attributes(Cataclysm_Armor.createAttributes(Armortier.IGNITIUM, ArmorItem.Type.LEGGINGS, new AttributeContainer[0])).durability(ArmorItem.Type.LEGGINGS.getDurability(45))));
-    public static final DeferredItem<Item> IGNITIUM_BOOTS = ITEMS.register("ignitium_boots", () -> new Ignitium_Armor((Holder<ArmorMaterial>)Armortier.IGNITIUM, ArmorItem.Type.BOOTS, new Item.Properties().fireResistant().rarity(Rarity.EPIC).attributes(Cataclysm_Armor.createAttributes(Armortier.IGNITIUM, ArmorItem.Type.BOOTS, new AttributeContainer[0])).durability(ArmorItem.Type.BOOTS.getDurability(45))));
-    public static final DeferredItem<Item> CURSIUM_HELMET = ITEMS.register("cursium_helmet", () -> new Cursium_Armor((Holder<ArmorMaterial>)Armortier.CURSIUM, ArmorItem.Type.HELMET, new Item.Properties().fireResistant().rarity(Rarity.EPIC).attributes(Cataclysm_Armor.createAttributes(Armortier.CURSIUM, ArmorItem.Type.HELMET, new AttributeContainer[0])).durability(ArmorItem.Type.HELMET.getDurability(45))));
-    public static final DeferredItem<Item> CURSIUM_CHESTPLATE = ITEMS.register("cursium_chestplate", () -> new Cursium_ChestPlate((Holder<ArmorMaterial>)Armortier.CURSIUM, ArmorItem.Type.CHESTPLATE, new Item.Properties().fireResistant().rarity(Rarity.EPIC).attributes(Cataclysm_Armor.createAttributes(Armortier.CURSIUM, ArmorItem.Type.CHESTPLATE, new AttributeContainer[0])).durability(ArmorItem.Type.CHESTPLATE.getDurability(45))));
-    public static final DeferredItem<Item> CURSIUM_LEGGINGS = ITEMS.register("cursium_leggings", () -> new Cursium_Armor((Holder<ArmorMaterial>)Armortier.CURSIUM, ArmorItem.Type.LEGGINGS, new Item.Properties().fireResistant().rarity(Rarity.EPIC).attributes(Cataclysm_Armor.createAttributes(Armortier.CURSIUM, ArmorItem.Type.LEGGINGS, new AttributeContainer[0])).durability(ArmorItem.Type.LEGGINGS.getDurability(45))));
-    public static final DeferredItem<Item> CURSIUM_BOOTS = ITEMS.register("cursium_boots", () -> new Cursium_Armor((Holder<ArmorMaterial>)Armortier.CURSIUM, ArmorItem.Type.BOOTS, new Item.Properties().fireResistant().rarity(Rarity.EPIC).attributes(Cataclysm_Armor.createAttributes(Armortier.CURSIUM, ArmorItem.Type.BOOTS, new AttributeContainer[0])).durability(ArmorItem.Type.BOOTS.getDurability(45))));
+    public static final DeferredItem<Item> BONE_REPTILE_HELMET = ITEMS.register("bone_reptile_helmet", () -> new Bone_Reptile_Armor(Armortier.BONE_REPTILE, ArmorType.HELMET, new Item.Properties().humanoidArmor(Armortier.BONE_REPTILE.value(), ArmorType.HELMET).attributes(Cataclysm_Armor.createAttributes(Armortier.BONE_REPTILE, ArmorType.HELMET))));
+    public static final DeferredItem<Item> BONE_REPTILE_CHESTPLATE = ITEMS.register("bone_reptile_chestplate", () -> new Bone_Reptile_Armor(Armortier.BONE_REPTILE, ArmorType.CHESTPLATE, new Item.Properties().humanoidArmor(Armortier.BONE_REPTILE.value(), ArmorType.CHESTPLATE).attributes(Cataclysm_Armor.createAttributes(Armortier.BONE_REPTILE, ArmorType.CHESTPLATE))));
+    public static final DeferredItem<Item> IGNITIUM_HELMET = ITEMS.register("ignitium_helmet", () -> new Ignitium_Armor(Armortier.IGNITIUM, ArmorType.HELMET, new Item.Properties().fireResistant().rarity(Rarity.EPIC).humanoidArmor(Armortier.IGNITIUM.value(), ArmorType.HELMET).attributes(Cataclysm_Armor.createAttributes(Armortier.IGNITIUM, ArmorType.HELMET))));
+    public static final DeferredItem<Item> IGNITIUM_CHESTPLATE = ITEMS.register("ignitium_chestplate", () -> new Ignitium_Armor(Armortier.IGNITIUM, ArmorType.CHESTPLATE, new Item.Properties().fireResistant().rarity(Rarity.EPIC).humanoidArmor(Armortier.IGNITIUM.value(), ArmorType.CHESTPLATE).attributes(Cataclysm_Armor.createAttributes(Armortier.IGNITIUM, ArmorType.CHESTPLATE))));
+    public static final DeferredItem<Item> IGNITIUM_ELYTRA_CHESTPLATE = ITEMS.register("ignitium_elytra_chestplate", () -> new Ignitium_Elytra_ChestPlate(new Item.Properties().fireResistant().rarity(Rarity.EPIC).humanoidArmor(Armortier.IGNITIUM.value(), ArmorType.CHESTPLATE).attributes(Cataclysm_Armor.createAttributes(Armortier.IGNITIUM, ArmorType.CHESTPLATE)).component(DataComponents.GLIDER, Unit.INSTANCE), Armortier.IGNITIUM));
+    public static final DeferredItem<Item> IGNITIUM_LEGGINGS = ITEMS.register("ignitium_leggings", () -> new Ignitium_Armor(Armortier.IGNITIUM, ArmorType.LEGGINGS, new Item.Properties().fireResistant().rarity(Rarity.EPIC).humanoidArmor(Armortier.IGNITIUM.value(), ArmorType.LEGGINGS).attributes(Cataclysm_Armor.createAttributes(Armortier.IGNITIUM, ArmorType.LEGGINGS))));
+    public static final DeferredItem<Item> IGNITIUM_BOOTS = ITEMS.register("ignitium_boots", () -> new Ignitium_Armor(Armortier.IGNITIUM, ArmorType.BOOTS, new Item.Properties().fireResistant().rarity(Rarity.EPIC).humanoidArmor(Armortier.IGNITIUM.value(), ArmorType.BOOTS).attributes(Cataclysm_Armor.createAttributes(Armortier.IGNITIUM, ArmorType.BOOTS))));
+    public static final DeferredItem<Item> CURSIUM_HELMET = ITEMS.register("cursium_helmet", () -> new Cursium_Armor(Armortier.CURSIUM, ArmorType.HELMET, new Item.Properties().fireResistant().rarity(Rarity.EPIC).humanoidArmor(Armortier.CURSIUM.value(), ArmorType.HELMET).attributes(Cataclysm_Armor.createAttributes(Armortier.CURSIUM, ArmorType.HELMET))));
+    public static final DeferredItem<Item> CURSIUM_CHESTPLATE = ITEMS.register("cursium_chestplate", () -> new Cursium_ChestPlate(Armortier.CURSIUM, ArmorType.CHESTPLATE, new Item.Properties().fireResistant().rarity(Rarity.EPIC).humanoidArmor(Armortier.CURSIUM.value(), ArmorType.CHESTPLATE).attributes(Cataclysm_Armor.createAttributes(Armortier.CURSIUM, ArmorType.CHESTPLATE))));
+    public static final DeferredItem<Item> CURSIUM_LEGGINGS = ITEMS.register("cursium_leggings", () -> new Cursium_Armor(Armortier.CURSIUM, ArmorType.LEGGINGS, new Item.Properties().fireResistant().rarity(Rarity.EPIC).humanoidArmor(Armortier.CURSIUM.value(), ArmorType.LEGGINGS).attributes(Cataclysm_Armor.createAttributes(Armortier.CURSIUM, ArmorType.LEGGINGS))));
+    public static final DeferredItem<Item> CURSIUM_BOOTS = ITEMS.register("cursium_boots", () -> new Cursium_Armor(Armortier.CURSIUM, ArmorType.BOOTS, new Item.Properties().fireResistant().rarity(Rarity.EPIC).humanoidArmor(Armortier.CURSIUM.value(), ArmorType.BOOTS).attributes(Cataclysm_Armor.createAttributes(Armortier.CURSIUM, ArmorType.BOOTS))));
     public static final DeferredItem<Item> MONSTROUS_HORN = ITEMS.register("monstrous_horn", () -> new Item(new Item.Properties().fireResistant().rarity(Rarity.EPIC)));
     public static final DeferredItem<Item> LAVA_POWER_CELL = ITEMS.register("lava_power_cell", () -> new Item(new Item.Properties().fireResistant().rarity(Rarity.EPIC)));
-    public static final DeferredItem<Item> MONSTROUS_HELM = ITEMS.register("monstrous_helm", () -> new Monstrous_Helm((Holder<ArmorMaterial>)ArmorMaterials.NETHERITE, ArmorItem.Type.HELMET, new Item.Properties().fireResistant().attributes(Cataclysm_Armor.createAttributes((Holder<ArmorMaterial>)ArmorMaterials.NETHERITE, ArmorItem.Type.HELMET, new AttributeContainer[0])).durability(ArmorItem.Type.HELMET.getDurability(45)).rarity(Rarity.EPIC)));
-    public static final DeferredItem<Item> BLOOM_STONE_PAULDRONS = ITEMS.register("bloom_stone_pauldrons", () -> new Bloom_Stone_Pauldrons((Holder<ArmorMaterial>)Armortier.CRAB, ArmorItem.Type.CHESTPLATE, new Item.Properties().fireResistant().rarity(Rarity.UNCOMMON).attributes(Cataclysm_Armor.createAttributes(Armortier.CRAB, ArmorItem.Type.CHESTPLATE, new AttributeContainer[]{new AttributeContainer((Holder<Attribute>)ModAttribute.NATURE_HEAL, 15.0, AttributeModifier.Operation.ADD_VALUE)})).durability(ArmorItem.Type.CHESTPLATE.getDurability(30)), new AttributeContainer[0]));
+    public static final DeferredItem<Item> MONSTROUS_HELM = ITEMS.register("monstrous_helm", () -> new Monstrous_Helm(ArmorMaterials.NETHERITE, ArmorType.HELMET, new Item.Properties().fireResistant().humanoidArmor(ArmorMaterials.NETHERITE, ArmorType.HELMET).rarity(Rarity.EPIC)));
+    public static final DeferredItem<Item> BLOOM_STONE_PAULDRONS = ITEMS.register("bloom_stone_pauldrons", () -> new Bloom_Stone_Pauldrons(Armortier.CRAB, ArmorType.CHESTPLATE, new Item.Properties().fireResistant().rarity(Rarity.UNCOMMON).humanoidArmor(Armortier.CRAB.value(), ArmorType.CHESTPLATE).attributes(Cataclysm_Armor.createAttributes(Armortier.CRAB, ArmorType.CHESTPLATE, new AttributeContainer(ModAttribute.NATURE_HEAL, 15.0, AttributeModifier.Operation.ADD_VALUE))), new AttributeContainer[0]));
     public static final DeferredItem<Item> BURNING_ASHES = ITEMS.register("burning_ashes", () -> new Item(new Item.Properties().fireResistant().rarity(Rarity.RARE)));
     public static final DeferredItem<Item> DYING_EMBER = ITEMS.register("dying_ember", () -> new Item(new Item.Properties().fireResistant().rarity(Rarity.UNCOMMON)));
     public static final DeferredItem<Item> MUSIC_DISC_NETHERITE_MONSTROSITY = ITEMS.register("music_disc_netherite_monstrosity", () -> new Item(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant().jukeboxPlayable(ModJukeboxSongs.MONSTROSITY_THEME)));
@@ -397,45 +395,45 @@ public class ModItems {
     public static final DeferredItem<Item> THE_BABY_LEVIATHAN_BUCKET = ITEMS.register("the_baby_leviathan_bucket", () -> new ModFishBucket((EntityType)ModEntities.THE_BABY_LEVIATHAN.get(), (Fluid)Fluids.WATER, new Item.Properties().fireResistant()));
     public static final DeferredItem<Item> MODERN_REMNANT_BUCKET = ITEMS.register("modern_remnant_bucket", () -> new ModernRemantBucket((EntityType)ModEntities.MODERN_REMNANT.get(), Fluids.EMPTY, new Item.Properties().fireResistant()));
     public static final DeferredItem<Item> NETHERITE_MINISTROSITY_BUCKET = ITEMS.register("netherite_ministrosity_bucket", () -> new ModernRemantBucket((EntityType)ModEntities.NETHERITE_MINISTROSITY.get(), Fluids.EMPTY, new Item.Properties().fireResistant()));
-    public static final DeferredItem<SpawnEggItem> ENDER_GOLEM_SPAWN_EGG = ITEMS.register("ender_golem_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> NETHERITE_MONSTROSITY_SPAWN_EGG = ITEMS.register("netherite_monstrosity_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> NETHERITE_MINISTROSITY_SPAWN_EGG = ITEMS.register("netherite_ministrosity_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> ENDER_GUARDIAN_SPAWN_EGG = ITEMS.register("ender_guardian_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> ENDERMAPTERA_SPAWN_EGG = ITEMS.register("endermaptera_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> IGNIS_SPAWN_EGG = ITEMS.register("ignis_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> IGNITED_REVENANT_SPAWN_EGG = ITEMS.register("ignited_revenant_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> IGNITED_BERSERKER_SPAWN_EGG = ITEMS.register("ignited_berserker_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> THE_WATCHER_SPAWN_EGG = ITEMS.register("the_watcher_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> THE_PROWLER_SPAWN_EGG = ITEMS.register("the_prowler_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> THE_HARBINGER_SPAWN_EGG = ITEMS.register("the_harbinger_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> THE_LEVIATHAN_SPAWN_EGG = ITEMS.register("the_leviathan_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> THE_BABY_LEVIATHAN_SPAWN_EGG = ITEMS.register("the_baby_leviathan_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> DEEPLING_SPAWN_EGG = ITEMS.register("deepling_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> DEEPLING_BRUTE_SPAWN_EGG = ITEMS.register("deepling_brute_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> DEEPLING_ANGLER_SPAWN_EGG = ITEMS.register("deepling_angler_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> DEEPLING_PRIEST_SPAWN_EGG = ITEMS.register("deepling_priest_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> DEEPLING_WARLOCK_SPAWN_EGG = ITEMS.register("deepling_warlock_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> LIONFISH_SPAWN_EGG = ITEMS.register("lionfish_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> CORAL_GOLEM_SPAWN_EGG = ITEMS.register("coral_golem_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> CORALSSUS_SPAWN_EGG = ITEMS.register("coralssus_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> AMETHYST_CRAB_SPAWN_EGG = ITEMS.register("amethyst_crab_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> KOBOLETON_SPAWN_EGG = ITEMS.register("koboleton_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> KOBOLEDIATOR_SPAWN_EGG = ITEMS.register("kobolediator_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> WADJET_SPAWN_EGG = ITEMS.register("wadjet_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> ANCIENT_REMNANT_SPAWN_EGG = ITEMS.register("ancient_remnant_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> MODERN_REMNANT_SPAWN_EGG = ITEMS.register("modern_remnant_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> MALEDICTUS_SPAWN_EGG = ITEMS.register("maledictus_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> APTRGANGR_SPAWN_EGG = ITEMS.register("aptrgangr_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> ELITE_DRAUGR_SPAWN_EGG = ITEMS.register("elite_draugr_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> ROYAL_DRAUGR_SPAWN_EGG = ITEMS.register("royal_draugr_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> DRAUGR_SPAWN_EGG = ITEMS.register("draugr_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> SCYLLA_SPAWN_EGG = ITEMS.register("scylla_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> CLAWDIAN_SPAWN_EGG = ITEMS.register("clawdian_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> HIPPOCAMTUS_SPAWN_EGG = ITEMS.register("hippocamtus_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> CINDARIA_SPAWN_EGG = ITEMS.register("cindaria_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> OCTOHOST_SPAWN_EGG = ITEMS.register("octohost_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> SYMBIOCTO_SPAWN_EGG = ITEMS.register("symbiocto_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
-    public static final DeferredItem<SpawnEggItem> URCHINKIN_SPAWN_EGG = ITEMS.register("urchinkin_spawn_egg", () -> new SpawnEggItem(new Item.Properties()));
+    public static final DeferredItem<SpawnEggItem> ENDER_GOLEM_SPAWN_EGG = ITEMS.register("ender_golem_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.ENDER_GOLEM.get())));
+    public static final DeferredItem<SpawnEggItem> NETHERITE_MONSTROSITY_SPAWN_EGG = ITEMS.register("netherite_monstrosity_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.NETHERITE_MONSTROSITY.get())));
+    public static final DeferredItem<SpawnEggItem> NETHERITE_MINISTROSITY_SPAWN_EGG = ITEMS.register("netherite_ministrosity_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.NETHERITE_MINISTROSITY.get())));
+    public static final DeferredItem<SpawnEggItem> ENDER_GUARDIAN_SPAWN_EGG = ITEMS.register("ender_guardian_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.ENDER_GUARDIAN.get())));
+    public static final DeferredItem<SpawnEggItem> ENDERMAPTERA_SPAWN_EGG = ITEMS.register("endermaptera_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.ENDERMAPTERA.get())));
+    public static final DeferredItem<SpawnEggItem> IGNIS_SPAWN_EGG = ITEMS.register("ignis_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.IGNIS.get())));
+    public static final DeferredItem<SpawnEggItem> IGNITED_REVENANT_SPAWN_EGG = ITEMS.register("ignited_revenant_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.IGNITED_REVENANT.get())));
+    public static final DeferredItem<SpawnEggItem> IGNITED_BERSERKER_SPAWN_EGG = ITEMS.register("ignited_berserker_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.IGNITED_BERSERKER.get())));
+    public static final DeferredItem<SpawnEggItem> THE_WATCHER_SPAWN_EGG = ITEMS.register("the_watcher_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.THE_WATCHER.get())));
+    public static final DeferredItem<SpawnEggItem> THE_PROWLER_SPAWN_EGG = ITEMS.register("the_prowler_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.THE_PROWLER.get())));
+    public static final DeferredItem<SpawnEggItem> THE_HARBINGER_SPAWN_EGG = ITEMS.register("the_harbinger_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.THE_HARBINGER.get())));
+    public static final DeferredItem<SpawnEggItem> THE_LEVIATHAN_SPAWN_EGG = ITEMS.register("the_leviathan_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.THE_LEVIATHAN.get())));
+    public static final DeferredItem<SpawnEggItem> THE_BABY_LEVIATHAN_SPAWN_EGG = ITEMS.register("the_baby_leviathan_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.THE_BABY_LEVIATHAN.get())));
+    public static final DeferredItem<SpawnEggItem> DEEPLING_SPAWN_EGG = ITEMS.register("deepling_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.DEEPLING.get())));
+    public static final DeferredItem<SpawnEggItem> DEEPLING_BRUTE_SPAWN_EGG = ITEMS.register("deepling_brute_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.DEEPLING_BRUTE.get())));
+    public static final DeferredItem<SpawnEggItem> DEEPLING_ANGLER_SPAWN_EGG = ITEMS.register("deepling_angler_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.DEEPLING_ANGLER.get())));
+    public static final DeferredItem<SpawnEggItem> DEEPLING_PRIEST_SPAWN_EGG = ITEMS.register("deepling_priest_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.DEEPLING_PRIEST.get())));
+    public static final DeferredItem<SpawnEggItem> DEEPLING_WARLOCK_SPAWN_EGG = ITEMS.register("deepling_warlock_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.DEEPLING_WARLOCK.get())));
+    public static final DeferredItem<SpawnEggItem> LIONFISH_SPAWN_EGG = ITEMS.register("lionfish_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.LIONFISH.get())));
+    public static final DeferredItem<SpawnEggItem> CORAL_GOLEM_SPAWN_EGG = ITEMS.register("coral_golem_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.CORAL_GOLEM.get())));
+    public static final DeferredItem<SpawnEggItem> CORALSSUS_SPAWN_EGG = ITEMS.register("coralssus_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.CORALSSUS.get())));
+    public static final DeferredItem<SpawnEggItem> AMETHYST_CRAB_SPAWN_EGG = ITEMS.register("amethyst_crab_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.AMETHYST_CRAB.get())));
+    public static final DeferredItem<SpawnEggItem> KOBOLETON_SPAWN_EGG = ITEMS.register("koboleton_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.KOBOLETON.get())));
+    public static final DeferredItem<SpawnEggItem> KOBOLEDIATOR_SPAWN_EGG = ITEMS.register("kobolediator_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.KOBOLEDIATOR.get())));
+    public static final DeferredItem<SpawnEggItem> WADJET_SPAWN_EGG = ITEMS.register("wadjet_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.WADJET.get())));
+    public static final DeferredItem<SpawnEggItem> ANCIENT_REMNANT_SPAWN_EGG = ITEMS.register("ancient_remnant_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.ANCIENT_REMNANT.get())));
+    public static final DeferredItem<SpawnEggItem> MODERN_REMNANT_SPAWN_EGG = ITEMS.register("modern_remnant_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.MODERN_REMNANT.get())));
+    public static final DeferredItem<SpawnEggItem> MALEDICTUS_SPAWN_EGG = ITEMS.register("maledictus_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.MALEDICTUS.get())));
+    public static final DeferredItem<SpawnEggItem> APTRGANGR_SPAWN_EGG = ITEMS.register("aptrgangr_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.APTRGANGR.get())));
+    public static final DeferredItem<SpawnEggItem> ELITE_DRAUGR_SPAWN_EGG = ITEMS.register("elite_draugr_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.ELITE_DRAUGR.get())));
+    public static final DeferredItem<SpawnEggItem> ROYAL_DRAUGR_SPAWN_EGG = ITEMS.register("royal_draugr_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.ROYAL_DRAUGR.get())));
+    public static final DeferredItem<SpawnEggItem> DRAUGR_SPAWN_EGG = ITEMS.register("draugr_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.DRAUGR.get())));
+    public static final DeferredItem<SpawnEggItem> SCYLLA_SPAWN_EGG = ITEMS.register("scylla_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.SCYLLA.get())));
+    public static final DeferredItem<SpawnEggItem> CLAWDIAN_SPAWN_EGG = ITEMS.register("clawdian_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.CLAWDIAN.get())));
+    public static final DeferredItem<SpawnEggItem> HIPPOCAMTUS_SPAWN_EGG = ITEMS.register("hippocamtus_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.HIPPOCAMTUS.get())));
+    public static final DeferredItem<SpawnEggItem> CINDARIA_SPAWN_EGG = ITEMS.register("cindaria_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.CINDARIA.get())));
+    public static final DeferredItem<SpawnEggItem> OCTOHOST_SPAWN_EGG = ITEMS.register("octohost_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.DROWNED_HOST.get())));
+    public static final DeferredItem<SpawnEggItem> SYMBIOCTO_SPAWN_EGG = ITEMS.register("symbiocto_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.SYMBIOCTO.get())));
+    public static final DeferredItem<SpawnEggItem> URCHINKIN_SPAWN_EGG = ITEMS.register("urchinkin_spawn_egg", () -> new SpawnEggItem(new Item.Properties().spawnEgg(ModEntities.URCHINKIN.get())));
     public static final DeferredItem<BlockItem> ALTAR_OF_VOID = ITEMS.register("altar_of_void", () -> new BlockItem((Block)ModBlocks.ALTAR_OF_VOID.get(), new Item.Properties().fireResistant().rarity(Rarity.EPIC)));
     public static final DeferredItem<BlockItem> ALTAR_OF_FIRE = ITEMS.register("altar_of_fire", () -> new BlockItem((Block)ModBlocks.ALTAR_OF_FIRE.get(), new Item.Properties().fireResistant().rarity(Rarity.EPIC)));
     public static final DeferredItem<BlockItem> ALTAR_OF_AMETHYST = ITEMS.register("altar_of_amethyst", () -> new BlockItem((Block)ModBlocks.ALTAR_OF_AMETHYST.get(), new Item.Properties().fireResistant().rarity(Rarity.EPIC)));
@@ -447,6 +445,17 @@ public class ModItems {
     public static final DeferredItem<BlockItem> DOOR_OF_SEAL = ITEMS.register("door_of_seal", () -> new BlockItem((Block)ModBlocks.DOOR_OF_SEAL.get(), new Item.Properties().fireResistant().rarity(Rarity.EPIC)));
     public static final DeferredItem<BlockItem> GODDESS_STATUE = ITEMS.register("goddess_statue", () -> new BlockItem((Block)ModBlocks.GODDESS_STATUE.get(), new Item.Properties().fireResistant().rarity(Rarity.EPIC)));
     public static final DeferredItem<BlockItem> BOSS_RESPAWNER = ITEMS.register("boss_respawner", () -> new BlockItem((Block)ModBlocks.BOSS_RESPAWNER.get(), new Item.Properties().fireResistant().rarity(Rarity.EPIC)));
+
+    private static ItemAttributeModifiers toolAttributes(ToolMaterial material, float attackDamageBaseline, float attackSpeedBaseline) {
+        return ItemAttributeModifiers.builder()
+            .add(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE,
+                new net.minecraft.world.entity.ai.attributes.AttributeModifier(Item.BASE_ATTACK_DAMAGE_ID, attackDamageBaseline + material.attackDamageBonus(), net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADD_VALUE),
+                net.minecraft.world.entity.EquipmentSlotGroup.MAINHAND)
+            .add(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_SPEED,
+                new net.minecraft.world.entity.ai.attributes.AttributeModifier(Item.BASE_ATTACK_SPEED_ID, attackSpeedBaseline, net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation.ADD_VALUE),
+                net.minecraft.world.entity.EquipmentSlotGroup.MAINHAND)
+            .build();
+    }
 
     public static void initDispenser() {
         DispenserBlock.registerProjectileBehavior((ItemLike)((ItemLike)VOID_SCATTER_ARROW.get()));
@@ -472,46 +481,46 @@ public class ModItems {
         if (!ConfigHolder.COMMON_SPEC.isLoaded()) {
             Cataclysm.LOGGER.error("Could not modify default components due to config not being loaded yet");
         } else {
-            event.modify((ItemLike)MONSTROUS_HELM.get(), (components, context, item) -> components.set(DataComponents.UNBREAKABLE, new Unbreakable(true)));
+            event.modify((ItemLike)MONSTROUS_HELM.get(), (components, context, item) -> components.set(DataComponents.UNBREAKABLE, Unit.INSTANCE));
             event.modify((ItemLike)IGNITIUM_HELMET.get(), (components, context, item) -> {
-                components.set(DataComponents.UNBREAKABLE, new Unbreakable(true));
-                AttributeUtils.mergeAttributes(components, (Item)IGNITIUM_HELMET.get(), Cataclysm_Armor.createArmorAttributes(Armortier.IGNITIUM, (float)CMCommonConfig.IgnitiumArmor.armorMultiplier, (float)CMCommonConfig.IgnitiumArmor.toughness, (float)CMCommonConfig.IgnitiumArmor.knockbackResistance, ArmorItem.Type.HELMET, new AttributeContainer[0]));
+                components.set(DataComponents.UNBREAKABLE, Unit.INSTANCE);
+                AttributeUtils.mergeAttributes(components, (Item)IGNITIUM_HELMET.get(), Cataclysm_Armor.createArmorAttributes(Armortier.IGNITIUM, (float)CMCommonConfig.IgnitiumArmor.armorMultiplier, (float)CMCommonConfig.IgnitiumArmor.toughness, (float)CMCommonConfig.IgnitiumArmor.knockbackResistance, ArmorType.HELMET, new AttributeContainer[0]));
             });
             event.modify((ItemLike)IGNITIUM_CHESTPLATE.get(), (components, context, item) -> {
-                components.set(DataComponents.UNBREAKABLE, new Unbreakable(true));
-                AttributeUtils.mergeAttributes(components, (Item)IGNITIUM_CHESTPLATE.get(), Cataclysm_Armor.createArmorAttributes(Armortier.IGNITIUM, (float)CMCommonConfig.IgnitiumArmor.armorMultiplier, (float)CMCommonConfig.IgnitiumArmor.toughness, (float)CMCommonConfig.IgnitiumArmor.knockbackResistance, ArmorItem.Type.CHESTPLATE, new AttributeContainer[0]));
+                components.set(DataComponents.UNBREAKABLE, Unit.INSTANCE);
+                AttributeUtils.mergeAttributes(components, (Item)IGNITIUM_CHESTPLATE.get(), Cataclysm_Armor.createArmorAttributes(Armortier.IGNITIUM, (float)CMCommonConfig.IgnitiumArmor.armorMultiplier, (float)CMCommonConfig.IgnitiumArmor.toughness, (float)CMCommonConfig.IgnitiumArmor.knockbackResistance, ArmorType.CHESTPLATE, new AttributeContainer[0]));
             });
             event.modify((ItemLike)IGNITIUM_ELYTRA_CHESTPLATE.get(), (components, context, item) -> {
-                components.set(DataComponents.UNBREAKABLE, new Unbreakable(true));
-                AttributeUtils.mergeAttributes(components, (Item)IGNITIUM_ELYTRA_CHESTPLATE.get(), Cataclysm_Armor.createArmorAttributes(Armortier.IGNITIUM, (float)CMCommonConfig.IgnitiumArmor.armorMultiplier, (float)CMCommonConfig.IgnitiumArmor.toughness, (float)CMCommonConfig.IgnitiumArmor.knockbackResistance, ArmorItem.Type.CHESTPLATE, new AttributeContainer[0]));
+                components.set(DataComponents.UNBREAKABLE, Unit.INSTANCE);
+                AttributeUtils.mergeAttributes(components, (Item)IGNITIUM_ELYTRA_CHESTPLATE.get(), Cataclysm_Armor.createArmorAttributes(Armortier.IGNITIUM, (float)CMCommonConfig.IgnitiumArmor.armorMultiplier, (float)CMCommonConfig.IgnitiumArmor.toughness, (float)CMCommonConfig.IgnitiumArmor.knockbackResistance, ArmorType.CHESTPLATE, new AttributeContainer[0]));
             });
             event.modify((ItemLike)IGNITIUM_LEGGINGS.get(), (components, context, item) -> {
-                components.set(DataComponents.UNBREAKABLE, new Unbreakable(true));
-                AttributeUtils.mergeAttributes(components, (Item)IGNITIUM_LEGGINGS.get(), Cataclysm_Armor.createArmorAttributes(Armortier.IGNITIUM, (float)CMCommonConfig.IgnitiumArmor.armorMultiplier, (float)CMCommonConfig.IgnitiumArmor.toughness, (float)CMCommonConfig.IgnitiumArmor.knockbackResistance, ArmorItem.Type.LEGGINGS, new AttributeContainer[0]));
+                components.set(DataComponents.UNBREAKABLE, Unit.INSTANCE);
+                AttributeUtils.mergeAttributes(components, (Item)IGNITIUM_LEGGINGS.get(), Cataclysm_Armor.createArmorAttributes(Armortier.IGNITIUM, (float)CMCommonConfig.IgnitiumArmor.armorMultiplier, (float)CMCommonConfig.IgnitiumArmor.toughness, (float)CMCommonConfig.IgnitiumArmor.knockbackResistance, ArmorType.LEGGINGS, new AttributeContainer[0]));
             });
             event.modify((ItemLike)IGNITIUM_BOOTS.get(), (components, context, item) -> {
-                components.set(DataComponents.UNBREAKABLE, new Unbreakable(true));
-                AttributeUtils.mergeAttributes(components, (Item)IGNITIUM_BOOTS.get(), Cataclysm_Armor.createArmorAttributes(Armortier.IGNITIUM, (float)CMCommonConfig.IgnitiumArmor.armorMultiplier, (float)CMCommonConfig.IgnitiumArmor.toughness, (float)CMCommonConfig.IgnitiumArmor.knockbackResistance, ArmorItem.Type.BOOTS, new AttributeContainer[0]));
+                components.set(DataComponents.UNBREAKABLE, Unit.INSTANCE);
+                AttributeUtils.mergeAttributes(components, (Item)IGNITIUM_BOOTS.get(), Cataclysm_Armor.createArmorAttributes(Armortier.IGNITIUM, (float)CMCommonConfig.IgnitiumArmor.armorMultiplier, (float)CMCommonConfig.IgnitiumArmor.toughness, (float)CMCommonConfig.IgnitiumArmor.knockbackResistance, ArmorType.BOOTS, new AttributeContainer[0]));
             });
             event.modify((ItemLike)CURSIUM_HELMET.get(), (components, context, item) -> {
-                components.set(DataComponents.UNBREAKABLE, new Unbreakable(true));
-                AttributeUtils.mergeAttributes(components, (Item)CURSIUM_HELMET.get(), Cataclysm_Armor.createArmorAttributes(Armortier.CURSIUM, (float)CMCommonConfig.CursiumArmor.armorMultiplier, (float)CMCommonConfig.CursiumArmor.toughness, (float)CMCommonConfig.CursiumArmor.knockbackResistance, ArmorItem.Type.HELMET, new AttributeContainer[0]));
+                components.set(DataComponents.UNBREAKABLE, Unit.INSTANCE);
+                AttributeUtils.mergeAttributes(components, (Item)CURSIUM_HELMET.get(), Cataclysm_Armor.createArmorAttributes(Armortier.CURSIUM, (float)CMCommonConfig.CursiumArmor.armorMultiplier, (float)CMCommonConfig.CursiumArmor.toughness, (float)CMCommonConfig.CursiumArmor.knockbackResistance, ArmorType.HELMET, new AttributeContainer[0]));
             });
             event.modify((ItemLike)CURSIUM_CHESTPLATE.get(), (components, context, item) -> {
-                components.set(DataComponents.UNBREAKABLE, new Unbreakable(true));
-                AttributeUtils.mergeAttributes(components, (Item)CURSIUM_CHESTPLATE.get(), Cataclysm_Armor.createArmorAttributes(Armortier.CURSIUM, (float)CMCommonConfig.CursiumArmor.armorMultiplier, (float)CMCommonConfig.CursiumArmor.toughness, (float)CMCommonConfig.CursiumArmor.knockbackResistance, ArmorItem.Type.CHESTPLATE, new AttributeContainer[0]));
+                components.set(DataComponents.UNBREAKABLE, Unit.INSTANCE);
+                AttributeUtils.mergeAttributes(components, (Item)CURSIUM_CHESTPLATE.get(), Cataclysm_Armor.createArmorAttributes(Armortier.CURSIUM, (float)CMCommonConfig.CursiumArmor.armorMultiplier, (float)CMCommonConfig.CursiumArmor.toughness, (float)CMCommonConfig.CursiumArmor.knockbackResistance, ArmorType.CHESTPLATE, new AttributeContainer[0]));
             });
             event.modify((ItemLike)CURSIUM_LEGGINGS.get(), (components, context, item) -> {
-                components.set(DataComponents.UNBREAKABLE, new Unbreakable(true));
-                AttributeUtils.mergeAttributes(components, (Item)CURSIUM_LEGGINGS.get(), Cataclysm_Armor.createArmorAttributes(Armortier.CURSIUM, (float)CMCommonConfig.CursiumArmor.armorMultiplier, (float)CMCommonConfig.CursiumArmor.toughness, (float)CMCommonConfig.CursiumArmor.knockbackResistance, ArmorItem.Type.LEGGINGS, new AttributeContainer[0]));
+                components.set(DataComponents.UNBREAKABLE, Unit.INSTANCE);
+                AttributeUtils.mergeAttributes(components, (Item)CURSIUM_LEGGINGS.get(), Cataclysm_Armor.createArmorAttributes(Armortier.CURSIUM, (float)CMCommonConfig.CursiumArmor.armorMultiplier, (float)CMCommonConfig.CursiumArmor.toughness, (float)CMCommonConfig.CursiumArmor.knockbackResistance, ArmorType.LEGGINGS, new AttributeContainer[0]));
             });
             event.modify((ItemLike)CURSIUM_BOOTS.get(), (components, context, item) -> {
-                components.set(DataComponents.UNBREAKABLE, new Unbreakable(true));
-                AttributeUtils.mergeAttributes(components, (Item)CURSIUM_BOOTS.get(), Cataclysm_Armor.createArmorAttributes(Armortier.CURSIUM, (float)CMCommonConfig.CursiumArmor.armorMultiplier, (float)CMCommonConfig.CursiumArmor.toughness, (float)CMCommonConfig.CursiumArmor.knockbackResistance, ArmorItem.Type.BOOTS, new AttributeContainer[0]));
+                components.set(DataComponents.UNBREAKABLE, Unit.INSTANCE);
+                AttributeUtils.mergeAttributes(components, (Item)CURSIUM_BOOTS.get(), Cataclysm_Armor.createArmorAttributes(Armortier.CURSIUM, (float)CMCommonConfig.CursiumArmor.armorMultiplier, (float)CMCommonConfig.CursiumArmor.toughness, (float)CMCommonConfig.CursiumArmor.knockbackResistance, ArmorType.BOOTS, new AttributeContainer[0]));
             });
-            event.modify((ItemLike)BONE_REPTILE_HELMET.get(), (components, context, item) -> AttributeUtils.mergeAttributes(components, (Item)BONE_REPTILE_HELMET.get(), Cataclysm_Armor.createArmorAttributes(Armortier.BONE_REPTILE, (float)CMCommonConfig.BoneReptileArmor.armorMultiplier, (float)CMCommonConfig.BoneReptileArmor.toughness, (float)CMCommonConfig.BoneReptileArmor.knockbackResistance, ArmorItem.Type.HELMET, new AttributeContainer[0])));
-            event.modify((ItemLike)BONE_REPTILE_CHESTPLATE.get(), (components, context, item) -> AttributeUtils.mergeAttributes(components, (Item)BONE_REPTILE_CHESTPLATE.get(), Cataclysm_Armor.createArmorAttributes(Armortier.BONE_REPTILE, (float)CMCommonConfig.BoneReptileArmor.armorMultiplier, (float)CMCommonConfig.BoneReptileArmor.toughness, (float)CMCommonConfig.BoneReptileArmor.knockbackResistance, ArmorItem.Type.CHESTPLATE, new AttributeContainer[0])));
-            event.modify((ItemLike)BLOOM_STONE_PAULDRONS.get(), (components, context, item) -> AttributeUtils.mergeAttributes(components, (Item)BLOOM_STONE_PAULDRONS.get(), Cataclysm_Armor.createArmorAttributes(Armortier.CRAB, (float)CMCommonConfig.BloomStoneArmor.armorMultiplier, (float)CMCommonConfig.BloomStoneArmor.toughness, (float)CMCommonConfig.BloomStoneArmor.knockbackResistance, ArmorItem.Type.CHESTPLATE, new AttributeContainer[0])));
+            event.modify((ItemLike)BONE_REPTILE_HELMET.get(), (components, context, item) -> AttributeUtils.mergeAttributes(components, (Item)BONE_REPTILE_HELMET.get(), Cataclysm_Armor.createArmorAttributes(Armortier.BONE_REPTILE, (float)CMCommonConfig.BoneReptileArmor.armorMultiplier, (float)CMCommonConfig.BoneReptileArmor.toughness, (float)CMCommonConfig.BoneReptileArmor.knockbackResistance, ArmorType.HELMET, new AttributeContainer[0])));
+            event.modify((ItemLike)BONE_REPTILE_CHESTPLATE.get(), (components, context, item) -> AttributeUtils.mergeAttributes(components, (Item)BONE_REPTILE_CHESTPLATE.get(), Cataclysm_Armor.createArmorAttributes(Armortier.BONE_REPTILE, (float)CMCommonConfig.BoneReptileArmor.armorMultiplier, (float)CMCommonConfig.BoneReptileArmor.toughness, (float)CMCommonConfig.BoneReptileArmor.knockbackResistance, ArmorType.CHESTPLATE, new AttributeContainer[0])));
+            event.modify((ItemLike)BLOOM_STONE_PAULDRONS.get(), (components, context, item) -> AttributeUtils.mergeAttributes(components, (Item)BLOOM_STONE_PAULDRONS.get(), Cataclysm_Armor.createArmorAttributes(Armortier.CRAB, (float)CMCommonConfig.BloomStoneArmor.armorMultiplier, (float)CMCommonConfig.BloomStoneArmor.toughness, (float)CMCommonConfig.BloomStoneArmor.knockbackResistance, ArmorType.CHESTPLATE, new AttributeContainer[0])));
             event.modify((ItemLike)GAUNTLET_OF_BULWARK.get(), (components, context, item) -> AttributeUtils.mergeAttributes(components, (Item)GAUNTLET_OF_BULWARK.get(), Cataclysm_Weapon.createAttributes(-1.0f + (float)CMCommonConfig.GauntletOfBulwark.attackDamage, -4.0f + (float)CMCommonConfig.GauntletOfBulwark.attackSpeed, new AttributeContainer[0])));
             event.modify((ItemLike)GAUNTLET_OF_GUARD.get(), (components, context, item) -> AttributeUtils.mergeAttributes(components, (Item)GAUNTLET_OF_GUARD.get(), Cataclysm_Weapon.createAttributes(-1.0f + (float)CMCommonConfig.GauntletOfGuard.attackDamage, -4.0f + (float)CMCommonConfig.GauntletOfGuard.attackSpeed, new AttributeContainer[0])));
             event.modify((ItemLike)GAUNTLET_OF_MAELSTROM.get(), (components, context, item) -> AttributeUtils.mergeAttributes(components, (Item)GAUNTLET_OF_MAELSTROM.get(), Cataclysm_Weapon.createAttributes(-1.0f + (float)CMCommonConfig.GauntletOfMaelstrom.attackDamage, -4.0f + (float)CMCommonConfig.GauntletOfMaelstrom.attackSpeed, new AttributeContainer[0])));
@@ -522,10 +531,10 @@ public class ModItems {
             event.modify((ItemLike)THE_IMMOLATOR.get(), (components, context, item) -> AttributeUtils.mergeAttributes(components, (Item)THE_IMMOLATOR.get(), Cataclysm_Weapon.createAttributes(-1.0f + (float)CMCommonConfig.Immolator.attackDamage, -4.0f + (float)CMCommonConfig.Immolator.attackSpeed, new AttributeContainer[0])));
             event.modify((ItemLike)ASTRAPE.get(), (components, context, item) -> AttributeUtils.mergeAttributes(components, (Item)ASTRAPE.get(), Cataclysm_Weapon.createAttributes(-1.0f + (float)CMCommonConfig.Astrape.attackDamage, -4.0f + (float)CMCommonConfig.Astrape.attackSpeed, new AttributeContainer[0])));
             event.modify((ItemLike)THE_INCINERATOR.get(), (components, context, item) -> AttributeUtils.mergeAttributes(components, (Item)THE_INCINERATOR.get(), Cataclysm_Weapon.createAttributes(-1.0f + (float)CMCommonConfig.Incinerator.attackDamage, -4.0f + (float)CMCommonConfig.Incinerator.attackSpeed, new AttributeContainer[0])));
-            event.modify((ItemLike)INFERNAL_FORGE.get(), (components, context, item) -> AttributeUtils.mergeAttributes(components, (Item)INFERNAL_FORGE.get(), PickaxeItem.createAttributes((Tier)Tooltier.MONSTROSITY, (float)(-4.0f + (float)CMCommonConfig.InfernalForge.attackDamage), (float)(-4.0f + (float)CMCommonConfig.InfernalForge.attackSpeed))));
+            event.modify((ItemLike)INFERNAL_FORGE.get(), (components, context, item) -> AttributeUtils.mergeAttributes(components, (Item)INFERNAL_FORGE.get(), toolAttributes(Tooltier.MONSTROSITY, -4.0F + (float)CMCommonConfig.InfernalForge.attackDamage, -4.0F + (float)CMCommonConfig.InfernalForge.attackSpeed)));
             event.modify((ItemLike)TIDAL_CLAWS.get(), (components, context, item) -> AttributeUtils.mergeAttributes(components, (Item)TIDAL_CLAWS.get(), Cataclysm_Weapon.createAttributes(-1.0f + (float)CMCommonConfig.TidalClaws.attackDamage, -4.0f + (float)CMCommonConfig.TidalClaws.attackSpeed, new AttributeContainer[0])));
-            event.modify((ItemLike)BRONTES.get(), (components, context, item) -> AttributeUtils.mergeAttributes(components, (Item)BRONTES.get(), PickaxeItem.createAttributes((Tier)Tooltier.MONSTROSITY, (float)(-4.0f + (float)CMCommonConfig.Brontes.attackDamage), (float)(-4.0f + (float)CMCommonConfig.Brontes.attackSpeed))));
-            event.modify((ItemLike)VOID_FORGE.get(), (components, context, item) -> AttributeUtils.mergeAttributes(components, (Item)VOID_FORGE.get(), PickaxeItem.createAttributes((Tier)Tooltier.MONSTROSITY, (float)(-4.0f + (float)CMCommonConfig.VoidForge.attackDamage), (float)(-4.0f + (float)CMCommonConfig.VoidForge.attackSpeed))));
+            event.modify((ItemLike)BRONTES.get(), (components, context, item) -> AttributeUtils.mergeAttributes(components, (Item)BRONTES.get(), toolAttributes(Tooltier.MONSTROSITY, -4.0F + (float)CMCommonConfig.Brontes.attackDamage, -4.0F + (float)CMCommonConfig.Brontes.attackSpeed)));
+            event.modify((ItemLike)VOID_FORGE.get(), (components, context, item) -> AttributeUtils.mergeAttributes(components, (Item)VOID_FORGE.get(), toolAttributes(Tooltier.MONSTROSITY, -4.0F + (float)CMCommonConfig.VoidForge.attackDamage, -4.0F + (float)CMCommonConfig.VoidForge.attackSpeed)));
             event.modify((ItemLike)ANCIENT_SPEAR.get(), (components, context, item) -> AttributeUtils.mergeAttributes(components, (Item)ANCIENT_SPEAR.get(), Cataclysm_Weapon.createAttributes(-1.0f + (float)CMCommonConfig.AncientSpear.attackDamage, -4.0f + (float)CMCommonConfig.AncientSpear.attackSpeed, new AttributeContainer[0])));
         }
     }
