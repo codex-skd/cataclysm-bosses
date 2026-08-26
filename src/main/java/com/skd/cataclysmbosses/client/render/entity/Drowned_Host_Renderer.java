@@ -27,7 +27,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.zombie.Zombie;
 
 public class Drowned_Host_Renderer
-extends AbstractZombieRenderer<Drowned_Host_Entity, Drowned_Host_Model<Drowned_Host_Entity>> {
+extends CmMobRenderer<Drowned_Host_Entity> {
     private static final Identifier DROWNED_LOCATION = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/sea/drowned_host.png");
 
     public Drowned_Host_Renderer(EntityRendererProvider.Context p_173964_) {

@@ -26,7 +26,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Hippocamtus_Renderer
-extends MobRenderer<Hippocamtus_Entity, Hippocamtus_Model> {
+extends CmMobRenderer<Hippocamtus_Entity> {
     private static final Identifier KOBOLEDIATOR_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/sea/hippocamtus.png");
 
     public Hippocamtus_Renderer(EntityRendererProvider.Context renderManagerIn) {

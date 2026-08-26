@@ -24,7 +24,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Coralssus_Renderer
-extends MobRenderer<Coralssus_Entity, Coralssus_Model> {
+extends CmMobRenderer<Coralssus_Entity> {
     private static final Identifier FIRE_TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/deepling/coralssus_fire.png");
     private static final Identifier HORN_TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/deepling/coralssus_horn.png");
     private static final Identifier TUBE_TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/deepling/coralssus_tube.png");

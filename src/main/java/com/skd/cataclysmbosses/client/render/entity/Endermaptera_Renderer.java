@@ -37,7 +37,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Endermaptera_Renderer
-extends MobRenderer<Endermaptera_Entity, Endermaptera_Model> {
+extends CmMobRenderer<Endermaptera_Entity> {
     private static final Identifier SSAPBUG_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/ender_ssap_bug.png");
     private static final Identifier SSAPBUG_LAYER_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/ender_ssap_bug_layer.png");
 

@@ -25,7 +25,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Spike_Renderer
-extends MobRenderer<Spike_Entity, Spike_Model> {
+extends CmMobRenderer<Spike_Entity> {
     private static final Identifier LIONFISH_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/deepling/lionfish.png");
 
     public Spike_Renderer(EntityRendererProvider.Context renderManagerIn) {

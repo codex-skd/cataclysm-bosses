@@ -24,7 +24,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Urchinkin_Renderer
-extends MobRenderer<Urchinkin_Entity, Urchinkin_Model> {
+extends CmMobRenderer<Urchinkin_Entity> {
     private static final Identifier URCHIN_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/sea/urchinkin.png");
     private static final Identifier MEAT_BOY = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/sea/meat_boy.png");
 

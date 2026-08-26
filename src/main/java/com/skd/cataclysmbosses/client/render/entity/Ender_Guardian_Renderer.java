@@ -25,7 +25,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Ender_Guardian_Renderer
-extends MobRenderer<Ender_Guardian_Entity, Ender_Guardian_Model> {
+extends CmMobRenderer<Ender_Guardian_Entity> {
     private static final Identifier ENDER_GUARDIAN_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/ender_guardian.png");
 
     public Ender_Guardian_Renderer(EntityRendererProvider.Context renderManagerIn) {

@@ -28,7 +28,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Koboleton_Renderer
-extends MobRenderer<Koboleton_Entity, Koboleton_Model> {
+extends CmMobRenderer<Koboleton_Entity> {
     private static final Identifier KOBOLETON_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/koboleton/koboleton.png");
     private static final Identifier KOBOLETON_LAYER_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/koboleton/koboleton_layer.png");
 

@@ -29,7 +29,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 
 public class Royal_Draugr_Renderer
-extends MobRenderer<Royal_Draugr_Entity, Royal_Draugr_Model> {
+extends CmMobRenderer<Royal_Draugr_Entity> {
     private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/draugar/royal_draugr.png");
     private static final Identifier LAYER = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/draugar/draugr_layer.png");
 

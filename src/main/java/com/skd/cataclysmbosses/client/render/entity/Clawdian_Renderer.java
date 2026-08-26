@@ -30,7 +30,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Clawdian_Renderer
-extends MobRenderer<Clawdian_Entity, Clawdian_Model> {
+extends CmMobRenderer<Clawdian_Entity> {
     private static final Identifier KOBOLEDIATOR_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/sea/shrimp.png");
     private static final Identifier LAYER = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/sea/shrimp_glow.png");
 

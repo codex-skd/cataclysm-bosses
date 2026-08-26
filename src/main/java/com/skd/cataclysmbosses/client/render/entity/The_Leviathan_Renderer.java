@@ -39,7 +39,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmMobRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.culling.Frustum;
@@ -61,7 +62,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(value=Dist.CLIENT)
 public class The_Leviathan_Renderer
-extends MobRenderer<The_Leviathan_Entity, The_Leviathan_Model> {
+extends CmMobRenderer<The_Leviathan_Entity> {
     private static final Identifier LEVIATHAN_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/leviathan/the_leviathan.png");
     private static final Identifier BURNING_LEVIATHAN_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/leviathan/the_burning_leviathan.png");
     private static final Identifier LEVIATHAN_TEXTURE_EYES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/leviathan/the_leviathan_eye.png");
@@ -104,8 +105,7 @@ extends MobRenderer<The_Leviathan_Entity, The_Leviathan_Model> {
         return super.getRenderOffset((Entity)entity, partialTicks);
     }
 
-    public void render(The_Leviathan_Entity entity, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
-        super.render((LivingEntity)entity, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
+    protected void render(The_Leviathan_Entity entity, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
         if (entity.getAnimation() == The_Leviathan_Entity.LEVIATHAN_TAIL_WHIPS) {
             Vec3 bladePos = RenderUtils.matrixStackFromCitadelModel((Entity)entity, entityYaw, ((The_Leviathan_Model)this.model).Tail_Particle);
             entity.setSocketPosArray(0, bladePos);

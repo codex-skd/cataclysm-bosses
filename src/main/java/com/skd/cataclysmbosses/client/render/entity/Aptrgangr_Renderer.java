@@ -33,7 +33,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Aptrgangr_Renderer
-extends MobRenderer<Aptrgangr_Entity, Aptrgangr_Model> {
+extends CmMobRenderer<Aptrgangr_Entity> {
     private final RandomSource rnd = RandomSource.create();
     private static final Identifier APTRGANGR_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/draugar/aptrgangr.png");
 

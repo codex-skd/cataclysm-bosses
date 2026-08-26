@@ -26,7 +26,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Cindaria_Renderer
-extends MobRenderer<Cindaria_Entity, Cindaria_Model> {
+extends CmMobRenderer<Cindaria_Entity> {
     private static final Identifier CINDARIA_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/sea/cindaria_armor.png");
 
     public Cindaria_Renderer(EntityRendererProvider.Context renderManagerIn) {

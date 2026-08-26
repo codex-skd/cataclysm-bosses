@@ -26,7 +26,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Ancient_Remnant_Rework_Renderer
-extends MobRenderer<Ancient_Remnant_Entity, Ancient_Remnant_Rework_Model> {
+extends CmMobRenderer<Ancient_Remnant_Entity> {
     private static final Identifier REMNANT_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/ancient_remnant/ancient_remnant.png");
     private final RandomSource rnd = RandomSource.create();
 

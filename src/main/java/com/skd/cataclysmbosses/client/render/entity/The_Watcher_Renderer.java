@@ -25,7 +25,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(value=Dist.CLIENT)
 public class The_Watcher_Renderer
-extends MobRenderer<The_Watcher_Entity, The_Watcher_Model> {
+extends CmMobRenderer<The_Watcher_Entity> {
     private static final Identifier WATCHER_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/factory/the_watcher.png");
     private static final Identifier WATCHER_LAYER_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/factory/the_watcher_layer.png");
 

@@ -24,7 +24,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Amethyst_Crab_Renderer
-extends MobRenderer<Amethyst_Crab_Entity, Amethyst_Crab_Model> {
+extends CmMobRenderer<Amethyst_Crab_Entity> {
     private static final Identifier TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/amethyst_crab.png");
     private static final Identifier KRABS_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/mr_amethyst_krabs.png");
 

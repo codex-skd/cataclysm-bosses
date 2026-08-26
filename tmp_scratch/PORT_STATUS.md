@@ -2,8 +2,8 @@ SESSION STATUS — NeoForge 26.2.0.45-beta -> 26.2.0.57 compile port
 ================================================================
 Date: 2026-08-26
 Compile baseline: ./gradlew compileJava  (Xmaxerrs 20000)
-Error count: start 5548 -> 5010 -> 3782 (items) -> 3524 -> 3381 (CMItemstackRenderer) -> now 3207
-Item/data-driven cluster DONE (~258). Custom item renderer DONE (~143). Simple EntityRenderers batch DONE (~174, 56 files):
+Error count: start 5548 -> 5010 -> 3782 (items) -> 3524 -> 3381 (CMItemstackRenderer) -> 3207 -> now 3162
+Item/data-driven cluster DONE (~258). Custom item renderer DONE (~143). Simple EntityRenderers batch DONE (~174, 56 files). MobRenderer bosses batch DONE (~45, 34 files):
 see "CLUSTER FIXED (CMItemstackRenderer / custom item rendering)" below.
 
 Resumes: local branch minecraft/26.2/neoforge-26.2.0.57/production
@@ -80,10 +80,21 @@ Resumes: local branch minecraft/26.2/neoforge-26.2.0.57/production
   ResourceLocation->Identifier, this.model.renderType(...) -> RenderTypes.entityCutout(...)
   + RenderTypes import fix. Removed super.render nametag calls (handled by bridge).
   Example: Thrown_Coral_Spear/Bardiche, Brontes, Abyss blast variants, etc.
-- Remaining in render/entity: 33 MobRenderer-based bosses (Scylla 38, Clawdian 65, ...),
-  need CmMobRenderer<T extends LivingEntity> sibling bridge (LivingEntityRenderState,
-  model field, shadow, layers, getTextureLocation, scale/getBob/setupRotations etc.).
-  Plus 13 files with missing base classes (Lionfish_Entity itself missing).
+- Remaining in render/entity: ~13 files with missing entity/model bases (e.g. Lionfish_Entity
+  itself missing — referenced but never ported; blocks ModEntities compilation).
+
+== CLUSTER FIXED (MobRenderer bosses batch — 34 files) ==
+- Compat bridge CmMobRenderer<T extends Mob> extends CmEntityRenderer<T> with stubs for
+  the old LivingEntityRenderer/MobRenderer helpers called from Scylla etc.:
+  model field via compat ctor (Object model), addLayer raw, getAttackAnim/getBob/
+  setupRotations/scale/isBodyVisible/getWhiteOverlayProgress/getRenderType/getFlipDegrees/
+  isShaking/shouldShowName/getOverlayCoords/isEntityUpsideDown etc. All return safe defaults.
+- Batch-converted 34 MobRenderer/LivingEntityRenderer bosses:
+  extends CmMobRenderer<XXX>, render(XXX,float,PoseStack,CmMultiBufferSource,int),
+  ResourceLocation->Identifier, this.model.renderType(...) -> RenderTypes.entityCutout(...),
+  layer loops commented as TODO (need new RenderLayer<S,M>.submit API).
+  Scylla_Renderer: 38 -> 23 errors (-15); similar for others. Two syntax fixes for
+  AbstractZombieRenderer 3-param generics (Drowned_Host, Ignited_Berserker).
 
 == PREVIOUS SESSION CLUSTERS (mechanical) ==
 Local checkpoint commits (NOT pushed, local-only):

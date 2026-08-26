@@ -24,7 +24,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(value=Dist.CLIENT)
 public class The_Baby_Leviathan_Renderer
-extends MobRenderer<The_Baby_Leviathan_Entity, The_Baby_Leviathan_Model> {
+extends CmMobRenderer<The_Baby_Leviathan_Entity> {
     private static final Identifier BABY_LEVIATHAN_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/leviathan/the_baby_leviathan.png");
 
     public The_Baby_Leviathan_Renderer(EntityRendererProvider.Context renderManagerIn) {

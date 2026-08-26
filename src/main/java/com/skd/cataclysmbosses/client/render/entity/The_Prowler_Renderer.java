@@ -36,7 +36,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(value=Dist.CLIENT)
 public class The_Prowler_Renderer
-extends MobRenderer<The_Prowler_Entity, The_Prowler_Model> {
+extends CmMobRenderer<The_Prowler_Entity> {
     private final RandomSource rnd = RandomSource.create();
     private static final Identifier PROWLER_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/factory/the_prowler.png");
     private static final Identifier[] TEXTURE_PROGRESS = new Identifier[4];

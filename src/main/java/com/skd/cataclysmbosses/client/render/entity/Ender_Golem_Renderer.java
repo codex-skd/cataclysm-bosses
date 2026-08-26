@@ -25,7 +25,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Ender_Golem_Renderer
-extends MobRenderer<Ender_Golem_Entity, Ender_Golem_Model> {
+extends CmMobRenderer<Ender_Golem_Entity> {
     private static final Identifier ENDER_GOLEM_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/ender_golem.png");
 
     public Ender_Golem_Renderer(EntityRendererProvider.Context renderManagerIn) {

@@ -28,7 +28,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Deepling_Warlock_Renderer
-extends MobRenderer<Deepling_Warlock_Entity, Deepling_Warlock_Model> {
+extends CmMobRenderer<Deepling_Warlock_Entity> {
     private static final Identifier DEEPLING_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/deepling/deepling_warlock.png");
     private static final Identifier DEEPLING_LAYER_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/deepling/deepling_warlock_layer.png");
 

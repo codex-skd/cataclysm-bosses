@@ -29,7 +29,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Deepling_Priest_Renderer
-extends MobRenderer<Deepling_Priest_Entity, Deepling_Priest_Model> {
+extends CmMobRenderer<Deepling_Priest_Entity> {
     private static final Identifier DEEPLING_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/deepling/deepling_priest.png");
     private static final Identifier DEEPLING_LAYER_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/deepling/deepling_priest_layer.png");
 

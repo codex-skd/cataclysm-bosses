@@ -46,7 +46,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmMobRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -75,7 +76,7 @@ import net.neoforged.neoforge.common.NeoForge;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Scylla_Renderer
-extends MobRenderer<Scylla_Entity, Scylla_Model> {
+extends CmMobRenderer<Scylla_Entity> {
     private static final Identifier SCYLLA_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/scylla/scylla_no_snake.png");
     private static final Identifier SCYLLA_EYE_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/scylla/scylla_eye.png");
 
@@ -90,7 +91,7 @@ extends MobRenderer<Scylla_Entity, Scylla_Model> {
         return SCYLLA_TEXTURES;
     }
 
-    public void render(Scylla_Entity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
+    protected void render(Scylla_Entity entityIn, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
         Direction direction;
         Entity entity;
         boolean shouldSit;
@@ -166,9 +167,8 @@ extends MobRenderer<Scylla_Entity, Scylla_Model> {
             ((Scylla_Model)this.model).renderToBuffer(matrixStackIn, vertexconsumer, packedLightIn, i, flag1 ? i1 : -1);
         }
         if (!entityIn.isSpectator()) {
-            for (RenderLayer renderlayer : this.layers) {
-                renderlayer.render(matrixStackIn, bufferIn, packedLightIn, (Entity)entityIn, f5, f4, partialTicks, f9, f2, f6);
-            }
+        // TODO (26.2): layers need port to new RenderLayer<S,M>.submit API
+        // for (RenderLayer renderlayer : this.layers) { renderlayer.submit(...); }
         }
         matrixStackIn.popPose();
         this.renderetc(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);

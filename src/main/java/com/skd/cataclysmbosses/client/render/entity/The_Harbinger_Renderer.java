@@ -34,7 +34,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmMobRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
@@ -52,7 +53,7 @@ import org.joml.Matrix4f;
 
 @OnlyIn(value=Dist.CLIENT)
 public class The_Harbinger_Renderer
-extends MobRenderer<The_Harbinger_Entity, The_Harbinger_Model> {
+extends CmMobRenderer<The_Harbinger_Entity> {
     private static final Identifier HARBINGER_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/harbinger/the_harbinger.png");
     private final RandomSource rnd = RandomSource.create();
     private static final float HALF_SQRT_3 = (float)(Math.sqrt(3.0) / 2.0);
@@ -77,7 +78,7 @@ extends MobRenderer<The_Harbinger_Entity, The_Harbinger_Model> {
         return super.getRenderOffset((Entity)entityIn, partialTicks);
     }
 
-    public void render(The_Harbinger_Entity entity, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
+    protected void render(The_Harbinger_Entity entity, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
         matrixStackIn.pushPose();
         if (entity.deathTime > 0) {
             float f5 = ((float)entity.deathTime + partialTicks) / 144.0f;
@@ -112,7 +113,6 @@ extends MobRenderer<The_Harbinger_Entity, The_Harbinger_Model> {
             matrixStackIn.popPose();
         }
         matrixStackIn.popPose();
-        super.render((LivingEntity)entity, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
     }
 
     private static void vertex01(VertexConsumer p_114220_, Matrix4f p_114221_, int p_114222_) {

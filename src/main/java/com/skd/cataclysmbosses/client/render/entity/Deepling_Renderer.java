@@ -28,7 +28,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Deepling_Renderer
-extends MobRenderer<Deepling_Entity, Deepling_Model> {
+extends CmMobRenderer<Deepling_Entity> {
     private static final Identifier SSAPBUG_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/deepling/deepling_1.png");
     private static final Identifier DEEPLING_LAYER_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/deepling/deepling_layer.png");
 

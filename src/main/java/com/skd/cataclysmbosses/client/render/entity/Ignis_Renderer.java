@@ -31,10 +31,12 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmMobRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -45,7 +47,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Ignis_Renderer
-extends MobRenderer<Ignis_Entity, Ignis_Model> {
+extends CmMobRenderer<Ignis_Entity> {
     private static final Identifier[] TEXTURE_PROGRESS = new Identifier[8];
     private static final Identifier[] TEXTURE_SOUL_PROGRESS = new Identifier[8];
 
@@ -67,8 +69,7 @@ extends MobRenderer<Ignis_Entity, Ignis_Model> {
         return entity.getBossPhase() > 0 ? TEXTURE_SOUL_PROGRESS[Mth.clamp((int)age, (int)0, (int)7)] : TEXTURE_PROGRESS[Mth.clamp((int)age, (int)0, (int)7)];
     }
 
-    public void render(Ignis_Entity entity, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
-        super.render((LivingEntity)entity, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
+    protected void render(Ignis_Entity entity, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
         if (entity.getAnimation() == Ignis_Entity.HORIZONTAL_SWING_ATTACK || entity.getAnimation() == Ignis_Entity.SWING_ATTACK || entity.getAnimation() == Ignis_Entity.HORIZONTAL_SWING_ATTACK_SOUL || entity.getAnimation() == Ignis_Entity.SWING_ATTACK_SOUL || entity.getAnimation() == Ignis_Entity.SWING_ATTACK_BERSERK || entity.getAnimation() == Ignis_Entity.REINFORCED_SMASH_IN_AIR || entity.getAnimation() == Ignis_Entity.REINFORCED_SMASH_IN_AIR_SOUL || entity.getAnimation() == Ignis_Entity.PHASE_3 || entity.getAnimation() == Ignis_Entity.SPIN_ATTACK || entity.getAnimation() == Ignis_Entity.ULTIMATE_ATTACK || entity.getAnimation() == Ignis_Entity.STRIKE || entity.getAnimation() == Ignis_Entity.COMBO1 || entity.getAnimation() == Ignis_Entity.COMBO2 || entity.getAnimation() == Ignis_Entity.SHIELD_BREAK_STRIKE || entity.getAnimation() == Ignis_Entity.HORIZONTAL_SMALL_SWING_ATTACK || entity.getAnimation() == Ignis_Entity.HORIZONTAL_SMALL_SWING_ALT_ATTACK2 || entity.getAnimation() == Ignis_Entity.SWING_UPPERSLASH) {
             Vec3 bladePos = RenderUtils.matrixStackFromCitadelModel((Entity)entity, entityYaw, ((Ignis_Model)this.model).blade2);
             entity.setSocketPosArray(0, bladePos);
