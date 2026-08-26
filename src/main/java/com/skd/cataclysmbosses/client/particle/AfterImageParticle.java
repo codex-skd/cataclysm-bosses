@@ -41,6 +41,7 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.SingleQuadParticle;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -61,12 +62,12 @@ import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
 
 public class AfterImageParticle
-extends Particle {
+extends SingleQuadParticle {
     private final int EntityId;
     private final boolean ghost;
 
     public AfterImageParticle(ClientLevel world, double x, double y, double z, int r, int g, int b, int entityId, boolean ghost, int lifetimes) {
-        super(world, x, y, z);
+        super(world, x, y, z, null);
         this.setSize(6.0f, 6.0f);
         this.x = x;
         this.y = y;
@@ -192,13 +193,18 @@ extends Particle {
     }
 
     @NotNull
-    public ParticleRenderType getRenderType() {
+    public ParticleRenderType getGroup() {
         return ParticleRenderType.CUSTOM;
+    }
+
+    @Override
+    protected Layer getLayer() {
+        return Layer.TRANSLUCENT;
     }
 
     @OnlyIn(value=Dist.CLIENT)
     public static class Factory
-    implements ParticleProvider<AfterImageParticleOptions> {
+    implements ParticleProvider.Sprite<AfterImageParticleOptions> {
         public Particle createParticle(AfterImageParticleOptions data, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
             AfterImageParticle particle = new AfterImageParticle(level, x, y, z, data.r(), data.g(), data.b(), data.entityid(), data.ghost(), data.lifeticks());
             return particle;
