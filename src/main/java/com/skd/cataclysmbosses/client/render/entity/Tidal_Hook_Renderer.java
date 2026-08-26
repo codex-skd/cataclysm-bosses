@@ -32,7 +32,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.culling.Frustum;
@@ -51,7 +52,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 public class Tidal_Hook_Renderer
-extends EntityRenderer<Tidal_Hook_Entity, EntityRenderState> {
+extends CmEntityRenderer<Tidal_Hook_Entity> {
     private final Tidal_Hook_Model model = new Tidal_Hook_Model();
     private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/tidal_hook.png");
     private static final Identifier CHAIN_TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/tidal_hook_chain.png");
@@ -61,13 +62,13 @@ extends EntityRenderer<Tidal_Hook_Entity, EntityRenderState> {
         super(renderManagerIn);
     }
 
-    public void render(Tidal_Hook_Entity entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource provider, int light) {
+    protected void render(Tidal_Hook_Entity entity, float tickDelta, PoseStack matrices, CmMultiBufferSource provider, int light) {
         matrices.pushPose();
         float yRot = Mth.lerp((float)tickDelta, (float)entity.yRotO, (float)entity.getYRot());
         float xRot = Mth.lerp((float)tickDelta, (float)entity.xRotO, (float)entity.getXRot());
         matrices.mulPose(Axis.YP.rotationDegrees(yRot - 90.0f));
         matrices.mulPose(Axis.ZP.rotationDegrees(xRot + 90.0f));
-        VertexConsumer vertexConsumer = provider.getBuffer(this.model.renderType(this.getTextureLocation(entity)));
+        VertexConsumer vertexConsumer = provider.getBuffer(RenderTypes.entityCutout(this.getTextureLocation(entity)));
         this.model.renderToBuffer(matrices, vertexConsumer, light, OverlayTexture.NO_OVERLAY, -1);
         matrices.popPose();
         Entity fromEntity = entity.getOwner();

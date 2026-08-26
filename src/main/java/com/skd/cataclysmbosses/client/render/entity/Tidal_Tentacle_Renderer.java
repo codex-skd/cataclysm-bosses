@@ -34,7 +34,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.culling.Frustum;
@@ -55,7 +56,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 public class Tidal_Tentacle_Renderer
-extends EntityRenderer<Tidal_Tentacle_Entity, EntityRenderState> {
+extends CmEntityRenderer<Tidal_Tentacle_Entity> {
     private static final Identifier CLAW_TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/tidal_tentacle_claws.png");
     private static final Identifier TENTACLE_TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/tidal_tentacle.png");
     private static final Tidal_Tentacle_Claws_Model CLAW_MODEL = new Tidal_Tentacle_Claws_Model();
@@ -71,8 +72,7 @@ extends EntityRenderer<Tidal_Tentacle_Entity, EntityRenderState> {
         return next != null && frustum.isVisible(entity.getBoundingBox().minmax(next.getBoundingBox())) || super.shouldRender((Entity)entity, frustum, x, y, z);
     }
 
-    public void render(Tidal_Tentacle_Entity entity, float yaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int light) {
-        super.render((Entity)entity, yaw, partialTicks, poseStack, buffer, light);
+    protected void render(Tidal_Tentacle_Entity entity, float partialTicks, PoseStack poseStack, CmMultiBufferSource buffer, int light) {
         poseStack.pushPose();
         Entity fromEntity = entity.getFromEntity();
         float x = (float)Mth.lerp((double)partialTicks, (double)entity.xo, (double)entity.getX());

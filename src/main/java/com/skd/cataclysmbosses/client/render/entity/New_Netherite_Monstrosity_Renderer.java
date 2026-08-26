@@ -33,15 +33,15 @@ import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
-public class New_Netherite_Monstrosity_Renderer extends EntityRenderer<Netherite_Monstrosity_Entity, EntityRenderState> {
-    private static final Identifier NETHER_MONSTROSITY_TEXTURES = new ResourceLocation("cataclysm_bosses", "textures/entity/monstrosity/netherite_monstrosity.png");
+public class New_Netherite_Monstrosity_Renderer extends CmEntityRenderer<Netherite_Monstrosity_Entity> {
+    private static final Identifier NETHER_MONSTROSITY_TEXTURES = Identifier.fromNamespaceAndPath("cataclysm", "textures/entity/monstrosity/netherite_monstrosity.png");
 
     public New_Netherite_Monstrosity_Renderer(EntityRendererProvider.Context renderManagerIn) {
         super(renderManagerIn);
     }
 
     @Override
-    public void render(Netherite_Monstrosity_Entity entity, float f, float f1, PoseStack posestack, MultiBufferSource multibuffersource, int i) {
+    protected void render(Netherite_Monstrosity_Entity entity, float f1, PoseStack posestack, CmMultiBufferSource multibuffersource, int i) {
         posestack.pushPose();
         posestack.mulPose(Axis.YP.rotationDegrees(Mth.lerp(f, entity.yRotO, entity.getYRot()) - 90.0f));
         posestack.mulPose(Axis.ZP.rotationDegrees(Mth.lerp(f, entity.xRotO, entity.getXRot())));

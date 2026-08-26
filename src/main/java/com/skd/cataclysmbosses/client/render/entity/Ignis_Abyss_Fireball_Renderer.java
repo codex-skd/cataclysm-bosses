@@ -28,8 +28,10 @@ import com.skd.cataclysmbosses.entity.projectile.Ignis_Abyss_Fireball_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
@@ -45,7 +47,7 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Ignis_Abyss_Fireball_Renderer
-extends EntityRenderer<Ignis_Abyss_Fireball_Entity, EntityRenderState> {
+extends CmEntityRenderer<Ignis_Abyss_Fireball_Entity> {
     private static final Identifier IGNIS_FIRE_BALL = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/ignis_fireball_abyss.png");
     private static final Identifier TRAIL_TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/particle/storm.png");
     public Ignis_Fireball_Model model;
@@ -60,7 +62,7 @@ extends EntityRenderer<Ignis_Abyss_Fireball_Entity, EntityRenderState> {
         return 15;
     }
 
-    public void render(Ignis_Abyss_Fireball_Entity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
+    protected void render(Ignis_Abyss_Fireball_Entity entityIn, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
         matrixStackIn.pushPose();
         float f = this.rotLerp(entityIn.yRotO, entityIn.getYRot(), partialTicks);
         float f1 = Mth.lerp((float)partialTicks, (float)entityIn.xRotO, (float)entityIn.getXRot());
@@ -70,7 +72,7 @@ extends EntityRenderer<Ignis_Abyss_Fireball_Entity, EntityRenderState> {
         matrixStackIn.mulPose(Axis.XP.rotationDegrees(Mth.cos((float)(f2 * 0.1f)) * 180.0f));
         matrixStackIn.mulPose(Axis.ZP.rotationDegrees(Mth.sin((float)(f2 * 0.15f)) * 360.0f));
         this.model.setupAnim((Entity)entityIn, 0.0f, 0.0f, 0.0f, f, f1);
-        VertexConsumer VertexConsumer2 = bufferIn.getBuffer(this.model.renderType(this.getTextureLocation(entityIn)));
+        VertexConsumer VertexConsumer2 = bufferIn.getBuffer(RenderTypes.entityCutout(this.getTextureLocation(entityIn)));
         this.model.renderToBuffer(matrixStackIn, VertexConsumer2, packedLightIn, OverlayTexture.NO_OVERLAY, -1);
         matrixStackIn.popPose();
         if (entityIn.hasTrail()) {
@@ -86,7 +88,6 @@ extends EntityRenderer<Ignis_Abyss_Fireball_Entity, EntityRenderState> {
             this.renderTrail(entityIn, partialTicks, matrixStackIn, bufferIn, r, g, b, 1.0f, packedLightIn);
             matrixStackIn.popPose();
         }
-        super.render((Entity)entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
     }
 
     public Identifier getTextureLocation(Ignis_Abyss_Fireball_Entity entity) {

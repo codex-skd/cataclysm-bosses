@@ -22,8 +22,10 @@ import com.skd.cataclysmbosses.client.render.CMRenderTypes;
 import com.skd.cataclysmbosses.entity.projectile.Lightning_Spear_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
@@ -35,7 +37,7 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Lightning_Spear_Renderer
-extends EntityRenderer<Lightning_Spear_Entity, EntityRenderState> {
+extends CmEntityRenderer<Lightning_Spear_Entity> {
     private static final Identifier[] TEXTURE_PROGRESS = new Identifier[6];
     public Elemental_Spear_Model model;
 
@@ -47,7 +49,7 @@ extends EntityRenderer<Lightning_Spear_Entity, EntityRenderState> {
         }
     }
 
-    public void render(Lightning_Spear_Entity entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
+    protected void render(Lightning_Spear_Entity entity, float partialTicks, PoseStack poseStack, CmMultiBufferSource buffer, int packedLight) {
         poseStack.pushPose();
         poseStack.scale(-1.0f, -1.0f, 1.0f);
         float f = Mth.rotLerp((float)partialTicks, (float)entity.yRotO, (float)entity.getYRot());
@@ -56,7 +58,6 @@ extends EntityRenderer<Lightning_Spear_Entity, EntityRenderState> {
         VertexConsumer vertexconsumer = buffer.getBuffer(CMRenderTypes.CMEyes(this.getTextureLocation(entity)));
         this.model.renderToBuffer(poseStack, vertexconsumer, packedLight, OverlayTexture.NO_OVERLAY, -1);
         poseStack.popPose();
-        super.render((Entity)entity, entityYaw, partialTicks, poseStack, buffer, packedLight);
     }
 
     public Identifier getTextureLocation(Lightning_Spear_Entity entity) {

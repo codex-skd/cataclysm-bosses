@@ -25,9 +25,11 @@ import com.skd.cataclysmbosses.entity.projectile.Brontes_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -40,7 +42,7 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Brontes_Renderer
-extends EntityRenderer<Brontes_Entity, EntityRenderState> {
+extends CmEntityRenderer<Brontes_Entity> {
     private final Brontes_Model model = new Brontes_Model();
     private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/item/brontes.png");
     private static final Identifier TEXTURE_LAYER = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/item/brontes_layer.png");
@@ -49,16 +51,15 @@ extends EntityRenderer<Brontes_Entity, EntityRenderState> {
         super(renderManagerIn);
     }
 
-    public void render(Brontes_Entity entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
+    protected void render(Brontes_Entity entity, float partialTicks, PoseStack poseStack, CmMultiBufferSource buffer, int packedLight) {
         poseStack.pushPose();
         poseStack.mulPose(Axis.YP.rotationDegrees(Mth.lerp((float)partialTicks, (float)entity.yRotO, (float)entity.getYRot())));
         poseStack.mulPose(Axis.XP.rotationDegrees(((float)entity.tickCount + partialTicks) * 40.0f));
-        VertexConsumer vertexconsumer = ItemRenderer.getFoilBufferDirect((MultiBufferSource)buffer, (RenderType)this.model.renderType(this.getTextureLocation(entity)), (boolean)false, (boolean)false);
+        VertexConsumer vertexconsumer = buffer.getBuffer(RenderTypes.entityCutout(TEXTURE));
         this.model.renderToBuffer(poseStack, vertexconsumer, packedLight, OverlayTexture.NO_OVERLAY, -1);
-        VertexConsumer vertexconsumer2 = ItemRenderer.getFoilBuffer((MultiBufferSource)buffer, (RenderType)CMRenderTypes.CMEyes(TEXTURE_LAYER), (boolean)false, (boolean)false);
+        VertexConsumer vertexconsumer2 = buffer.getBuffer(CMRenderTypes.CMEyes(TEXTURE_LAYER));
         this.model.renderToBuffer(poseStack, vertexconsumer2, packedLight, OverlayTexture.NO_OVERLAY, -1);
         poseStack.popPose();
-        super.render((Entity)entity, entityYaw, partialTicks, poseStack, buffer, packedLight);
     }
 
     public Identifier getTextureLocation(Brontes_Entity entity) {

@@ -24,7 +24,8 @@ import com.skd.cataclysmbosses.entity.projectile.Ender_Guardian_Bullet_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -40,7 +41,7 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Ender_Guardian_bullet_Renderer
-extends EntityRenderer<Ender_Guardian_Bullet_Entity, EntityRenderState> {
+extends CmEntityRenderer<Ender_Guardian_Bullet_Entity> {
     private static final Identifier ENDER_GUARDIAN_TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/shulkerbullet.png");
     private static final RenderType ENDER_GUARDIAN_RENDER_TYPE = RenderTypes.entityTranslucent((Identifier)ENDER_GUARDIAN_TEXTURE);
     public Ender_Guardian_Bullet_Model model = new Ender_Guardian_Bullet_Model();
@@ -53,7 +54,7 @@ extends EntityRenderer<Ender_Guardian_Bullet_Entity, EntityRenderState> {
         return 15;
     }
 
-    public void render(Ender_Guardian_Bullet_Entity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
+    protected void render(Ender_Guardian_Bullet_Entity entityIn, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
         matrixStackIn.pushPose();
         float f = this.rotLerp(entityIn.yRotO, entityIn.getYRot(), partialTicks);
         float f1 = Mth.lerp((float)partialTicks, (float)entityIn.xRotO, (float)entityIn.getXRot());
@@ -64,13 +65,12 @@ extends EntityRenderer<Ender_Guardian_Bullet_Entity, EntityRenderState> {
         matrixStackIn.mulPose(Axis.ZP.rotationDegrees(Mth.sin((float)(f2 * 0.15f)) * 360.0f));
         matrixStackIn.scale(-0.5f, -0.5f, 0.5f);
         this.model.setupAnim((Entity)entityIn, 0.0f, 0.0f, 0.0f, f, f1);
-        VertexConsumer VertexConsumer2 = bufferIn.getBuffer(this.model.renderType(ENDER_GUARDIAN_TEXTURE));
+        VertexConsumer VertexConsumer2 = bufferIn.getBuffer(RenderTypes.entityCutout(ENDER_GUARDIAN_TEXTURE));
         this.model.renderToBuffer(matrixStackIn, VertexConsumer2, packedLightIn, OverlayTexture.NO_OVERLAY, -1);
         matrixStackIn.scale(1.5f, 1.5f, 1.5f);
         VertexConsumer VertexConsumer1 = bufferIn.getBuffer(ENDER_GUARDIAN_RENDER_TYPE);
         this.model.renderToBuffer(matrixStackIn, VertexConsumer1, packedLightIn, OverlayTexture.NO_OVERLAY, 0x26FFFFFF);
         matrixStackIn.popPose();
-        super.render((Entity)entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
     }
 
     public Identifier getTextureLocation(Ender_Guardian_Bullet_Entity entity) {

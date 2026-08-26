@@ -24,7 +24,8 @@ import com.skd.cataclysmbosses.entity.projectile.Ancient_Desert_Stele_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -40,7 +41,7 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Ancient_Desert_Stele_Renderer
-extends EntityRenderer<Ancient_Desert_Stele_Entity, EntityRenderState> {
+extends CmEntityRenderer<Ancient_Desert_Stele_Entity> {
     private static final Identifier ANCIENT_DESERT_STELE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/ancient_desert_stele.png");
     private final Ancient_Desert_Stele_Model model = new Ancient_Desert_Stele_Model();
 
@@ -48,7 +49,7 @@ extends EntityRenderer<Ancient_Desert_Stele_Entity, EntityRenderState> {
         super(renderManagerIn);
     }
 
-    public void render(Ancient_Desert_Stele_Entity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
+    protected void render(Ancient_Desert_Stele_Entity entityIn, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
         matrixStackIn.pushPose();
         matrixStackIn.mulPose(Axis.YP.rotationDegrees(90.0f - entityIn.getYRot()));
         matrixStackIn.translate(0.0, 1.5, 0.0);
@@ -63,7 +64,6 @@ extends EntityRenderer<Ancient_Desert_Stele_Entity, EntityRenderState> {
         int i = ARGB.color((int)((int)(255.0f * alpha)), (int)r, (int)g, (int)b);
         this.model.renderToBuffer(matrixStackIn, vertexconsumer, packedLightIn, OverlayTexture.NO_OVERLAY, i);
         matrixStackIn.popPose();
-        super.render((Entity)entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
     }
 
     public Identifier getTextureLocation(Ancient_Desert_Stele_Entity entity) {

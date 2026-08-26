@@ -2,8 +2,8 @@ SESSION STATUS — NeoForge 26.2.0.45-beta -> 26.2.0.57 compile port
 ================================================================
 Date: 2026-08-26
 Compile baseline: ./gradlew compileJava  (Xmaxerrs 20000)
-Error count: start 5548 -> 5010 -> 3782 (items cluster) -> 3524 -> now 3381
-Item/data-driven cluster DONE (~258 errors). Custom item renderer port DONE (~143):
+Error count: start 5548 -> 5010 -> 3782 (items) -> 3524 -> 3381 (CMItemstackRenderer) -> now 3207
+Item/data-driven cluster DONE (~258). Custom item renderer DONE (~143). Simple EntityRenderers batch DONE (~174, 56 files):
 see "CLUSTER FIXED (CMItemstackRenderer / custom item rendering)" below.
 
 Resumes: local branch minecraft/26.2/neoforge-26.2.0.57/production
@@ -65,6 +65,26 @@ Resumes: local branch minecraft/26.2/neoforge-26.2.0.57/production
   LionFish_Layer/Spike_Renderer remain old-API (entity renderer cluster).
 - net.minecraft.Util -> net.minecraft.util.Util.
 
+== CLUSTER FIXED (simple EntityRenderers batch — 56 files) ==
+- Compat bridge for the 26.2 EntityRenderer/RenderState split so legacy immediate-mode
+  bodies keep working on top of SubmitNodeCollector:
+  client/render/compat/CmEntityRenderState (Entity + partialTick),
+  CmRecordingVertexConsumer (7-method VertexConsumer recorder → replayInto),
+  CmMultiBufferSource (getBuffer(RenderType) + getFoilBuffer(rt,foil) — foil schedules
+  a second pending draw sharing the same op list under entityGlint()),
+  CmEntityRenderer<T extends Entity> (extends EntityRenderer<T,CmEntityRenderState>,
+  extract captures entity/partialTick, submit() runs legacy render() then flushes
+  pending draws as ordered submitCustomGeometry + super.submit for nametag/leash).
+- Batch-converted 56 EntityRenderer-based renderers (projectiles, portals, marks, etc.):
+  extends CmEntityRenderer<XXX>, signature render(XXX,float,PoseStack,CmMultiBufferSource,int),
+  ResourceLocation->Identifier, this.model.renderType(...) -> RenderTypes.entityCutout(...)
+  + RenderTypes import fix. Removed super.render nametag calls (handled by bridge).
+  Example: Thrown_Coral_Spear/Bardiche, Brontes, Abyss blast variants, etc.
+- Remaining in render/entity: 33 MobRenderer-based bosses (Scylla 38, Clawdian 65, ...),
+  need CmMobRenderer<T extends LivingEntity> sibling bridge (LivingEntityRenderState,
+  model field, shadow, layers, getTextureLocation, scale/getBob/setupRotations etc.).
+  Plus 13 files with missing base classes (Lionfish_Entity itself missing).
+
 == PREVIOUS SESSION CLUSTERS (mechanical) ==
 Local checkpoint commits (NOT pushed, local-only):
   944e3bf ValueInput/Output namespace, addCooldown ItemStack, value-io bodies
@@ -100,8 +120,9 @@ Local checkpoint commits (NOT pushed, local-only):
 Items cluster is DONE. Dominant blockers now (root-cause classes must be fixed first;
 many child errors are cascades):
 - Rendering rewrite: MultiBufferSource -> SubmitNodeCollector (submitModel / submitCustomGeometry).
-  CMItemstackRenderer DONE; remaining ~130+ errors in entity renderers/layers/models
-  (~40 renderer classes with old EntityRenderer<T>/MobRenderer ctors + RenderLayer entity-based).
+  CMItemstackRenderer DONE; simple EntityRenderers batch DONE (56 files via CmEntityRenderer bridge);
+  remaining ~90+ errors in 33 MobRenderer bosses + layers (need CmMobRenderer bridge) + 13 files
+  with missing entity/model bases (e.g. Lionfish_Entity).
 - RenderType/CompositeState/RenderStateShard removal (CMRenderTypes.java, 209 errors):
   RenderStateShard/RenderType.CompositeState gone. New custom render types are built with
   RenderType.create(name, RenderSetup) + RenderSetup.builder(RenderPipeline) +

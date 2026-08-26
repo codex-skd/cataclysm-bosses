@@ -25,8 +25,10 @@ import com.skd.cataclysmbosses.entity.projectile.Axe_Blade_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
@@ -40,7 +42,7 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Axe_Blade_Renderer
-extends EntityRenderer<Axe_Blade_Entity, EntityRenderState> {
+extends CmEntityRenderer<Axe_Blade_Entity> {
     private static final Identifier[] TEXTURE_PROGRESS = new Identifier[5];
     public Axe_Blade_Model model = new Axe_Blade_Model();
 
@@ -55,7 +57,7 @@ extends EntityRenderer<Axe_Blade_Entity, EntityRenderState> {
         return 15;
     }
 
-    public void render(Axe_Blade_Entity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
+    protected void render(Axe_Blade_Entity entityIn, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
         matrixStackIn.pushPose();
         matrixStackIn.scale(-1.0f, -1.0f, 1.0f);
         matrixStackIn.translate(0.0f, 0.0f, 0.0f);
@@ -67,7 +69,6 @@ extends EntityRenderer<Axe_Blade_Entity, EntityRenderState> {
         int i = ARGB.color((int)Mth.floor((float)(alpha * 255.0f)), (int)-1);
         this.model.renderToBuffer(matrixStackIn, vertexconsumer, packedLightIn, OverlayTexture.NO_OVERLAY, i);
         matrixStackIn.popPose();
-        super.render((Entity)entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
     }
 
     public Identifier getTextureLocation(Axe_Blade_Entity entity) {

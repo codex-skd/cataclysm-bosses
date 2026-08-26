@@ -22,7 +22,8 @@ import com.skd.cataclysmbosses.entity.projectile.Lionfish_Spike_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -36,15 +37,15 @@ import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
-public class Lionfish_Spike_Renderer extends EntityRenderer<Lionfish_Spike_Entity, EntityRenderState> {
-    private static final ResourceLocation TEXTURE = new ResourceLocation("cataclysm_bosses", "textures/entity/lionfish_spike.png");
+public class Lionfish_Spike_Renderer extends CmEntityRenderer<Lionfish_Spike_Entity> {
+    private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath("cataclysm", "textures/entity/lionfish_spike.png");
 
     public Lionfish_Spike_Renderer(EntityRendererProvider.Context manager) {
         super(manager);
     }
 
     @Override
-    public void render(Lionfish_Spike_Entity entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
+    protected void render(Lionfish_Spike_Entity entity, float partialTicks, PoseStack poseStack, CmMultiBufferSource buffer, int packedLight) {
         poseStack.pushPose();
         poseStack.mulPose(Axis.YP.rotationDegrees(Mth.lerp(partialTicks, entity.yRotO, entity.getYRot()) - 90.0f));
         poseStack.mulPose(Axis.ZP.rotationDegrees(Mth.lerp(partialTicks, entity.xRotO, entity.getXRot())));

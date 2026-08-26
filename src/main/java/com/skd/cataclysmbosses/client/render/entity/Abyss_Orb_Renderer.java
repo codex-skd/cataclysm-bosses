@@ -23,7 +23,8 @@ import com.skd.cataclysmbosses.entity.AnimationMonster.BossMonsters.The_Leviatha
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -38,7 +39,7 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Abyss_Orb_Renderer
-extends EntityRenderer<Abyss_Orb_Entity, EntityRenderState> {
+extends CmEntityRenderer<Abyss_Orb_Entity> {
     private static final Identifier TEXTURE_LOCATION = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/leviathan/abyss_orb.png");
     private static final RenderType RENDER_TYPE = RenderTypes.entityCutoutNoCull((Identifier)TEXTURE_LOCATION);
 
@@ -50,7 +51,7 @@ extends EntityRenderer<Abyss_Orb_Entity, EntityRenderState> {
         return 15;
     }
 
-    public void render(Abyss_Orb_Entity p_114080_, float p_114081_, float p_114082_, PoseStack p_114083_, MultiBufferSource p_114084_, int p_114085_) {
+    protected void render(Abyss_Orb_Entity p_114080_, float p_114082_, PoseStack p_114083_, CmMultiBufferSource p_114084_, int p_114085_) {
         p_114083_.pushPose();
         p_114083_.scale(1.0f, 1.0f, 1.0f);
         p_114083_.mulPose(this.entityRenderDispatcher.cameraOrientation());
@@ -62,7 +63,6 @@ extends EntityRenderer<Abyss_Orb_Entity, EntityRenderState> {
         Abyss_Orb_Renderer.vertex(vertexconsumer, posestack$pose, p_114085_, 1.0f, 1, 1, 0);
         Abyss_Orb_Renderer.vertex(vertexconsumer, posestack$pose, p_114085_, 0.0f, 1, 0, 0);
         p_114083_.popPose();
-        super.render((Entity)p_114080_, p_114081_, p_114082_, p_114083_, p_114084_, p_114085_);
     }
 
     private static void vertex(VertexConsumer p_114090_, PoseStack.Pose normals, int p_114093_, float p_114094_, int p_114095_, int p_114096_, int p_114097_) {

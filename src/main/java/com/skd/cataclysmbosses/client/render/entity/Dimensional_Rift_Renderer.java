@@ -23,8 +23,10 @@ import com.skd.cataclysmbosses.entity.AnimationMonster.BossMonsters.The_Leviatha
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
@@ -36,7 +38,7 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Dimensional_Rift_Renderer
-extends EntityRenderer<Dimensional_Rift_Entity, EntityRenderState> {
+extends CmEntityRenderer<Dimensional_Rift_Entity> {
     private static final Identifier TEXTURE_IDLE_1 = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/leviathan/dimensional_rift/dimensional_rift_idle1.png");
     private static final Identifier TEXTURE_IDLE_2 = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/leviathan/dimensional_rift/dimensional_rift_idle2.png");
     private static final Identifier TEXTURE_IDLE_3 = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/leviathan/dimensional_rift/dimensional_rift_idle3.png");
@@ -50,7 +52,7 @@ extends EntityRenderer<Dimensional_Rift_Entity, EntityRenderState> {
         super(mgr);
     }
 
-    public void render(Dimensional_Rift_Entity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
+    protected void render(Dimensional_Rift_Entity entityIn, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
         matrixStackIn.pushPose();
         Identifier tex = entityIn.getStage() < 1 ? TEXTURE_GROW_1 : (entityIn.getStage() < 2 ? TEXTURE_GROW_2 : (entityIn.getStage() < 3 ? TEXTURE_GROW_3 : (entityIn.getStage() < 4 ? TEXTURE_GROW_4 : this.getIdleTexture(entityIn.tickCount % 9))));
         matrixStackIn.mulPose(this.entityRenderDispatcher.cameraOrientation());
@@ -64,7 +66,6 @@ extends EntityRenderer<Dimensional_Rift_Entity, EntityRenderState> {
         Dimensional_Rift_Renderer.vertex(vertexconsumer, matrix4f, posestack$pose, packedLightIn, 1.0f, 1, 1, 0);
         Dimensional_Rift_Renderer.vertex(vertexconsumer, matrix4f, posestack$pose, packedLightIn, 0.0f, 1, 0, 0);
         matrixStackIn.popPose();
-        super.render((Entity)entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
     }
 
     private static void vertex(VertexConsumer p_114090_, Matrix4f p_114091_, PoseStack.Pose p_114092_, int p_114093_, float p_114094_, int p_114095_, int p_114096_, int p_114097_) {

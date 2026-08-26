@@ -21,9 +21,11 @@ import com.skd.cataclysmbosses.client.render.CMRenderTypes;
 import com.skd.cataclysmbosses.entity.projectile.Laser_Beam_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
@@ -32,7 +34,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 public class Laser_Beam_Renderer
-extends EntityRenderer<Laser_Beam_Entity, EntityRenderState> {
+extends CmEntityRenderer<Laser_Beam_Entity> {
     private static final Identifier TEXTURE_RED = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/harbinger/laser_beam.png");
     private static final RenderType RENDER_TYPE_RED = CMRenderTypes.CMEyes(TEXTURE_RED);
     public Laser_Beam_Model model;
@@ -42,7 +44,7 @@ extends EntityRenderer<Laser_Beam_Entity, EntityRenderState> {
         this.model = new Laser_Beam_Model(mgr.bakeLayer(CMModelLayers.LASER_BEAM_MODEL));
     }
 
-    public void render(Laser_Beam_Entity entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
+    protected void render(Laser_Beam_Entity entity, float partialTicks, PoseStack poseStack, CmMultiBufferSource buffer, int packedLight) {
         poseStack.pushPose();
         poseStack.scale(-1.0f, -1.0f, 1.0f);
         float f = Mth.rotLerp((float)partialTicks, (float)entity.yRotO, (float)entity.getYRot());
@@ -51,7 +53,6 @@ extends EntityRenderer<Laser_Beam_Entity, EntityRenderState> {
         VertexConsumer vertexconsumer = buffer.getBuffer(RENDER_TYPE_RED);
         this.model.renderToBuffer(poseStack, vertexconsumer, packedLight, OverlayTexture.NO_OVERLAY, -1);
         poseStack.popPose();
-        super.render((Entity)entity, entityYaw, partialTicks, poseStack, buffer, packedLight);
     }
 
     public Identifier getTextureLocation(Laser_Beam_Entity entity) {

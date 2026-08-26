@@ -26,8 +26,10 @@ import com.skd.cataclysmbosses.entity.projectile.Storm_Serpent_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
@@ -41,7 +43,7 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Storm_Serpent_Renderer
-extends EntityRenderer<Storm_Serpent_Entity, EntityRenderState> {
+extends CmEntityRenderer<Storm_Serpent_Entity> {
     private static final Identifier SNAKE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/scylla/storm_serpent.png");
     private final Storm_Serpent_Model model;
 
@@ -50,7 +52,7 @@ extends EntityRenderer<Storm_Serpent_Entity, EntityRenderState> {
         this.model = new Storm_Serpent_Model(renderManagerIn.bakeLayer(CMModelLayers.STORM_SERPENT_MODEL));
     }
 
-    public void render(Storm_Serpent_Entity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
+    protected void render(Storm_Serpent_Entity entityIn, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
         matrixStackIn.pushPose();
         matrixStackIn.mulPose(Axis.YP.rotationDegrees(-90.0f));
         matrixStackIn.translate(0.0, 1.0, 0.0);
@@ -63,7 +65,6 @@ extends EntityRenderer<Storm_Serpent_Entity, EntityRenderState> {
         VertexConsumer vertexConsumer = bufferIn.getBuffer(CMRenderTypes.getGhost(this.getTextureLocation(entityIn)));
         this.model.renderToBuffer(matrixStackIn, vertexConsumer, packedLightIn, OverlayTexture.NO_OVERLAY, i1);
         matrixStackIn.popPose();
-        super.render((Entity)entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
     }
 
     protected int getBlockLightLevel(Storm_Serpent_Entity entityIn, BlockPos pos) {

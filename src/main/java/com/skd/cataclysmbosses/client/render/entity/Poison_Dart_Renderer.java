@@ -23,7 +23,8 @@ import com.skd.cataclysmbosses.entity.projectile.Poison_Dart_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -38,7 +39,7 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Poison_Dart_Renderer
-extends EntityRenderer<Poison_Dart_Entity, EntityRenderState> {
+extends CmEntityRenderer<Poison_Dart_Entity> {
     private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/poison_dart.png");
 
     public Poison_Dart_Renderer(EntityRendererProvider.Context renderManagerIn) {
@@ -49,7 +50,7 @@ extends EntityRenderer<Poison_Dart_Entity, EntityRenderState> {
         return TEXTURE;
     }
 
-    public void render(Poison_Dart_Entity p_113839_, float p_113840_, float p_113841_, PoseStack p_113842_, MultiBufferSource p_113843_, int p_113844_) {
+    protected void render(Poison_Dart_Entity p_113839_, float p_113841_, PoseStack p_113842_, CmMultiBufferSource p_113843_, int p_113844_) {
         p_113842_.pushPose();
         p_113842_.mulPose(Axis.YP.rotationDegrees(Mth.lerp((float)p_113841_, (float)p_113839_.yRotO, (float)p_113839_.getYRot()) - 90.0f));
         p_113842_.mulPose(Axis.ZP.rotationDegrees(Mth.lerp((float)p_113841_, (float)p_113839_.xRotO, (float)p_113839_.getXRot())));
@@ -89,7 +90,6 @@ extends EntityRenderer<Poison_Dart_Entity, EntityRenderState> {
             this.vertex(posestack$pose, vertexconsumer, -8, 2, 0, 0.0f, 0.15625f, 0, 1, 0, p_113844_);
         }
         p_113842_.popPose();
-        super.render((Entity)p_113839_, p_113840_, p_113841_, p_113842_, p_113843_, p_113844_);
     }
 
     public void vertex(PoseStack.Pose p_324380_, VertexConsumer p_253902_, int p_254058_, int p_254338_, int p_254196_, float p_254003_, float p_254165_, int p_253982_, int p_254037_, int p_254038_, int p_254271_) {

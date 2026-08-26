@@ -23,7 +23,8 @@ import com.skd.cataclysmbosses.entity.projectile.Lava_Bomb_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -38,7 +39,7 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Lava_Bomb_Renderer
-extends EntityRenderer<Lava_Bomb_Entity, EntityRenderState> {
+extends CmEntityRenderer<Lava_Bomb_Entity> {
     private static final Identifier FIRE_BOMB_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/fire_bomb.png");
     private final Lava_Bomb_Model model = new Lava_Bomb_Model();
 
@@ -46,7 +47,7 @@ extends EntityRenderer<Lava_Bomb_Entity, EntityRenderState> {
         super(renderManagerIn);
     }
 
-    public void render(Lava_Bomb_Entity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
+    protected void render(Lava_Bomb_Entity entityIn, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
         matrixStackIn.pushPose();
         matrixStackIn.translate(0.0, 0.25, 0.0);
         float scale = entityIn.getGround() ? 0.0f : 1.0f;

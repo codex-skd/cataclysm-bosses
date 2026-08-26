@@ -21,7 +21,8 @@ import com.skd.cataclysmbosses.entity.projectile.Blazing_Bone_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -34,12 +35,12 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Blazing_Bone_Renderer
-extends EntityRenderer<Blazing_Bone_Entity, EntityRenderState> {
+extends CmEntityRenderer<Blazing_Bone_Entity> {
     public Blazing_Bone_Renderer(EntityRendererProvider.Context manager) {
         super(manager);
     }
 
-    public void render(Blazing_Bone_Entity entity, float yaw, float partialTicks, PoseStack stack, MultiBufferSource buffer, int light) {
+    protected void render(Blazing_Bone_Entity entity, float partialTicks, PoseStack stack, CmMultiBufferSource buffer, int light) {
         stack.pushPose();
         float spin = ((float)entity.tickCount + partialTicks) * 30.0f;
         stack.scale(1.25f, 1.25f, 1.25f);

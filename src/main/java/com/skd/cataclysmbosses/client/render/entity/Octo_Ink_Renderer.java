@@ -25,8 +25,10 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.model.LlamaSpitModel;
 import net.minecraft.client.model.geom.ModelLayers;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
@@ -37,8 +39,8 @@ import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
-public class Octo_Ink_Renderer extends EntityRenderer<Octo_Ink_Entity, EntityRenderState> {
-    private static final Identifier OCTO_INK_TEXTURE = new ResourceLocation("cataclysm_bosses", "textures/entity/sea/octo_ink.png");
+public class Octo_Ink_Renderer extends CmEntityRenderer<Octo_Ink_Entity> {
+    private static final Identifier OCTO_INK_TEXTURE = Identifier.fromNamespaceAndPath("cataclysm", "textures/entity/sea/octo_ink.png");
     private final com.skd.cataclysmbosses.client.model.entity.Octo_Ink_Model model;
 
     public Octo_Ink_Renderer(EntityRendererProvider.Context context) {
@@ -47,13 +49,13 @@ public class Octo_Ink_Renderer extends EntityRenderer<Octo_Ink_Entity, EntityRen
     }
 
     @Override
-    public void render(Octo_Ink_Entity entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
+    protected void render(Octo_Ink_Entity entity, float partialTicks, PoseStack poseStack, CmMultiBufferSource buffer, int packedLight) {
         poseStack.pushPose();
         poseStack.translate(0.0f, 0.15f, 0.0f);
         poseStack.mulPose(Axis.YP.rotationDegrees(Mth.lerp(partialTicks, entity.yRotO, entity.getYRot()) - 90.0f));
         poseStack.mulPose(Axis.ZP.rotationDegrees(Mth.lerp(partialTicks, entity.xRotO, entity.getXRot())));
         this.model.setupAnim(entity, partialTicks, 0.0f, -0.1f, 0.0f, 0.0f);
-        buffer.getBuffer(this.model.renderType(OCTO_INK_TEXTURE)).ifPresent(vertexconsumer -> {
+        buffer.getBuffer(RenderTypes.entityCutout(OCTO_INK_TEXTURE)).ifPresent(vertexconsumer -> {
             this.model.renderToBuffer(poseStack, vertexconsumer, packedLight, OverlayTexture.NO_OVERLAY, -1);
         });
         poseStack.popPose();

@@ -33,7 +33,8 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.culling.Frustum;
@@ -48,7 +49,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 public class Scylla_Ceraunus_Renderer
-extends EntityRenderer<Scylla_Ceraunus_Entity, EntityRenderState> {
+extends CmEntityRenderer<Scylla_Ceraunus_Entity> {
     private final Ceraunus_Model model;
     private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/scylla/ceraunus.png");
     private static final Identifier CHAIN_TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/scylla/scylla_chain.png");
@@ -58,13 +59,13 @@ extends EntityRenderer<Scylla_Ceraunus_Entity, EntityRenderState> {
         this.model = new Ceraunus_Model(renderManagerIn.bakeLayer(CMModelLayers.CERAUNUS_MODEL));
     }
 
-    public void render(Scylla_Ceraunus_Entity entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource provider, int light) {
+    protected void render(Scylla_Ceraunus_Entity entity, float tickDelta, PoseStack matrices, CmMultiBufferSource provider, int light) {
         matrices.pushPose();
         float yRot = Mth.lerp((float)tickDelta, (float)entity.yRotO, (float)entity.getYRot());
         float xRot = Mth.lerp((float)tickDelta, (float)entity.xRotO, (float)entity.getXRot());
         matrices.mulPose(Axis.YP.rotationDegrees(yRot - 90.0f));
         matrices.mulPose(Axis.ZP.rotationDegrees(xRot + 90.0f));
-        VertexConsumer vertexConsumer = provider.getBuffer(this.model.renderType(this.getTextureLocation(entity)));
+        VertexConsumer vertexConsumer = provider.getBuffer(RenderTypes.entityCutout(this.getTextureLocation(entity)));
         this.model.renderToBuffer(matrices, vertexConsumer, light, OverlayTexture.NO_OVERLAY, -1);
         matrices.popPose();
         Entity fromEntity = entity.getController();

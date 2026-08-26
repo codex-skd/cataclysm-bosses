@@ -20,8 +20,10 @@ import com.skd.cataclysmbosses.entity.AnimationMonster.BossMonsters.The_Leviatha
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
@@ -30,7 +32,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 public class Abyss_Blast_Portal_Renderer
-extends EntityRenderer<Abyss_Blast_Portal_Entity, EntityRenderState> {
+extends CmEntityRenderer<Abyss_Blast_Portal_Entity> {
     private static final Identifier PORTAL = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/leviathan/portal/abyss_blast_portal.png");
     public Abyss_Blast_Portal_Model model = new Abyss_Blast_Portal_Model();
 
@@ -42,18 +44,17 @@ extends EntityRenderer<Abyss_Blast_Portal_Entity, EntityRenderState> {
         return 15;
     }
 
-    public void render(Abyss_Blast_Portal_Entity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
+    protected void render(Abyss_Blast_Portal_Entity entityIn, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
         matrixStackIn.pushPose();
         float activateProgress = entityIn.prevactivateProgress + (entityIn.activateProgress - entityIn.prevactivateProgress) * partialTicks;
         float d = activateProgress * 0.15f;
         matrixStackIn.scale(-d, -d, d);
         matrixStackIn.translate(0.0f, -1.5f, 0.0f);
         matrixStackIn.mulPose(Axis.YP.rotationDegrees(90.0f - entityIn.getYRot()));
-        VertexConsumer vertexconsumer = bufferIn.getBuffer(this.model.renderType(this.getTextureLocation(entityIn)));
+        VertexConsumer vertexconsumer = bufferIn.getBuffer(RenderTypes.entityCutout(this.getTextureLocation(entityIn)));
         this.model.setupAnim(entityIn, 0.0f, 0.0f, (float)entityIn.tickCount + partialTicks, 0.0f, 0.0f);
         this.model.renderToBuffer(matrixStackIn, vertexconsumer, packedLightIn, OverlayTexture.NO_OVERLAY, -1);
         matrixStackIn.popPose();
-        super.render((Entity)entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
     }
 
     public Identifier getTextureLocation(Abyss_Blast_Portal_Entity entity) {

@@ -28,7 +28,8 @@ package com.skd.cataclysmbosses.client.render.entity;
 
 import com.skd.cataclysmbosses.entity.effect.Cm_Falling_Block_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -52,7 +53,7 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Cm_Falling_Block_Renderer
-extends EntityRenderer<Cm_Falling_Block_Entity, EntityRenderState> {
+extends CmEntityRenderer<Cm_Falling_Block_Entity> {
     private final BlockRenderDispatcher dispatcher;
 
     public Cm_Falling_Block_Renderer(EntityRendererProvider.Context p_174112_) {
@@ -60,7 +61,7 @@ extends EntityRenderer<Cm_Falling_Block_Entity, EntityRenderState> {
         this.dispatcher = p_174112_.getBlockRenderDispatcher();
     }
 
-    public void render(Cm_Falling_Block_Entity p_114634_, float p_114635_, float p_114636_, PoseStack p_114637_, MultiBufferSource p_114638_, int p_114639_) {
+    protected void render(Cm_Falling_Block_Entity p_114634_, float p_114636_, PoseStack p_114637_, CmMultiBufferSource p_114638_, int p_114639_) {
         Level level;
         BlockState blockstate = p_114634_.getBlockState();
         if (blockstate.getRenderShape() == RenderShape.MODEL && blockstate != (level = p_114634_.level()).getBlockState(p_114634_.blockPosition()) && blockstate.getRenderShape() != RenderShape.INVISIBLE) {
@@ -72,7 +73,6 @@ extends EntityRenderer<Cm_Falling_Block_Entity, EntityRenderState> {
                 this.dispatcher.getModelRenderer().tesselateBlock((BlockAndTintGetter)level, this.dispatcher.getBlockModel(blockstate), blockstate, blockpos, p_114637_, p_114638_.getBuffer(RenderTypeHelper.getMovingBlockRenderType((RenderType)renderType)), false, RandomSource.create(), blockstate.getSeed(p_114634_.getStartPos()), OverlayTexture.NO_OVERLAY, ModelData.EMPTY, renderType);
             }
             p_114637_.popPose();
-            super.render((Entity)p_114634_, p_114635_, p_114636_, p_114637_, p_114638_, p_114639_);
         }
     }
 

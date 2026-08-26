@@ -23,16 +23,16 @@ import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
-public class Symbiocto_Renderer extends EntityRenderer<Symbiocto_Entity, EntityRenderState> {
-    private static final Identifier SYMbiocto_OPEN = new ResourceLocation("cataclysm_bosses", "textures/entity/sea/symbiocto_open.png");
-    private static final Identifier SYMbiocto_CLOSE = new ResourceLocation("cataclysm_bosses", "textures/entity/sea/symbiocto_close.png");
+public class Symbiocto_Renderer extends CmEntityRenderer<Symbiocto_Entity> {
+    private static final Identifier SYMbiocto_OPEN = Identifier.fromNamespaceAndPath("cataclysm", "textures/entity/sea/symbiocto_open.png");
+    private static final Identifier SYMbiocto_CLOSE = Identifier.fromNamespaceAndPath("cataclysm", "textures/entity/sea/symbiocto_close.png");
 
     public Symbiocto_Renderer(EntityRendererProvider.Context renderManagerIn) {
         super(renderManagerIn);
     }
 
     @Override
-    public void render(Symbiocto_Entity entity, float f, float f1, PoseStack posestack, MultiBufferSource multibuffersource, int i) {
+    protected void render(Symbiocto_Entity entity, float f1, PoseStack posestack, CmMultiBufferSource multibuffersource, int i) {
         posestack.pushPose();
         posestack.mulPose(Axis.YP.rotationDegrees(Mth.lerp(f, entity.yRotO, entity.getYRot()) - 90.0f));
         posestack.mulPose(Axis.ZP.rotationDegrees(Mth.lerp(f, entity.xRotO, entity.getXRot())));

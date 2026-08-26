@@ -28,7 +28,8 @@ import com.skd.cataclysmbosses.entity.projectile.Accretion_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -47,7 +48,7 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Accretion_Renderer
-extends EntityRenderer<Accretion_Entity, EntityRenderState> {
+extends CmEntityRenderer<Accretion_Entity> {
     private final BlockRenderDispatcher blockRenderer;
     private final EntityRenderDispatcher entityRenderer;
     private final RandomSource rnd = RandomSource.create();
@@ -58,7 +59,7 @@ extends EntityRenderer<Accretion_Entity, EntityRenderState> {
         this.entityRenderer = renderManagerIn.getEntityRenderDispatcher();
     }
 
-    public void render(Accretion_Entity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
+    protected void render(Accretion_Entity entityIn, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
         BlockState blockstate = entityIn.getBlockState();
         if (blockstate != null && blockstate.getRenderShape() == RenderShape.MODEL) {
             matrixStackIn.pushPose();
@@ -82,7 +83,6 @@ extends EntityRenderer<Accretion_Entity, EntityRenderState> {
             matrixStackIn.scale(scale, scale, scale);
             this.blockRenderer.renderSingleBlock(blockstate, matrixStackIn, bufferIn, packedLightIn, OverlayTexture.NO_OVERLAY);
             matrixStackIn.popPose();
-            super.render((Entity)entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
         }
     }
 

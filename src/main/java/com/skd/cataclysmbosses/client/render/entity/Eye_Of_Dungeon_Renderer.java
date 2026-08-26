@@ -27,8 +27,10 @@ import com.skd.cataclysmbosses.client.render.CMRenderTypes;
 import com.skd.cataclysmbosses.entity.projectile.Eye_Of_Dungeon_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -46,7 +48,7 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Eye_Of_Dungeon_Renderer
-extends EntityRenderer<Eye_Of_Dungeon_Entity, EntityRenderState> {
+extends CmEntityRenderer<Eye_Of_Dungeon_Entity> {
     private final ItemRenderer itemRenderer;
     private static final Identifier TRAIL_TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/particle/gathering_lightning.png");
 
@@ -55,7 +57,7 @@ extends EntityRenderer<Eye_Of_Dungeon_Entity, EntityRenderState> {
         this.itemRenderer = renderManagerIn.getItemRenderer();
     }
 
-    public void render(Eye_Of_Dungeon_Entity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
+    protected void render(Eye_Of_Dungeon_Entity entityIn, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
         if (entityIn.tickCount >= 2 || !(this.entityRenderDispatcher.camera.getEntity().distanceToSqr((Entity)entityIn) < 12.25)) {
             matrixStackIn.pushPose();
             matrixStackIn.mulPose(this.entityRenderDispatcher.cameraOrientation());
@@ -73,7 +75,6 @@ extends EntityRenderer<Eye_Of_Dungeon_Entity, EntityRenderState> {
                 this.renderTrail(entityIn, partialTicks, matrixStackIn, bufferIn, r, g, b, 1.0f, packedLightIn);
                 matrixStackIn.popPose();
             }
-            super.render((Entity)entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
         }
     }
 

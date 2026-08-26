@@ -20,8 +20,10 @@ import com.skd.cataclysmbosses.client.model.entity.Sandstorm_Projectile_Model;
 import com.skd.cataclysmbosses.entity.projectile.Sandstorm_Projectile;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
@@ -33,7 +35,7 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Sandstorm_Projectile_Renderer
-extends EntityRenderer<Sandstorm_Projectile, EntityRenderState> {
+extends CmEntityRenderer<Sandstorm_Projectile> {
     private static final Identifier SANDSTORM = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/koboleton/sandstorm.png");
     public Sandstorm_Projectile_Model model = new Sandstorm_Projectile_Model();
 
@@ -41,17 +43,16 @@ extends EntityRenderer<Sandstorm_Projectile, EntityRenderState> {
         super(manager);
     }
 
-    public void render(Sandstorm_Projectile entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
+    protected void render(Sandstorm_Projectile entityIn, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
         matrixStackIn.pushPose();
         matrixStackIn.scale(-0.5f, -0.5f, 0.5f);
         matrixStackIn.translate(0.0f, -1.5f, 0.0f);
         float f = Mth.rotLerp((float)partialTicks, (float)entityIn.yRotO, (float)entityIn.getYRot());
         float f1 = Mth.lerp((float)partialTicks, (float)entityIn.xRotO, (float)entityIn.getXRot());
-        VertexConsumer vertexconsumer = bufferIn.getBuffer(this.model.renderType(this.getTextureLocation(entityIn)));
+        VertexConsumer vertexconsumer = bufferIn.getBuffer(RenderTypes.entityCutout(this.getTextureLocation(entityIn)));
         this.model.setupAnim(entityIn, 0.0f, 0.0f, (float)entityIn.tickCount + partialTicks, f, f1);
         this.model.renderToBuffer(matrixStackIn, vertexconsumer, packedLightIn, OverlayTexture.NO_OVERLAY, -1);
         matrixStackIn.popPose();
-        super.render((Entity)entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
     }
 
     public Identifier getTextureLocation(Sandstorm_Projectile entity) {

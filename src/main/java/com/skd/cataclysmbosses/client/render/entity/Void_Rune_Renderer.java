@@ -25,8 +25,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import java.util.Random;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
@@ -39,7 +41,7 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Void_Rune_Renderer
-extends EntityRenderer<Void_Rune_Entity, EntityRenderState> {
+extends CmEntityRenderer<Void_Rune_Entity> {
     private static final Identifier VOID_RUNE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/void_rune.png");
     private final Void_Rune_Model model = new Void_Rune_Model();
     private final Random rnd = new Random();
@@ -48,7 +50,7 @@ extends EntityRenderer<Void_Rune_Entity, EntityRenderState> {
         super(renderManagerIn);
     }
 
-    public void render(Void_Rune_Entity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
+    protected void render(Void_Rune_Entity entityIn, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
         matrixStackIn.pushPose();
         matrixStackIn.mulPose(Axis.YP.rotationDegrees(90.0f - entityIn.getYRot()));
         matrixStackIn.translate(0.0, 3.0, 0.0);
@@ -57,7 +59,6 @@ extends EntityRenderer<Void_Rune_Entity, EntityRenderState> {
         this.model.setupAnim(entityIn, 0.0f, 0.0f, (float)entityIn.tickCount + partialTicks, 0.0f, 0.0f);
         this.model.renderToBuffer(matrixStackIn, vertexConsumer, packedLightIn, OverlayTexture.NO_OVERLAY, -1);
         matrixStackIn.popPose();
-        super.render((Entity)entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
     }
 
     public Vec3 getRenderOffset(Void_Rune_Entity entityIn, float partialTicks) {

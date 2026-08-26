@@ -26,7 +26,8 @@ import com.skd.cataclysmbosses.entity.projectile.Phantom_Halberd_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -43,7 +44,7 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Phantom_Halberd_Renderer
-extends EntityRenderer<Phantom_Halberd_Entity, EntityRenderState> {
+extends CmEntityRenderer<Phantom_Halberd_Entity> {
     private static final Identifier PHANTOM_HALBERD = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/maledictus/phantom_halberd.png");
     private static final Identifier PHANTOM_HALBERD_DISCARD = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/maledictus/phantom_halberd_discard.png");
     private final Phantom_Halberd_Model model = new Phantom_Halberd_Model();
@@ -54,7 +55,7 @@ extends EntityRenderer<Phantom_Halberd_Entity, EntityRenderState> {
         super(renderManagerIn);
     }
 
-    public void render(Phantom_Halberd_Entity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
+    protected void render(Phantom_Halberd_Entity entityIn, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
         matrixStackIn.pushPose();
         matrixStackIn.mulPose(Axis.YP.rotationDegrees(90.0f - entityIn.getYRot()));
         matrixStackIn.translate(0.0, 1.0, 0.0);
@@ -73,7 +74,6 @@ extends EntityRenderer<Phantom_Halberd_Entity, EntityRenderState> {
             this.model.renderToBuffer(matrixStackIn, vertexconsumer3, packedLightIn, OverlayTexture.NO_OVERLAY, -1);
         }
         matrixStackIn.popPose();
-        super.render((Entity)entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
     }
 
     protected int getBlockLightLevel(Phantom_Halberd_Entity entityIn, BlockPos pos) {

@@ -24,8 +24,10 @@ import com.skd.cataclysmbosses.entity.AnimationMonster.BossMonsters.The_Leviatha
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
@@ -38,7 +40,7 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Abyss_Mine_Renderer
-extends EntityRenderer<Abyss_Mine_Entity, EntityRenderState> {
+extends CmEntityRenderer<Abyss_Mine_Entity> {
     private static final Identifier ABYSS_MINE_TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/leviathan/abyss_mine.png");
     private static final float SIN_45 = (float)Math.sin(0.7853981633974483);
     public Abyss_Mine_Model model = new Abyss_Mine_Model();
@@ -51,7 +53,7 @@ extends EntityRenderer<Abyss_Mine_Entity, EntityRenderState> {
         return 15;
     }
 
-    public void render(Abyss_Mine_Entity p_114162_, float p_114163_, float p_114164_, PoseStack p_114165_, MultiBufferSource p_114166_, int p_114167_) {
+    protected void render(Abyss_Mine_Entity p_114162_, float p_114164_, PoseStack p_114165_, CmMultiBufferSource p_114166_, int p_114167_) {
         p_114165_.pushPose();
         float f1 = ((float)p_114162_.time + p_114164_) * 3.0f;
         float activateProgress = p_114162_.prevactivateProgress + (p_114162_.activateProgress - p_114162_.prevactivateProgress) * p_114164_;
@@ -77,7 +79,6 @@ extends EntityRenderer<Abyss_Mine_Entity, EntityRenderState> {
         this.model.root.render(p_114165_, vertexconsumer, p_114167_, i);
         p_114165_.popPose();
         p_114165_.popPose();
-        super.render((Entity)p_114162_, p_114163_, p_114164_, p_114165_, p_114166_, p_114167_);
     }
 
     public Identifier getTextureLocation(Abyss_Mine_Entity entity) {
