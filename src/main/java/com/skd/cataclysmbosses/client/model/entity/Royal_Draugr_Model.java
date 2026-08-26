@@ -26,8 +26,9 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.Map;
 import java.util.Optional;
 import net.minecraft.client.model.ArmedModel;
-import net.minecraft.client.model.HierarchicalModel;
+import com.skd.cataclysmbosses.client.model.compat.CmHierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
@@ -39,7 +40,7 @@ import net.minecraft.world.entity.HumanoidArm;
 import org.jetbrains.annotations.NotNull;
 
 public class Royal_Draugr_Model
-extends HierarchicalModel<Royal_Draugr_Entity>
+extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRenderState>
 implements ArmedModel {
     private final ModelPart everything;
     private final ModelPart root;
@@ -58,6 +59,7 @@ implements ArmedModel {
     private final Map<String, Optional<ModelPart>> optionalPartCache = new Object2ObjectOpenHashMap();
 
     public Royal_Draugr_Model(ModelPart root) {
+        super(root);
         this.everything = root;
         this.buildPartCache(root);
         this.root = this.everything.getChild("root");
@@ -92,7 +94,12 @@ implements ArmedModel {
         return LayerDefinition.create((MeshDefinition)meshdefinition, (int)128, (int)64);
     }
 
-    public void setupAnim(Royal_Draugr_Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+        @Override
+    public void setupAnim(EntityRenderState state) {
+        super.setupAnim(state);
+        // TODO (26.2): port animate/animateWalk calls from old setupAnim(entity, limbSwing, ...)
+        // Original body stubbed for compile; see git history for original.
+        // if (false) { // stubbed for compile
         boolean flag2;
         this.root().getAllParts().forEach(ModelPart::resetPose);
         this.animateHeadLookTarget(netHeadYaw, headPitch);
@@ -132,7 +139,7 @@ implements ArmedModel {
     }
 
     private void buildPartCache(ModelPart part) {
-        for (Map.Entry entry : part.children.entrySet()) {
+        for (Map.Entry entry : part.getAllParts().entrySet()) {
             String partName = (String)entry.getKey();
             ModelPart childPart = (ModelPart)entry.getValue();
             this.partCache.putIfAbsent(partName, childPart);

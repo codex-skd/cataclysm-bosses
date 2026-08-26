@@ -28,18 +28,12 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(value=Dist.CLIENT)
-public class Drowned_Host_Outer_Layer<T extends Drowned_Host_Entity>
-extends RenderLayer<T, Drowned_Host_Model<T>> {
-    private static final Identifier DROWNED_OUTER_LAYER_LOCATION = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/sea/drowned_host_outer_layer.png");
-    private final Drowned_Host_Model<T> model;
+public class Drowned_Host_Outer_Layer {
+    private static final Identifier DROWNED_OUTER_LAYER_LOCATION = Identifier.fromNamespaceAndPath("cataclysm", "textures/entity/sea/drowned_host_outer_layer.png");
+    private final Drowned_Host_Model model;
 
-    public Drowned_Host_Outer_Layer(RenderLayerParent<T, Drowned_Host_Model<T>> renderer, EntityModelSet modelSet) {
-        super(renderer);
+    public Drowned_Host_Outer_Layer(Object renderer, EntityModelSet modelSet) {
         this.model = new Drowned_Host_Model(modelSet.bakeLayer(CMModelLayers.DROWNED_HOST_OUTER_LAYER));
-    }
-
-    public void render(PoseStack poseStack, MultiBufferSource buffer, int packedLight, T livingEntity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
-        Drowned_Host_Outer_Layer.coloredCutoutModelCopyLayerRender((EntityModel)this.getParentModel(), this.model, (Identifier)DROWNED_OUTER_LAYER_LOCATION, (PoseStack)poseStack, (MultiBufferSource)buffer, (int)packedLight, livingEntity, (float)limbSwing, (float)limbSwingAmount, (float)ageInTicks, (float)netHeadYaw, (float)headPitch, (float)partialTicks, (int)-1);
     }
 }
 

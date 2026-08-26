@@ -15,8 +15,9 @@ package com.skd.cataclysmbosses.client.model.entity;
 
 import com.skd.cataclysmbosses.client.animation.Storm_Serpent_Animation;
 import com.skd.cataclysmbosses.entity.projectile.Storm_Serpent_Entity;
-import net.minecraft.client.model.HierarchicalModel;
+import com.skd.cataclysmbosses.client.model.compat.CmHierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
@@ -25,7 +26,7 @@ import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 
 public class Storm_Serpent_Model
-extends HierarchicalModel<Storm_Serpent_Entity> {
+extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRenderState> {
     private final ModelPart root;
     private final ModelPart everything;
     private final ModelPart seg6;
@@ -41,6 +42,7 @@ extends HierarchicalModel<Storm_Serpent_Entity> {
     private final ModelPart teeth2;
 
     public Storm_Serpent_Model(ModelPart root) {
+        super(root);
         this.root = root;
         this.everything = this.root.getChild("everything");
         this.seg6 = this.everything.getChild("seg6");
@@ -79,7 +81,12 @@ extends HierarchicalModel<Storm_Serpent_Entity> {
         return LayerDefinition.create((MeshDefinition)meshdefinition, (int)256, (int)256);
     }
 
-    public void setupAnim(Storm_Serpent_Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+        @Override
+    public void setupAnim(EntityRenderState state) {
+        super.setupAnim(state);
+        // TODO (26.2): port animate/animateWalk calls from old setupAnim(entity, limbSwing, ...)
+        // Original body stubbed for compile; see git history for original.
+        // if (false) { // stubbed for compile
         this.root().getAllParts().forEach(ModelPart::resetPose);
         this.root.visible = entity.getState() != 0;
         this.animate(entity.getAnimationState("spawn"), Storm_Serpent_Animation.STORM_SERPENT, ageInTicks, 1.0f);

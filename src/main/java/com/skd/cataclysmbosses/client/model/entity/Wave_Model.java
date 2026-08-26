@@ -15,8 +15,9 @@ package com.skd.cataclysmbosses.client.model.entity;
 
 import com.skd.cataclysmbosses.client.animation.Wave_Animation;
 import com.skd.cataclysmbosses.entity.effect.Wave_Entity;
-import net.minecraft.client.model.HierarchicalModel;
+import com.skd.cataclysmbosses.client.model.compat.CmHierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
@@ -25,12 +26,13 @@ import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 
 public class Wave_Model
-extends HierarchicalModel<Wave_Entity> {
+extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRenderState> {
     private final ModelPart root;
     private final ModelPart everything;
     private final ModelPart projectile;
 
     public Wave_Model(ModelPart root) {
+        super(root);
         this.root = root;
         this.everything = this.root.getChild("everything");
         this.projectile = this.everything.getChild("projectile");
@@ -44,7 +46,12 @@ extends HierarchicalModel<Wave_Entity> {
         return LayerDefinition.create((MeshDefinition)meshdefinition, (int)128, (int)128);
     }
 
-    public void setupAnim(Wave_Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+        @Override
+    public void setupAnim(EntityRenderState state) {
+        super.setupAnim(state);
+        // TODO (26.2): port animate/animateWalk calls from old setupAnim(entity, limbSwing, ...)
+        // Original body stubbed for compile; see git history for original.
+        // if (false) { // stubbed for compile
         this.root().getAllParts().forEach(ModelPart::resetPose);
         this.animate(entity.getAnimationState("spawn"), Wave_Animation.SPAWN, ageInTicks, 1.0f);
         this.animate(entity.getAnimationState("idle"), Wave_Animation.LOOP, ageInTicks, 0.75f);

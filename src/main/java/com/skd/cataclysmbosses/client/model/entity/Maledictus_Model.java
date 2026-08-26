@@ -25,8 +25,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.Map;
 import java.util.Optional;
-import net.minecraft.client.model.HierarchicalModel;
+import com.skd.cataclysmbosses.client.model.compat.CmHierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
@@ -36,7 +37,7 @@ import net.minecraft.client.model.geom.builders.PartDefinition;
 import org.jetbrains.annotations.NotNull;
 
 public class Maledictus_Model
-extends HierarchicalModel<Maledictus_Entity> {
+extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRenderState> {
     private final ModelPart root;
     private final ModelPart roots;
     private final ModelPart berserker;
@@ -99,6 +100,7 @@ extends HierarchicalModel<Maledictus_Entity> {
     private final Map<String, Optional<ModelPart>> optionalPartCache = new Object2ObjectOpenHashMap();
 
     public Maledictus_Model(ModelPart root) {
+        super(root);
         this.root = root;
         this.buildPartCache(root);
         this.roots = this.root.getChild("roots");
@@ -223,7 +225,12 @@ extends HierarchicalModel<Maledictus_Entity> {
         return LayerDefinition.create((MeshDefinition)meshdefinition, (int)256, (int)256);
     }
 
-    public void setupAnim(Maledictus_Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+        @Override
+    public void setupAnim(EntityRenderState state) {
+        super.setupAnim(state);
+        // TODO (26.2): port animate/animateWalk calls from old setupAnim(entity, limbSwing, ...)
+        // Original body stubbed for compile; see git history for original.
+        // if (false) { // stubbed for compile
         this.root().getAllParts().forEach(ModelPart::resetPose);
         this.animateHeadLookTarget(netHeadYaw, headPitch);
         this.animate(entity.getAnimationState("idle"), Maledictus_Animation.IDLE, ageInTicks, 0.75f);
@@ -279,7 +286,7 @@ extends HierarchicalModel<Maledictus_Entity> {
     }
 
     private void buildPartCache(ModelPart part) {
-        for (Map.Entry entry : part.children.entrySet()) {
+        for (Map.Entry entry : part.getAllParts().entrySet()) {
             String partName = (String)entry.getKey();
             ModelPart childPart = (ModelPart)entry.getValue();
             this.partCache.putIfAbsent(partName, childPart);

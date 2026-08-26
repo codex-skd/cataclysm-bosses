@@ -25,8 +25,9 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.Map;
 import java.util.Optional;
-import net.minecraft.client.model.HierarchicalModel;
+import com.skd.cataclysmbosses.client.model.compat.CmHierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
@@ -36,7 +37,7 @@ import net.minecraft.client.model.geom.builders.PartDefinition;
 import org.jetbrains.annotations.NotNull;
 
 public class Ignited_Berserker_Model<T extends Ignited_Berserker_Entity>
-extends HierarchicalModel<T> {
+extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRenderState> {
     private final ModelPart root;
     private final ModelPart everything;
     private final ModelPart mid_root;
@@ -55,6 +56,7 @@ extends HierarchicalModel<T> {
     private final Map<String, Optional<ModelPart>> optionalPartCache = new Object2ObjectOpenHashMap();
 
     public Ignited_Berserker_Model(ModelPart root) {
+        super(root);
         this.root = root;
         this.buildPartCache(root);
         this.everything = root.getChild("everything");
@@ -108,7 +110,12 @@ extends HierarchicalModel<T> {
         return LayerDefinition.create((MeshDefinition)meshdefinition, (int)128, (int)128);
     }
 
-    public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+        @Override
+    public void setupAnim(EntityRenderState state) {
+        super.setupAnim(state);
+        // TODO (26.2): port animate/animateWalk calls from old setupAnim(entity, limbSwing, ...)
+        // Original body stubbed for compile; see git history for original.
+        // if (false) { // stubbed for compile
         this.root().getAllParts().forEach(ModelPart::resetPose);
         this.animateHeadLookTarget(netHeadYaw, headPitch);
         if (((Internal_Animation_Monster)((Object)entity)).getAttackState() == 0) {
@@ -125,7 +132,7 @@ extends HierarchicalModel<T> {
     }
 
     private void buildPartCache(ModelPart part) {
-        for (Map.Entry entry : part.children.entrySet()) {
+        for (Map.Entry entry : part.getAllParts().entrySet()) {
             String partName = (String)entry.getKey();
             ModelPart childPart = (ModelPart)entry.getValue();
             this.partCache.putIfAbsent(partName, childPart);

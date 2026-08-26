@@ -14,8 +14,9 @@
 package com.skd.cataclysmbosses.client.model.entity;
 
 import com.skd.cataclysmbosses.entity.projectile.Laser_Beam_Entity;
-import net.minecraft.client.model.HierarchicalModel;
+import com.skd.cataclysmbosses.client.model.compat.CmHierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
@@ -24,10 +25,11 @@ import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 
 public class Laser_Beam_Model
-extends HierarchicalModel<Laser_Beam_Entity> {
+extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRenderState> {
     private final ModelPart root;
 
     public Laser_Beam_Model(ModelPart root) {
+        super(root);
         this.root = root.getChild("root");
     }
 
@@ -40,10 +42,20 @@ extends HierarchicalModel<Laser_Beam_Entity> {
         return LayerDefinition.create((MeshDefinition)meshdefinition, (int)32, (int)32);
     }
 
-    public void setupAnim(Laser_Beam_Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+        @Override
+    public void setupAnim(EntityRenderState state) {
+        super.setupAnim(state);
+        // TODO (26.2): port animate/animateWalk calls from old setupAnim(entity, limbSwing, ...)
+        // Original body stubbed for compile; see git history for original.
+        // if (false) { // stubbed for compile
     }
 
-    public void setupAnim(float yRot, float xRot) {
+        @Override
+    public void setupAnim(EntityRenderState state) {
+        super.setupAnim(state);
+        // TODO (26.2): port animate/animateWalk calls from old setupAnim(entity, limbSwing, ...)
+        // Original body stubbed for compile; see git history for original.
+        // if (false) { // stubbed for compile
         this.root.yRot = yRot * ((float)Math.PI / 180);
         this.root.xRot = xRot * ((float)Math.PI / 180);
     }

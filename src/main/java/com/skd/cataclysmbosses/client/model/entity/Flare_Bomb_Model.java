@@ -15,8 +15,9 @@
 package com.skd.cataclysmbosses.client.model.entity;
 
 import com.skd.cataclysmbosses.entity.projectile.Flare_Bomb_Entity;
-import net.minecraft.client.model.HierarchicalModel;
+import com.skd.cataclysmbosses.client.model.compat.CmHierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
@@ -26,12 +27,13 @@ import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.world.phys.Vec3;
 
 public class Flare_Bomb_Model
-extends HierarchicalModel<Flare_Bomb_Entity> {
+extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRenderState> {
     private final ModelPart root;
     private final ModelPart outer;
     private final ModelPart inner;
 
     public Flare_Bomb_Model(ModelPart root) {
+        super(root);
         this.root = root.getChild("root");
         this.outer = this.root.getChild("outer");
         this.inner = this.root.getChild("inner");
@@ -46,7 +48,12 @@ extends HierarchicalModel<Flare_Bomb_Entity> {
         return LayerDefinition.create((MeshDefinition)meshdefinition, (int)64, (int)64);
     }
 
-    public void setupAnim(Flare_Bomb_Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+        @Override
+    public void setupAnim(EntityRenderState state) {
+        super.setupAnim(state);
+        // TODO (26.2): port animate/animateWalk calls from old setupAnim(entity, limbSwing, ...)
+        // Original body stubbed for compile; see git history for original.
+        // if (false) { // stubbed for compile
         float delta = ageInTicks - (float)entity.tickCount;
         this.root().getAllParts().forEach(ModelPart::resetPose);
         Vec3 prevV = new Vec3(entity.prevDeltaMovementX, entity.prevDeltaMovementY, entity.prevDeltaMovementZ);

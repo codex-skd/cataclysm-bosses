@@ -2,7 +2,8 @@ SESSION STATUS — NeoForge 26.2.0.45-beta -> 26.2.0.57 compile port
 ================================================================
 Date: 2026-08-26
 Compile baseline: ./gradlew compileJava  (Xmaxerrs 20000)
-Error count: start 5548 -> 5010 -> 3782 (items) -> 3524 -> 3381 (CMItemstackRenderer) -> 3207 -> now 3162
+Error count: start 5548 -> 5010 -> 3782 (items) -> 3524 -> 3381 (CMItemstackRenderer) -> 3207 -> 3162 -> now 3257
+# Note: 3257 is after partial model WIP (23 HierarchicalModel files stubbed, Drowned_Host vanilla model fixed); count temporarily up due to new bridge stubs (expected to drop after follow-up fixes)
 Item/data-driven cluster DONE (~258). Custom item renderer DONE (~143). Simple EntityRenderers batch DONE (~174, 56 files). MobRenderer bosses batch DONE (~45, 34 files):
 see "CLUSTER FIXED (CMItemstackRenderer / custom item rendering)" below.
 
