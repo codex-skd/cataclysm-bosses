@@ -60,6 +60,8 @@ import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import com.skd.cataclysmbosses.entity.AnimationMonster.LLibrary_Monster;
+import com.skd.cataclysmbosses.entity.etc.ISemiAquatic;
 
 public class AbstractDeepling
 extends LLibrary_Monster

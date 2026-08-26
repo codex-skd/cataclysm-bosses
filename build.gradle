@@ -167,7 +167,7 @@ publishing {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
-    options.compilerArgs << '-Xmaxerrs' << '5000' // TEMP: Fase 1 diagnostic, revert once port is done
+    options.compilerArgs << '-Xmaxerrs' << '20000' // TEMP: Fase 1 diagnostic, revert once port is done
 }
 
 // IDEA no longer automatically downloads sources/javadoc jars for dependencies, so we need to explicitly enable the behavior.

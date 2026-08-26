@@ -158,8 +158,8 @@ implements Enemy {
         if (!this.isRemoved() && !this.dead) {
             Entity entity = cause.getEntity();
             LivingEntity livingentity = this.getKillCredit();
-            if (this.deathScore >= 0 && livingentity != null) {
-                livingentity.awardKillScore((Entity)this, this.deathScore, cause);
+            if (livingentity != null) {
+                livingentity.awardKillScore(this, cause);
             }
             if (this.isSleeping()) {
                 this.stopSleeping();
@@ -169,7 +169,7 @@ implements Enemy {
             Level level = this.level();
             if (level instanceof ServerLevel) {
                 ServerLevel serverlevel = (ServerLevel)level;
-                if (entity == null || entity.killedEntity(serverlevel, (LivingEntity)this)) {
+                if (entity == null || entity.killedEntity(serverlevel, this, cause)) {
                     this.gameEvent((Holder)GameEvent.ENTITY_DIE);
                     this.dropAllDeathLoot(serverlevel, cause);
                     this.createWitherRose(livingentity);
