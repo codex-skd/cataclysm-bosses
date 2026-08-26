@@ -616,7 +616,7 @@ implements IHoldEntity {
                     EntityUtil.disableShield(player, shieldbreakticks);
                 }
             }
-            if (!flag || entity.getType().is(ModTag.IGNIS_CANT_POKE) || !entity.isAlive()) continue;
+            if (!flag || entity.getType().builtInRegistryHolder().is(ModTag.IGNIS_CANT_POKE) || !entity.isAlive()) continue;
             if (entity.isShiftKeyDown()) {
                 entity.setShiftKeyDown(false);
             }
@@ -738,7 +738,7 @@ implements IHoldEntity {
         if (super.isAlliedTo(entityIn)) {
             return true;
         }
-        if (entityIn.getType().is(ModTag.TEAM_MALEDICTUS)) {
+        if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_MALEDICTUS)) {
             return this.getTeam() == null && entityIn.getTeam() == null;
         }
         return false;

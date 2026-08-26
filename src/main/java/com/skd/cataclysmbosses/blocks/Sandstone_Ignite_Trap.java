@@ -92,7 +92,7 @@ extends BaseEntityBlock {
     }
 
     public static boolean shouldTrigger(Entity entity) {
-        if (entity instanceof LivingEntity && !entity.getType().is(ModTag.SANDSTONE_TRAP_NOT_DETECTED)) {
+        if (entity instanceof LivingEntity && !entity.getType().builtInRegistryHolder().is(ModTag.SANDSTONE_TRAP_NOT_DETECTED)) {
             if (entity instanceof Player) {
                 return !((Player)entity).isCreative() && !entity.isSpectator();
             }

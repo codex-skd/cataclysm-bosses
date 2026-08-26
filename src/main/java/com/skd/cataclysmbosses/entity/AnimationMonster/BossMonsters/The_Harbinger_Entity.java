@@ -194,7 +194,7 @@ PowerableMob {
     private final CMBossInfoServer bossEvent = new CMBossInfoServer(this.getDisplayName(), BossEvent.BossBarColor.RED, true, 4);
     private int mode_change_cooldown = 0;
     private int skill_cooldown = 160;
-    private static final Predicate<LivingEntity> LIVING_ENTITY_SELECTOR = p_31504_ -> p_31504_.attackable() && !p_31504_.getType().is(ModTag.TEAM_THE_HARBINGER);
+    private static final Predicate<LivingEntity> LIVING_ENTITY_SELECTOR = p_31504_ -> p_31504_.attackable() && !p_31504_.getType().builtInRegistryHolder().is(ModTag.TEAM_THE_HARBINGER);
     private static final TargetingConditions TARGETING_CONDITIONS = TargetingConditions.forCombat().range(20.0).selector(LIVING_ENTITY_SELECTOR);
 
     public The_Harbinger_Entity(EntityType entity, Level world) {
@@ -345,7 +345,7 @@ PowerableMob {
         if (super.isAlliedTo(entityIn)) {
             return true;
         }
-        if (entityIn.getType().is(ModTag.TEAM_THE_HARBINGER)) {
+        if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_THE_HARBINGER)) {
             return this.getTeam() == null && entityIn.getTeam() == null;
         }
         return false;

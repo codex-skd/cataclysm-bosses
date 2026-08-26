@@ -937,7 +937,7 @@ implements IHoldEntity {
                 float entityRelativeAngle = entityHitAngle - entityAttackingAngle;
                 float entityHitDistance = (float)Math.sqrt((entityHit.getZ() - this.getZ()) * (entityHit.getZ() - this.getZ()) + (entityHit.getX() - this.getX()) * (entityHit.getX() - this.getX()));
                 if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || entityHit instanceof Clawdian_Entity || entityHit == this) continue;
-                if (!entityHit.getType().is(ModTag.IGNIS_CANT_POKE) && entityHit.isAlive() && this.getPassengers().isEmpty()) {
+                if (!entityHit.getType().builtInRegistryHolder().is(ModTag.IGNIS_CANT_POKE) && entityHit.isAlive() && this.getPassengers().isEmpty()) {
                     if (entityHit.isShiftKeyDown()) {
                         entityHit.setShiftKeyDown(false);
                     }
@@ -976,7 +976,7 @@ implements IHoldEntity {
         if (super.isAlliedTo(entityIn)) {
             return true;
         }
-        if (entityIn.getType().is(ModTag.TEAM_SCYLLA)) {
+        if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_SCYLLA)) {
             return this.getTeam() == null && entityIn.getTeam() == null;
         }
         return false;

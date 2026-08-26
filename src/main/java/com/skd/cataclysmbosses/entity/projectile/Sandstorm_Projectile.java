@@ -246,7 +246,7 @@ extends Projectile {
             Entity entity1 = this.getOwner();
             boolean flag = false;
             if (entity1 instanceof LivingEntity) {
-                if (!entity.getType().is(ModTag.TEAM_ANCIENT_REMNANT) || !entity1.getType().is(ModTag.TEAM_ANCIENT_REMNANT)) {
+                if (!entity.getType().builtInRegistryHolder().is(ModTag.TEAM_ANCIENT_REMNANT) || !entity1.getType().builtInRegistryHolder().is(ModTag.TEAM_ANCIENT_REMNANT)) {
                     LivingEntity livingentity = (LivingEntity)entity1;
                     flag = entity.hurtOrSimulate(this.damageSources().mobProjectile((Entity)this, livingentity), this.getDamage());
                     if (flag && !entity.isAlive()) {
@@ -268,7 +268,7 @@ extends Projectile {
         if (hitresult$type == HitResult.Type.ENTITY) {
             EntityHitResult entityhitresult = (EntityHitResult)p_37260_;
             Entity entity = entityhitresult.getEntity();
-            if (entity.getType().is(EntityTypeTags.REDIRECTABLE_PROJECTILE) && entity instanceof Projectile) {
+            if (entity.getType().builtInRegistryHolder().is(EntityTypeTags.REDIRECTABLE_PROJECTILE) && entity instanceof Projectile) {
                 Projectile projectile = (Projectile)entity;
                 projectile.deflect(ProjectileDeflection.AIM_DEFLECT, this.getOwner(), this.getOwner(), true);
             }

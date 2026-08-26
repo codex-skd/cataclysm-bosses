@@ -95,7 +95,7 @@ extends Block {
     }
 
     public static boolean shouldTrigger(Entity entity) {
-        if (entity instanceof LivingEntity && !entity.getType().is(ModTag.TRAP_BLOCK_NOT_DETECTED)) {
+        if (entity instanceof LivingEntity && !entity.getType().builtInRegistryHolder().is(ModTag.TRAP_BLOCK_NOT_DETECTED)) {
             if (entity instanceof Player) {
                 return !((Player)entity).isCreative() && !entity.isSpectator();
             }

@@ -449,7 +449,7 @@ extends Internal_Animation_Monster {
         if (super.isAlliedTo(entityIn)) {
             return true;
         }
-        if (entityIn.getType().is(ModTag.TEAM_IGNIS)) {
+        if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_IGNIS)) {
             return this.getTeam() == null && entityIn.getTeam() == null;
         }
         return false;

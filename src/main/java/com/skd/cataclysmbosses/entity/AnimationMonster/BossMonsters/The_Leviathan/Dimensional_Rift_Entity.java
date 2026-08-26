@@ -108,7 +108,7 @@ extends Entity {
                 entity.setDeltaMovement(entity.getDeltaMovement().subtract(diff));
                 continue;
             }
-            if (entity.getType().is(ModTag.DIMENSIONAL_LIFT_IMMUNE)) continue;
+            if (entity.getType().builtInRegistryHolder().is(ModTag.DIMENSIONAL_LIFT_IMMUNE)) continue;
             diff = diff.normalize().scale((double)this.getStage() * 0.045);
             entity.setDeltaMovement(entity.getDeltaMovement().subtract(diff));
         }

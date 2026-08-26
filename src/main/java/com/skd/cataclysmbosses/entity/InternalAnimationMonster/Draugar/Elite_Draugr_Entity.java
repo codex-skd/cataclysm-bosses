@@ -289,7 +289,7 @@ implements CrossbowAttackMob {
         if (super.isAlliedTo(entityIn)) {
             return true;
         }
-        if (entityIn.getType().is(ModTag.TEAM_MALEDICTUS)) {
+        if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_MALEDICTUS)) {
             return this.getTeam() == null && entityIn.getTeam() == null;
         }
         return false;

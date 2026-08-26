@@ -61,7 +61,7 @@ extends BlockEntity {
             float f = 5.0f;
             if (this.tickCount < 80) {
                 for (LivingEntity inRange : this.level.getEntitiesOfClass(LivingEntity.class, new AABB((double)x - (double)f, (double)y - (double)f, (double)z - (double)f, (double)x + (double)f, (double)y + (double)f, (double)z + (double)f))) {
-                    if (inRange instanceof Player && ((Player)inRange).getAbilities().invulnerable || inRange.getType().is(ModTag.TRAP_BLOCK_NOT_DETECTED)) continue;
+                    if (inRange instanceof Player && ((Player)inRange).getAbilities().invulnerable || inRange.getType().builtInRegistryHolder().is(ModTag.TRAP_BLOCK_NOT_DETECTED)) continue;
                     Vec3 diff = inRange.position().subtract(Vec3.atCenterOf((Vec3i)this.getBlockPos().offset(0, 0, 0)));
                     diff = diff.normalize().scale(0.06);
                     inRange.setDeltaMovement(inRange.getDeltaMovement().subtract(diff));

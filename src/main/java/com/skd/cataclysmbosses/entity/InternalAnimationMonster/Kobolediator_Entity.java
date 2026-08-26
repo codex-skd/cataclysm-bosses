@@ -671,7 +671,7 @@ extends Internal_Animation_Monster {
         if (super.isAlliedTo(entityIn)) {
             return true;
         }
-        if (entityIn.getType().is(ModTag.TEAM_ANCIENT_REMNANT)) {
+        if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_ANCIENT_REMNANT)) {
             return this.getTeam() == null && entityIn.getTeam() == null;
         }
         return false;

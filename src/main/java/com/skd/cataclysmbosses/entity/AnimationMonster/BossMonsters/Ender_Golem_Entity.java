@@ -394,7 +394,7 @@ extends LLibrary_Boss_Monster {
         if (super.isAlliedTo(entityIn)) {
             return true;
         }
-        if (entityIn.getType().is(ModTag.TEAM_ENDER_GUARDIAN)) {
+        if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_ENDER_GUARDIAN)) {
             return this.getTeam() == null && entityIn.getTeam() == null;
         }
         return false;

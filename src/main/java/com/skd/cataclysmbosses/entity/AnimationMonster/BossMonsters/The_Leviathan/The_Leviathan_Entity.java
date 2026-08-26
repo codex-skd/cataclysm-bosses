@@ -397,7 +397,7 @@ IHoldEntity {
         if (super.isAlliedTo(entityIn)) {
             return true;
         }
-        if (entityIn.getType().is(ModTag.TEAM_THE_LEVIATHAN)) {
+        if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_THE_LEVIATHAN)) {
             return this.getTeam() == null && entityIn.getTeam() == null;
         }
         return false;
@@ -1181,7 +1181,7 @@ IHoldEntity {
                         EntityUtil.disableShield(player, shieldbreakticks);
                     }
                 }
-                if (!flag || target.getType().is(ModTag.IGNIS_CANT_POKE) || !target.isAlive()) continue;
+                if (!flag || target.getType().builtInRegistryHolder().is(ModTag.IGNIS_CANT_POKE) || !target.isAlive()) continue;
                 if (target.isShiftKeyDown()) {
                     target.setShiftKeyDown(false);
                 }

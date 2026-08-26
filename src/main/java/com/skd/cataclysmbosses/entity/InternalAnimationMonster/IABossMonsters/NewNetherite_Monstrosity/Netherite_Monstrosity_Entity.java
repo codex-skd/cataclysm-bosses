@@ -590,7 +590,7 @@ extends IABoss_monster {
         if (super.isAlliedTo(entityIn)) {
             return true;
         }
-        if (entityIn.getType().is(ModTag.TEAM_MONSTROSITY)) {
+        if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_MONSTROSITY)) {
             return this.getTeam() == null && entityIn.getTeam() == null;
         }
         return false;

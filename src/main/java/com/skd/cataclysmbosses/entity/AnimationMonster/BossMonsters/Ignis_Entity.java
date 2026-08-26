@@ -1827,7 +1827,7 @@ implements IHoldEntity {
                         EntityUtil.disableShield(player, shieldbreakticks);
                     }
                 }
-                if (!flag || entityHit.getType().is(ModTag.IGNIS_CANT_POKE) || !entityHit.isAlive() || !this.getPassengers().isEmpty()) continue;
+                if (!flag || entityHit.getType().builtInRegistryHolder().is(ModTag.IGNIS_CANT_POKE) || !entityHit.isAlive() || !this.getPassengers().isEmpty()) continue;
                 if (entityHit.isShiftKeyDown()) {
                     entityHit.setShiftKeyDown(false);
                 }
@@ -2174,7 +2174,7 @@ implements IHoldEntity {
         if (super.isAlliedTo(entityIn)) {
             return true;
         }
-        if (entityIn.getType().is(ModTag.TEAM_IGNIS)) {
+        if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_IGNIS)) {
             return this.getTeam() == null && entityIn.getTeam() == null;
         }
         return false;

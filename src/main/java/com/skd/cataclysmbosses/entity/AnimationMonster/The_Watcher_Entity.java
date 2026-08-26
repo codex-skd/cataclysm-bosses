@@ -169,7 +169,7 @@ extends LLibrary_Monster {
         if (super.isAlliedTo(entityIn)) {
             return true;
         }
-        if (entityIn.getType().is(ModTag.TEAM_THE_HARBINGER)) {
+        if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_THE_HARBINGER)) {
             return this.getTeam() == null && entityIn.getTeam() == null;
         }
         return false;
