@@ -134,7 +134,9 @@ extends Goal {
         if (!this.isTeleportFriendlyBlock(new BlockPos(x, y, z))) {
             return false;
         }
-        this.tameAnimal.moveTo((double)x + 0.5, y, (double)z + 0.5, this.tameAnimal.getYRot(), this.tameAnimal.getXRot());
+        this.tameAnimal.setPos((double)x + 0.5, y, (double)z + 0.5);
+        this.tameAnimal.setYRot(this.tameAnimal.getYRot());
+        this.tameAnimal.setXRot(this.tameAnimal.getXRot());
         this.navigator.stop();
         return true;
     }

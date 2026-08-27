@@ -182,7 +182,7 @@ implements RangedAttackMob {
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor accessor, DifficultyInstance difficulty, EntitySpawnReason spawnType, @Nullable SpawnGroupData spawnGroupData) {
         spawnGroupData = super.finalizeSpawn(accessor, difficulty, spawnType, spawnGroupData);
         Symbiocto_Entity upper = new Symbiocto_Entity((EntityType)ModEntities.SYMBIOCTO.get(), this.level());
-        upper.moveTo(this.getX(), this.getY() + 1.3125, this.getZ(), this.getYRot(), 0.0f);
+        upper.setPos(this.getX(), this.getY() + 1.3125, this.getZ()); upper.setYRot(this.getZ()); upper.setXRot(this.getYRot());
         EventHooks.finalizeMobSpawn((Mob)upper, (ServerLevelAccessor)accessor, (DifficultyInstance)difficulty, (EntitySpawnReason)spawnType, (SpawnGroupData)spawnGroupData);
         upper.setYBodyRot(this.yBodyRot);
         upper.setYHeadRot(this.getYHeadRot());

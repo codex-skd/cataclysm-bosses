@@ -335,7 +335,9 @@ extends LLibrary_Boss_Monster {
             double vy = 0.0;
             double vz = Mth.sin((float)throwAngle);
             Blazing_Bone_Entity projectile = new Blazing_Bone_Entity(this.level(), (float)CMCommonConfig.IgnitedRevenant.BlazingBoneDamage, (LivingEntity)this);
-            projectile.moveTo(sx, sy, sz, (float)i * 45.0f, this.getXRot());
+            projectile.setPos(sx, sy, sz);
+            projectile.setYRot((float)i * 45.0f);
+            projectile.setXRot(this.getXRot());
             float speed = 0.5f;
             projectile.shoot(vx, vy, vz, speed, 1.0f);
             this.level().addFreshEntity((Entity)projectile);
@@ -354,7 +356,9 @@ extends LLibrary_Boss_Monster {
             double vy = 0.0;
             double vz = Mth.sin((float)throwAngle);
             Blazing_Bone_Entity projectile = new Blazing_Bone_Entity(this.level(), (float)CMCommonConfig.IgnitedRevenant.BlazingBoneDamage, (LivingEntity)this);
-            projectile.moveTo(sx, sy, sz, (float)i * 60.0f, this.getXRot());
+            projectile.setPos(sx, sy, sz);
+            projectile.setYRot((float)i * 60.0f);
+            projectile.setXRot(this.getXRot());
             float speed = 0.6f;
             projectile.shoot(vx, vy, vz, speed, 1.0f);
             this.level().addFreshEntity((Entity)projectile);
@@ -373,7 +377,9 @@ extends LLibrary_Boss_Monster {
             double vy = 0.0;
             double vz = Mth.sin((float)throwAngle);
             Blazing_Bone_Entity projectile = new Blazing_Bone_Entity(this.level(), (float)CMCommonConfig.IgnitedRevenant.BlazingBoneDamage, (LivingEntity)this);
-            projectile.moveTo(sx, sy, sz, (float)i * 36.0f, this.getXRot());
+            projectile.setPos(sx, sy, sz);
+            projectile.setYRot((float)i * 36.0f);
+            projectile.setXRot(this.getXRot());
             float speed = 0.4f;
             projectile.shoot(vx, vy, vz, speed, 1.0f);
             this.level().addFreshEntity((Entity)projectile);

@@ -621,7 +621,9 @@ implements NeutralMob {
                     double vz = Mth.sin((float)throwAngle);
                     double v3 = Mth.sqrt((float)((float)(vx * vx + vz * vz)));
                     Amethyst_Cluster_Projectile_Entity projectile = new Amethyst_Cluster_Projectile_Entity((EntityType<Amethyst_Cluster_Projectile_Entity>)((EntityType)ModEntities.AMETHYST_CLUSTER_PROJECTILE.get()), ((Amethyst_Crab_Entity)this.entity).level(), (LivingEntity)this.entity, (float)CMCommonConfig.AmethystCrab.AmethystClusterDamage);
-                    projectile.moveTo(sx, sy, sz, (float)i * 11.25f, ((Amethyst_Crab_Entity)this.entity).getXRot());
+                    projectile.setPos(sx, sy, sz);
+                    projectile.setYRot((float)i * 11.25f);
+                    projectile.setXRot(((Amethyst_Crab_Entity)this.entity).getXRot());
                     float speed = 0.8f;
                     projectile.shoot(vx, vy + v3 * (double)0.2f, vz, speed, 1.0f);
                     ((Amethyst_Crab_Entity)this.entity).level().addFreshEntity((Entity)projectile);

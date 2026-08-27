@@ -248,8 +248,10 @@ public void addAdditionalHomePoint(ValueOutput compound) {
             
             // Check if home position is in the same dimension
             if (this.getHomePos().dimension().equals(this.level().dimension())) {
-                if (!homeBlockPos.closerToCenterThan(this.position(), 16.0)) {
-                    this.moveTo(homeVec.x, homeVec.y, homeVec.z, this.getYRot(), this.getXRot());
+                if (!homeBlockPos.getCenter().distanceTo(this.position()) > 16.0) {
+                    this.setPos(homeVec.x, homeVec.y, homeVec.z);
+                    this.setYRot(this.getYRot());
+                    this.setXRot(this.getXRot());
                     this.homeTicks = this.HOME_COOLDOWN;
                 }
             } else {

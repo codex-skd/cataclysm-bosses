@@ -147,7 +147,9 @@ extends Goal {
         if (!this.isTeleportFriendlyBlock(new BlockPos(p_226328_1_, p_226328_2_, p_226328_3_))) {
             return false;
         }
-        this.tameable.moveTo((double)p_226328_1_ + 0.5, p_226328_2_, (double)p_226328_3_ + 0.5, this.tameable.getYRot(), this.tameable.getXRot());
+        this.tameable.setPos((double)p_226328_1_ + 0.5, p_226328_2_, (double)p_226328_3_ + 0.5);
+        this.tameable.setYRot(this.tameable.getYRot());
+        this.tameable.setXRot(this.tameable.getXRot());
         this.tameable.getNavigation().stop();
         return true;
     }
