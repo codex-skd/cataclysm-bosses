@@ -7,7 +7,6 @@
  *  net.minecraft.core.BlockPos
  *  net.minecraft.core.GlobalPos
  *  net.minecraft.core.Position
- *  net.minecraft.nbt.CompoundTag
  *  net.minecraft.network.syncher.EntityDataAccessor
  *  net.minecraft.network.syncher.EntityDataSerializer
  *  net.minecraft.network.syncher.EntityDataSerializers
@@ -29,6 +28,8 @@
  *  net.minecraft.world.level.ServerLevelAccessor
  *  net.minecraft.world.level.portal.DimensionTransition
  *  net.minecraft.world.phys.Vec3
+ *  net.minecraft.world.level.storage.ValueInput
+ *  net.minecraft.world.level.storage.ValueOutput
  */
 package com.skd.cataclysmbosses.entity.AnimationMonster.BossMonsters;
 
@@ -42,11 +43,12 @@ import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.Position;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.SynchedEntityData.Builder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.DamageTypeTags;
@@ -61,7 +63,7 @@ import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraft.world.level.portal.DimensionTransition;
+
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -89,7 +91,7 @@ IHomeEntity {
     @Override
     @Nullable
     public GlobalPos getHomePos() {
-        return ((Optional)this.entityData.get(HOME_POS)).orElse(null);
+        return ((Optional<GlobalPos>)this.entityData.get(HOME_POS)).orElse(null);
     }
 
     @Override
@@ -98,14 +100,18 @@ IHomeEntity {
         builder.define(HOME_POS, Optional.empty());
     }
 
+    @Override
     public void addAdditionalSaveData(ValueOutput compound) {
-        super.addAdditionalSaveData(compound);
+        // Convert ValueOutput to CompoundTag for parent compatibility
+        CompoundTag tag = compound.createCompound();
+        super.addAdditionalSaveData(tag);
         this.addAdditionalHomePoint(compound);
     }
 
     public void readAdditionalSaveData(ValueInput compound) {
         this.readAdditionalHomePoint(compound);
-        super.readAdditionalSaveData(compound);
+        // Convert ValueInput to CompoundTag for parent compatibility
+        super.readAdditionalSaveData(compound.createCompound());
     }
 
     @Nullable
@@ -114,15 +120,16 @@ IHomeEntity {
         return super.finalizeSpawn(level, difficulty, spawnType, spawnGroupData);
     }
 
-    public boolean hurt(DamageSource source, float amount) {
+    @Override
+    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
         boolean flag;
-        if (this.isInvulnerableTo(source)) {
+        if (this.isInvulnerableTo(level, source)) {
             return false;
         }
         if (source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
-            return super.hurtOrSimulate(source, amount);
+            return super.hurtServer(level, source, amount);
         }
-        amount = Math.min(this.DamageCap(), amount);
+        float amount2 = Math.min(this.DamageCap(), amount);
         double distSqr = this.calculateRange(source);
         if (distSqr != -1.0) {
             double distance;
@@ -134,27 +141,27 @@ IHomeEntity {
             if (distSqr >= maxLimitSqr) {
                 return false;
             }
-            if (distSqr > limitSqr && (amount *= (multiplier = (float)((maxLimit - (distance = Math.sqrt(distSqr))) / (maxLimit - limit)))) <= 0.0f) {
+            if (distSqr > limitSqr && (amount2 *= (multiplier = (float)((maxLimit - (distance = Math.sqrt(distSqr))) / (maxLimit - limit)))) <= 0.0f) {
                 return false;
             }
         }
         float BUCKET = this.damageBucket;
         if (!source.is(ModTag.BYPASSES_HURT_TIME)) {
-            float projectedBucket = this.damageBucket + amount;
+            float projectedBucket = this.damageBucket + amount2;
             float limit = this.DamageCap();
             if (projectedBucket > limit) {
                 float roomLeft = limit - this.damageBucket;
                 if (roomLeft > 0.0f) {
-                    amount = roomLeft;
+                    amount2 = roomLeft;
                     this.damageBucket = limit;
                 } else {
-                    amount = 0.1f;
+                    amount2 = 0.1f;
                 }
             } else {
-                this.damageBucket += amount;
+                this.damageBucket += amount2;
             }
         }
-        if (flag = super.hurtOrSimulate(source, amount)) {
+        if (flag = super.hurtServer((ServerLevel)level, source, amount2)) {
             if (source.is(ModTag.BLOCK_SELF_REGEN)) {
                 this.self_regen = this.HealCooldown();
             }
@@ -162,6 +169,26 @@ IHomeEntity {
             this.damageBucket = BUCKET;
         }
         return flag;
+    }
+
+    @Override
+    public boolean isInvulnerableTo(ServerLevel level, DamageSource source) {
+        return super.isInvulnerableTo(level, source);
+    }
+
+    @Override
+    public void readAdditionalHomePoint(ValueInput compound) {
+        // Implementation for reading home point from ValueInput
+        if (compound.contains("HomePos")) {
+            this.setHomePos(GlobalPos.CODEC.parse(ValueInput.wrapValueOutput(compound), "HomePos").result().orElse(null));
+        }
+    }
+
+    @Override
+    public void addAdditionalHomePoint(ValueOutput compound) {
+        if (this.getHomePos() != null) {
+            GlobalPos.CODEC.encodeStart(ValueOutput.wrapValueInput(compound), this.getHomePos()).resultOrPartial(arg_0 -> ((Logger)Cataclysm.LOGGER).error(arg_0)).ifPresent(tag -> compound.put("HomePos", tag));
+        }
     }
 
     public float DamageCap() {
@@ -218,20 +245,20 @@ IHomeEntity {
     }
 
     protected void ReturnToHome() {
-        Level level;
-        if (this.getHomePos() != null && (level = this.level()) instanceof ServerLevel) {
-            ServerLevel targetLevel;
-            ServerLevel serverLevel = (ServerLevel)level;
-            ResourceKey targetDim = this.getHomePos().dimension();
+        if (this.getHomePos() != null && this.level() instanceof ServerLevel) {
+            ServerLevel serverLevel = (ServerLevel) this.level();
             BlockPos homeBlockPos = this.getHomePos().pos();
             Vec3 homeVec = new Vec3((double)homeBlockPos.getX() + 0.5, (double)homeBlockPos.getY(), (double)homeBlockPos.getZ() + 0.5);
-            if (!targetDim.equals(this.level().dimension()) && (targetLevel = serverLevel.getServer().getLevel(targetDim)) != null) {
-                this.changeDimension(new DimensionTransition(targetLevel, homeVec, Vec3.ZERO, this.getYRot(), this.getXRot(), DimensionTransition.DO_NOTHING));
-                this.homeTicks = this.HOME_COOLDOWN;
-                return;
-            }
-            if (!homeBlockPos.closerToCenterThan((Position)this.position(), 16.0)) {
-                this.setPos(homeVec.x, homeVec.y, homeVec.z, this.getYRot(), this.getXRot());
+            
+            // Check if home position is in the same dimension
+            if (this.getHomePos().dimension().equals(this.level().dimension())) {
+                if (!homeBlockPos.closerToCenterThan(this.position(), 16.0)) {
+                    this.moveTo(homeVec.x, homeVec.y, homeVec.z, this.getYRot(), this.getXRot());
+                    this.homeTicks = this.HOME_COOLDOWN;
+                }
+            } else {
+                // Home is in different dimension - just reset cooldown for now
+                // TODO: Implement proper cross-dimension teleportation in 26.2
                 this.homeTicks = this.HOME_COOLDOWN;
             }
         }
@@ -249,7 +276,6 @@ IHomeEntity {
         return false;
     }
 
-
     protected boolean shouldDespawnInPeaceful() {
         return false;
     }
@@ -258,4 +284,3 @@ IHomeEntity {
         return false;
     }
 }
-
