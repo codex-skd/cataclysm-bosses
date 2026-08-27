@@ -41,8 +41,7 @@ import com.skd.cataclysmbosses.config.CMCommonConfig;
 import com.skd.cataclysmbosses.entity.InternalAnimationMonster.Internal_Animation_Monster;
 import com.skd.cataclysmbosses.entity.etc.IHomeEntity;
 import com.skd.cataclysmbosses.init.ModTag;
-import com.mojang.serialization.DynamicOps;
-import com.mojang.serialization.NbtOps;
+import com.mojang.serialization.Codec;
 import java.util.Optional;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
@@ -52,7 +51,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.network.syncher.SynchedEntityData$Builder;
+import net.minecraft.network.syncher.SynchedEntityData.Builder;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -116,13 +115,18 @@ IHomeEntity {
         builder.define(LIFE, 0);
     }
 
-    public void addAdditionalSaveData(ValueOutput compound) {
-        super.addAdditionalSaveData(compound);
-        compound.putInt("LifeRemain", this.getLife());
+    @Override
+    public void addAdditionalHomePoint(ValueOutput compound) {
         if (this.getHomePos() != null) {
-            GlobalPos.CODEC.encodeStart((DynamicOps)NbtOps.INSTANCE, (Object)this.getHomePos()).resultOrPartial(arg_0 -> ((Logger)Cataclysm.LOGGER).error(arg_0)).ifPresent(tag1 -> compound.put("HomePos", tag1));
+            GlobalPos.CODEC.encodeStart(this, this.getHomePos()).resultOrPartial(arg_0 -> ((Logger)Cataclysm.LOGGER).error(arg_0)).ifPresent(tag1 -> compound.put("HomePos", tag1));
         }
-        this.addAdditionalHomePoint(compound);
+    }
+
+    @Override
+    public void readAdditionalHomePoint(ValueInput compound) {
+        if (compound.contains("HomePos")) {
+            this.setHomePos(GlobalPos.CODEC.parse(compound.get("HomePos")).result().orElse(null));
+        }
     }
 
     public void readAdditionalSaveData(ValueInput compound) {

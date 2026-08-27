@@ -3,6 +3,7 @@
  */
 package com.skd.cataclysmbosses.entity.etc;
 
+import net.minecraft.core.GlobalPos;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
