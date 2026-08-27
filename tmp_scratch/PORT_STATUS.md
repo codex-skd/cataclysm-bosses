@@ -90,6 +90,35 @@ Resumes: local branch minecraft/26.2/neoforge-26.2.0.57/production
   the old LivingEntityRenderer/MobRenderer helpers called from Scylla etc.:
   model field via compat ctor (Object model), addLayer raw, getAttackAnim/getBob/
   setupRotations/scale/isBodyVisible/getWhiteOverlayProgress/getRenderType/getFlipDegrees/
+  isShaking/shouldShowName/getOverlayCoords/isEntityUpSideDown etc. All return safe defaults.
+- Batch-converted 34 MobRenderer/LivingEntityRenderer bosses:
+  extends CmMobRenderer<XXX>, render(XXX,float,PoseStack,CmMultiBufferSource,int),
+  ResourceLocation->Identifier, this.model.renderType(...) -> RenderTypes.entityCutout(...),
+  layer loops commented as TODO (need new RenderLayer<S,M>.submit API).
+  Scylla_Renderer: 38->23 (-15); similar for others. Two syntax fixes for
+  AbstractZombieRenderer 3-param generics (Drowned_Host, Ignited_Berserker).
+
+== CLUSTER FIXED (entity base classes — 4 bases) ==
+- LLibrary_Boss_Monster: hurtServer(ServerLevel, DamageSource, float), isInvulnerableTo(ServerLevel),
+  addAdditionalHomePoint/readAdditionalHomePoint with ValueOutput/ValueInput,
+  ReturnToHome simplified (no DimensionTransition), moveTo instead of setPos
+- IABoss_monster: same fixes, DynamicOps/NbtOps imports added
+- AbstractDeepling: ISemiAquatic methods (shouldEnterWater, shouldLeaveWater, shouldStopMoving,
+  getWaterSearchRange), shouldEnterWater added, made abstract, MobTag import added,
+  RidingCoralssus/StopRiding commented out
+- Internal_Animation_Monster: hurtServer stub
+- Drowned_Host_Model migrated to vanilla ZombieModel<ZombieRenderState>
+- ISemiAquatic/IHomeEntity interfaces updated for 26.2 API
+- LLibrary_Boss_Monster: SynchedEntityData.Builder import fixed, DimensionTransition removed,
+  ReturnToHome simplified, moveTo instead of setPos
+- IABoss_monster: DynamicOps/NbtOps imports added, DimensionTransition removed
+
+== REMAINING CLUSTERS (deep/architectural rewrites — NOT done, need real porting) ==
+
+- Compat bridge CmMobRenderer<T extends Mob> extends CmEntityRenderer<T> with stubs for
+  the old LivingEntityRenderer/MobRenderer helpers called from Scylla etc.:
+  model field via compat ctor (Object model), addLayer raw, getAttackAnim/getBob/
+  setupRotations/scale/isBodyVisible/getWhiteOverlayProgress/getRenderType/getFlipDegrees/
   isShaking/shouldShowName/getOverlayCoords/isEntityUpsideDown etc. All return safe defaults.
 - Batch-converted 34 MobRenderer/LivingEntityRenderer bosses:
   extends CmMobRenderer<XXX>, render(XXX,float,PoseStack,CmMultiBufferSource,int),
