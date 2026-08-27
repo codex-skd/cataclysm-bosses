@@ -413,7 +413,7 @@ implements RangedAttackMob {
         }
 
         public boolean canUse() {
-            if (!this.level.isDay()) {
+            if (!this.level().getOverworldClockTime() % 24000 < 12000 % 24000 < 12000) {
                 return false;
             }
             if (this.mob.isInWater()) {
@@ -486,7 +486,7 @@ implements RangedAttackMob {
         }
 
         public boolean canUse() {
-            return super.canUse() && !this.drowned.level().isDay() && this.drowned.isInWater() && this.drowned.getY() >= (double)(this.drowned.level().getSeaLevel() - 3);
+            return super.canUse() && !this.drowned.level().getOverworldClockTime() % 24000 < 12000 % 24000 < 12000 && this.drowned.isInWater() && this.drowned.getY() >= (double)(this.drowned.level().getSeaLevel() - 3);
         }
 
         public boolean canContinueToUse() {
@@ -523,7 +523,7 @@ implements RangedAttackMob {
         }
 
         public boolean canUse() {
-            return !this.drowned.level().isDay() && this.drowned.isInWater() && this.drowned.getY() < (double)(this.seaLevel - 2);
+            return !this.drowned.level().getOverworldClockTime() % 24000 < 12000 % 24000 < 12000 && this.drowned.isInWater() && this.drowned.getY() < (double)(this.seaLevel - 2);
         }
 
         public boolean canContinueToUse() {

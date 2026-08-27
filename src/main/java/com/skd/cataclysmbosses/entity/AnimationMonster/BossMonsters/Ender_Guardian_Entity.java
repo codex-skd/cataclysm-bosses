@@ -389,8 +389,9 @@ extends LLibrary_Boss_Monster {
         return CMCommonConfig.EnderGuardian.rangeCap;
     }
 
-    public boolean isInvulnerableTo(DamageSource source) {
-        return source.is(DamageTypes.IN_WALL) || super.isInvulnerableTo(source);
+    @Override
+    public boolean isInvulnerableTo(ServerLevel level, DamageSource source) {
+        return source.is(DamageTypes.IN_WALL) || super.isInvulnerableTo(level, source);
     }
 
     @Override

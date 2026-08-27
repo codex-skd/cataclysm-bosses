@@ -102,16 +102,14 @@ IHomeEntity {
 
     @Override
     public void addAdditionalSaveData(ValueOutput compound) {
-        // Convert ValueOutput to CompoundTag for parent compatibility
-        CompoundTag tag = compound.createCompound();
-        super.addAdditionalSaveData(tag);
+        super.addAdditionalSaveData(compound);
         this.addAdditionalHomePoint(compound);
     }
 
+    @Override
     public void readAdditionalSaveData(ValueInput compound) {
         this.readAdditionalHomePoint(compound);
-        // Convert ValueInput to CompoundTag for parent compatibility
-        super.readAdditionalSaveData(compound.createCompound());
+        super.readAdditionalSaveData(compound);
     }
 
     @Nullable
@@ -178,18 +176,16 @@ IHomeEntity {
 
     @Override
     public void readAdditionalHomePoint(ValueInput compound) {
-        // Implementation for reading home point from ValueInput
-        if (compound.contains("HomePos")) {
-            this.setHomePos(GlobalPos.CODEC.parse(ValueInput.wrapValueOutput(compound), "HomePos").result().orElse(null));
-        }
+        compound.read("HomePos", GlobalPos.CODEC).ifPresent(this::setHomePos);
     }
 
     @Override
-    public void addAdditionalHomePoint(ValueOutput compound) {
-        if (this.getHomePos() != null) {
-            GlobalPos.CODEC.encodeStart(ValueOutput.wrapValueInput(compound), this.getHomePos()).resultOrPartial(arg_0 -> ((Logger)Cataclysm.LOGGER).error(arg_0)).ifPresent(tag -> compound.put("HomePos", tag));
-        }
+public void addAdditionalHomePoint(ValueOutput compound) {
+    GlobalPos homePos = this.getHomePos();
+    if (homePos != null) {
+        compound.store("HomePos", GlobalPos.CODEC, homePos);
     }
+}
 
     public float DamageCap() {
         return Float.MAX_VALUE;

@@ -117,18 +117,22 @@ IHomeEntity {
 
     @Override
     public void addAdditionalHomePoint(ValueOutput compound) {
-        if (this.getHomePos() != null) {
-            GlobalPos.CODEC.encodeStart(this, this.getHomePos()).resultOrPartial(arg_0 -> ((Logger)Cataclysm.LOGGER).error(arg_0)).ifPresent(tag1 -> compound.put("HomePos", tag1));
-        }
+        this.getHomePos().ifPresent(homePos -> GlobalPos.CODEC.encodeStart(compound.child("HomePos"), homePos).resultOrPartial(arg_0 -> ((Logger)Cataclysm.LOGGER).error(arg_0)));
     }
 
     @Override
     public void readAdditionalHomePoint(ValueInput compound) {
-        if (compound.contains("HomePos")) {
-            this.setHomePos(GlobalPos.CODEC.parse(compound.get("HomePos")).result().orElse(null));
-        }
+        compound.read("HomePos", GlobalPos.CODEC).ifPresent(this::setHomePos);
     }
 
+    @Override
+    public void addAdditionalSaveData(ValueOutput compound) {
+        super.addAdditionalSaveData(compound);
+        compound.putInt("LifeRemain", this.getLife());
+        this.addAdditionalHomePoint(compound);
+    }
+
+    @Override
     public void readAdditionalSaveData(ValueInput compound) {
         this.setLife(compound.getIntOr("LifeRemain", 0));
         this.readAdditionalHomePoint(compound);
@@ -151,7 +155,8 @@ IHomeEntity {
         this.setLife(playerCount);
     }
 
-    public void awardKillScore(Entity killed, int scoreValue, DamageSource source) {
+    @Override
+    public void awardKillScore(Entity killed, DamageSource source) {
         if (killed instanceof ServerPlayer) {
             if (this.getLife() > 0) {
                 this.setLife(this.getLife() - 1);
@@ -159,7 +164,7 @@ IHomeEntity {
                 this.Retry();
             }
         }
-        super.awardKillScore(killed, scoreValue, source);
+        super.awardKillScore(killed, source);
     }
 
     protected void Retry() {
@@ -286,7 +291,7 @@ IHomeEntity {
             
             // Check if home position is in the same dimension
             if (this.getHomePos().dimension().equals(this.level().dimension())) {
-                if (!homeBlockPos.closerToCenterThan(this.position(), 16.0)) {
+                if (homeBlockPos.getCenter().distanceTo(this.position()) > 16.0) {
                     this.moveTo(homeVec.x, homeVec.y, homeVec.z, this.getYRot(), this.getXRot());
                     this.homeTicks = this.HOME_COOLDOWN;
                 }

@@ -67,6 +67,7 @@ import org.jspecify.annotations.Nullable;
 import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import com.skd.cataclysmbosses.init.ModTag;
 import com.skd.cataclysmbosses.entity.AnimationMonster.LLibrary_Monster;
 import com.skd.cataclysmbosses.entity.etc.ISemiAquatic;
@@ -111,15 +112,16 @@ Enemy {
         p_326229_.define(DEEPLINGSWIM, false);
     }
 
-    public boolean isAlliedTo(Entity entityIn) {
-        if (entityIn == this) {
+    @Override
+    protected boolean considersEntityAsAlly(Entity other) {
+        if (other == this) {
             return true;
         }
-        if (super.isAlliedTo(entityIn)) {
+        if (super.considersEntityAsAlly(other)) {
             return true;
         }
-        if (entityIn != null && entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_THE_LEVIATHAN)) {
-            return this.getTeam() == null && entityIn.getTeam() == null;
+        if (other != null && other.getType().builtInRegistryHolder().is(ModTag.TEAM_THE_LEVIATHAN)) {
+            return this.getTeam() == null && other.getTeam() == null;
         }
         return false;
     }
@@ -138,10 +140,12 @@ Enemy {
         } else if (this.isInWaterOrRain()) {
             this.setMoistness(6000);
         } else {
-            int dry = this.level().isDay() ? 2 : 1;
+            int dry = (this.level().getOverworldClockTime() % 24000 < 12000) ? 2 : 1;
             this.setMoistness(this.getMoistness() - dry);
             if (this.getMoistness() <= 0 && this.moistureAttackTime-- <= 0) {
-                this.hurtServer(this.level(), this.damageSources().dryOut(), this.random.nextInt(2) == 0 ? 1.0f : 0.0f);
+                if (this.level() instanceof ServerLevel serverLevel) {
+                    this.hurtServer(serverLevel, this.damageSources().dryOut(), this.random.nextInt(2) == 0 ? 1.0f : 0.0f);
+                }
                 this.moistureAttackTime = 20;
             }
         }

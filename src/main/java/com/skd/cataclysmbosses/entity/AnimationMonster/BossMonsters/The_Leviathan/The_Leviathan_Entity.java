@@ -457,8 +457,9 @@ IHoldEntity {
     public void onAboveBubbleCol(boolean p_20313_) {
     }
 
-    public boolean isInvulnerableTo(DamageSource source) {
-        return source.is(DamageTypes.IN_WALL) || source.is(DamageTypes.FALLING_BLOCK) || super.isInvulnerableTo(source);
+    @Override
+    public boolean isInvulnerableTo(ServerLevel level, DamageSource source) {
+        return source.is(DamageTypes.IN_WALL) || source.is(DamageTypes.FALLING_BLOCK) || super.isInvulnerableTo(level, source);
     }
 
     public boolean attackEntityFromPart(The_Leviathan_Part leviathan_part, DamageSource source, float amount) {

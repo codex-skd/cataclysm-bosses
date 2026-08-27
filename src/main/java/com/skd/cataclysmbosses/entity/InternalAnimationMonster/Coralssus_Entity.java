@@ -462,7 +462,7 @@ ISemiAquatic {
         } else if (this.isInWaterRainOrBubble()) {
             this.setMoistness(6000);
         } else {
-            int dry = this.level().isDay() ? 2 : 1;
+            int dry = (this.level().getOverworldClockTime() % 24000 < 12000) ? 2 : 1;
             this.setMoistness(this.getMoistness() - dry);
             if (this.getMoistness() <= 0 && this.moistureAttackTime-- <= 0) {
                 this.hurtOrSimulate(this.damageSources().dryOut(), this.random.nextInt(2) == 0 ? 1.0f : 0.0f);
