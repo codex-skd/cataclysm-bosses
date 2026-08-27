@@ -34,4 +34,10 @@ public class Lionfish_Entity extends AbstractDeepling {
     public BlockPos getBlockPosBelowThatAffectsMyMovement() {
         return super.getBlockPosBelowThatAffectsMyMovement();
     }
+
+    public static net.minecraft.world.entity.EntityType.Builder<Lionfish_Entity> lionfish() {
+        return net.minecraft.world.entity.EntityType.Builder.<Lionfish_Entity>of(Lionfish_Entity::new, net.minecraft.world.entity.MobCategory.MONSTER)
+            .sized(0.6f, 0.55f)
+            .clientTrackingRange(4);
+    }
 }
