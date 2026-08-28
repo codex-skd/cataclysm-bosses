@@ -153,7 +153,7 @@ extends LLibrary_Boss_Monster {
     }
 
     @Override
-    public boolean hurt(DamageSource source, float damage) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         double itemDamage;
         LivingEntity living;
         ItemStack itemstack;
@@ -275,11 +275,11 @@ extends LLibrary_Boss_Monster {
         }
     }
 
-    public boolean isAlliedTo(Entity entityIn) {
+    public boolean considersEntityAsAlly(Entity entityIn) {
         if (entityIn == this) {
             return true;
         }
-        if (super.isAlliedTo(entityIn)) {
+        if (super.considersEntityAsAlly(entityIn)) {
             return true;
         }
         if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_IGNIS)) {

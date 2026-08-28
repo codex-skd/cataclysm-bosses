@@ -237,7 +237,9 @@ extends Structure {
                 } else if ("golem".equals(function)) {
                     Ender_Golem_Entity golem = (Ender_Golem_Entity)((EntityType)ModEntities.ENDER_GOLEM.get()).create((Level)worldIn.getLevel(), EntitySpawnReason.STRUCTURE);
                     worldIn.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
-                    golem.moveTo(pos, 180.0f, 180.0f);
+                    golem.setPos(pos);
+                golem.setYRot(180.0f);
+                golem.setXRot(180.0f);
                     worldIn.addFreshEntity((Entity)golem);
                 }
             }

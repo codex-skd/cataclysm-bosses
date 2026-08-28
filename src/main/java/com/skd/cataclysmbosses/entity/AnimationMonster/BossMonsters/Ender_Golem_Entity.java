@@ -51,6 +51,7 @@
  *  net.neoforged.neoforge.event.EventHooks
  */
 package com.skd.cataclysmbosses.entity.AnimationMonster.BossMonsters;
+import net.minecraft.server.level.ServerLevel;
 
 import com.skd.cataclysmbosses.config.CMCommonConfig;
 import com.skd.cataclysmbosses.entity.AI.CmAttackGoal;
@@ -168,7 +169,7 @@ extends LLibrary_Boss_Monster {
     }
 
     @Override
-    public boolean hurt(DamageSource source, float damage) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         if (!(this.getAnimation() != VOID_RUNE_ATTACK && this.getIsAwaken() || !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY) && source.is(DamageTypes.MAGIC))) {
             damage = (float)((double)damage * 0.5);
         }
@@ -387,11 +388,11 @@ extends LLibrary_Boss_Monster {
         e.push(d0 / d2 * (double)f, huge ? 0.5 : (double)0.2f, d1 / d2 * (double)f);
     }
 
-    public boolean isAlliedTo(Entity entityIn) {
+    public boolean considersEntityAsAlly(Entity entityIn) {
         if (entityIn == this) {
             return true;
         }
-        if (super.isAlliedTo(entityIn)) {
+        if (super.considersEntityAsAlly(entityIn)) {
             return true;
         }
         if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_ENDER_GUARDIAN)) {

@@ -56,7 +56,7 @@ extends SingleQuadParticle {
     }
 
     public ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_OPAQUE;
+        return ParticleRenderType.OPAQUE;
     }
 
     public int getLightColor(float partialTick) {
@@ -88,6 +88,11 @@ extends SingleQuadParticle {
         public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
             return new Phantom_Emitter_Particle(level, x, y, z, xSpeed, ySpeed, zSpeed, 2.5f, this.sprites);
         }
+    }
+
+    @Override
+    public SingleQuadParticle.Layer getLayer() {
+        return SingleQuadParticle.Layer.TRANSLUCENT;
     }
 }
 

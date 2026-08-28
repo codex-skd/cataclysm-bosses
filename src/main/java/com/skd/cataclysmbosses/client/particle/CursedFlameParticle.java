@@ -29,7 +29,7 @@ extends RisingParticle {
     }
 
     public ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_OPAQUE;
+        return ParticleRenderType.OPAQUE;
     }
 
     public void move(double p_106817_, double p_106818_, double p_106819_) {

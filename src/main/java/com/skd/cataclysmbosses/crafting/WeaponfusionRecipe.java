@@ -13,6 +13,7 @@ import net.minecraft.world.item.crafting.PlacementInfo;
 import net.minecraft.world.item.crafting.RecipeBookCategory;
 import net.minecraft.world.item.crafting.RecipeBookCategories;
 import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 
@@ -26,6 +27,33 @@ public class WeaponfusionRecipe implements WeaponfusionRecipeInterface {
         this.base = base;
         this.addition = addition;
         this.result = result;
+    }
+
+    // Static codec and serializer for 26.2
+    public static final MapCodec<WeaponfusionRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
+        Ingredient.CODEC.fieldOf("base").forGetter(recipe -> recipe.base),
+        Ingredient.CODEC.fieldOf("addition").forGetter(recipe -> recipe.addition),
+        ItemStack.STRICT_CODEC.fieldOf("result").forGetter(recipe -> recipe.result)
+    ).apply(i, WeaponfusionRecipe::new));
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, WeaponfusionRecipe> STREAM_CODEC = StreamCodec.of(
+        WeaponfusionRecipe::toNetwork,
+        WeaponfusionRecipe::fromNetwork
+    );
+
+    public static final RecipeSerializer<WeaponfusionRecipe> SERIALIZER = new RecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
+
+    private static void toNetwork(RegistryFriendlyByteBuf buf, WeaponfusionRecipe recipe) {
+        Ingredient.CONTENTS_STREAM_CODEC.encode(buf, recipe.base);
+        Ingredient.CONTENTS_STREAM_CODEC.encode(buf, recipe.addition);
+        ItemStack.STREAM_CODEC.encode(buf, recipe.result);
+    }
+
+    private static WeaponfusionRecipe fromNetwork(RegistryFriendlyByteBuf buf) {
+        Ingredient ingredient1 = Ingredient.CONTENTS_STREAM_CODEC.decode(buf);
+        Ingredient ingredient2 = Ingredient.CONTENTS_STREAM_CODEC.decode(buf);
+        ItemStack itemstack = ItemStack.STREAM_CODEC.decode(buf);
+        return new WeaponfusionRecipe(ingredient1, ingredient2, itemstack);
     }
 
     public boolean matches(WeaponfusionRecipeInput input, Level level) {
@@ -81,41 +109,15 @@ public class WeaponfusionRecipe implements WeaponfusionRecipeInterface {
         return this.addition.test(stack);
     }
 
+    @Override
     public RecipeSerializer<WeaponfusionRecipe> getSerializer() {
-        return ModRecipeSerializers.WEAPON_FUSION.get();
+        return SERIALIZER;
     }
 
     public boolean isIncomplete() {
         return Stream.of(this.base, this.addition).anyMatch(Ingredient::hasNoItems);
     }
 
-    public static class Serializer implements RecipeSerializer<WeaponfusionRecipe> {
-        private static final MapCodec<WeaponfusionRecipe> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-                Ingredient.CODEC.fieldOf("base").forGetter(recipe -> recipe.base),
-                Ingredient.CODEC.fieldOf("addition").forGetter(recipe -> recipe.addition),
-                ItemStack.STRICT_CODEC.fieldOf("result").forGetter(recipe -> recipe.result)
-        ).apply(i, WeaponfusionRecipe::new));
-        public static final StreamCodec<RegistryFriendlyByteBuf, WeaponfusionRecipe> STREAM_CODEC = StreamCodec.of(Serializer::toNetwork, Serializer::fromNetwork);
-
-        public MapCodec<WeaponfusionRecipe> codec() {
-            return CODEC;
-        }
-
-        public StreamCodec<RegistryFriendlyByteBuf, WeaponfusionRecipe> streamCodec() {
-            return STREAM_CODEC;
-        }
-
-        private static WeaponfusionRecipe fromNetwork(RegistryFriendlyByteBuf buf) {
-            Ingredient ingredient1 = Ingredient.CONTENTS_STREAM_CODEC.decode(buf);
-            Ingredient ingredient2 = Ingredient.CONTENTS_STREAM_CODEC.decode(buf);
-            ItemStack itemstack = ItemStack.STREAM_CODEC.decode(buf);
-            return new WeaponfusionRecipe(ingredient1, ingredient2, itemstack);
-        }
-
-        private static void toNetwork(RegistryFriendlyByteBuf buf, WeaponfusionRecipe recipe) {
-            Ingredient.CONTENTS_STREAM_CODEC.encode(buf, recipe.base);
-            Ingredient.CONTENTS_STREAM_CODEC.encode(buf, recipe.addition);
-            ItemStack.STREAM_CODEC.encode(buf, recipe.result);
-        }
-    }
+    // Legacy inner class removed - serializer is now a static record instance
+    // public static class Serializer implements RecipeSerializer<WeaponfusionRecipe> { ... }
 }

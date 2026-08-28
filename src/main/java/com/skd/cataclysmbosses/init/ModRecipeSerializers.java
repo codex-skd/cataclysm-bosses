@@ -20,7 +20,6 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class ModRecipeSerializers {
     public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create((ResourceKey)Registries.RECIPE_SERIALIZER, (String)"cataclysm");
-    public static final DeferredHolder<RecipeSerializer<?>, WeaponfusionRecipe.Serializer> WEAPON_FUSION = RECIPE_SERIALIZERS.register("weapon_fusion", WeaponfusionRecipe.Serializer::new);
-    public static final DeferredHolder<RecipeSerializer<?>, AltarOfAmethystRecipe.Serializer> AMETHYST_BLESS = RECIPE_SERIALIZERS.register("amethyst_bless", AltarOfAmethystRecipe.Serializer::new);
+    public static final DeferredHolder<RecipeSerializer<?>, WeaponfusionRecipe> WEAPON_FUSION = RECIPE_SERIALIZERS.register("weapon_fusion", () -> WeaponfusionRecipe.SERIALIZER);
+    public static final DeferredHolder<RecipeSerializer<?>, AltarOfAmethystRecipe> AMETHYST_BLESS = RECIPE_SERIALIZERS.register("amethyst_bless", () -> AltarOfAmethystRecipe.SERIALIZER);
 }
-

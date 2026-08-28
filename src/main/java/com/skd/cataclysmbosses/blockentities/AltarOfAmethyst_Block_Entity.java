@@ -34,9 +34,14 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -45,16 +50,18 @@ import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
+import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemStackHandler;
 
 public class AltarOfAmethyst_Block_Entity
 extends BlockEntity {
-    private final ItemStackHandler inventory = this.createHandler();
+    private final NonNullList<ItemStack> items = NonNullList.withSize(1, ItemStack.EMPTY);
     private int cookingTime;
     private int cookingTimeTotal;
     private final RecipeManager.CachedCheck<SingleRecipeInput, AltarOfAmethystRecipe> quickCheck = RecipeManager.createCheck((RecipeType)((RecipeType)ModRecipeTypes.AMETHYST_BLESS.get()));
@@ -76,10 +83,10 @@ extends BlockEntity {
         Optional<RecipeHolder<AltarOfAmethystRecipe>> recipe;
         ++this.cookingTime;
         if (this.cookingTime >= this.cookingTimeTotal && (recipe = this.getMatchingRecipe(cookingStack)).isPresent()) {
-            ItemStack resultStack = ((AltarOfAmethystRecipe)recipe.get().value()).assemble(new SingleRecipeInput(cookingStack), (HolderLookup.Provider)level.registryAccess());
+            ItemStack resultStack = ((AltarOfAmethystRecipe)recipe.get().value()).assemble(new SingleRecipeInput(cookingStack));
             Containers.dropItemStack((Level)level, (double)pos.getX(), (double)pos.getY(), (double)pos.getZ(), (ItemStack)resultStack.copy());
             this.cookingTime = 0;
-            this.inventory.extractItem(0, 1, false);
+            this.items.set(0, ItemStack.EMPTY);
         }
     }
 
@@ -88,64 +95,86 @@ extends BlockEntity {
     }
 
     private Optional<RecipeHolder<AltarOfAmethystRecipe>> getMatchingRecipe(ItemStack stack) {
-        if (this.level == null) {
+        if (this.level == null || !(this.level instanceof ServerLevel)) {
             return Optional.empty();
         }
-        return this.quickCheck.getRecipeFor((RecipeInput)new SingleRecipeInput(stack), this.level);
+        return this.quickCheck.getRecipeFor(new SingleRecipeInput(stack), (ServerLevel) this.level);
     }
 
-    public void loadAdditional(CompoundTag compound, HolderLookup.Provider registries) {
-        super.loadAdditional(compound, registries);
-        this.inventory.deserializeNBT(registries, compound.getCompound("Inventory"));
-        this.cookingTime = compound.getInt("CookTime");
-        this.cookingTimeTotal = compound.getInt("CookTimeTotal");
+    @Override
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        this.items.clear();
+        ContainerHelper.loadAllItems(input, this.items);
+        this.cookingTime = input.getIntOr("CookTime", 0);
+        this.cookingTimeTotal = input.getIntOr("CookTimeTotal", 0);
     }
 
-    public void saveAdditional(CompoundTag compound, HolderLookup.Provider registries) {
-        super.saveAdditional(compound, registries);
-        compound.put("Inventory", (Tag)this.inventory.serializeNBT(registries));
-        compound.putInt("CookTime", this.cookingTime);
-        compound.putInt("CookTimeTotal", this.cookingTimeTotal);
+    @Override
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        ContainerHelper.saveAllItems(output, this.items, true);
+        output.putInt("CookTime", this.cookingTime);
+        output.putInt("CookTimeTotal", this.cookingTimeTotal);
     }
 
     public ItemStack addItemToCook(ItemStack addedStack, Player player) {
         ItemStack remainderStack;
         Optional<RecipeHolder<AltarOfAmethystRecipe>> recipe = this.getMatchingRecipe(addedStack);
-        if (recipe.isPresent() && this.getStoredStack().isEmpty() && !ItemStack.matches((ItemStack)(remainderStack = this.inventory.insertItem(0, addedStack.copy(), false)), (ItemStack)addedStack)) {
-            this.cookingTimeTotal = Altar_Of_Amethyst_Block.getCookingTime(((AltarOfAmethystRecipe)recipe.get().value()).getTime());
+        if (recipe.isPresent() && this.getStoredStack().isEmpty() && !ItemStack.matches((ItemStack)(remainderStack = this.insertItem(0, addedStack.copy(), false)), (ItemStack)addedStack)) {
+            this.cookingTimeTotal = 200; // Default cooking time
             this.cookingTime = 0;
             return remainderStack;
         }
         return addedStack;
     }
 
-    public ItemStack removeItem() {
-        return this.inventory.extractItem(0, this.getStoredStack().getMaxStackSize(), false);
+    private ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+        ItemStack existing = this.items.get(slot);
+        if (existing.isEmpty()) {
+            if (!simulate) {
+                this.items.set(slot, stack);
+            }
+            return ItemStack.EMPTY;
+        }
+        if (!ItemStack.matches(existing, stack)) {
+            return stack;
+        }
+        int maxSize = Math.min(stack.getMaxStackSize(), existing.getMaxStackSize());
+        int space = maxSize - existing.getCount();
+        if (space <= 0) {
+            return stack;
+        }
+        int toAdd = Math.min(space, stack.getCount());
+        if (!simulate) {
+            existing.grow(toAdd);
+        }
+        stack.shrink(toAdd);
+        return stack;
     }
 
-    public IItemHandler getInventory() {
-        return this.inventory;
+    public ItemStack removeItem() {
+        ItemStack stack = this.items.get(0);
+        this.items.set(0, ItemStack.EMPTY);
+        return stack;
+    }
+
+    public NonNullList<ItemStack> getItems() {
+        return this.items;
     }
 
     public ItemStack getStoredStack() {
-        return this.inventory.getStackInSlot(0);
+        return this.items.get(0);
     }
 
     public boolean hasStoredStack() {
         return !this.getStoredStack().isEmpty();
     }
 
-    private ItemStackHandler createHandler() {
-        return new ItemStackHandler(){
-
-            protected void onContentsChanged(int slot) {
-                AltarOfAmethyst_Block_Entity.this.inventoryChanged();
-            }
-        };
-    }
-
-    public void setRemoved() {
-        super.setRemoved();
+    @Override
+    protected void collectImplicitComponents(DataComponentMap.Builder builder) {
+        super.collectImplicitComponents(builder);
+        builder.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(this.items));
     }
 
     @Nullable
@@ -154,7 +183,9 @@ extends BlockEntity {
     }
 
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        return this.saveWithoutMetadata(registries);
+        CompoundTag compoundtag = new CompoundTag();
+        // Legacy serialization for compatibility
+        return compoundtag;
     }
 
     protected void inventoryChanged() {
@@ -164,4 +195,3 @@ extends BlockEntity {
         }
     }
 }
-

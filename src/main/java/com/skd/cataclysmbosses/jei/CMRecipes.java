@@ -1,43 +1,30 @@
 /*
  * Decompiled with CFR 0.152.
- * 
- * Could not load the following classes:
- *  net.minecraft.client.Minecraft
- *  net.minecraft.client.multiplayer.ClientLevel
- *  net.minecraft.world.item.crafting.RecipeHolder
- *  net.minecraft.world.item.crafting.RecipeManager
- *  net.minecraft.world.item.crafting.RecipeType
+ * JEI 26.2 API changed - stubbed for compilation
  */
 package com.skd.cataclysmbosses.jei;
 
 import com.skd.cataclysmbosses.crafting.AltarOfAmethystRecipe;
 import com.skd.cataclysmbosses.crafting.WeaponfusionRecipe;
+import com.skd.cataclysmbosses.init.ModRecipeSerializers;
 import com.skd.cataclysmbosses.init.ModRecipeTypes;
-import java.util.List;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeType;
+import java.util.List;
 
 public class CMRecipes {
-    private final RecipeManager recipeManager;
-
-    public CMRecipes() {
-        Minecraft minecraft = Minecraft.getInstance();
-        ClientLevel level = minecraft.level;
-        if (level == null) {
-            throw new NullPointerException("minecraft world must not be null.");
-        }
-        this.recipeManager = level.getRecipeManager();
+    public static List<RecipeHolder<AltarOfAmethystRecipe>> getAmethystBlessRecipes() {
+        return Minecraft.getInstance().level.getRecipeManager().getAllRecipesFor(ModRecipeTypes.AMETHYST_BLESS.get());
     }
-
-    public List<WeaponfusionRecipe> getWeaponfusionRecipes() {
-        return this.recipeManager.getAllRecipesFor((RecipeType)ModRecipeTypes.WEAPON_FUSION.get()).stream().map(RecipeHolder::value).toList();
+    
+    public static List<RecipeHolder<WeaponfusionRecipe>> getWeaponFusionRecipes() {
+        return Minecraft.getInstance().level.getRecipeManager().getAllRecipesFor(ModRecipeTypes.WEAPON_FUSION.get());
     }
-
-    public List<AltarOfAmethystRecipe> getAmethystBlessRecipes() {
-        return this.recipeManager.getAllRecipesFor((RecipeType)ModRecipeTypes.AMETHYST_BLESS.get()).stream().map(RecipeHolder::value).toList();
+    
+    public static boolean isRecipeValid(RecipeHolder<?> holder) {
+        return holder.value().showNotification();
     }
 }
-

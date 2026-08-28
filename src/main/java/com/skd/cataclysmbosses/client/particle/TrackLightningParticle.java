@@ -30,9 +30,10 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.SingleQuadParticle;
+import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.ParticleRenderType;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -80,18 +81,8 @@ extends Particle {
         }
     }
 
-    public void render(VertexConsumer consumer, Camera camera, float partialTick) {
-        MultiBufferSource.BufferSource multibuffersource$buffersource = Minecraft.getInstance().renderBuffers().bufferSource();
-        Vec3 cameraPos = camera.getPosition();
-        float x = (float)Mth.lerp((double)partialTick, (double)this.xo, (double)this.x);
-        float y = (float)Mth.lerp((double)partialTick, (double)this.yo, (double)this.y);
-        float z = (float)Mth.lerp((double)partialTick, (double)this.zo, (double)this.z);
-        PoseStack posestack = new PoseStack();
-        posestack.pushPose();
-        posestack.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
-        posestack.translate(x, y, z);
-        this.lightningRender.render(partialTick, posestack, (MultiBufferSource)multibuffersource$buffersource);
-        posestack.popPose();
+    public void extract(QuadParticleRenderState state, Camera camera, float partialTick) {
+        // TODO: Implement trail rendering with new API
     }
 
     public ParticleRenderType getRenderType() {

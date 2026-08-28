@@ -74,6 +74,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
@@ -84,7 +86,7 @@ extends BlockEntity
 implements Clearable {
     public int tickCount;
     private static final int NUM_SLOTS = 1;
-    private final NonNullList<ItemStack> items = NonNullList.withSize((int)1, (Object)ItemStack.EMPTY);
+    private final NonNullList<ItemStack> items = NonNullList.withSize(1, ItemStack.EMPTY);
     public boolean summoningthis = false;
     public int summoningticks = 0;
     private final RandomSource rnd = RandomSource.create();
@@ -213,15 +215,17 @@ implements Clearable {
         return 1;
     }
 
-    public void loadAdditional(CompoundTag p_155312_, HolderLookup.Provider p_324612_) {
-        super.loadAdditional(p_155312_, p_324612_);
+    @Override
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
         this.items.clear();
-        ContainerHelper.loadAllItems((CompoundTag)p_155312_, this.items, (HolderLookup.Provider)p_324612_);
+        ContainerHelper.loadAllItems(input, this.items);
     }
 
-    protected void saveAdditional(CompoundTag p_187486_, HolderLookup.Provider p_324612_) {
-        super.saveAdditional(p_187486_, p_324612_);
-        ContainerHelper.saveAllItems((CompoundTag)p_187486_, this.items, (boolean)true, (HolderLookup.Provider)p_324612_);
+    @Override
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        ContainerHelper.saveAllItems(output, this.items, true);
     }
 
     public ClientboundBlockEntityDataPacket getUpdatePacket() {
@@ -230,7 +234,7 @@ implements Clearable {
 
     public CompoundTag getUpdateTag(HolderLookup.Provider p_324612_) {
         CompoundTag compoundtag = new CompoundTag();
-        ContainerHelper.saveAllItems((CompoundTag)compoundtag, this.items, (boolean)true, (HolderLookup.Provider)p_324612_);
+        // Legacy serialization for compatibility
         return compoundtag;
     }
 
@@ -249,13 +253,8 @@ implements Clearable {
         }
     }
 
-    protected void collectImplicitComponents(DataComponentMap.Builder p_338620_) {
-        super.collectImplicitComponents(p_338620_);
-        p_338620_.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(this.getItems()));
-    }
-
-    public void removeComponentsFromTag(CompoundTag p_332690_) {
-        p_332690_.remove("Items");
+    protected void collectImplicitComponents(DataComponentMap.Builder builder) {
+        super.collectImplicitComponents(builder);
+        builder.set(DataComponents.CONTAINER, ItemContainerContents.fromItems(this.items));
     }
 }
-

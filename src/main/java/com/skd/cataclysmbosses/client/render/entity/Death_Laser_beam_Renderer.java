@@ -109,7 +109,7 @@ extends CmEntityRenderer<Death_Laser_Beam_Entity> {
         this.drawVertex(matrixstack$entry, builder, 0.75f, -0.75f, 0.0f, maxU, minV, 1.0f, packedLightIn);
     }
 
-    private void renderLighting(float frame, PoseStack poseStack, Death_Laser_Beam_Entity entity, MultiBufferSource buffer) {
+    private void renderLighting(float frame, PoseStack poseStack, Death_Laser_Beam_Entity entity, CmMultiBufferSource buffer) {
         double x = Mth.lerp((double)frame, (double)entity.xOld, (double)entity.getX());
         double y = Mth.lerp((double)frame, (double)entity.yOld, (double)entity.getY());
         double z = Mth.lerp((double)frame, (double)entity.zOld, (double)entity.getZ());

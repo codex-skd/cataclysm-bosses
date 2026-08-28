@@ -1,4 +1,6 @@
-# Changelog — The Sundering
+# Changelog — Cataclysm Bosses
+
+> Nota: las entradas anteriores a `0.0.0-beta.4` se publicaron bajo el nombre anterior del proyecto, "The Sundering" (`mod_id` `the_sundering`). El mod se renombró a **Cataclysm Bosses** (`mod_id` `cataclysm_bosses`, package `com.skd.cataclysmbosses`).
 
 ## [0.0.0-beta.3] - 2026-08-15
 

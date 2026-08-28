@@ -36,6 +36,7 @@
  *  net.minecraft.world.phys.Vec3
  */
 package com.skd.cataclysmbosses.entity.InternalAnimationMonster;
+import net.minecraft.server.level.ServerLevel;
 
 import com.skd.cataclysmbosses.config.CMCommonConfig;
 import com.skd.cataclysmbosses.entity.InternalAnimationMonster.AI.InternalAttackGoal;
@@ -164,7 +165,7 @@ extends Internal_Animation_Monster {
         return Monster.createMonsterAttributes().add(Attributes.FOLLOW_RANGE, 30.0).add(Attributes.MOVEMENT_SPEED, (double)0.28f).add(Attributes.ATTACK_DAMAGE, 14.0).add(Attributes.MAX_HEALTH, 160.0).add(Attributes.ARMOR, 10.0).add(Attributes.STEP_HEIGHT, 1.5).add(Attributes.KNOCKBACK_RESISTANCE, 0.95);
     }
 
-    public boolean hurt(DamageSource source, float damage) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         double distSqr;
         if (source.is(CMDamageTypes.EMP) && this.getAttackState() != 1) {
             this.setAttackState(1);
@@ -431,11 +432,11 @@ extends Internal_Animation_Monster {
         this.level().addFreshEntity((Entity)laserBeam);
     }
 
-    public boolean isAlliedTo(Entity entityIn) {
+    public boolean considersEntityAsAlly(Entity entityIn) {
         if (entityIn == this) {
             return true;
         }
-        if (super.isAlliedTo(entityIn)) {
+        if (super.considersEntityAsAlly(entityIn)) {
             return true;
         }
         if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_THE_HARBINGER)) {

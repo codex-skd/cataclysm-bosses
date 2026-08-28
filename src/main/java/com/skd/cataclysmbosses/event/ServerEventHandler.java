@@ -126,7 +126,7 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import top.theillusivec4.curios.api.CuriosApi;
 
-@EventBusSubscriber(modid="the_sundering")
+@EventBusSubscriber(modid="cataclysm_bosses")
 public class ServerEventHandler {
     @SubscribeEvent
     public static void onLivingUpdateEvent(PlayerTickEvent.Post event) {

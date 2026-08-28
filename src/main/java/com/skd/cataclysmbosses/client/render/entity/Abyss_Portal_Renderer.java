@@ -21,14 +21,11 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
 import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
-import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 public class Abyss_Portal_Renderer
 extends CmEntityRenderer<Abyss_Portal_Entity> {
@@ -58,7 +55,7 @@ extends CmEntityRenderer<Abyss_Portal_Entity> {
         matrixStackIn.popPose();
     }
 
-    private void renderPortal(Abyss_Portal_Entity entityIn, PoseStack matrixStackIn, MultiBufferSource bufferIn, boolean shattered) {
+    private void renderPortal(Abyss_Portal_Entity entityIn, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, boolean shattered) {
         Identifier tex = entityIn.getLifespan() < 20 ? this.getGrowingTexture((int)((float)entityIn.getLifespan() * 0.5f % 20.0f)) : (entityIn.tickCount < 20 ? this.getGrowingTexture((int)((float)entityIn.tickCount * 0.5f % 20.0f)) : this.getIdleTexture((int)((float)entityIn.tickCount * 0.35f % 3.0f)));
         VertexConsumer ivertexbuilder = bufferIn.getBuffer(CMRenderTypes.getfullBright(tex));
         this.renderArc(matrixStackIn, ivertexbuilder);

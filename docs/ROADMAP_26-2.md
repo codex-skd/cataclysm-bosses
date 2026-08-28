@@ -1,5 +1,7 @@
-# Roadmap — The Sundering (NeoForge 26.2)
+# Roadmap — Cataclysm Bosses (NeoForge 26.2)
 
+> ⚠️ **Documento parcialmente obsoleto** (snapshot del 2026-08-18, cuando el proyecto se llamaba "The Sundering" / `the_sundering` / `com.skd.thesundering`). El estado real de la compilación vive en `docs/PORT_STATUS_26-2.md`. Nombres actuales: `mod_id` `cataclysm_bosses`, package `com.skd.cataclysmbosses`, NeoForge `26.2.0.57`.
+>
 > **Fecha**: 2026-08-18
 > **Estado base**: Fase 0 completada, Fases 1, 2, 4 completadas (commits locales). Port de 839 clases Java desde L_Ender's Cataclysm 3.32 (descompilado CFR).
 > **Objetivo**: Versión beta estable para CurseForge (v1.0.0-beta.1).

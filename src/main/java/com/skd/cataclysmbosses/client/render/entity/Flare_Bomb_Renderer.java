@@ -84,7 +84,7 @@ extends CmEntityRenderer<Flare_Bomb_Entity> {
         return 15;
     }
 
-    private void renderTrail(Flare_Bomb_Entity entityIn, float partialTicks, PoseStack poseStack, MultiBufferSource bufferIn, float trailR, float trailG, float trailB, float trailA, int packedLightIn) {
+    private void renderTrail(Flare_Bomb_Entity entityIn, float partialTicks, PoseStack poseStack, CmMultiBufferSource bufferIn, float trailR, float trailG, float trailB, float trailA, int packedLightIn) {
         int sampleSize = 10;
         float trailHeight = 0.5f;
         float trailZRot = 0.0f;

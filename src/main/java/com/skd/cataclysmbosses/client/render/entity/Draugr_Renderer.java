@@ -13,6 +13,8 @@
  *  net.minecraft.world.entity.LivingEntity
  */
 package com.skd.cataclysmbosses.client.render.entity;
+import com.skd.cataclysmbosses.client.render.compat.CmMobRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
 
 import com.skd.cataclysmbosses.client.model.CMModelLayers;
 import com.skd.cataclysmbosses.client.model.entity.Draugr_Model;

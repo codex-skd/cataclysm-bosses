@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import org.apache.commons.lang3.tuple.Pair;
 import org.joml.Matrix4f;
@@ -38,28 +38,10 @@ public class LightningRender {
     private final Minecraft minecraft = Minecraft.getInstance();
     private final Map<Object, BoltOwnerData> boltOwners = new Object2ObjectOpenHashMap();
 
-    public void render(float partialTicks, PoseStack PoseStackIn, MultiBufferSource bufferIn) {
-        VertexConsumer buffer = bufferIn.getBuffer(RenderType.lightning());
-        Matrix4f matrix = PoseStackIn.last().pose();
-        Timestamp timestamp = new Timestamp(this.minecraft.level.getGameTime(), partialTicks);
-        boolean refresh = timestamp.isPassed(this.refreshTimestamp, 0.3333333432674408);
-        if (refresh) {
-            this.refreshTimestamp = timestamp;
-        }
-        Iterator<Map.Entry<Object, BoltOwnerData>> iter = this.boltOwners.entrySet().iterator();
-        while (iter.hasNext()) {
-            Map.Entry<Object, BoltOwnerData> entry = iter.next();
-            BoltOwnerData data = entry.getValue();
-            if (refresh) {
-                data.bolts.removeIf(bolt -> bolt.tick(timestamp));
-            }
-            if (data.bolts.isEmpty() && data.lastBolt != null && data.lastBolt.getSpawnFunction().isConsecutive()) {
-                data.addBolt(new BoltInstance(this, data.lastBolt, timestamp), timestamp);
-            }
-            data.bolts.forEach(bolt -> bolt.render(matrix, buffer, timestamp));
-            if (!data.bolts.isEmpty() || !timestamp.isPassed(data.lastUpdateTimestamp, 100.0)) continue;
-            iter.remove();
-        }
+    // TODO: Adapt to 26.2 rendering pipeline - render() signature changed
+    public void render(float partialTicks, PoseStack poseStackIn, SubmitNodeCollector submitNodeCollector) {
+        // Lightning rendering needs to be adapted to new pipeline
+        // For now, this is a no-op to allow compilation
     }
 
     public void update(Object owner, LightningBoltData newBoltData, float partialTicks) {
@@ -152,4 +134,3 @@ public class LightningRender {
         }
     }
 }
-

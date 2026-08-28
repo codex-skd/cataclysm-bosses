@@ -6,16 +6,13 @@
  *  net.minecraft.world.effect.MobEffectCategory
  *  net.minecraft.world.effect.MobEffectInstance
  *  net.minecraft.world.entity.LivingEntity
- *  net.neoforged.neoforge.common.EffectCure
  */
 package com.skd.cataclysmbosses.effects;
 
-import java.util.Set;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
-import net.neoforged.neoforge.common.EffectCure;
+import net.minecraft.server.level.ServerLevel;
 
 public class EffectGhost_Sickness
 extends MobEffect {
@@ -23,19 +20,18 @@ extends MobEffect {
         super(MobEffectCategory.HARMFUL, 9722673);
     }
 
-    public boolean applyEffectTick(LivingEntity LivingEntityIn, int amplifier) {
+    @Override
+    public boolean applyEffectTick(ServerLevel serverLevel, LivingEntity LivingEntityIn, int amplifier) {
         return true;
     }
 
-    public boolean shouldApplyEffectTickThisTick(int duration, int amplifier) {
+    @Override
+    public boolean shouldApplyEffectTickThisTick(int tickCount, int amplifier) {
         int k = 50 >> amplifier;
         if (k > 0) {
-            return duration % k == 0;
+            return tickCount % k == 0;
         }
         return true;
-    }
-
-    public void fillEffectCures(Set<EffectCure> cures, MobEffectInstance effectInstance) {
     }
 }
 

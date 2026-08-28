@@ -11,6 +11,8 @@
  *  net.neoforged.api.distmarker.OnlyIn
  */
 package com.skd.cataclysmbosses.client.render.entity;
+import com.skd.cataclysmbosses.client.render.compat.CmMobRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
 
 import com.skd.cataclysmbosses.client.model.entity.Wadjet_Model;
 import com.skd.cataclysmbosses.client.render.layer.Wadjet_Layer;

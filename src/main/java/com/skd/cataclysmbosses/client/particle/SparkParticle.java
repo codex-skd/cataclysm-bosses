@@ -38,7 +38,7 @@ extends SingleQuadParticle {
     }
 
     public ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_OPAQUE;
+        return ParticleRenderType.OPAQUE;
     }
 
     public int getLightColor(float p_107086_) {
@@ -79,6 +79,11 @@ extends SingleQuadParticle {
             lavaparticle.pickSprite(this.sprite);
             return lavaparticle;
         }
+    }
+
+    @Override
+    public SingleQuadParticle.Layer getLayer() {
+        return SingleQuadParticle.Layer.TRANSLUCENT;
     }
 }
 

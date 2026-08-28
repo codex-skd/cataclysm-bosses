@@ -209,7 +209,7 @@ IFollower {
         return super.getTeam();
     }
 
-    public boolean isAlliedTo(Entity entity) {
+    public boolean considersEntityAsAlly(Entity entity) {
         if (this.isTame()) {
             LivingEntity livingentity = this.getOwner();
             if (entity == livingentity) {
@@ -219,7 +219,7 @@ IFollower {
                 return livingentity.isAlliedTo(entity);
             }
         }
-        return super.isAlliedTo(entity);
+        return super.considersEntityAsAlly(entity);
     }
 
     public void tryToTeleportToOwner() {

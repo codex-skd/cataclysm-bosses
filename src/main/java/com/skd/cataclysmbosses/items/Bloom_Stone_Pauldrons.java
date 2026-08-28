@@ -100,7 +100,9 @@ implements KeybindUsingArmor {
                 double vz = Mth.sin((float)throwAngle);
                 double v3 = Mth.sqrt((float)((float)(vx * vx + vz * vz)));
                 Amethyst_Cluster_Projectile_Entity projectile = new Amethyst_Cluster_Projectile_Entity((EntityType<Amethyst_Cluster_Projectile_Entity>)((EntityType)ModEntities.AMETHYST_CLUSTER_PROJECTILE.get()), player.level(), (LivingEntity)player, 11.0f);
-                projectile.moveTo(sx, sy, sz, (float)i * 11.25f, player.getXRot());
+                projectile.setPos(sx, sy, sz);
+            projectile.setYRot((float)i * 11.25f);
+            projectile.setXRot(this.getXRot());
                 float speed = 0.8f;
                 projectile.shoot(vx, vy + v3 * (double)0.2f, vz, speed, 1.0f);
                 player.level().addFreshEntity((Entity)projectile);
@@ -109,7 +111,7 @@ implements KeybindUsingArmor {
         }
     }
 
-    public Identifier getArmorTexture(@Nonnull ItemStack stack, @Nonnull Entity entity, @Nonnull EquipmentSlot slot, @Nonnull net.minecraft.world.item.equipment.EquipmentClientInfo.Layer layer, boolean isInnerModel) {
+    public Identifier getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, net.minecraft.client.resources.model.EquipmentClientInfo.Layer layer, boolean isInnerModel) {
         return Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/armor/bloom_stone_pauldrons.png");
     }
 }

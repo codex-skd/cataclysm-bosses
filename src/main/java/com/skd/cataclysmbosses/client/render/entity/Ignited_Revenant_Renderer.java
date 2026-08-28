@@ -83,7 +83,7 @@ extends CmMobRenderer<Ignited_Revenant_Entity> {
             super((RenderLayerParent)p_i50928_1_);
         }
 
-        public void render(PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn, Ignited_Revenant_Entity entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+        public void render(PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn, Ignited_Revenant_Entity entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
             VertexConsumer ivertexbuilder = bufferIn.getBuffer(CMRenderTypes.getFlickering(IGNITED_REVENANT_LAYER_TEXTURES));
             float alpha = 0.5f + (Mth.cos((float)(ageInTicks * 0.2f)) + 1.0f) * 0.2f;
             int i = ARGB.color((int)Mth.floor((float)(alpha * 255.0f)), (int)255, (int)255, (int)255);

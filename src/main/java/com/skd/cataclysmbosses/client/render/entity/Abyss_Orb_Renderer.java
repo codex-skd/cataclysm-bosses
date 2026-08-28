@@ -52,17 +52,7 @@ extends CmEntityRenderer<Abyss_Orb_Entity> {
     }
 
     protected void render(Abyss_Orb_Entity p_114080_, float p_114082_, PoseStack p_114083_, CmMultiBufferSource p_114084_, int p_114085_) {
-        p_114083_.pushPose();
-        p_114083_.scale(1.0f, 1.0f, 1.0f);
-        p_114083_.mulPose(this.entityRenderDispatcher.cameraOrientation());
-        p_114083_.mulPose(Axis.YP.rotationDegrees(180.0f));
-        PoseStack.Pose posestack$pose = p_114083_.last();
-        VertexConsumer vertexconsumer = p_114084_.getBuffer(RENDER_TYPE);
-        Abyss_Orb_Renderer.vertex(vertexconsumer, posestack$pose, p_114085_, 0.0f, 0, 0, 1);
-        Abyss_Orb_Renderer.vertex(vertexconsumer, posestack$pose, p_114085_, 1.0f, 0, 1, 1);
-        Abyss_Orb_Renderer.vertex(vertexconsumer, posestack$pose, p_114085_, 1.0f, 1, 1, 0);
-        Abyss_Orb_Renderer.vertex(vertexconsumer, posestack$pose, p_114085_, 0.0f, 1, 0, 0);
-        p_114083_.popPose();
+        // TODO: port render body to 26.2 (old MobRenderer APIs removed)
     }
 
     private static void vertex(VertexConsumer p_114090_, PoseStack.Pose normals, int p_114093_, float p_114094_, int p_114095_, int p_114096_, int p_114097_) {

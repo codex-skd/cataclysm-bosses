@@ -70,19 +70,7 @@ extends CmMobRenderer<Ignis_Entity> {
     }
 
     protected void render(Ignis_Entity entity, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
-        if (entity.getAnimation() == Ignis_Entity.HORIZONTAL_SWING_ATTACK || entity.getAnimation() == Ignis_Entity.SWING_ATTACK || entity.getAnimation() == Ignis_Entity.HORIZONTAL_SWING_ATTACK_SOUL || entity.getAnimation() == Ignis_Entity.SWING_ATTACK_SOUL || entity.getAnimation() == Ignis_Entity.SWING_ATTACK_BERSERK || entity.getAnimation() == Ignis_Entity.REINFORCED_SMASH_IN_AIR || entity.getAnimation() == Ignis_Entity.REINFORCED_SMASH_IN_AIR_SOUL || entity.getAnimation() == Ignis_Entity.PHASE_3 || entity.getAnimation() == Ignis_Entity.SPIN_ATTACK || entity.getAnimation() == Ignis_Entity.ULTIMATE_ATTACK || entity.getAnimation() == Ignis_Entity.STRIKE || entity.getAnimation() == Ignis_Entity.COMBO1 || entity.getAnimation() == Ignis_Entity.COMBO2 || entity.getAnimation() == Ignis_Entity.SHIELD_BREAK_STRIKE || entity.getAnimation() == Ignis_Entity.HORIZONTAL_SMALL_SWING_ATTACK || entity.getAnimation() == Ignis_Entity.HORIZONTAL_SMALL_SWING_ALT_ATTACK2 || entity.getAnimation() == Ignis_Entity.SWING_UPPERSLASH) {
-            Vec3 bladePos = RenderUtils.matrixStackFromCitadelModel((Entity)entity, entityYaw, ((Ignis_Model)this.model).blade2);
-            entity.setSocketPosArray(0, bladePos);
-        }
-        matrixStackIn.pushPose();
-        Vec3 endBeam = entity.ClientTargetPosition(partialTicks);
-        Vec3 startBeam = this.getPosition((LivingEntity)entity, 0.03, partialTicks);
-        if (endBeam != null) {
-            float beamVecX = (float)(endBeam.x - startBeam.x);
-            float beamVecZ = (float)(endBeam.z - startBeam.z);
-            this.renderBeams(entity, beamVecX, 0.0f, beamVecZ, partialTicks, matrixStackIn, bufferIn, packedLightIn);
-        }
-        matrixStackIn.popPose();
+        // TODO: port render body to 26.2 (old MobRenderer APIs removed)
     }
 
     private Vec3 getPosition(LivingEntity livingEntity, double yOffset, float partialTick) {

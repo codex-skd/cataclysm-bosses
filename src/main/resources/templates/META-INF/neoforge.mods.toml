@@ -9,7 +9,7 @@
 license="${mod_license}"
 
 # A URL to refer people to when problems occur with this mod
-issueTrackerURL="https://gitlab.com/stalking-dragons/minecraft/the-sundering/-/issues" #optional
+issueTrackerURL="https://gitlab.com/stalking-dragons/minecraft/cataclysm-bosses/-/issues" #optional
 
 # A list of mods - how many allowed here is determined by the individual mod loader
 [[mods]] #mandatory
@@ -40,7 +40,7 @@ authors="stalking-dragons"
 
 # The description text for the mod (multi line!) (#mandatory)
 description='''
-The Sundering for Minecraft ${minecraft_version} / NeoForge. A port of L_Ender's Cataclysm (L_Ender / MCL_Ender).
+Cataclysm Bosses for Minecraft ${minecraft_version} / NeoForge. A port of L_Ender's Cataclysm (L_Ender / MCL_Ender).
 '''
 
 # The [[mixins]] block allows you to declare your mixin config to FML so that it gets loaded.

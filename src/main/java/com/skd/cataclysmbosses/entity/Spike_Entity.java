@@ -36,6 +36,7 @@
  *  net.minecraft.world.phys.Vec3
  */
 package com.skd.cataclysmbosses.entity.Deepling;
+import net.minecraft.server.level.ServerLevel;
 
 import com.skd.cataclysmbosses.entity.AI.AnimalAIRandomSwimming;
 import com.skd.cataclysmbosses.entity.AI.EntityAINearestTarget3D;
@@ -43,7 +44,6 @@ import com.skd.cataclysmbosses.entity.Deepling.AbstractDeepling;
 import com.skd.cataclysmbosses.entity.Deepling.Deepling_Angler_Entity;
 import com.skd.cataclysmbosses.entity.etc.AquaticMoveController;
 import com.skd.cataclysmbosses.entity.etc.path.SemiAquaticPathNavigator;
-import com.skd.cataclysmbosses.entity.projectile.Spike_Spike_Entity;
 import com.skd.cataclysmbosses.init.ModTag;
 import com.skd.nautilusapi.server.animation.Animation;
 import com.skd.nautilusapi.server.animation.AnimationHandler;
@@ -140,7 +140,7 @@ implements IAnimatedEntity {
         return Monster.createMonsterAttributes().add(Attributes.ATTACK_DAMAGE, 2.0).add(Attributes.MOVEMENT_SPEED, 0.3).add(Attributes.MAX_HEALTH, 12.0);
     }
 
-    public boolean hurt(DamageSource p_32820_, float p_32821_) {
+    public boolean hurtServer(ServerLevel level, DamageSource p_32820_, float p_32821_) {
         LivingEntity livingentity;
         Entity entity;
         if (this.level().isClientSide()) {
@@ -201,11 +201,11 @@ implements IAnimatedEntity {
         this.handleAirSupply(i);
     }
 
-    public boolean isAlliedTo(Entity entityIn) {
+    public boolean considersEntityAsAlly(Entity entityIn) {
         if (entityIn == this) {
             return true;
         }
-        if (super.isAlliedTo(entityIn)) {
+        if (super.considersEntityAsAlly(entityIn)) {
             return true;
         }
         if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_THE_LEVIATHAN)) {
@@ -220,7 +220,7 @@ implements IAnimatedEntity {
         if (!this.level().isClientSide()) {
             for (int i = 0; i < shardCount; ++i) {
                 float f = (float)(i + 1) / (float)shardCount * 360.0f;
-                Spike_Spike_Entity shard = new Spike_Spike_Entity(this.level(), (LivingEntity)this);
+                com.skd.cataclysmbosses.entity.projectile.Spike_Entity shard = new com.skd.cataclysmbosses.entity.projectile.Spike_Entity(this.level(), (LivingEntity)this);
                 shard.shoot(this.random.nextFloat() * 0.4f * 2.0f - 0.4f, this.random.nextFloat() * 0.25f + 0.1f, this.random.nextFloat() * 0.4f * 2.0f - 0.4f, 0.35f, 1.0f);
                 this.level().addFreshEntity((Entity)shard);
             }

@@ -430,7 +430,7 @@ extends IABoss_monster {
     }
 
     @Override
-    public boolean hurt(DamageSource source, float damage) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         boolean flag;
         if (!source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
             if (this.canBlockFaceSource(source) && !this.level().isClientSide()) {
@@ -2033,11 +2033,11 @@ extends IABoss_monster {
         return super.mobInteract(player, hand);
     }
 
-    public boolean isAlliedTo(Entity entityIn) {
+    public boolean considersEntityAsAlly(Entity entityIn) {
         if (entityIn == this) {
             return true;
         }
-        if (super.isAlliedTo(entityIn)) {
+        if (super.considersEntityAsAlly(entityIn)) {
             return true;
         }
         if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_SCYLLA)) {
@@ -2092,7 +2092,7 @@ extends IABoss_monster {
         return false;
     }
 
-    protected boolean isAffectedByFluids() {
+    public boolean isAffectedByFluids() {
         return false;
     }
 

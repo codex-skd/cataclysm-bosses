@@ -124,6 +124,7 @@ extends Cataclysm_Weapon {
                 }
             }
         }
+        return false;
     }
 
     public static float getPowerForTime(int p_40662_) {

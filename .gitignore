@@ -43,3 +43,19 @@ repo/
 temp/
 lib_ext/
 graphify-out/[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]/
+
+### Port WIP — logs, crash dumps y scratch (no versionar) ###
+build.log
+build_log*.txt
+compile*.txt
+compile*.log
+build_errors*.txt
+hs_err_pid*.log
+*.hprof
+replay_pid*.log
+/net/
+/top/
+/tmp_*/
+/nul
+fix_*.py
+fix_*.sh

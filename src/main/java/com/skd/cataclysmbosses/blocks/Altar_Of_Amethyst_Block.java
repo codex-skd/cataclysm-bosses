@@ -13,7 +13,7 @@
  *  net.minecraft.world.item.context.BlockPlaceContext
  *  net.minecraft.world.level.BlockGetter
  *  net.minecraft.world.level.Level
- *  net.minecraft.world.level.LevelAccessor
+ *  net.minecraft.world.level.LevelReader
  *  net.minecraft.world.level.LevelReader
  *  net.minecraft.world.level.block.BaseEntityBlock
  *  net.minecraft.world.level.block.Block
@@ -53,8 +53,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
@@ -104,7 +104,7 @@ implements SimpleWaterloggedBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level p_152123_, BlockState p_152124_, BlockEntityType<T> p_152125_) {
-        return p_152125_ == ModTileentites.ALTAR_OF_AMETHYST.get() ? (p_154006_, p_154007_, p_154008_, p_154009_) -> ((AltarOfAmethyst_Block_Entity)p_154009_).tick() : null;
+        return p_152125_ == ModTileentites.ALTAR_OF_AMETHYST.get() ? (level, pos, state, entity) -> ((AltarOfAmethyst_Block_Entity)entity).tick() : null;
     }
 
     @Override
@@ -143,10 +143,10 @@ implements SimpleWaterloggedBlock {
     }
 
     @Override
-    public BlockState updateShape(BlockState p_57061_, Direction p_57062_, BlockState p_57063_, LevelAccessor p_57064_, BlockPos p_57065_, BlockPos p_57066_) {
+    protected BlockState updateShape(BlockState p_57061_, LevelReader p_57064_, ScheduledTickAccess ticks, BlockPos p_57065_, Direction p_57062_, BlockPos p_57066_, BlockState p_57063_, RandomSource random) {
         // if (p_57061_.getValue((Property)WATERLOGGED)) {
         //     p_57064_.scheduleTick(p_57065_, Fluids.WATER, Fluids.WATER.getTickDelay(p_57064_));
         // }
-        return super.updateShape(p_57061_, p_57062_, p_57063_, p_57064_, p_57065_, p_57066_);
+        return super.updateShape(p_57061_, p_57064_, ticks, p_57065_, p_57062_, p_57066_, p_57063_, random);
     }
 }

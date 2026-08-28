@@ -33,7 +33,7 @@ extends Cataclysm_Armor {
         super(material, slot, properties, new AttributeContainer[0]);
     }
 
-    public Identifier getArmorTexture(@Nonnull ItemStack stack, @Nonnull Entity entity, @Nonnull EquipmentSlot slot, @Nonnull net.minecraft.world.item.equipment.EquipmentClientInfo.Layer layer, boolean isInnerModel) {
+    public Identifier getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, net.minecraft.client.resources.model.EquipmentClientInfo.Layer layer, boolean isInnerModel) {
         return Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/armor/bone_reptile_armor.png");
     }
 }

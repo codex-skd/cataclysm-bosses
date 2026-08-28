@@ -18,16 +18,8 @@ import net.neoforged.api.distmarker.OnlyIn;
 @OnlyIn(Dist.CLIENT)
 public abstract class CmHierarchicalModel<T extends EntityRenderState>
 extends EntityModel<T> {
-    protected final ModelPart root;
-
     protected CmHierarchicalModel(ModelPart root) {
         super(root);
-        this.root = root;
-    }
-
-    @Override
-    public ModelPart root() {
-        return this.root;
     }
 
     // Stubs for old HierarchicalModel helpers — no-op for compile, animation deferred

@@ -31,6 +31,35 @@ public class AltarOfAmethystRecipe implements Recipe<SingleRecipeInput> {
         this.time = time;
     }
 
+    // Static codec and serializer for 26.2
+    public static final MapCodec<AltarOfAmethystRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec(
+        i -> i.group(
+            Ingredient.CODEC.fieldOf("ingredient").forGetter(recipe -> recipe.ingredient),
+            ItemStack.CODEC.fieldOf("result").forGetter(recipe -> recipe.result),
+            Codec.INT.optionalFieldOf("time", 200).forGetter(recipe -> recipe.time)
+        ).apply(i, AltarOfAmethystRecipe::new)
+    );
+
+    public static final StreamCodec<RegistryFriendlyByteBuf, AltarOfAmethystRecipe> STREAM_CODEC = StreamCodec.of(
+        AltarOfAmethystRecipe::toNetwork,
+        AltarOfAmethystRecipe::fromNetwork
+    );
+
+    public static final RecipeSerializer<AltarOfAmethystRecipe> SERIALIZER = new RecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
+
+    private static void toNetwork(RegistryFriendlyByteBuf buf, AltarOfAmethystRecipe recipe) {
+        Ingredient.CONTENTS_STREAM_CODEC.encode(buf, recipe.ingredient);
+        ItemStack.STREAM_CODEC.encode(buf, recipe.result);
+        buf.writeVarInt(recipe.time);
+    }
+
+    private static AltarOfAmethystRecipe fromNetwork(RegistryFriendlyByteBuf buf) {
+        Ingredient ingredient = Ingredient.CONTENTS_STREAM_CODEC.decode(buf);
+        ItemStack itemstack = ItemStack.STREAM_CODEC.decode(buf);
+        int time = buf.readVarInt();
+        return new AltarOfAmethystRecipe(ingredient, itemstack, time);
+    }
+
     public boolean matches(SingleRecipeInput input, Level level) {
         return this.ingredient.test(input.item());
     }
@@ -72,37 +101,11 @@ public class AltarOfAmethystRecipe implements Recipe<SingleRecipeInput> {
         return ModRecipeTypes.AMETHYST_BLESS.get();
     }
 
+    @Override
     public RecipeSerializer<AltarOfAmethystRecipe> getSerializer() {
-        return ModRecipeSerializers.AMETHYST_BLESS.get();
+        return SERIALIZER;
     }
 
-    public static class Serializer implements RecipeSerializer<AltarOfAmethystRecipe> {
-        private static final MapCodec<AltarOfAmethystRecipe> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
-                Ingredient.CODEC_NONEMPTY.fieldOf("ingredient").forGetter(recipe -> recipe.ingredient),
-                ItemStack.CODEC.fieldOf("result").forGetter(recipe -> recipe.result),
-                Codec.INT.optionalFieldOf("time", 200).forGetter(recipe -> recipe.time)
-        ).apply(i, AltarOfAmethystRecipe::new));
-        public static final StreamCodec<RegistryFriendlyByteBuf, AltarOfAmethystRecipe> STREAM_CODEC = StreamCodec.of(Serializer::toNetwork, Serializer::fromNetwork);
-
-        public MapCodec<AltarOfAmethystRecipe> codec() {
-            return CODEC;
-        }
-
-        public StreamCodec<RegistryFriendlyByteBuf, AltarOfAmethystRecipe> streamCodec() {
-            return STREAM_CODEC;
-        }
-
-        private static AltarOfAmethystRecipe fromNetwork(RegistryFriendlyByteBuf buf) {
-            Ingredient ingredient = Ingredient.CONTENTS_STREAM_CODEC.decode(buf);
-            ItemStack itemstack = ItemStack.STREAM_CODEC.decode(buf);
-            int time = buf.readVarInt();
-            return new AltarOfAmethystRecipe(ingredient, itemstack, time);
-        }
-
-        private static void toNetwork(RegistryFriendlyByteBuf buf, AltarOfAmethystRecipe recipe) {
-            Ingredient.CONTENTS_STREAM_CODEC.encode(buf, recipe.ingredient);
-            ItemStack.STREAM_CODEC.encode(buf, recipe.result);
-            buf.writeVarInt(recipe.time);
-        }
-    }
+    // Legacy inner class removed - serializer is now a static record instance
+    // public static class Serializer implements RecipeSerializer<AltarOfAmethystRecipe> { ... }
 }

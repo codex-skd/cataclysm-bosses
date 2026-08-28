@@ -51,7 +51,7 @@ import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockAndTintGetter;
+// import net.minecraft.world.level.BlockAndTintGetter; // Removed in 26.2
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 

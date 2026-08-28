@@ -63,7 +63,7 @@ extends SingleQuadParticle {
     }
 
     public ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+        return ParticleRenderType.TRANSLUCENT;
     }
 
     public float getQuadSize(float p_107608_) {
@@ -143,6 +143,11 @@ extends SingleQuadParticle {
             Rain_Fog_Particle particle = new Rain_Fog_Particle(worldIn, x, y, z, xSpeed, ySpeed, zSpeed, typeIn.size(), this.spriteSet);
             return particle;
         }
+    }
+
+    @Override
+    public SingleQuadParticle.Layer getLayer() {
+        return SingleQuadParticle.Layer.TRANSLUCENT;
     }
 }
 

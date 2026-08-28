@@ -73,7 +73,7 @@ extends SingleQuadParticle {
     }
 
     public ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+        return ParticleRenderType.TRANSLUCENT;
     }
 
     @OnlyIn(value=Dist.CLIENT)
@@ -89,6 +89,11 @@ extends SingleQuadParticle {
             RoarParticle particle = new RoarParticle(worldIn, x, y, z, xSpeed, ySpeed, zSpeed, typeIn.duration(), typeIn.r(), typeIn.g(), typeIn.b(), typeIn.a(), typeIn.startsize(), typeIn.increase(), typeIn.endsize(), this.spriteSet);
             return particle;
         }
+    }
+
+    @Override
+    public SingleQuadParticle.Layer getLayer() {
+        return SingleQuadParticle.Layer.TRANSLUCENT;
     }
 }
 

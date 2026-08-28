@@ -63,6 +63,7 @@
  *  net.neoforged.neoforge.fluids.FluidType
  */
 package com.skd.cataclysmbosses.entity.InternalAnimationMonster;
+import net.minecraft.server.level.ServerLevel;
 
 import com.skd.cataclysmbosses.client.particle.Options.RingParticleOptions;
 import com.skd.cataclysmbosses.entity.AI.MobAIFindWater;
@@ -112,7 +113,6 @@ import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.SpawnGroupData;
-import net.minecraft.world.entity.VariantHolder;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.BodyRotationControl;
@@ -143,8 +143,7 @@ import net.minecraft.world.level.storage.ValueOutput;
 
 public class Coralssus_Entity
 extends Internal_Animation_Monster
-implements VariantHolder<Variant>,
-ISemiAquatic {
+implements ISemiAquatic {
     private static final EntityDataAccessor<Integer> MOISTNESS = SynchedEntityData.defineId(Coralssus_Entity.class, (EntityDataSerializer)EntityDataSerializers.INT);
     public static final EntityDataAccessor<Integer> VARIANT = SynchedEntityData.defineId(Coralssus_Entity.class, (EntityDataSerializer)EntityDataSerializers.INT);
     public static final EntityDataAccessor<Boolean> RIGHT = SynchedEntityData.defineId(Coralssus_Entity.class, (EntityDataSerializer)EntityDataSerializers.BOOLEAN);
@@ -425,7 +424,7 @@ ISemiAquatic {
         return livingentity != null && livingentity.isInWater();
     }
 
-    public boolean hurt(DamageSource source, float damage) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         if (source.is(DamageTypes.HOT_FLOOR)) {
             return false;
         }
@@ -613,11 +612,11 @@ ISemiAquatic {
         return null;
     }
 
-    public boolean isAlliedTo(Entity entityIn) {
+    public boolean considersEntityAsAlly(Entity entityIn) {
         if (entityIn == this) {
             return true;
         }
-        if (super.isAlliedTo(entityIn)) {
+        if (super.considersEntityAsAlly(entityIn)) {
             return true;
         }
         if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_THE_LEVIATHAN)) {

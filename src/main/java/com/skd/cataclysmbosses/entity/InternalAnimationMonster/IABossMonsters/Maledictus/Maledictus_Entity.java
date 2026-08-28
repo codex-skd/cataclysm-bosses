@@ -421,7 +421,7 @@ implements IHoldEntity {
     }
 
     @Override
-    public boolean hurt(DamageSource source, float damage) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         if (!(this.getAttackState() != 31 && this.getAttackState() != 32 && this.getAttackState() != 33 || source.is(DamageTypeTags.BYPASSES_INVULNERABILITY))) {
             return false;
         }
@@ -1886,11 +1886,11 @@ implements IHoldEntity {
         }
     }
 
-    public boolean isAlliedTo(Entity entityIn) {
+    public boolean considersEntityAsAlly(Entity entityIn) {
         if (entityIn == this) {
             return true;
         }
-        if (super.isAlliedTo(entityIn)) {
+        if (super.considersEntityAsAlly(entityIn)) {
             return true;
         }
         if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_MALEDICTUS)) {
@@ -1916,7 +1916,7 @@ implements IHoldEntity {
         return (SoundEvent)ModSounds.MALEDICTUS_MUSIC.get();
     }
 
-    protected boolean isAffectedByFluids() {
+    public boolean isAffectedByFluids() {
         return false;
     }
 

@@ -138,7 +138,7 @@ implements SimpleWaterloggedBlock {
 
     public BlockState updateShape(BlockState p_154147_, Direction p_154148_, BlockState p_154149_, LevelAccessor p_154150_, BlockPos p_154151_, BlockPos p_154152_) {
         if (((Boolean)p_154147_.getValue((Property)WATERLOGGED)).booleanValue()) {
-            p_154150_.scheduleTick(p_154151_, (Fluid)Fluids.WATER, Fluids.WATER.getTickDelay((LevelReader)p_154150_));
+            ticks.scheduleTick(p_154151_, Fluids.WATER, Fluids.WATER.getTickDelay(p_154150_));
         }
         if (p_154148_ != Direction.UP && p_154148_ != Direction.DOWN) {
             return p_154147_;

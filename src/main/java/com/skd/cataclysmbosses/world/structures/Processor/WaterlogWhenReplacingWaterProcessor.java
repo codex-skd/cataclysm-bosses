@@ -36,15 +36,24 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlac
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import org.jspecify.annotations.Nullable;
 
 public class WaterlogWhenReplacingWaterProcessor
-extends StructureProcessor {
+implements StructureProcessor {
     public static final MapCodec<WaterlogWhenReplacingWaterProcessor> CODEC = MapCodec.unit(WaterlogWhenReplacingWaterProcessor::new);
 
     private WaterlogWhenReplacingWaterProcessor() {
     }
 
-    public StructureTemplate.StructureBlockInfo processBlock(LevelReader levelReader, BlockPos pos, BlockPos pos2, BlockPos pos3, StructureTemplate.StructureBlockInfo infoIn, StructurePlaceSettings settings) {
+    @Override
+    public StructureTemplate.@Nullable StructureBlockInfo processBlock(
+        LevelReader levelReader,
+        BlockPos targetPosition,
+        BlockPos referencePos,
+        BlockPos templateRelativePos,
+        StructureTemplate.StructureBlockInfo infoIn,
+        StructurePlaceSettings settings
+    ) {
         if (infoIn.state().hasProperty((Property)BlockStateProperties.WATERLOGGED)) {
             WorldGenRegion worldGenRegion;
             if (levelReader instanceof WorldGenRegion && !(worldGenRegion = (WorldGenRegion)levelReader).getCenter().equals((Object)new ChunkPos(infoIn.pos()))) {
@@ -66,8 +75,12 @@ extends StructureProcessor {
         return infoIn;
     }
 
+    @Override
+    public MapCodec<? extends StructureProcessor> codec() {
+        return CODEC;
+    }
+
     protected StructureProcessorType getType() {
         return ModStructureProcessor.WATERLOGGING_WHEN_REPLACING_WATER_PROCESSOR.get();
     }
 }
-

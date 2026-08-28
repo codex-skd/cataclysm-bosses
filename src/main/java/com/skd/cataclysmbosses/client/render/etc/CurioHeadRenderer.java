@@ -22,6 +22,7 @@
  *  top.theillusivec4.curios.api.client.ICurioRenderer
  */
 package com.skd.cataclysmbosses.client.render.etc;
+import net.minecraft.resources.Identifier;
 
 import com.skd.cataclysmbosses.blocks.Cataclysm_Skull_Block;
 import com.skd.cataclysmbosses.blocks.Cataclysm_Wall_Skull_Block;
@@ -65,7 +66,7 @@ implements ICurioRenderer.ModelRender<HumanoidRenderState, HeadedModel> {
     }
 
     @Override
-    public void prepareModel(ItemStack stack, SlotContext slotContext, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight, HumanoidRenderState renderState, RenderLayerParent<HumanoidRenderState, HeadedModel> renderLayerParent, EntityRendererProvider.Context context, float limbSwing, float ageInTicks) {
+    public void prepareModel(ItemStack stack, SlotContext slotContext, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight, HumanoidRenderState renderState, RenderLayerParent<HumanoidRenderState, HeadedModel> renderLayerParent, net.minecraft.client.renderer.entity.EntityRendererProvider.Context context, float limbSwing, float ageInTicks) {
         if (!stack.isEmpty()) {
             Item item = stack.getItem();
             if (item instanceof BlockItem) {

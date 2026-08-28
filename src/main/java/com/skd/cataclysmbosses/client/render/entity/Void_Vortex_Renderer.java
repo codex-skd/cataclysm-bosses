@@ -59,7 +59,7 @@ extends CmEntityRenderer<Void_Vortex_Entity> {
         matrixStackIn.popPose();
     }
 
-    private void renderArc(PoseStack matrixStackIn, MultiBufferSource bufferIn, Identifier res) {
+    private void renderArc(PoseStack matrixStackIn, CmMultiBufferSource bufferIn, Identifier res) {
         matrixStackIn.pushPose();
         VertexConsumer ivertexbuilder = bufferIn.getBuffer(CMRenderTypes.getfullBright(res));
         PoseStack.Pose lvt_19_1_ = matrixStackIn.last();

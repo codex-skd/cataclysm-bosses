@@ -176,7 +176,7 @@ extends CmMobRenderer<Scylla_Entity> {
         this.shadowRadius = entityIn.getAct() ? 0.75f : 0.0f;
     }
 
-    private void renderetc(Scylla_Entity p_entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+    private void renderetc(Scylla_Entity p_entity, float entityYaw, float partialTick, PoseStack poseStack, CmMultiBufferSource bufferSource, int packedLight) {
         RenderNameTagEvent event = new RenderNameTagEvent((Entity)p_entity, p_entity.getDisplayName(), (EntityRenderer)this, poseStack, bufferSource, packedLight, partialTick);
         NeoForge.EVENT_BUS.post((Event)event);
         if (event.canRender().isTrue() || event.canRender().isDefault() && this.shouldShowName((Mob)p_entity)) {

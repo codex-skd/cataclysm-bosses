@@ -64,7 +64,7 @@ extends SingleQuadParticle {
     }
 
     public ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+        return ParticleRenderType.TRANSLUCENT;
     }
 
     public int getLightColor(float partialTicks) {
@@ -88,6 +88,11 @@ extends SingleQuadParticle {
             TrapFlameParticle particle = new TrapFlameParticle(worldIn, x, y, z, xSpeed, ySpeed, zSpeed, this.spriteSet);
             return particle;
         }
+    }
+
+    @Override
+    public SingleQuadParticle.Layer getLayer() {
+        return SingleQuadParticle.Layer.TRANSLUCENT;
     }
 }
 

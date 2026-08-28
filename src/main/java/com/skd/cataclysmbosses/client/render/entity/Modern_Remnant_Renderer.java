@@ -33,13 +33,7 @@ public class Modern_Remnant_Renderer extends CmEntityRenderer<Modern_Remnant_Ent
 
     @Override
     protected void render(Modern_Remnant_Entity entity, float f1, PoseStack posestack, CmMultiBufferSource multibuffersource, int i) {
-        posestack.pushPose();
-        posestack.mulPose(Axis.YP.rotationDegrees(Mth.lerp(f, entity.yRotO, entity.getYRot()) - 90.0f));
-        posestack.mulPose(Axis.ZP.rotationDegrees(Mth.lerp(f, entity.xRotO, entity.getXRot())));
-        Modern_Remnant_Model model = new Modern_Remnant_Model(entity);
-        int j = LivingEntity.getLightBrightness(entity.level(), entity.blockPosition());
-        this.getRenderLayer().getRenderer().render(entity, model, posestack, multibuffersource.getBuffer(this.getRenderType(entity.getTextureLocation(entity))), j, LivingEntity.getLightBrightnessColor(entity.level(), entity.blockPosition()));
-        posestack.popPose();
+        // TODO: port render body to 26.2 (old MobRenderer APIs removed)
     }
 
     @Override

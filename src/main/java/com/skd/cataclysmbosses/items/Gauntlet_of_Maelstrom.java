@@ -102,6 +102,7 @@ extends Cataclysm_Weapon {
             }
         }
         return true;
+        return false;
     }
 
     private boolean spawnVortex(double x, double y, double z, int lowestYCheck, float rotation, Level world, Player player) {

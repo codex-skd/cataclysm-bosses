@@ -58,7 +58,7 @@ extends Item {
         return InteractionResult.PASS;
     }
 
-    public Identifier getArmorTexture(@Nonnull ItemStack stack, @Nonnull Entity entity, @Nonnull EquipmentSlot slot, @Nonnull ArmorMaterial.Layer layer, boolean isInnerModel) {
+    public Identifier getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, net.minecraft.client.resources.model.EquipmentClientInfo.Layer layer, boolean isInnerModel) {
         return Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/armor/ignitium_elytra_chestplate.png");
     }
 }

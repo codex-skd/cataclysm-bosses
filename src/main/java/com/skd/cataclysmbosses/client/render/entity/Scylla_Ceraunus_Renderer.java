@@ -60,30 +60,7 @@ extends CmEntityRenderer<Scylla_Ceraunus_Entity> {
     }
 
     protected void render(Scylla_Ceraunus_Entity entity, float tickDelta, PoseStack matrices, CmMultiBufferSource provider, int light) {
-        matrices.pushPose();
-        float yRot = Mth.lerp((float)tickDelta, (float)entity.yRotO, (float)entity.getYRot());
-        float xRot = Mth.lerp((float)tickDelta, (float)entity.xRotO, (float)entity.getXRot());
-        matrices.mulPose(Axis.YP.rotationDegrees(yRot - 90.0f));
-        matrices.mulPose(Axis.ZP.rotationDegrees(xRot + 90.0f));
-        VertexConsumer vertexConsumer = provider.getBuffer(RenderTypes.entityCutout(this.getTextureLocation(entity)));
-        this.model.renderToBuffer(matrices, vertexConsumer, light, OverlayTexture.NO_OVERLAY, -1);
-        matrices.popPose();
-        Entity fromEntity = entity.getController();
-        if (fromEntity != null) {
-            Vec3 entityPos = entity.getPosition(tickDelta);
-            PoseStack poseForModel = new PoseStack();
-            poseForModel.mulPose(Axis.YP.rotationDegrees(yRot - 90.0f));
-            poseForModel.mulPose(Axis.ZP.rotationDegrees(xRot + 90.0f));
-            Vec3 modelOffset = this.model.getChainPosition(new Vec3(0.0, 0.0, 0.0), poseForModel);
-            Vec3 fromPos = this.getPositionOfPriorMob(fromEntity, tickDelta);
-            Vec3 chainTo = fromPos.subtract(entityPos);
-            Vec3 chainBase = modelOffset;
-            matrices.pushPose();
-            matrices.translate(chainBase.x, chainBase.y, chainBase.z);
-            VertexConsumer chainBuffer = provider.getBuffer(RenderTypes.entityCutoutNoCull((Identifier)CHAIN_TEXTURE));
-            Scylla_Ceraunus_Renderer.renderChainCube(chainTo.subtract(chainBase), matrices, chainBuffer, light, OverlayTexture.NO_OVERLAY);
-            matrices.popPose();
-        }
+        // TODO: port render body to 26.2 (old MobRenderer APIs removed)
     }
 
     public boolean shouldRender(Scylla_Ceraunus_Entity entity, Frustum camera, double camX, double camY, double camZ) {

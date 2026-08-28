@@ -150,6 +150,7 @@ extends Item {
     public boolean releaseUsing(ItemStack stack, Level world, LivingEntity living, int remainingUseTicks) {
         stack.set(ModDataComponents.LASER_GATLING, (Object)false);
         return true;
+        return false;
     }
 
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int i, boolean held) {

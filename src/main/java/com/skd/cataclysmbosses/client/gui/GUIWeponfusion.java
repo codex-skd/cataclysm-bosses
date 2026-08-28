@@ -12,7 +12,7 @@
 package com.skd.cataclysmbosses.client.gui;
 
 import com.skd.cataclysmbosses.inventory.WeaponfusionMenu;
-// import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.ItemCombinerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -29,7 +29,8 @@ extends ItemCombinerScreen<WeaponfusionMenu> {
         this.titleLabelY = 18;
     }
 
-    protected void renderErrorIcon(GuiGraphics p_282905_, int p_283237_, int p_282237_) {
+    @Override
+    protected void extractErrorIcon(GuiGraphicsExtractor p_282905_, int p_283237_, int p_282237_) {
         if ((((WeaponfusionMenu)this.menu).getSlot(0).hasItem() || ((WeaponfusionMenu)this.menu).getSlot(1).hasItem()) && !((WeaponfusionMenu)this.menu).getSlot(((WeaponfusionMenu)this.menu).getResultSlot()).hasItem()) {
             p_282905_.blit(SMITHING_LOCATION, p_283237_ + 99, p_282237_ + 45, this.imageWidth, 0, 28, 21);
         }

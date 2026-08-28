@@ -104,7 +104,7 @@ extends SingleQuadParticle {
     }
 
     public ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+        return ParticleRenderType.TRANSLUCENT;
     }
 
     @OnlyIn(value=Dist.CLIENT)
@@ -120,6 +120,11 @@ extends SingleQuadParticle {
             FlameJetParticle particle = new FlameJetParticle(worldIn, x, y, z, xSpeed, ySpeed, zSpeed, this.spriteSet);
             return particle;
         }
+    }
+
+    @Override
+    public SingleQuadParticle.Layer getLayer() {
+        return SingleQuadParticle.Layer.TRANSLUCENT;
     }
 }
 

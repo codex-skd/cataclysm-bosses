@@ -201,6 +201,7 @@ extends ProjectileWeaponItem {
                 }
             }
         }
+        return false;
     }
 
     // FASE0 DIAGNOSTIC STUB: CFR failed to decompile this method ("Unable to fully structure

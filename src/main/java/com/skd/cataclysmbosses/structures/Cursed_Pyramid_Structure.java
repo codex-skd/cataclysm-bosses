@@ -212,8 +212,9 @@ extends CataclysmStructure {
                     Koboleton_Entity koboleton = (Koboleton_Entity)((EntityType)ModEntities.KOBOLETON.get()).create((Level)worldIn.getLevel(), EntitySpawnReason.STRUCTURE);
                     if (koboleton == null) break;
                     koboleton.setPersistenceRequired();
-                    koboleton.moveTo(pos, 0.0f, 0.0f);
-                    koboleton.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(koboleton.blockPosition()), EntitySpawnReason.STRUCTURE, null);
+                    koboleton.setPos(pos, 0.0f, 0.0f);
+                    koboleton.finalizeSpawn(worldIn); koboleton.setYRot(0.0f);
+                    koboleton.finalizeSpawn(worldIn); koboleton.setXRot(worldIn.getCurrentDifficultyAt(koboleton.blockPosition()));
                     worldIn.addFreshEntityWithPassengers((Entity)koboleton);
                     worldIn.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
                     break;
@@ -222,8 +223,9 @@ extends CataclysmStructure {
                     Wadjet_Entity wadjet = (Wadjet_Entity)((EntityType)ModEntities.WADJET.get()).create((Level)worldIn.getLevel(), EntitySpawnReason.STRUCTURE);
                     if (wadjet == null) break;
                     wadjet.setPersistenceRequired();
-                    wadjet.moveTo(pos, 0.0f, 0.0f);
-                    wadjet.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(wadjet.blockPosition()), EntitySpawnReason.STRUCTURE, null);
+                    wadjet.setPos(pos, 0.0f, 0.0f);
+                    wadjet.finalizeSpawn(worldIn); wadjet.setYRot(0.0f);
+                    wadjet.finalizeSpawn(worldIn); wadjet.setXRot(worldIn.getCurrentDifficultyAt(wadjet.blockPosition()));
                     worldIn.addFreshEntityWithPassengers((Entity)wadjet);
                     worldIn.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
                     break;
@@ -232,9 +234,11 @@ extends CataclysmStructure {
                     Kobolediator_Entity kobolediator = (Kobolediator_Entity)((EntityType)ModEntities.KOBOLEDIATOR.get()).create((Level)worldIn.getLevel(), EntitySpawnReason.STRUCTURE);
                     if (kobolediator == null) break;
                     kobolediator.setPersistenceRequired();
-                    kobolediator.moveTo(pos, 0.0f, 0.0f);
+                    kobolediator.setPos(pos, 0.0f, 0.0f);
                     kobolediator.setSleep(true);
-                    kobolediator.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(kobolediator.blockPosition()), EntitySpawnReason.STRUCTURE, null);
+                    kobolediator.finalizeSpawn(worldIn); kobolediator.setYRot(0.0f);
+                    kobolediator.setSleep(true);
+                    kobolediator.finalizeSpawn(worldIn); kobolediator.setXRot(worldIn.getCurrentDifficultyAt(kobolediator.blockPosition()));
                     worldIn.addFreshEntityWithPassengers((Entity)kobolediator);
                     worldIn.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
                     break;
@@ -244,8 +248,9 @@ extends CataclysmStructure {
                     if (remnant == null) break;
                     remnant.setNecklace(false);
                     remnant.setPersistenceRequired();
-                    remnant.moveTo(pos, 0.0f, 0.0f);
-                    remnant.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(remnant.blockPosition()), EntitySpawnReason.STRUCTURE, null);
+                    remnant.setPos(pos, 0.0f, 0.0f);
+                    remnant.finalizeSpawn(worldIn); remnant.setYRot(0.0f);
+                    remnant.finalizeSpawn(worldIn); remnant.setXRot(worldIn.getCurrentDifficultyAt(remnant.blockPosition()));
                     worldIn.addFreshEntityWithPassengers((Entity)remnant);
                     worldIn.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
                 }

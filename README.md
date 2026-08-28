@@ -1,19 +1,19 @@
-# The Sundering
+# Cataclysm Bosses
 
-The Sundering is a boss-monster mod for Minecraft 26.2 (NeoForge).
+Cataclysm Bosses is a boss-monster mod for Minecraft 26.2 (NeoForge).
 
 > This mod is a port of [L_Ender's Cataclysm](https://www.curseforge.com/minecraft/mc-mods/lendercataclysm) by L_Ender (MCL_Ender).
 
 ## Status
 
-Not yet functional — project scaffolding only. Porting is in progress; see `docs/WORKFLOW_SUNDERING_26-2.md` for the current phase.
+Not yet functional — porting in progress. See `docs/WORKFLOW_CATACLYSM_BOSSES_26-2.md` and `docs/PORT_STATUS_26-2.md` for the current phase.
 
 ## Requirements
 
 | Component | Version |
 |---|---|
 | Minecraft | 26.2 |
-| NeoForge | 26.2.0.45-beta |
+| NeoForge | 26.2.0.57 |
 | Java | 25+ |
 
 ## Installation

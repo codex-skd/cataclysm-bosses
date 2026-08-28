@@ -5,11 +5,11 @@
  *  com.google.common.base.Suppliers
  *  com.mojang.blaze3d.vertex.PoseStack
  *  com.mojang.blaze3d.vertex.VertexConsumer
- *  com.mojang.blaze3d.vertex.VertexMultiConsumer
+ *  com.mojang.blaze3d.vertex.com.mojang.blaze3d.vertex.VertexConsumer
  *  net.minecraft.client.Minecraft
  *  net.minecraft.client.model.HumanoidModel
  *  net.minecraft.client.model.Model
- *  net.minecraft.client.renderer.MultiBufferSource
+ *  net.minecraft.client.renderer.CmMultiBufferSource
  *  net.minecraft.client.renderer.rendertype.RenderType
  *  net.minecraft.client.renderer.texture.OverlayTexture
  *  net.minecraft.resources.Identifier
@@ -35,20 +35,19 @@ import com.skd.cataclysmbosses.items.Armortier;
 import com.google.common.base.Suppliers;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.blaze3d.vertex.VertexMultiConsumer;
 import java.util.function.Supplier;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.Model;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.EquipmentClientInfo;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 
@@ -78,7 +77,7 @@ implements IClientItemExtensions {
         CURSIUM_ARMOR_MODEL_LEGS = new Cursium_Armor_Model(Minecraft.getInstance().getEntityModels().bakeLayer(CMModelLayers.CURSIUM_ARMOR_MODEL_LEGS));
     }
 
-    public Model getHumanoidArmorModel(ItemStack itemStack, EquipmentClientInfo.LayerType layerType, Model _default) {
+    public Model getHumanoidArmorModel(ItemStack itemStack, net.minecraft.client.resources.model.EquipmentClientInfo.LayerType layerType, Model _default) {
         if (!init) {
             CustomArmorRenderProperties.initializeModels();
         }
@@ -124,9 +123,9 @@ implements IClientItemExtensions {
         return _default;
     }
 
-    public static void renderCustomArmor(PoseStack poseStack, MultiBufferSource multiBufferSource, int light, ItemStack itemStack, Item item, Model armorModel, boolean legs, Identifier texture) {
+    public static void renderCustomArmor(PoseStack poseStack, CmMultiBufferSource multiBufferSource, int light, ItemStack itemStack, Item item, Model armorModel, boolean legs, Identifier texture) {
         if (item instanceof com.skd.cataclysmbosses.items.Cataclysm_Armor cataclysmArmor && cataclysmArmor.getMaterial() == Armortier.CURSIUM) {
-            VertexConsumer vertexconsumer1 = itemStack.hasFoil() ? VertexMultiConsumer.create((VertexConsumer)multiBufferSource.getBuffer(RenderType.entityGlintDirect()), (VertexConsumer)multiBufferSource.getBuffer(RenderTypes.entityTranslucent((Identifier)texture))) : multiBufferSource.getBuffer(RenderTypes.entityTranslucent((Identifier)texture));
+            VertexConsumer vertexconsumer1 = itemStack.hasFoil() ? com.mojang.blaze3d.vertex.VertexConsumer.create((VertexConsumer)multiBufferSource.getBuffer(RenderType.entityGlintDirect()), (VertexConsumer)multiBufferSource.getBuffer(RenderTypes.entityTranslucent((Identifier)texture))) : multiBufferSource.getBuffer(RenderTypes.entityTranslucent((Identifier)texture));
             armorModel.renderToBuffer(poseStack, vertexconsumer1, light, OverlayTexture.NO_OVERLAY, -1);
             VertexConsumer vertexconsumer2 = multiBufferSource.getBuffer(CMRenderTypes.getGhost(CURSIUM_ARMOR_GHOST));
             int i = ARGB.color((int)125, (int)255, (int)255, (int)255);

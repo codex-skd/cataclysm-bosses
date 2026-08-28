@@ -54,7 +54,7 @@ extends SingleQuadParticle {
     }
 
     public ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_LIT;
+        return ParticleRenderType.TRANSLUCENT;
     }
 
     public float getQuadSize(float scaleFactor) {
@@ -76,6 +76,11 @@ extends SingleQuadParticle {
         public Particle createParticle(Cursed_MarkParticleOption data, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
             return new CursedMarkParticle(worldIn, x, y, z, xSpeed, ySpeed, zSpeed, this.spriteSet, data.size());
         }
+    }
+
+    @Override
+    public SingleQuadParticle.Layer getLayer() {
+        return SingleQuadParticle.Layer.TRANSLUCENT;
     }
 }
 

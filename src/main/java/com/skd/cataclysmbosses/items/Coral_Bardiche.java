@@ -109,7 +109,7 @@ RangeTool {
         return 72000;
     }
 
-    public void releaseUsing(ItemStack p_43394_, Level p_43395_, LivingEntity p_43396_, int p_43397_) {
+    public boolean releaseUsing(ItemStack p_43394_, Level p_43395_, LivingEntity p_43396_, int p_43397_) {
         if (p_43396_ instanceof Player) {
             float f;
             Player player = (Player)p_43396_;
@@ -149,6 +149,7 @@ RangeTool {
                 }
             }
         }
+        return false;
     }
 
     public InteractionResult use(Level p_43405_, Player p_43406_, InteractionHand p_43407_) {

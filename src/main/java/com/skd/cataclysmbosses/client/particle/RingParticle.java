@@ -139,7 +139,7 @@ extends SingleQuadParticle {
     }
 
     public ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+        return ParticleRenderType.TRANSLUCENT;
     }
 
     @OnlyIn(value=Dist.CLIENT)
@@ -163,6 +163,11 @@ extends SingleQuadParticle {
         CONSTANT,
         GROW_THEN_SHRINK;
 
+    }
+
+    @Override
+    public SingleQuadParticle.Layer getLayer() {
+        return SingleQuadParticle.Layer.TRANSLUCENT;
     }
 }
 

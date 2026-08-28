@@ -90,6 +90,7 @@ extends Item {
                 ((Player)entityLiving).getCooldowns().addCooldown(this.getDefaultInstance(), CMCommonConfig.BulwarkOfTheFlame.cooldown);
             }
         }
+        return false;
     }
 
     public InteractionResult use(Level p_77659_1_, Player p_77659_2_, InteractionHand p_77659_3_) {

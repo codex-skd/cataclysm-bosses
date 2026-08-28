@@ -32,6 +32,7 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -60,11 +61,11 @@ extends BlockEntity {
         this.prevChompProgress = this.chompProgress;
         boolean powered = false;
         if (this.getBlockState().getBlock() instanceof EMP_Block) {
-            powered = (Boolean)this.getBlockState().getValue((Property)EMP_Block.POWERED);
+            powered = this.getBlockState().getValue(EMP_Block.POWERED);
         }
         boolean overload = false;
         if (this.getBlockState().getBlock() instanceof EMP_Block) {
-            overload = (Boolean)this.getBlockState().getValue((Property)EMP_Block.OVERLOAD);
+            overload = this.getBlockState().getValue(EMP_Block.OVERLOAD);
         }
         if (powered && this.chompProgress < 15.0f) {
             this.chompProgress += 1.0f;
@@ -79,7 +80,7 @@ extends BlockEntity {
             this.level.addParticle((ParticleOptions)ModParticle.EM_PULSE.get(), (double)x, (double)y, (double)z, 0.0, 0.0, 0.0);
             ScreenShake_Entity.ScreenShake(this.level, Vec3.atCenterOf((Vec3i)this.getBlockPos()), 20.0f, 0.01f, 0, 20);
             this.level.playSound((Player)null, this.getBlockPos(), (SoundEvent)ModSounds.EMP_ACTIVATED.get(), SoundSource.BLOCKS, 4.0f, this.level.getRandom().nextFloat() * 0.2f + 1.0f);
-            this.level.setBlockAndUpdate(this.getBlockPos(), (BlockState)this.getBlockState().setValue((Property)EMP_Block.OVERLOAD, (Comparable)Boolean.valueOf(true)));
+            this.level.setBlockAndUpdate(this.getBlockPos(), this.getBlockState().setValue(EMP_Block.OVERLOAD, true));
             AABB screamBox = new AABB((double)((float)this.getBlockPos().getX() - 5.0f), (double)((float)this.getBlockPos().getY() - 5.0f), (double)(this.getBlockPos().getZ() - 5), (double)(this.getBlockPos().getX() + 5), (double)((float)this.getBlockPos().getY() + 5.0f), (double)((float)this.getBlockPos().getZ() + 5.0f));
             for (LivingEntity entity : this.level.getEntitiesOfClass(LivingEntity.class, screamBox)) {
                 entity.hurtOrSimulate(CMDamageTypes.getDamageSource(this.level, CMDamageTypes.EMP, new EntityType[0]), (float)(3 + entity.getRandom().nextInt(3)));
@@ -92,4 +93,3 @@ extends BlockEntity {
         return this.prevChompProgress + (this.chompProgress - this.prevChompProgress) * partialTick;
     }
 }
-

@@ -62,7 +62,7 @@ extends Item {
         return 72000;
     }
 
-    public void releaseUsing(ItemStack p_43394_, Level p_43395_, LivingEntity p_43396_, int p_43397_) {
+    public boolean releaseUsing(ItemStack p_43394_, Level p_43395_, LivingEntity p_43396_, int p_43397_) {
         if (p_43396_ instanceof Player) {
             Player player = (Player)p_43396_;
             int i = this.getUseDuration(p_43394_, p_43396_) - p_43397_;
@@ -102,6 +102,7 @@ extends Item {
                 }
             }
         }
+        return false;
     }
 
     public static float getPowerForTime(int p_40662_) {

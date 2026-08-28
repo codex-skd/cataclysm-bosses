@@ -11,6 +11,7 @@
  *  net.minecraft.world.entity.Pose
  */
 package com.skd.cataclysmbosses.entity.InternalAnimationMonster.IABossMonsters.NewNetherite_Monstrosity;
+import net.minecraft.server.level.ServerLevel;
 
 import com.skd.cataclysmbosses.entity.InternalAnimationMonster.IABossMonsters.NewNetherite_Monstrosity.Netherite_Monstrosity_Entity;
 import com.skd.cataclysmbosses.entity.partentity.Cm_Part_Entity;
@@ -57,7 +58,7 @@ extends Cm_Part_Entity<Netherite_Monstrosity_Entity> {
         super.setSize(size);
     }
 
-    public boolean hurt(DamageSource source, float amount) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
         return this.isInvulnerableTo(source) ? false : this.parentMob.hurtParts(this, source, amount);
     }
 

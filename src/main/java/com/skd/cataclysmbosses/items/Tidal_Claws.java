@@ -152,11 +152,12 @@ implements ILeftClick {
         return super.finishUsingItem(p_40712_, p_40713_, p_40714_);
     }
 
-    public void releaseUsing(ItemStack stack, Level world, LivingEntity user, int remainingUseTicks) {
+    public boolean releaseUsing(ItemStack stack, Level world, LivingEntity user, int remainingUseTicks) {
         boolean flag = (Boolean)user.getData(ModDataAttachments.HOOK_FALLING);
         if (flag) {
             user.setData(ModDataAttachments.HOOK_FALLING, (Object)false);
         }
+        return false;
     }
 
     public boolean isEnchantable(ItemStack stack) {

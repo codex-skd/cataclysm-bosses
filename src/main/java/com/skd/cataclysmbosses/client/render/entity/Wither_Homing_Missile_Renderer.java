@@ -84,7 +84,7 @@ extends CmEntityRenderer<Wither_Homing_Missile_Entity> {
         }
     }
 
-    private void renderTrail(Wither_Homing_Missile_Entity entityIn, float partialTicks, PoseStack poseStack, MultiBufferSource bufferIn, float trailR, float trailG, float trailB, float trailA, int packedLightIn) {
+    private void renderTrail(Wither_Homing_Missile_Entity entityIn, float partialTicks, PoseStack poseStack, CmMultiBufferSource bufferIn, float trailR, float trailG, float trailB, float trailA, int packedLightIn) {
         int sampleSize = 10;
         float trailWidth = 0.2f;
         PoseStack.Pose lastPose = poseStack.last();

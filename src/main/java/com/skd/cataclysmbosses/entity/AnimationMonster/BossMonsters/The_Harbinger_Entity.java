@@ -126,7 +126,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.PowerableMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.FlyingMoveControl;
@@ -160,8 +159,7 @@ import net.minecraft.world.level.storage.ValueOutput;
 
 public class The_Harbinger_Entity
 extends LLibrary_Boss_Monster
-implements RangedAttackMob,
-PowerableMob {
+implements RangedAttackMob {
     public static final Animation DEATHLASER_ANIMATION = Animation.create((int)124);
     public static final Animation CHARGE_ANIMATION = Animation.create((int)45);
     public static final Animation DEATH_ANIMATION = Animation.create((int)144);
@@ -298,7 +296,7 @@ PowerableMob {
     }
 
     @Override
-    public boolean hurt(DamageSource source, float damage) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         Entity entity;
         Entity entity1 = source.getEntity();
         if (entity1 instanceof The_Harbinger_Entity) {
@@ -338,11 +336,11 @@ PowerableMob {
         this.bossEvent.removePlayer(player);
     }
 
-    public boolean isAlliedTo(Entity entityIn) {
+    public boolean considersEntityAsAlly(Entity entityIn) {
         if (entityIn == this) {
             return true;
         }
-        if (super.isAlliedTo(entityIn)) {
+        if (super.considersEntityAsAlly(entityIn)) {
             return true;
         }
         if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_THE_HARBINGER)) {

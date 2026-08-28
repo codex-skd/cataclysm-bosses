@@ -11,7 +11,7 @@ import org.apache.logging.log4j.Logger;
  * the Cataclysm class. This class provides the same static fields.
  */
 public class Cataclysm {
-    public static final String MODID = "the_sundering";
+    public static final String MODID = "cataclysm_bosses";
     public static final Logger LOGGER = LogManager.getLogger(MODID);
     public static ServerProxy PROXY;
     

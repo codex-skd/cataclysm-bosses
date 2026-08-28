@@ -150,7 +150,7 @@ implements IShieldEntity {
         return new AnimationState();
     }
 
-    public boolean hurt(DamageSource source, float damage) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         Entity entity = source.getDirectEntity();
         if (damage > 0.0f && this.canBlockDamageSource(source)) {
             this.hurtCurrentlyUsedShield(damage);
@@ -338,11 +338,11 @@ implements IShieldEntity {
         super.aiStep();
     }
 
-    public boolean isAlliedTo(Entity entityIn) {
+    public boolean considersEntityAsAlly(Entity entityIn) {
         if (entityIn == this) {
             return true;
         }
-        if (super.isAlliedTo(entityIn)) {
+        if (super.considersEntityAsAlly(entityIn)) {
             return true;
         }
         if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_MALEDICTUS)) {

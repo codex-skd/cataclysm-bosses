@@ -203,7 +203,7 @@ Bucketable {
         return (this.random.nextFloat() - this.random.nextFloat()) * 0.2f + 2.0f;
     }
 
-    public boolean hurt(DamageSource source, float amount) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
         Entity entity = source.getDirectEntity();
         if (entity instanceof Mini_Abyss_Blast_Entity || entity instanceof Abyss_Blast_Entity || entity instanceof Portal_Abyss_Blast_Entity) {
             return false;
@@ -453,7 +453,7 @@ Bucketable {
         return new SmartBodyHelper2((Mob)this);
     }
 
-    public boolean isAlliedTo(Entity entityIn) {
+    public boolean considersEntityAsAlly(Entity entityIn) {
         if (this.isTame()) {
             LivingEntity livingentity = this.getOwner();
             if (entityIn == livingentity) {
@@ -466,7 +466,7 @@ Bucketable {
                 return livingentity.isAlliedTo(entityIn);
             }
         }
-        return super.isAlliedTo(entityIn);
+        return super.considersEntityAsAlly(entityIn);
     }
 
     public boolean isPushedByFluid() {

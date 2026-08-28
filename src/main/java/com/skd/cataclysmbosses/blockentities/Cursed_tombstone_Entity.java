@@ -25,7 +25,8 @@
  *  net.minecraft.world.level.block.state.BlockState
  *  net.minecraft.world.level.block.state.properties.Property
  *  net.minecraft.world.level.gameevent.GameEvent
- *  net.minecraft.world.level.gameevent.GameEvent$Context
+ *  net.minecraft.world.level.storage.ValueInput
+ *  net.minecraft.world.level.storage.ValueOutput
  *  net.minecraft.world.phys.Vec3
  */
 package com.skd.cataclysmbosses.blockentities;
@@ -52,6 +53,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Blocks;
@@ -60,6 +62,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 
 public class Cursed_tombstone_Entity
@@ -74,14 +78,14 @@ extends BlockEntity {
 
     public static void commonTick(Level level, BlockPos pos, BlockState blockState, Cursed_tombstone_Entity entity) {
         if (blockState.getBlock() instanceof Cursed_Tombstone_Block) {
-            if (!((Boolean)blockState.getValue((Property)Cursed_Tombstone_Block.POWERED)).booleanValue()) {
+            if (!blockState.getValue(Cursed_Tombstone_Block.POWERED)) {
                 if (entity.summonCooldownProgress < CMCommonConfig.Blocks.CursedTombstoneCooldown * 1200) {
                     ++entity.summonCooldownProgress;
                 } else {
-                    level.setBlock(pos, (BlockState)blockState.setValue((Property)Cursed_Tombstone_Block.POWERED, (Comparable)Boolean.valueOf(true)), 2);
-                    level.gameEvent((Holder)GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(null, (BlockState)blockState));
+                    level.setBlock(pos, blockState.setValue(Cursed_Tombstone_Block.POWERED, true), 2);
+                    level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(blockState));
                 }
-            } else if (((Boolean)blockState.getValue((Property)Cursed_Tombstone_Block.LIT)).booleanValue()) {
+            } else if (blockState.getValue(Cursed_Tombstone_Block.LIT)) {
                 ++entity.tickCount;
                 if (entity.tickCount == 1) {
                     ScreenShake_Entity.ScreenShake(level, Vec3.atCenterOf((Vec3i)pos), 20.0f, 0.05f, 0, 80);
@@ -112,7 +116,7 @@ extends BlockEntity {
                         if (maledictus != null) {
                             ScreenShake_Entity.ScreenShake(level, Vec3.atCenterOf((Vec3i)pos), 20.0f, 0.1f, 0, 40);
                             maledictus.setPos((double)pos.getX() + 0.5, pos.getY() + 2, (double)pos.getZ() + 0.5);
-                            maledictus.setTombstoneDirection((Direction)blockState.getValue((Property)Cursed_Tombstone_Block.FACING));
+                            maledictus.setTombstoneDirection(blockState.getValue(Cursed_Tombstone_Block.FACING));
                             maledictus.setHomePos(GlobalPos.of((ResourceKey)serverLevel.dimension(), (BlockPos)pos));
                             // maledictus.finalizeSpawn((ServerLevelAccessor)serverLevel, serverLevel.getCurrentDifficultyAt(pos), EntitySpawnReason.SPAWNER, null);
                             int MthX = Mth.floor((float)pos.getX());
@@ -143,16 +147,15 @@ extends BlockEntity {
         }
     }
 
-    public void loadAdditional(CompoundTag p_155312_, HolderLookup.Provider p_324612_) {
-        super.loadAdditional(p_155312_, p_324612_);
-        if (p_155312_.contains("summonCooldownProgress", 11)) {
-            this.summonCooldownProgress = p_155312_.getInt("summonCooldownProgress");
-        }
+    @Override
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        this.summonCooldownProgress = input.getIntOr("summonCooldownProgress", 0);
     }
 
-    protected void saveAdditional(CompoundTag p_187518_, HolderLookup.Provider p_324418_) {
-        super.saveAdditional(p_187518_, p_324418_);
-        p_187518_.putInt("summonCooldownProgress", this.summonCooldownProgress);
+    @Override
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        output.putInt("summonCooldownProgress", this.summonCooldownProgress);
     }
 }
-

@@ -62,6 +62,8 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -70,15 +72,17 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class Cursed_Tombstone_Block
 extends BaseEntityBlock {
-    // public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
-    // public static final BooleanProperty LIT = BlockStateProperties.LIT;
-    // public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
+    public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
+    public static final BooleanProperty LIT = BlockStateProperties.LIT;
+    public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
     private static final VoxelShape X_BASE = Block.box((double)5.0, (double)0.0, (double)0.0, (double)11.0, (double)2.0, (double)16.0);
     private static final VoxelShape Z_BASE = Block.box((double)0.0, (double)0.0, (double)5.0, (double)16.0, (double)2.0, (double)11.0);
     private static final VoxelShape X_MID = Block.box((double)6.0, (double)2.0, (double)1.0, (double)10.0, (double)24.0, (double)15.0);
     private static final VoxelShape Z_MID = Block.box((double)1.0, (double)2.0, (double)6.0, (double)15.0, (double)24.0, (double)10.0);
     private static final VoxelShape X_AXIS_AABB = Shapes.or((VoxelShape)X_BASE, (VoxelShape)X_MID);
     private static final VoxelShape Z_AXIS_AABB = Shapes.or((VoxelShape)Z_BASE, (VoxelShape)Z_MID);
+
+    public static final MapCodec<Cursed_Tombstone_Block> CODEC = simpleCodec(Cursed_Tombstone_Block::new);
 
     public MapCodec<Cursed_Tombstone_Block> codec() {
         return CODEC;

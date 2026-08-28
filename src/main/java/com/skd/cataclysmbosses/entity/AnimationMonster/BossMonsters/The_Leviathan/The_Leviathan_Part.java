@@ -15,6 +15,7 @@
  *  net.minecraft.world.level.gameevent.GameEvent
  */
 package com.skd.cataclysmbosses.entity.AnimationMonster.BossMonsters.The_Leviathan;
+import net.minecraft.server.level.ServerLevel;
 
 import com.skd.cataclysmbosses.entity.AnimationMonster.BossMonsters.The_Leviathan.The_Leviathan_Entity;
 import com.skd.cataclysmbosses.entity.partentity.Cm_Part_Entity;
@@ -68,7 +69,7 @@ extends Cm_Part_Entity<The_Leviathan_Entity> {
         super.setSize(size);
     }
 
-    public boolean hurt(DamageSource source, float amount) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
         boolean flag;
         boolean bl = flag = this.getParent() != null && ((The_Leviathan_Entity)this.getParent()).attackEntityFromPart(this, source, amount);
         if (flag) {

@@ -52,6 +52,7 @@
  *  org.jetbrains.annotations.Nullable
  */
 package com.skd.cataclysmbosses.entity.AnimationMonster.BossMonsters;
+import net.minecraft.server.level.ServerLevel;
 
 import com.skd.cataclysmbosses.client.particle.Options.RingParticleOptions;
 import com.skd.cataclysmbosses.config.CMCommonConfig;
@@ -191,7 +192,7 @@ implements NeutralMob {
     }
 
     @Override
-    public boolean hurt(DamageSource source, float damage) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         if (this.getAnimation() == CRAB_BURROW && this.getAnimationTick() > 9 && this.getAnimationTick() < 52 && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
             this.playSound(SoundEvents.ANVIL_LAND, 0.4f, 2.0f);
             return false;

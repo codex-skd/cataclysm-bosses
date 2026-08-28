@@ -91,8 +91,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 // import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 // import net.minecraft.client.renderer.entity.ItemRenderer;
@@ -223,8 +223,8 @@ public class ClientEvent {
     }
 
     public static void onCameraZoom(CalculateDetachedCameraDistanceEvent event) {
-        Entity cameraEntity = event.getCamera().getEntity();
-        float partialTick = event.getCamera().getPartialTickTime();
+        Entity cameraEntity = event.getCamera().entity();
+        float partialTick = event.getCamera().getCameraEntityPartialTicks(Minecraft.getInstance().getDeltaTracker());
         if (cameraEntity != null && cameraEntity.isPassenger() && cameraEntity.getVehicle() instanceof Maledictus_Entity && event.getCamera().isDetached()) {
             event.setDistance(6.0f);
         }
@@ -236,7 +236,7 @@ public class ClientEvent {
         }
         if (false && CameraZoomManager.isActive() && event.getCamera().isDetached()) {
             float zoom = CameraZoomManager.getZoomOffset(partialTick);
-            float floorzoom = event.getCamera().getMaxZoom(zoom);
+            float floorzoom = getMaxZoom(event.getCamera(), zoom);
             if (floorzoom < zoom) {
                 floorzoom = Math.max(0.0f, floorzoom - 0.2f);
             }
@@ -245,7 +245,7 @@ public class ClientEvent {
             if (ny > 0.0f) {
                 dy = Math.min(ny * 0.5f, 1.5f);
             }
-            event.getCamera().move(-floorzoom, dy, 0.0f);
+            moveCamera(event.getCamera(), -floorzoom, dy, 0.0f);
         }
     }
 
@@ -254,9 +254,9 @@ public class ClientEvent {
             return false;
         }
         return switch (keybind.getKey().getType()) {
-            case InputConstants.Type.KEYSYM -> InputConstants.isKeyDown((long)Minecraft.getInstance().getWindow().getWindow(), (int)keybind.getKey().getValue());
+            case InputConstants.Type.KEYSYM -> InputConstants.isKeyDown((long)Minecraft.getInstance().getWindow().handle(), (int)keybind.getKey().getValue());
             case InputConstants.Type.MOUSE -> {
-                if (GLFW.glfwGetMouseButton((long)Minecraft.getInstance().getWindow().getWindow(), (int)keybind.getKey().getValue()) == 1) {
+                if (GLFW.glfwGetMouseButton((long)Minecraft.getInstance().getWindow().handle(), (int)keybind.getKey().getValue()) == 1) {
                     yield true;
                 }
                 yield false;
@@ -561,5 +561,25 @@ public class ClientEvent {
             customBossBar.renderBossBar(event, data.remainLife());
         }
     }
-}
 
+    // Helper methods for Camera reflection
+    private static float getMaxZoom(Camera camera, float cameraDist) {
+        try {
+            Method method = Camera.class.getDeclaredMethod("getMaxZoom", float.class);
+            method.setAccessible(true);
+            return (float) method.invoke(camera, cameraDist);
+        } catch (Exception e) {
+            return 0.0f;
+        }
+    }
+
+    private static void moveCamera(Camera camera, float forwards, float up, float right) {
+        try {
+            Method method = Camera.class.getDeclaredMethod("move", float.class, float.class, float.class);
+            method.setAccessible(true);
+            method.invoke(camera, forwards, up, right);
+        } catch (Exception e) {
+            // Ignore
+        }
+    }
+}

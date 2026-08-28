@@ -53,19 +53,7 @@ extends CmEntityRenderer<Dimensional_Rift_Entity> {
     }
 
     protected void render(Dimensional_Rift_Entity entityIn, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
-        matrixStackIn.pushPose();
-        Identifier tex = entityIn.getStage() < 1 ? TEXTURE_GROW_1 : (entityIn.getStage() < 2 ? TEXTURE_GROW_2 : (entityIn.getStage() < 3 ? TEXTURE_GROW_3 : (entityIn.getStage() < 4 ? TEXTURE_GROW_4 : this.getIdleTexture(entityIn.tickCount % 9))));
-        matrixStackIn.mulPose(this.entityRenderDispatcher.cameraOrientation());
-        matrixStackIn.mulPose(Axis.YP.rotationDegrees(180.0f));
-        matrixStackIn.scale(7.0f, 7.0f, 7.0f);
-        PoseStack.Pose posestack$pose = matrixStackIn.last();
-        Matrix4f matrix4f = posestack$pose.pose();
-        VertexConsumer vertexconsumer = bufferIn.getBuffer(CMRenderTypes.getfullBright(tex));
-        Dimensional_Rift_Renderer.vertex(vertexconsumer, matrix4f, posestack$pose, packedLightIn, 0.0f, 0, 0, 1);
-        Dimensional_Rift_Renderer.vertex(vertexconsumer, matrix4f, posestack$pose, packedLightIn, 1.0f, 0, 1, 1);
-        Dimensional_Rift_Renderer.vertex(vertexconsumer, matrix4f, posestack$pose, packedLightIn, 1.0f, 1, 1, 0);
-        Dimensional_Rift_Renderer.vertex(vertexconsumer, matrix4f, posestack$pose, packedLightIn, 0.0f, 1, 0, 0);
-        matrixStackIn.popPose();
+        // TODO: port render body to 26.2 (old MobRenderer APIs removed)
     }
 
     private static void vertex(VertexConsumer p_114090_, Matrix4f p_114091_, PoseStack.Pose p_114092_, int p_114093_, float p_114094_, int p_114095_, int p_114096_, int p_114097_) {

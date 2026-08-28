@@ -48,7 +48,7 @@ extends SingleQuadParticle {
     }
 
     public ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_LIT;
+        return ParticleRenderType.TRANSLUCENT;
     }
 
     public float getQuadSize(float scaleFactor) {
@@ -70,6 +70,11 @@ extends SingleQuadParticle {
         public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
             return new CursedAlgizParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, this.spriteSet);
         }
+    }
+
+    @Override
+    public SingleQuadParticle.Layer getLayer() {
+        return SingleQuadParticle.Layer.TRANSLUCENT;
     }
 }
 

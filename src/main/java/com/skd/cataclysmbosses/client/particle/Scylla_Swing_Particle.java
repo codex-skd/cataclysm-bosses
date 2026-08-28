@@ -109,7 +109,7 @@ extends SingleQuadParticle {
 
     @NotNull
     public ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+        return ParticleRenderType.TRANSLUCENT;
     }
 
     protected int getLightColor(float pPartialTick) {
@@ -131,6 +131,11 @@ extends SingleQuadParticle {
             shriekparticle.setAlpha(1.0f);
             return shriekparticle;
         }
+    }
+
+    @Override
+    public SingleQuadParticle.Layer getLayer() {
+        return SingleQuadParticle.Layer.TRANSLUCENT;
     }
 }
 

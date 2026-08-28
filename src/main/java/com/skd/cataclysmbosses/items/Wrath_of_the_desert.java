@@ -186,6 +186,7 @@ extends Item {
                 player.awardStat(Stats.ITEM_USED.get((Object)this));
             }
         }
+        return false;
     }
 
     public boolean isEnchantable(ItemStack stack) {

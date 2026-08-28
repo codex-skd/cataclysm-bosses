@@ -6,7 +6,7 @@
  *  net.minecraft.core.Direction
  *  net.minecraft.world.item.context.BlockPlaceContext
  *  net.minecraft.world.level.Level
- *  net.minecraft.world.level.LevelAccessor
+ *  net.minecraft.world.level.LevelReader
  *  net.minecraft.world.level.block.Block
  *  net.minecraft.world.level.block.Mirror
  *  net.minecraft.world.level.block.Rotation
@@ -24,7 +24,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
@@ -45,8 +46,8 @@ extends Block {
         this.registerDefaultState((BlockState)((BlockState)this.defaultBlockState().setValue((Property)TOP, (Comparable)Boolean.valueOf(true))).setValue((Property)FACING, (Comparable)Direction.UP));
     }
 
-    public BlockState updateShape(BlockState state, Direction direction, BlockState state1, LevelAccessor levelAccessor, BlockPos blockPos, BlockPos blockPos1) {
-        BlockState pillar = super.updateShape(state, direction, state1, levelAccessor, blockPos, blockPos1);
+    protected BlockState updateShape(BlockState state, LevelReader levelAccessor, ScheduledTickAccess ticks, BlockPos blockPos, Direction direction, BlockPos blockPos1, BlockState state1, RandomSource random) {
+        BlockState pillar = super.updateShape(state, levelAccessor, ticks, blockPos, direction, blockPos1, state1, random);
         pillar = levelAccessor.getBlockState(blockPos.relative((Direction)state.getValue((Property)FACING))).getBlock() instanceof FacingPillarBlock ? (BlockState)pillar.setValue((Property)TOP, (Comparable)Boolean.valueOf(false)) : (BlockState)pillar.setValue((Property)TOP, (Comparable)Boolean.valueOf(true));
         return pillar;
     }

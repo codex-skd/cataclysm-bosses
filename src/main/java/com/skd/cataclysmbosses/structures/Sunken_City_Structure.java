@@ -313,8 +313,9 @@ extends Structure {
             }
             for (Mob mob : list) {
                 mob.setPersistenceRequired();
-                mob.moveTo(pos, 0.0f, 0.0f);
-                mob.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(mob.blockPosition()), EntitySpawnReason.STRUCTURE, null);
+                mob.setPos(pos, 0.0f, 0.0f);
+                mob.finalizeSpawn(worldIn); mob.setYRot(0.0f);
+                mob.finalizeSpawn(worldIn); mob.setXRot(worldIn.getCurrentDifficultyAt(mob.blockPosition()));
                 worldIn.addFreshEntityWithPassengers((Entity)mob);
                 worldIn.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
             }

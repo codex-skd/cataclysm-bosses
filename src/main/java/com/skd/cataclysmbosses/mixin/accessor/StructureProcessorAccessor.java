@@ -17,6 +17,6 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 @Mixin(value={StructureProcessor.class})
 public interface StructureProcessorAccessor {
     @Invoker(value="getType")
-    public StructureProcessorType<?> callGetType();
+    public StructureProcessorType callGetType();
 }
 

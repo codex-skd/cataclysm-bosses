@@ -43,7 +43,7 @@ extends SingleQuadParticle {
     }
 
     public ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_LIT;
+        return ParticleRenderType.TRANSLUCENT;
     }
 
     public float getQuadSize(float scaleFactor) {
@@ -68,6 +68,11 @@ extends SingleQuadParticle {
             particle.scale(1.0f);
             return particle;
         }
+    }
+
+    @Override
+    public SingleQuadParticle.Layer getLayer() {
+        return SingleQuadParticle.Layer.TRANSLUCENT;
     }
 }
 

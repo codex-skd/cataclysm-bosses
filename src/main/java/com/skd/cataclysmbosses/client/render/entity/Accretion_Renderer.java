@@ -30,74 +30,68 @@ import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
 import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
-import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
-import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.block.RenderShape;
-import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Accretion_Renderer
 extends CmEntityRenderer<Accretion_Entity> {
-    private final BlockRenderDispatcher blockRenderer;
     private final EntityRenderDispatcher entityRenderer;
     private final RandomSource rnd = RandomSource.create();
 
     public Accretion_Renderer(EntityRendererProvider.Context renderManagerIn) {
         super(renderManagerIn);
-        this.blockRenderer = renderManagerIn.getBlockRenderDispatcher();
         this.entityRenderer = renderManagerIn.getEntityRenderDispatcher();
     }
 
     protected void render(Accretion_Entity entityIn, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
-        BlockState blockstate = entityIn.getBlockState();
-        if (blockstate != null && blockstate.getRenderShape() == RenderShape.MODEL) {
-            matrixStackIn.pushPose();
-            matrixStackIn.translate(0.0, 0.5, 0.0);
-            float f2 = (float)entityIn.tickCount + partialTicks;
-            float random = this.rnd.nextFloat() * 0.03f;
-            matrixStackIn.mulPose(Axis.ZP.rotationDegrees(random * f2 * 60.0f));
-            matrixStackIn.mulPose(Axis.ZN.rotationDegrees(f2 * 36.0f));
-            matrixStackIn.mulPose(Axis.YP.rotationDegrees(Mth.lerp((float)partialTicks, (float)entityIn.yRotO, (float)entityIn.getYRot()) - 90.0f));
-            matrixStackIn.mulPose(Axis.ZP.rotationDegrees(Mth.lerp((float)partialTicks, (float)entityIn.xRotO, (float)entityIn.getXRot()) + 90.0f));
-            matrixStackIn.translate(-0.5, -0.5, -0.5);
-            float scale = 0.0f;
-            if (entityIn.isVehicle()) {
-                for (Entity passenger : entityIn.getPassengers()) {
-                    if (passenger == Minecraft.getInstance().player && Minecraft.getInstance().options.getCameraType().isFirstPerson()) continue;
-                    this.renderEntityInClaw(partialTicks, matrixStackIn, bufferIn, packedLightIn, passenger, this.entityRenderer);
-                }
-            } else {
-                scale = 1.0f;
-            }
-            matrixStackIn.scale(scale, scale, scale);
-            this.blockRenderer.renderSingleBlock(blockstate, matrixStackIn, bufferIn, packedLightIn, OverlayTexture.NO_OVERLAY);
-            matrixStackIn.popPose();
-        }
+        // TODO: Adapt block rendering to 26.2 pipeline
+        // BlockState blockstate = entityIn.getBlockState();
+        // if (blockstate != null && blockstate.getRenderShape() == RenderShape.MODEL) {
+        //     matrixStackIn.pushPose();
+        //     matrixStackIn.translate(0.0, 0.5, 0.0);
+        //     float f2 = (float)entityIn.tickCount + partialTicks;
+        //     float random = this.rnd.nextFloat() * 0.03f;
+        //     matrixStackIn.mulPose(Axis.ZP.rotationDegrees(random * f2 * 60.0f));
+        //     matrixStackIn.mulPose(Axis.ZN.rotationDegrees(f2 * 36.0f));
+        //     matrixStackIn.mulPose(Axis.YP.rotationDegrees(Mth.lerp((float)partialTicks, (float)entityIn.yRotO, (float)entityIn.getYRot()) - 90.0f));
+        //     matrixStackIn.mulPose(Axis.ZP.rotationDegrees(Mth.lerp((float)partialTicks, (float)entityIn.xRotO, (float)entityIn.getXRot()) + 90.0f));
+        //     matrixStackIn.translate(-0.5, -0.5, -0.5);
+        //     float scale = 0.0f;
+        //     if (entityIn.isVehicle()) {
+        //         for (Entity passenger : entityIn.getPassengers()) {
+        //             if (passenger == Minecraft.getInstance().player && Minecraft.getInstance().options.getCameraType().isFirstPerson()) continue;
+        //             this.renderEntityInClaw(partialTicks, matrixStackIn, bufferIn, packedLightIn, passenger, this.entityRenderer);
+        //         }
+        //     } else {
+        //         scale = 1.0f;
+        //     }
+        //     matrixStackIn.scale(scale, scale, scale);
+        //     this.blockRenderer.renderSingleBlock(blockstate, matrixStackIn, bufferIn, packedLightIn, OverlayTexture.NO_OVERLAY);
+        //     matrixStackIn.popPose();
+        // }
     }
 
-    public void renderEntityInClaw(float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, Entity entity, EntityRenderDispatcher entityRenderer) {
+    public void renderEntityInClaw(float partialTick, PoseStack poseStack, CmMultiBufferSource buffer, int packedLight, Entity entity, EntityRenderDispatcher entityRenderer) {
         Cataclysm.PROXY.releaseRenderingEntity(entity.getUUID());
         poseStack.pushPose();
         poseStack.translate(0.5f, -0.5f, 0.5f);
         poseStack.scale(1.0f, 1.0f, 1.0f);
-        entityRenderer.render(entity, 0.0, 0.0, 0.0, 0.0f, partialTick, poseStack, buffer, packedLight);
+        // TODO: Adapt entity rendering to 26.2 pipeline
+        // entityRenderer.render(entity, 0.0, 0.0, 0.0, 0.0f, partialTick, poseStack, buffer, packedLight);
         poseStack.popPose();
         Cataclysm.PROXY.blockRenderingEntity(entity.getUUID());
     }
 
     public Identifier getTextureLocation(Accretion_Entity p_114632_) {
-        return TextureAtlas.LOCATION_BLOCKS;
+        return Identifier.fromNamespaceAndPath("minecraft", "textures/atlas/blocks.png");
     }
 }
 

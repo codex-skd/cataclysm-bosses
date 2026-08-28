@@ -116,7 +116,7 @@ public class CMRenderTypes {
             .sortOnUpload()
             .createRenderSetup()
     ));
-    public static ParticleRenderType PARTICLE_SHEET_TRANSLUCENT_NO_DEPTH = ParticleRenderType.SINGLE_QUADS;
+    public static ParticleRenderType TRANSLUCENT_NO_DEPTH = ParticleRenderType.SINGLE_QUADS;
 
     public static RenderType getBright(Identifier location) {
         return BRIGHT.apply(location);

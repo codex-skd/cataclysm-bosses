@@ -11,6 +11,8 @@
  *  net.neoforged.api.distmarker.OnlyIn
  */
 package com.skd.cataclysmbosses.client.render.entity;
+import com.skd.cataclysmbosses.client.render.compat.CmMobRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
 
 import com.skd.cataclysmbosses.client.model.entity.Amethyst_Crab_Model;
 import com.skd.cataclysmbosses.entity.AnimationMonster.BossMonsters.Amethyst_Crab_Entity;

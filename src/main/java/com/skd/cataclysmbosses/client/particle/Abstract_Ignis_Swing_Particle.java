@@ -140,11 +140,16 @@ extends SingleQuadParticle {
 
     @NotNull
     public ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+        return ParticleRenderType.TRANSLUCENT;
     }
 
     protected int getLightColor(float pPartialTick) {
         return 0xF000F0;
+    }
+
+    @Override
+    public SingleQuadParticle.Layer getLayer() {
+        return SingleQuadParticle.Layer.TRANSLUCENT;
     }
 }
 

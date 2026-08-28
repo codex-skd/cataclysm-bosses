@@ -95,7 +95,7 @@ extends CmEntityRenderer<Ignis_Fireball_Entity> {
         return entity.isSoul() ? IGNIS_FIRE_BALL_SOUL : IGNIS_FIRE_BALL;
     }
 
-    private void renderTrail(Ignis_Fireball_Entity entityIn, float partialTicks, PoseStack poseStack, MultiBufferSource bufferIn, float trailR, float trailG, float trailB, float trailA, int packedLightIn) {
+    private void renderTrail(Ignis_Fireball_Entity entityIn, float partialTicks, PoseStack poseStack, CmMultiBufferSource bufferIn, float trailR, float trailG, float trailB, float trailA, int packedLightIn) {
         int sampleSize = 10;
         float trailWidth = 0.2f;
         PoseStack.Pose lastPose = poseStack.last();
