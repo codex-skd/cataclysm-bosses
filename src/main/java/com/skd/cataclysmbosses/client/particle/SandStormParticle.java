@@ -15,25 +15,22 @@ package com.skd.cataclysmbosses.client.particle;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.particle.SingleQuadParticle;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.util.RandomSource;
 
 public class SandStormParticle
 extends SingleQuadParticle {
     protected SandStormParticle(ClientLevel level, double xCoord, double yCoord, double zCoord, SpriteSet spriteSet, double xd, double yd, double zd) {
-        super(level, xCoord, yCoord, zCoord, xd, yd, zd);
+        super(level, xCoord, yCoord, zCoord, xd, yd, zd, (TextureAtlasSprite) null);
         this.xd += xd;
         this.yd += yd;
         this.zd += zd;
         this.quadSize *= 2.5f;
         this.lifetime = (int)(Math.random() * 2.0) + 60;
         this.setSpriteFromAge(spriteSet);
-    }
-
-    public ParticleRenderType getRenderType() {
-        return ParticleRenderType.OPAQUE;
     }
 
     public float getQuadSize(float p_107608_) {
@@ -64,7 +61,7 @@ extends SingleQuadParticle {
             this.sprites = spriteSet;
         }
 
-        public Particle createParticle(SimpleParticleType particleType, ClientLevel level, double x, double y, double z, double dx, double dy, double dz) {
+        public Particle createParticle(SimpleParticleType particleType, ClientLevel level, double x, double y, double z, double dx, double dy, double dz, RandomSource random) {
             return new SandStormParticle(level, x, y, z, this.sprites, dx, dy, dz);
         }
     }

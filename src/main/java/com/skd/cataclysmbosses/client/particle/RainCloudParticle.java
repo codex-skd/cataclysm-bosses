@@ -15,17 +15,18 @@ package com.skd.cataclysmbosses.client.particle;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.particle.SingleQuadParticle;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.util.RandomSource;
 
 public class RainCloudParticle
 extends SingleQuadParticle {
     private final SpriteSet sprites;
 
     protected RainCloudParticle(ClientLevel level, double xCoord, double yCoord, double zCoord, SpriteSet spriteSet, double xd, double yd, double zd) {
-        super(level, xCoord, yCoord, zCoord, xd, yd, zd);
+        super(level, xCoord, yCoord, zCoord, xd, yd, zd, (TextureAtlasSprite) null);
         this.sprites = spriteSet;
         this.setSpriteFromAge(this.sprites);
         this.xd = xd;
@@ -35,10 +36,6 @@ extends SingleQuadParticle {
         this.quadSize *= 8.0f;
         this.gravity = 0.0f;
         this.lifetime = (int)(Math.random() * 2.0) + 60;
-    }
-
-    public ParticleRenderType getRenderType() {
-        return ParticleRenderType.TRANSLUCENT;
     }
 
     public float getQuadSize(float p_107608_) {
@@ -69,7 +66,7 @@ extends SingleQuadParticle {
             this.sprites = spriteSet;
         }
 
-        public Particle createParticle(SimpleParticleType particleType, ClientLevel level, double x, double y, double z, double dx, double dy, double dz) {
+        public Particle createParticle(SimpleParticleType particleType, ClientLevel level, double x, double y, double z, double dx, double dy, double dz, RandomSource random) {
             return new RainCloudParticle(level, x, y, z, this.sprites, dx, dy, dz);
         }
     }

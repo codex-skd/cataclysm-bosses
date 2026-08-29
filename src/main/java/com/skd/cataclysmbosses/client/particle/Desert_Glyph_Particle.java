@@ -15,17 +15,18 @@ package com.skd.cataclysmbosses.client.particle;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.particle.SingleQuadParticle;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.util.RandomSource;
 
 public class Desert_Glyph_Particle
 extends SingleQuadParticle {
     private final SpriteSet sprites;
 
     protected Desert_Glyph_Particle(ClientLevel world, double x, double y, double z, double xSpeed, SpriteSet sprites) {
-        super(world, x, y, z, 0.0, 0.0, 0.0);
+        super(world, x, y, z, 0.0, 0.0, 0.0, (TextureAtlasSprite) null);
         this.quadSize = 2.0f * (1.0f - (float)xSpeed * 0.5f);
         this.lifetime = 6;
         this.sprites = sprites;
@@ -42,15 +43,11 @@ extends SingleQuadParticle {
         }
     }
 
-    public ParticleRenderType getRenderType() {
-        return ParticleRenderType.TRANSLUCENT;
-    }
-
     public float getQuadSize(float scaleFactor) {
         return super.getQuadSize(scaleFactor);
     }
 
-    public int getLightColor(float partialTicks) {
+    public int getLightCoords(float partialTicks) {
         return 240;
     }
 
@@ -62,7 +59,7 @@ extends SingleQuadParticle {
             this.spriteSet = spriteSet;
         }
 
-        public Particle createParticle(SimpleParticleType typeIn, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public Particle createParticle(SimpleParticleType typeIn, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, RandomSource random) {
             Desert_Glyph_Particle particle = new Desert_Glyph_Particle(worldIn, x, y, z, xSpeed, this.spriteSet);
             particle.setSpriteFromAge(this.spriteSet);
             particle.scale(1.0f);

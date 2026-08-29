@@ -17,9 +17,10 @@ import com.skd.cataclysmbosses.client.particle.Options.RoarParticleOptions;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.particle.SingleQuadParticle;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.util.RandomSource;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
@@ -34,7 +35,7 @@ extends SingleQuadParticle {
     private final SpriteSet sprites;
 
     public RoarParticle(ClientLevel world, double x, double y, double z, double motionX, double motionY, double motionZ, int duration, int r, int g, int b, float opacity, float startsize, float increase, float endsize, SpriteSet sprites) {
-        super(world, x, y, z);
+        super(world, x, y, z, (TextureAtlasSprite) null);
         this.sprites = sprites;
         this.setSize(1.0f, 1.0f);
         this.setSpriteFromAge(this.sprites);
@@ -52,8 +53,8 @@ extends SingleQuadParticle {
         this.zd = motionZ;
     }
 
-    public int getLightColor(float delta) {
-        return 0xF0 | super.getLightColor(delta) & 0xFF0000;
+    public int getLightCoords(float delta) {
+        return 0xF0 | super.getLightCoords(delta) & 0xFF0000;
     }
 
     public void tick() {
@@ -72,10 +73,6 @@ extends SingleQuadParticle {
         }
     }
 
-    public ParticleRenderType getRenderType() {
-        return ParticleRenderType.TRANSLUCENT;
-    }
-
     @OnlyIn(value=Dist.CLIENT)
     public static class RoarFactory
     implements ParticleProvider<RoarParticleOptions> {
@@ -85,7 +82,7 @@ extends SingleQuadParticle {
             this.spriteSet = sprite;
         }
 
-        public Particle createParticle(RoarParticleOptions typeIn, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public Particle createParticle(RoarParticleOptions typeIn, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, RandomSource random) {
             RoarParticle particle = new RoarParticle(worldIn, x, y, z, xSpeed, ySpeed, zSpeed, typeIn.duration(), typeIn.r(), typeIn.g(), typeIn.b(), typeIn.a(), typeIn.startsize(), typeIn.increase(), typeIn.endsize(), this.spriteSet);
             return particle;
         }

@@ -16,20 +16,23 @@ package com.skd.cataclysmbosses.client.particle;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.RisingParticle;
+import net.minecraft.client.particle.SingleQuadParticle;
 import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 
 public class CursedFlameParticle
 extends RisingParticle {
-    CursedFlameParticle(ClientLevel p_106800_, double p_106801_, double p_106802_, double p_106803_, double p_106804_, double p_106805_, double p_106806_) {
-        super(p_106800_, p_106801_, p_106802_, p_106803_, p_106804_, p_106805_, p_106806_);
+    CursedFlameParticle(ClientLevel p_106800_, double p_106801_, double p_106802_, double p_106803_, double p_106804_, double p_106805_, double p_106806_, TextureAtlasSprite sprite) {
+        super(p_106800_, p_106801_, p_106802_, p_106803_, p_106804_, p_106805_, p_106806_, sprite);
     }
 
-    public ParticleRenderType getRenderType() {
-        return ParticleRenderType.OPAQUE;
+    @Override
+    public SingleQuadParticle.Layer getLayer() {
+        return SingleQuadParticle.Layer.OPAQUE;
     }
 
     public void move(double p_106817_, double p_106818_, double p_106819_) {
@@ -42,10 +45,10 @@ extends RisingParticle {
         return this.quadSize * (1.0f - f * f * 0.5f);
     }
 
-    public int getLightColor(float p_106821_) {
+    public int getLightCoords(float p_106821_) {
         float f = ((float)this.age + p_106821_) / (float)this.lifetime;
         f = Mth.clamp((float)f, (float)0.0f, (float)1.0f);
-        int i = super.getLightColor(p_106821_);
+        int i = super.getLightCoords(p_106821_);
         int j = i & 0xFF;
         int k = i >> 16 & 0xFF;
         if ((j += (int)(f * 15.0f * 16.0f)) > 240) {
@@ -62,9 +65,8 @@ extends RisingParticle {
             this.sprite = p_172113_;
         }
 
-        public Particle createParticle(SimpleParticleType p_172124_, ClientLevel p_172125_, double p_172126_, double p_172127_, double p_172128_, double p_172129_, double p_172130_, double p_172131_) {
-            CursedFlameParticle flameparticle = new CursedFlameParticle(p_172125_, p_172126_, p_172127_, p_172128_, p_172129_, p_172130_, p_172131_);
-            flameparticle.pickSprite(this.sprite);
+        public Particle createParticle(SimpleParticleType p_172124_, ClientLevel p_172125_, double p_172126_, double p_172127_, double p_172128_, double p_172129_, double p_172130_, double p_172131_, RandomSource random) {
+            CursedFlameParticle flameparticle = new CursedFlameParticle(p_172125_, p_172126_, p_172127_, p_172128_, p_172129_, p_172130_, p_172131_, this.sprite.get(random));
             flameparticle.scale(0.5f);
             return flameparticle;
         }
@@ -78,9 +80,8 @@ extends RisingParticle {
             this.sprite = p_106827_;
         }
 
-        public Particle createParticle(SimpleParticleType p_106838_, ClientLevel p_106839_, double p_106840_, double p_106841_, double p_106842_, double p_106843_, double p_106844_, double p_106845_) {
-            CursedFlameParticle flameparticle = new CursedFlameParticle(p_106839_, p_106840_, p_106841_, p_106842_, p_106843_, p_106844_, p_106845_);
-            flameparticle.pickSprite(this.sprite);
+        public Particle createParticle(SimpleParticleType p_106838_, ClientLevel p_106839_, double p_106840_, double p_106841_, double p_106842_, double p_106843_, double p_106844_, double p_106845_, RandomSource random) {
+            CursedFlameParticle flameparticle = new CursedFlameParticle(p_106839_, p_106840_, p_106841_, p_106842_, p_106843_, p_106844_, p_106845_, this.sprite.get(random));
             return flameparticle;
         }
     }

@@ -15,9 +15,10 @@ import com.skd.cataclysmbosses.client.particle.Options.Cursed_MarkParticleOption
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.particle.SingleQuadParticle;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.util.RandomSource;
 
 public class CursedMarkParticle
 extends SingleQuadParticle {
@@ -26,7 +27,7 @@ extends SingleQuadParticle {
     private final float spinAcceleration;
 
     protected CursedMarkParticle(ClientLevel world, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites, float size) {
-        super(world, x, y, z, 0.0, 0.0, 0.0);
+        super(world, x, y, z, 0.0, 0.0, 0.0, (TextureAtlasSprite) null);
         this.xd = xSpeed;
         this.yd = ySpeed;
         this.zd = zSpeed;
@@ -53,15 +54,11 @@ extends SingleQuadParticle {
         }
     }
 
-    public ParticleRenderType getRenderType() {
-        return ParticleRenderType.TRANSLUCENT;
-    }
-
     public float getQuadSize(float scaleFactor) {
         return super.getQuadSize(scaleFactor);
     }
 
-    public int getLightColor(float partialTicks) {
+    public int getLightCoords(float partialTicks) {
         return 240;
     }
 
@@ -73,7 +70,7 @@ extends SingleQuadParticle {
             this.spriteSet = spriteSet;
         }
 
-        public Particle createParticle(Cursed_MarkParticleOption data, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public Particle createParticle(Cursed_MarkParticleOption data, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, RandomSource random) {
             return new CursedMarkParticle(worldIn, x, y, z, xSpeed, ySpeed, zSpeed, this.spriteSet, data.size());
         }
     }

@@ -21,13 +21,12 @@
 package com.skd.cataclysmbosses.client.particle;
 
 import com.skd.cataclysmbosses.util.CMMathUtil;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import javax.annotation.Nullable;
 import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.particle.SingleQuadParticle;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.Mth;
@@ -46,7 +45,7 @@ extends SingleQuadParticle {
     private final Vector3f[] localVertices;
 
     public Abstract_Ignis_Swing_Particle(ClientLevel pLevel, double pX, double pY, double pZ, SpriteSet spriteSet, double xd, double yd, double zd, int lifetime, float scale, float yaw, float pitch, float roll) {
-        super(pLevel, pX, pY, pZ, 0.0, 0.0, 0.0);
+        super(pLevel, pX, pY, pZ, 0.0, 0.0, 0.0, (TextureAtlasSprite) null);
         this.xd = xd;
         this.yd = yd;
         this.zd = zd;
@@ -110,40 +109,7 @@ extends SingleQuadParticle {
         return vertices;
     }
 
-    public void render(VertexConsumer buffer, Camera camera, float partialTicks) {
-        Vec3 Vector3d = camera.getPosition();
-        float f = (float)(Mth.lerp((double)partialTicks, (double)this.xo, (double)this.x) - Vector3d.x());
-        float f1 = (float)(Mth.lerp((double)partialTicks, (double)this.yo, (double)this.y) - Vector3d.y());
-        float f2 = (float)(Mth.lerp((double)partialTicks, (double)this.zo, (double)this.z) - Vector3d.z());
-        Vector3f[] avector3f = new Vector3f[4];
-        float f4 = this.getQuadSize(partialTicks);
-        for (int i = 0; i < 4; ++i) {
-            Vector3f localVertex = this.localVertices[i];
-            avector3f[i] = new Vector3f(localVertex.x(), localVertex.y(), localVertex.z());
-            avector3f[i].mul(f4);
-            avector3f[i].add(f, f1, f2);
-        }
-        float f7 = this.getU0();
-        float f8 = this.getU1();
-        float f5 = this.getV0();
-        float f6 = this.getV1();
-        int j = this.getLightColor(partialTicks);
-        buffer.addVertex(avector3f[0].x(), avector3f[0].y(), avector3f[0].z()).setUv(f8, f6).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(j);
-        buffer.addVertex(avector3f[1].x(), avector3f[1].y(), avector3f[1].z()).setUv(f8, f5).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(j);
-        buffer.addVertex(avector3f[2].x(), avector3f[2].y(), avector3f[2].z()).setUv(f7, f5).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(j);
-        buffer.addVertex(avector3f[3].x(), avector3f[3].y(), avector3f[3].z()).setUv(f7, f6).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(j);
-        buffer.addVertex(avector3f[3].x(), avector3f[3].y(), avector3f[3].z()).setUv(f7, f6).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(j);
-        buffer.addVertex(avector3f[2].x(), avector3f[2].y(), avector3f[2].z()).setUv(f7, f5).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(j);
-        buffer.addVertex(avector3f[1].x(), avector3f[1].y(), avector3f[1].z()).setUv(f8, f5).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(j);
-        buffer.addVertex(avector3f[0].x(), avector3f[0].y(), avector3f[0].z()).setUv(f8, f6).setColor(this.rCol, this.gCol, this.bCol, this.alpha).setLight(j);
-    }
-
-    @NotNull
-    public ParticleRenderType getRenderType() {
-        return ParticleRenderType.TRANSLUCENT;
-    }
-
-    protected int getLightColor(float pPartialTick) {
+    protected int getLightCoords(float pPartialTick) {
         return 0xF000F0;
     }
 

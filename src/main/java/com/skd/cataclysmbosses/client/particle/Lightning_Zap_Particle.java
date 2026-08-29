@@ -17,9 +17,10 @@ import com.skd.cataclysmbosses.client.particle.Options.LightningZapParticleOptio
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.particle.SingleQuadParticle;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.util.RandomSource;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
@@ -32,7 +33,7 @@ extends SingleQuadParticle {
     private int getB;
 
     protected Lightning_Zap_Particle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites, int r, int g, int b, float gravity) {
-        super(level, x, y, z);
+        super(level, x, y, z, (TextureAtlasSprite) null);
         this.gravity = gravity;
         this.friction = 0.1f;
         this.sprites = sprites;
@@ -50,11 +51,7 @@ extends SingleQuadParticle {
         this.setSpriteFromAge(sprites);
     }
 
-    public ParticleRenderType getRenderType() {
-        return ParticleRenderType.OPAQUE;
-    }
-
-    public int getLightColor(float p_106821_) {
+    public int getLightCoords(float p_106821_) {
         return 240;
     }
 
@@ -81,7 +78,7 @@ extends SingleQuadParticle {
             this.sprites = sprites;
         }
 
-        public Particle createParticle(LightningZapParticleOptions type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public Particle createParticle(LightningZapParticleOptions type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, RandomSource random) {
             return new Lightning_Zap_Particle(level, x, y, z, xSpeed, ySpeed, zSpeed, this.sprites, type.r(), type.g(), type.b(), type.gravity());
         }
     }

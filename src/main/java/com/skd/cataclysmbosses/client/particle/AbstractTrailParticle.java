@@ -26,10 +26,11 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SingleQuadParticle;
 import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
-import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
@@ -45,7 +46,7 @@ extends SingleQuadParticle {
     protected float trailA = 1.0f;
 
     public AbstractTrailParticle(ClientLevel world, double x, double y, double z, double xd, double yd, double zd, float r, float g, float b) {
-        super(world, x, y, z);
+        super(world, x, y, z, xd, yd, zd, (TextureAtlasSprite) null);
         this.xd = xd;
         this.yd = yd;
         this.zd = zd;
@@ -93,7 +94,7 @@ extends SingleQuadParticle {
     }
 
     public float getTrailRot(Camera camera) {
-        return (float)(-Math.PI) / 180 * camera.getXRot();
+        return (float)(-Math.PI) / 180 * camera.xRot();
     }
 
     public abstract float getTrailHeight();

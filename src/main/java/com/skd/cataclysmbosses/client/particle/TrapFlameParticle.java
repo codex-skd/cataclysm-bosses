@@ -17,10 +17,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.particle.SingleQuadParticle;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.util.RandomSource;
 
 public class TrapFlameParticle
 extends SingleQuadParticle {
@@ -28,7 +29,7 @@ extends SingleQuadParticle {
     private float prevAlpha = 0.0f;
 
     protected TrapFlameParticle(ClientLevel world, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet spriteSet) {
-        super(world, x, y, z, xSpeed, ySpeed, zSpeed);
+        super(world, x, y, z, xSpeed, ySpeed, zSpeed, (TextureAtlasSprite) null);
         this.sprites = spriteSet;
         this.setSpriteFromAge(this.sprites);
         this.xd = xSpeed;
@@ -63,11 +64,7 @@ extends SingleQuadParticle {
         }
     }
 
-    public ParticleRenderType getRenderType() {
-        return ParticleRenderType.TRANSLUCENT;
-    }
-
-    public int getLightColor(float partialTicks) {
+    public int getLightCoords(float partialTicks) {
         return 240;
     }
 
@@ -84,7 +81,7 @@ extends SingleQuadParticle {
             this.spriteSet = spriteSet;
         }
 
-        public Particle createParticle(SimpleParticleType typeIn, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public Particle createParticle(SimpleParticleType typeIn, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, RandomSource random) {
             TrapFlameParticle particle = new TrapFlameParticle(worldIn, x, y, z, xSpeed, ySpeed, zSpeed, this.spriteSet);
             return particle;
         }

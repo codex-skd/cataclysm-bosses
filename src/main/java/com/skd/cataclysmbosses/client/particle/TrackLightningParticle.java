@@ -30,11 +30,11 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.particle.SingleQuadParticle;
 import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
@@ -44,6 +44,9 @@ import org.joml.Vector4f;
 public class TrackLightningParticle
 extends Particle {
     private LightningRender lightningRender = new LightningRender();
+    private float rCol;
+    private float gCol;
+    private float bCol;
 
     public TrackLightningParticle(ClientLevel world, double x, double y, double z, double xd, double yd, double zd, int r, int g, int b) {
         super(world, x, y, z);
@@ -85,14 +88,15 @@ extends Particle {
         // TODO: Implement trail rendering with new API
     }
 
-    public ParticleRenderType getRenderType() {
-        return ParticleRenderType.CUSTOM;
+    @Override
+    public ParticleRenderType getGroup() {
+        return ParticleRenderType.SINGLE_QUADS;
     }
 
     @OnlyIn(value=Dist.CLIENT)
     public static class Factory
     implements ParticleProvider<TrackLightningParticleOptions> {
-        public Particle createParticle(TrackLightningParticleOptions data, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public Particle createParticle(TrackLightningParticleOptions data, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, RandomSource random) {
             TrackLightningParticle particle = new TrackLightningParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, data.r(), data.g(), data.b());
             return particle;
         }

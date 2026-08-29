@@ -33,13 +33,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.particle.SingleQuadParticle;
 import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -53,7 +54,7 @@ extends SingleQuadParticle {
     protected float trailA = 1.0f;
 
     protected ParryParticle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, float r, float g, float b) {
-        super(level, x, y, z, xSpeed, ySpeed, zSpeed);
+        super(level, x, y, z, xSpeed, ySpeed, zSpeed, (TextureAtlasSprite) null);
         this.gravity = 0.95f;
         this.friction = 0.999f;
         this.rCol = r;
@@ -69,16 +70,16 @@ extends SingleQuadParticle {
     }
 
     @Override
-    public ParticleRenderType getGroup() {
-        return ParticleRenderType.SINGLE_QUADS;
-    }
-
-    @Override
-    public int getLightColor(float p_107086_) {
-        int i = super.getLightColor(p_107086_);
+    public int getLightCoords(float p_107086_) {
+        int i = super.getLightCoords(p_107086_);
         int j = 240;
         int k = i >> 16 & 0xFF;
         return 0xF0 | k << 16;
+    }
+
+    @Override
+    public SingleQuadParticle.Layer getLayer() {
+        return SingleQuadParticle.Layer.TRANSLUCENT;
     }
 
     @Override
@@ -133,7 +134,7 @@ extends SingleQuadParticle {
     }
 
     public float getTrailRot(Camera camera) {
-        return (float)(-Math.PI) / 180 * camera.getXRot();
+        return (float)(-Math.PI) / 180 * camera.xRot();
     }
 
     public float getTrailHeight() {
@@ -173,9 +174,9 @@ extends SingleQuadParticle {
         }
 
         @Override
-        public Particle createParticle(ParryParticleOptions typeIn, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public Particle createParticle(ParryParticleOptions typeIn, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, RandomSource random) {
             ParryParticle particle = new ParryParticle(worldIn, x, y, z, xSpeed, ySpeed, zSpeed, typeIn.r(), typeIn.g(), typeIn.b());
-            particle.pickSprite(this.spriteSet);
+            particle.setSprite(this.spriteSet.get(random));
             return particle;
         }
     }

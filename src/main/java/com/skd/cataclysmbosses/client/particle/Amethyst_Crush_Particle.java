@@ -15,20 +15,22 @@ package com.skd.cataclysmbosses.client.particle;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.particle.SingleQuadParticle;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.util.RandomSource;
 
 public class Amethyst_Crush_Particle
 extends SingleQuadParticle {
     private final SpriteSet sprites;
 
     protected Amethyst_Crush_Particle(ClientLevel world, double x, double y, double z, double xSpeed, SpriteSet sprites) {
-        super(world, x, y, z, 0.0, 0.0, 0.0);
+        super(world, x, y, z, (TextureAtlasSprite) null);
         this.quadSize = 0.8f;
         this.lifetime = 4;
         this.sprites = sprites;
+        this.setSpriteFromAge(this.sprites);
     }
 
     public void tick() {
@@ -42,15 +44,11 @@ extends SingleQuadParticle {
         }
     }
 
-    public ParticleRenderType getRenderType() {
-        return ParticleRenderType.TRANSLUCENT;
-    }
-
     public float getQuadSize(float scaleFactor) {
         return super.getQuadSize(scaleFactor);
     }
 
-    public int getLightColor(float partialTicks) {
+    public int getLightCoords(float partialTicks) {
         return 240;
     }
 
@@ -62,7 +60,7 @@ extends SingleQuadParticle {
             this.spriteSet = spriteSet;
         }
 
-        public Particle createParticle(SimpleParticleType typeIn, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public Particle createParticle(SimpleParticleType typeIn, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, RandomSource random) {
             Amethyst_Crush_Particle particle = new Amethyst_Crush_Particle(worldIn, x, y, z, xSpeed, this.spriteSet);
             particle.setSpriteFromAge(this.spriteSet);
             particle.scale(1.0f);

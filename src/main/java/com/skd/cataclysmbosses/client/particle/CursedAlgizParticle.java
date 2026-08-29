@@ -15,17 +15,18 @@ package com.skd.cataclysmbosses.client.particle;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.particle.SingleQuadParticle;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.util.RandomSource;
 
 public class CursedAlgizParticle
 extends SingleQuadParticle {
     private final SpriteSet sprites;
 
     protected CursedAlgizParticle(ClientLevel world, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites) {
-        super(world, x, y, z, 0.0, 0.0, 0.0);
+        super(world, x, y, z, 0.0, 0.0, 0.0, (TextureAtlasSprite) null);
         this.xd = xSpeed;
         this.yd = ySpeed;
         this.zd = zSpeed;
@@ -47,15 +48,11 @@ extends SingleQuadParticle {
         }
     }
 
-    public ParticleRenderType getRenderType() {
-        return ParticleRenderType.TRANSLUCENT;
-    }
-
     public float getQuadSize(float scaleFactor) {
         return super.getQuadSize(scaleFactor);
     }
 
-    public int getLightColor(float partialTicks) {
+    public int getLightCoords(float partialTicks) {
         return 240;
     }
 
@@ -67,7 +64,7 @@ extends SingleQuadParticle {
             this.spriteSet = spriteSet;
         }
 
-        public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public Particle createParticle(SimpleParticleType type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, RandomSource random) {
             return new CursedAlgizParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, this.spriteSet);
         }
     }

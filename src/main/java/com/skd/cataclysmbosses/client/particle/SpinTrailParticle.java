@@ -18,6 +18,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -82,7 +83,7 @@ extends AbstractTrailParticle {
         super.tick();
     }
 
-    public int getLightColor(float f) {
+    public int getLightCoords(float f) {
         return 240;
     }
 
@@ -104,7 +105,7 @@ extends AbstractTrailParticle {
     @OnlyIn(value=Dist.CLIENT)
     public static class Factory
     implements ParticleProvider<SpinTrailParticleOptions> {
-        public Particle createParticle(SpinTrailParticleOptions data, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public Particle createParticle(SpinTrailParticleOptions data, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, RandomSource random) {
             SpinTrailParticle particle = new SpinTrailParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, data.r(), data.g(), data.b());
             return particle;
         }

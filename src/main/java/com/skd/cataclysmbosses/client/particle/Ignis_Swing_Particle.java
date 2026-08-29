@@ -17,6 +17,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.util.RandomSource;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
@@ -35,7 +36,7 @@ extends Abstract_Ignis_Swing_Particle {
             this.sprite = pSprite;
         }
 
-        public Particle createParticle(IgnisSwingParticleOptions options, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public Particle createParticle(IgnisSwingParticleOptions options, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, RandomSource random) {
             Ignis_Swing_Particle shriekparticle = new Ignis_Swing_Particle(worldIn, x, y, z, this.sprite, xSpeed, ySpeed, zSpeed, options.lifetime(), options.scale(), options.yaw(), options.pitch(), options.roll());
             shriekparticle.setSpriteFromAge(this.sprite);
             shriekparticle.setAlpha(1.0f);

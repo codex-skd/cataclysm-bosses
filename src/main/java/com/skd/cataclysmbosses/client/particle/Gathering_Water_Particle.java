@@ -17,13 +17,12 @@ package com.skd.cataclysmbosses.client.particle;
 
 import com.skd.cataclysmbosses.client.particle.Options.GatheringWaterParticleOptions;
 import com.skd.cataclysmbosses.client.particle.SpinTrailParticle;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -47,13 +46,8 @@ extends SpinTrailParticle {
     }
 
     @Override
-    public int getLightColor(float partialTicks) {
+    public int getLightCoords(float partialTicks) {
         return 240;
-    }
-
-    @Override
-    public void render(VertexConsumer vertexConsumer, Camera camera, float partialTick) {
-        super.render(vertexConsumer, camera, partialTick);
     }
 
     public float getAlpha() {
@@ -111,7 +105,7 @@ extends SpinTrailParticle {
     @OnlyIn(value=Dist.CLIENT)
     public static class Factory
     implements ParticleProvider<GatheringWaterParticleOptions> {
-        public Particle createParticle(GatheringWaterParticleOptions data, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public Particle createParticle(GatheringWaterParticleOptions data, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, RandomSource random) {
             Gathering_Water_Particle particle = new Gathering_Water_Particle(level, x, y, z, xSpeed, ySpeed, zSpeed, data.r(), data.g(), data.b());
             return particle;
         }

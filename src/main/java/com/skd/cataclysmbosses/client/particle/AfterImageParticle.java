@@ -41,10 +41,11 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SingleQuadParticle;
 import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
+import net.minecraft.util.RandomSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
@@ -119,7 +120,7 @@ extends SingleQuadParticle {
     public static class Factory
     implements ParticleProvider<AfterImageParticleOptions> {
         @Override
-        public Particle createParticle(AfterImageParticleOptions data, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public Particle createParticle(AfterImageParticleOptions data, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, RandomSource random) {
             AfterImageParticle particle = new AfterImageParticle(level, x, y, z, data.r(), data.g(), data.b(), data.entityid(), data.ghost(), data.lifeticks());
             return particle;
         }
