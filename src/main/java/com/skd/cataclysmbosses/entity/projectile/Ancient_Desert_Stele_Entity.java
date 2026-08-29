@@ -158,7 +158,7 @@ extends Projectile {
         if (hitresult.getType() != HitResult.Type.MISS && !EventHooks.onProjectileImpact((Projectile)this, (HitResult)hitresult)) {
             this.onHit(hitresult);
         }
-        this.checkInsideBlocks();
+        this.applyEffectsFromBlocks();
         if (this.level().isClientSide()) {
             --this.lifeTicks;
         } else {

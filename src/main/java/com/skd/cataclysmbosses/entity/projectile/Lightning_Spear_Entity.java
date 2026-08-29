@@ -75,7 +75,9 @@ extends Elemental_Spear_Entity {
 
     public Lightning_Spear_Entity(EntityType<? extends Lightning_Spear_Entity> type, LivingEntity p_36827_, double getX, double gety, double getz, Vec3 vec3, float damage, Level level) {
         this(type, level);
-        this.setPos(getX, gety, getz, this.getYRot(), this.getXRot());
+        this.setPos(getX, gety, getz);
+        this.setYRot((float)this.getYRot());
+        this.setXRot((float)this.getXRot());
         this.setOwner((Entity)p_36827_);
         this.setDamage(damage);
         this.reapplyPosition();
@@ -183,9 +185,7 @@ extends Elemental_Spear_Entity {
     @Override
     public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        if (compound.contains("acceleration_power", 6)) {
-            this.accelerationPower = compound.getDoubleOr("acceleration_power", 0.0);
-        }
+        this.accelerationPower = compound.getDoubleOr("acceleration_power", 0.0);
         this.setAreaDamage(compound.getFloatOr("area_damage", 0.0f));
         this.setHpDamage(compound.getFloatOr("hp_damage", 0.0f));
         this.setAreaRadius(compound.getFloatOr("area_radius", 0.0f));

@@ -61,7 +61,8 @@ extends ThrowableProjectile {
     }
 
     public Void_Howitzer_Entity(EntityType<Void_Howitzer_Entity> type, Level world, LivingEntity thrower) {
-        super(type, thrower, world);
+        super(type, thrower.getX(), thrower.getEyeY() - 0.10000000149011612D, thrower.getZ(), world);
+        this.setOwner(thrower);
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {

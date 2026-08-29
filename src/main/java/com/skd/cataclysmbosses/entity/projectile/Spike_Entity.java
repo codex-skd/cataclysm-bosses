@@ -53,7 +53,7 @@ extends ThrowableItemProjectile {
     }
 
     public Spike_Entity(Level worldIn, LivingEntity throwerIn) {
-        super((EntityType)ModEntities.LIONFISH_SPIKE.get(), throwerIn, world);
+        super((EntityType)ModEntities.LIONFISH_SPIKE.get(), throwerIn, worldIn, new ItemStack(ModItems.LIONFISH_SPIKE.get()));
     }
 
     public void addAdditionalSaveData(ValueOutput tag) {
@@ -102,7 +102,7 @@ extends ThrowableItemProjectile {
     public void handleEntityEvent(byte id) {
         if (id == 3) {
             for (int i = 0; i < 8; ++i) {
-                this.level().addParticle((ParticleOptions)new ItemParticleOption(ParticleTypes.ITEM, new ItemStack((ItemLike)ModItems.LIONFISH_SPIKE.get())), this.getX(), this.getY(), this.getZ(), this.random.nextGaussian() * 0.2, this.random.nextGaussian() * 0.2, this.random.nextGaussian() * 0.2);
+                this.level().addParticle((ParticleOptions)new ItemParticleOption(ParticleTypes.ITEM, (Item)ModItems.LIONFISH_SPIKE.get()), this.getX(), this.getY(), this.getZ(), this.random.nextGaussian() * 0.2, this.random.nextGaussian() * 0.2, this.random.nextGaussian() * 0.2);
             }
         }
     }

@@ -243,6 +243,11 @@ extends Entity {
         }
     }
 
+    @Override
+    public boolean hurtServer(ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return false;
+    }
+
     public float getAnimationProgress(float p_36937_) {
         if (!this.clientSideAttackStarted) {
             return 0.0f;

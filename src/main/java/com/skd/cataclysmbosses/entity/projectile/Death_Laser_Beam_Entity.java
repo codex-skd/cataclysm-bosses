@@ -56,7 +56,9 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -111,7 +113,6 @@ extends Entity {
 
     public Death_Laser_Beam_Entity(EntityType<? extends Death_Laser_Beam_Entity> type, Level world) {
         super(type, world);
-        this.noCulling(true);
         if (world.isClientSide()) {
             this.attractorPos = new Vec3[]{new Vec3(0.0, 0.0, 0.0)};
         }
@@ -134,6 +135,11 @@ extends Entity {
 
     public PushReaction getPistonPushReaction() {
         return PushReaction.IGNORE;
+    }
+
+    @Override
+    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
+        return false;
     }
 
     public void tick() {
@@ -174,14 +180,14 @@ extends Entity {
         }
         if (this.tickCount > 20) {
             this.calculateEndPos();
-            List<LivingEntity> hit = this.raytraceEntities((Level)this.level(), (Vec3)new Vec3((double)this.getX(), (double)this.getY(), (double)this.getZ()), (Vec3)new Vec3((double)this.endPosX, (double)this.endPosY, (double)this.endPosZ), (boolean)false, (boolean)true, (boolean)true).entities;
+            List<LivingEntity> hit = (List<LivingEntity>)this.raytraceEntities((Level)this.level(), (Vec3)new Vec3((double)this.getX(), (double)this.getY(), (double)this.getZ()), (Vec3)new Vec3((double)this.endPosX, (double)this.endPosY, (double)this.endPosZ), (boolean)false, (boolean)true, (boolean)true).entities;
             if (this.blockSide != null) {
                 this.spawnExplosionParticles(5);
                 if (!this.level().isClientSide()) {
                     BlockState block;
                     for (BlockPos pos : BlockPos.betweenClosed((int)Mth.floor((double)(this.collidePosX - 0.5)), (int)Mth.floor((double)(this.collidePosY - 0.5)), (int)Mth.floor((double)(this.collidePosZ - 0.5)), (int)Mth.floor((double)(this.collidePosX + 0.5)), (int)Mth.floor((double)(this.collidePosY + 0.5)), (int)Mth.floor((double)(this.collidePosZ + 0.5)))) {
                         block = this.level().getBlockState(pos);
-                        if (block.isAir() || !block.is(ModTag.CM_GLASS) || !EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) continue;
+                        if (block.isAir() || !block.is(ModTag.CM_GLASS) || !(this.level() instanceof ServerLevel) || !EventHooks.canEntityGrief((ServerLevel)this.level(), (Entity)this)) continue;
                         this.level().destroyBlock(pos, true);
                     }
                     for (BlockPos pos : BlockPos.betweenClosed((int)Mth.floor((double)(this.collidePosX - 2.5)), (int)Mth.floor((double)(this.collidePosY - 2.5)), (int)Mth.floor((double)(this.collidePosZ - 2.5)), (int)Mth.floor((double)(this.collidePosX + 2.5)), (int)Mth.floor((double)(this.collidePosY + 2.5)), (int)Mth.floor((double)(this.collidePosZ + 2.5)))) {
@@ -195,7 +201,7 @@ extends Entity {
                             if (this.level().isEmptyBlock(blockpos1)) {
                                 this.level().setBlockAndUpdate(blockpos1, BaseFireBlock.getState((BlockGetter)this.level(), (BlockPos)blockpos1));
                             }
-                        } else if (EventHooks.canEntityGrief((Level)this.level(), (Entity)this) && this.level().isEmptyBlock(blockpos1)) {
+                        } else if (this.level() instanceof ServerLevel && EventHooks.canEntityGrief((ServerLevel)this.level(), (Entity)this) && this.level().isEmptyBlock(blockpos1)) {
                             this.level().setBlockAndUpdate(blockpos1, BaseFireBlock.getState((BlockGetter)this.level(), (BlockPos)blockpos1));
                         }
                     }
@@ -334,7 +340,7 @@ extends Entity {
             this.collidePosZ = this.endPosZ;
             this.blockSide = null;
         }
-        List entities = world.getEntitiesOfClass(LivingEntity.class, new AABB(Math.min(this.getX(), this.collidePosX), Math.min(this.getY(), this.collidePosY), Math.min(this.getZ(), this.collidePosZ), Math.max(this.getX(), this.collidePosX), Math.max(this.getY(), this.collidePosY), Math.max(this.getZ(), this.collidePosZ)).inflate(1.0, 1.0, 1.0));
+        List<LivingEntity> entities = world.getEntitiesOfClass(LivingEntity.class, new AABB(Math.min(this.getX(), this.collidePosX), Math.min(this.getY(), this.collidePosY), Math.min(this.getZ(), this.collidePosZ), Math.max(this.getX(), this.collidePosX), Math.max(this.getY(), this.collidePosY), Math.max(this.getZ(), this.collidePosZ)).inflate(1.0, 1.0, 1.0));
         for (LivingEntity entity : entities) {
             if (entity == this.caster) continue;
             float pad = entity.getPickRadius() + 0.5f;

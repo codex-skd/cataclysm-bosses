@@ -60,7 +60,7 @@ extends ThrowableItemProjectile {
     }
 
     public Blazing_Bone_Entity(Level worldIn, float damage, LivingEntity throwerIn) {
-        super((EntityType)ModEntities.BLAZING_BONE.get(), throwerIn, worldIn);
+        super((EntityType)ModEntities.BLAZING_BONE.get(), throwerIn, worldIn, net.minecraft.world.item.ItemStack.EMPTY);
         this.setDamage(damage);
     }
 
@@ -120,9 +120,10 @@ extends ThrowableItemProjectile {
     public void handleEntityEvent(byte id) {
         if (id == 3) {
             for (int i = 0; i < 8; ++i) {
-                this.level().addParticle((ParticleOptions)new ItemParticleOption(ParticleTypes.ITEM, new ItemStack((ItemLike)ModItems.BLAZING_BONE.get())), this.getX(), this.getY(), this.getZ(), this.random.nextGaussian() * 0.2, this.random.nextGaussian() * 0.2, this.random.nextGaussian() * 0.2);
+                this.level().addParticle((ParticleOptions)new ItemParticleOption(ParticleTypes.ITEM, (Item)ModItems.BLAZING_BONE.get()), this.getX(), this.getY(), this.getZ(), this.random.nextGaussian() * 0.2, this.random.nextGaussian() * 0.2, this.random.nextGaussian() * 0.2);
             }
         }
     }
+
 }
 

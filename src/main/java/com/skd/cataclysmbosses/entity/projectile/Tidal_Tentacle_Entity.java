@@ -59,7 +59,7 @@ import net.minecraft.world.level.storage.ValueOutput;
 
 public class Tidal_Tentacle_Entity
 extends Entity {
-    private static final EntityDataAccessor<Optional<UUID>> CREATOR_ID = SynchedEntityData.defineId(Tidal_Tentacle_Entity.class, (EntityDataSerializer)EntityDataSerializers.OPTIONAL_UUID);
+    private static final EntityDataAccessor<String> CREATOR_ID = SynchedEntityData.defineId(Tidal_Tentacle_Entity.class, (EntityDataSerializer)EntityDataSerializers.STRING);
     private static final EntityDataAccessor<Integer> FROM_ID = SynchedEntityData.defineId(Tidal_Tentacle_Entity.class, (EntityDataSerializer)EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> TARGET_COUNT = SynchedEntityData.defineId(Tidal_Tentacle_Entity.class, (EntityDataSerializer)EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> CURRENT_TARGET_ID = SynchedEntityData.defineId(Tidal_Tentacle_Entity.class, (EntityDataSerializer)EntityDataSerializers.INT);
@@ -77,7 +77,7 @@ extends Entity {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(CREATOR_ID, Optional.empty());
+        p_326229_.define(CREATOR_ID, "");
         p_326229_.define(FROM_ID, -1);
         p_326229_.define(TARGET_COUNT, 0);
         p_326229_.define(CURRENT_TARGET_ID, -1);
@@ -208,11 +208,12 @@ extends Entity {
     }
 
     public UUID getCreatorEntityUUID() {
-        return ((Optional)this.entityData.get(CREATOR_ID)).orElse(null);
+        String s = (String)this.entityData.get(CREATOR_ID);
+        return s == null || s.isEmpty() ? null : UUID.fromString(s);
     }
 
     public void setCreatorEntityUUID(UUID id) {
-        this.entityData.set(CREATOR_ID, Optional.ofNullable(id));
+        this.entityData.set(CREATOR_ID, id == null ? "" : id.toString());
     }
 
     public Entity getCreatorEntity() {
@@ -283,6 +284,11 @@ extends Entity {
 
     public boolean isCreator(Entity mob) {
         return this.getCreatorEntityUUID() != null && mob.getUUID().equals(this.getCreatorEntityUUID());
+    }
+
+    @Override
+    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
+        return false;
     }
 }
 

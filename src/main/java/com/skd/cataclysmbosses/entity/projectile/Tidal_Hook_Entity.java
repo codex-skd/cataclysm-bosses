@@ -149,7 +149,7 @@ extends AbstractArrow {
             PacketDistributor.sendToPlayersTrackingEntityAndSelf((Entity)owner, (CustomPacketPayload)new MessageHookFalling(owner.getId(), true), (CustomPacketPayload[])new CustomPacketPayload[0]);
             owner.setNoGravity(false);
         }
-        super.kill();
+        this.discard();
     }
 
     public boolean shouldRenderAtSqrDistance(double distance) {

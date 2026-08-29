@@ -21,11 +21,11 @@ public class Lionfish_Spike_Entity extends ThrowableItemProjectile {
     }
 
     public Lionfish_Spike_Entity(EntityType<? extends Lionfish_Spike_Entity> type, double x, double y, double z, Level level) {
-        super(type, x, y, z, level);
+        super(type, x, y, z, level, net.minecraft.world.item.ItemStack.EMPTY);
     }
 
     public Lionfish_Spike_Entity(EntityType<? extends Lionfish_Spike_Entity> type, LivingEntity owner, Level level) {
-        super(type, owner, level);
+        super(type, owner, level, net.minecraft.world.item.ItemStack.EMPTY);
     }
 
     @Override

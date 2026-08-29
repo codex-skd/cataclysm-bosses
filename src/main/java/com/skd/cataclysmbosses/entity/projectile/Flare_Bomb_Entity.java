@@ -69,7 +69,8 @@ extends ThrowableProjectile {
     }
 
     public Flare_Bomb_Entity(EntityType<Flare_Bomb_Entity> type, Level world, LivingEntity thrower) {
-        super(type, thrower, world);
+        super(type, thrower.getX(), thrower.getEyeY() - 0.10000000149011612D, thrower.getZ(), world);
+        this.setOwner(thrower);
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
@@ -197,7 +198,7 @@ extends ThrowableProjectile {
     public void handleEntityEvent(byte id) {
         super.handleEntityEvent(id);
         if (id == 4) {
-            this.level().playLocalSound(this.getX(), this.getY(), this.getZ(), (SoundEvent)ModSounds.EXPLOSION.get(), SoundSource.BLOCKS, 4.0f, (1.0f + (thislevel().getRandom().nextFloat() - thislevel().getRandom().nextFloat()) * 0.2f) * 0.7f, false);
+            this.level().playLocalSound(this.getX(), this.getY(), this.getZ(), (SoundEvent)ModSounds.EXPLOSION.get(), SoundSource.BLOCKS, 4.0f, (1.0f + (this.level().getRandom().nextFloat() - this.level().getRandom().nextFloat()) * 0.2f) * 0.7f, false);
             this.level().addParticle((ParticleOptions)ModParticle.FLARE_EXPLODE.get(), this.getX(), this.getY(), this.getZ(), 0.1, 0.0, 0.0);
         }
     }

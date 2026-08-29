@@ -87,7 +87,7 @@ extends AbstractArrow {
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(ID_LOYALTY, 0);
+        p_326229_.define(ID_LOYALTY, (byte)0);
         p_326229_.define(ID_FOIL, false);
     }
 
@@ -147,7 +147,7 @@ extends AbstractArrow {
         }
         this.dealtDamage = true;
         if (entity.hurtOrSimulate(damagesource, f)) {
-            if (entity.getType() == EntityType.ENDERMAN) {
+            if (entity.getType() == net.minecraft.world.entity.EntityTypes.ENDERMAN) {
                 return;
             }
             level = this.level();
@@ -169,7 +169,7 @@ extends AbstractArrow {
         LivingEntity livingentity;
         Vec3 vec3 = p_346320_.getBlockPos().clampLocationWithin(p_346320_.getLocation());
         Entity entity = this.getOwner();
-        EnchantmentHelper.onHitBlock((ServerLevel)p_344953_, (ItemStack)p_344999_, (LivingEntity)(entity instanceof LivingEntity ? (livingentity = (LivingEntity)entity) : null), (Entity)this, null, (Vec3)vec3, (BlockState)p_344953_.getBlockState(p_346320_.getBlockPos()), p_348680_ -> this.kill());
+        EnchantmentHelper.onHitBlock((ServerLevel)p_344953_, (ItemStack)p_344999_, (LivingEntity)(entity instanceof LivingEntity ? (livingentity = (LivingEntity)entity) : null), (Entity)this, null, (Vec3)vec3, (BlockState)p_344953_.getBlockState(p_346320_.getBlockPos()), p_348680_ -> this.discard());
     }
 
     public ItemStack getWeaponItem() {

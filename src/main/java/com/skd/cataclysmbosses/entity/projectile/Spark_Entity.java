@@ -80,7 +80,8 @@ extends ThrowableProjectile {
     }
 
     public Spark_Entity(Level worldIn, LivingEntity throwerIn) {
-        super((EntityType)ModEntities.SPARK.get(), throwerIn, worldIn);
+        super((EntityType)ModEntities.SPARK.get(), throwerIn.getX(), throwerIn.getEyeY() - 0.10000000149011612D, throwerIn.getZ(), worldIn);
+        this.setOwner(throwerIn);
     }
 
     public void addAdditionalSaveData(ValueOutput tag) {
@@ -201,7 +202,7 @@ extends ThrowableProjectile {
             Entity entity = entityhitresult.getEntity();
             if (entity.getType().builtInRegistryHolder().is(EntityTypeTags.REDIRECTABLE_PROJECTILE) && entity instanceof Projectile) {
                 Projectile projectile = (Projectile)entity;
-                projectile.deflect(ProjectileDeflection.AIM_DEFLECT, this.getOwner(), this.getOwner(), true);
+                projectile.deflect(ProjectileDeflection.AIM_DEFLECT, this.getOwner(), null, true);
             }
             this.onHitEntity(entityhitresult);
             this.level().gameEvent((Holder)GameEvent.PROJECTILE_LAND, result.getLocation(), GameEvent.Context.of((Entity)this, (BlockState)null));

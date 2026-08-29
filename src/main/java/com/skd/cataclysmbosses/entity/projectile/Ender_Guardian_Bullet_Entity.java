@@ -161,7 +161,7 @@ extends AbstractHurtingProjectile {
             if (HitResult2.getType() != HitResult.Type.MISS && !EventHooks.onProjectileImpact((Projectile)this, (HitResult)HitResult2)) {
                 this.onHit(HitResult2);
             }
-            this.checkInsideBlocks();
+            this.applyEffectsFromBlocks();
             Vec3 Vec32 = this.getDeltaMovement();
             double d0 = this.getX() + Vec32.x;
             double d1 = this.getY() + Vec32.y;

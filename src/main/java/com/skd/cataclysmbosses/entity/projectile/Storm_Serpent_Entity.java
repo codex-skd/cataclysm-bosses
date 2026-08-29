@@ -337,5 +337,10 @@ extends Entity {
         int i = this.lifeTicks - 2;
         return i <= 0 ? 1.0f : 1.0f - ((float)i - p_36937_) / 20.0f;
     }
+
+    @Override
+    public boolean hurtServer(ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return false;
+    }
 }
 

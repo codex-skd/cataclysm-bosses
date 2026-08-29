@@ -90,7 +90,9 @@ extends Projectile {
 
     public Wither_Homing_Missile_Entity(EntityType<? extends Wither_Homing_Missile_Entity> type, double getX, double gety, double getz, Vec3 vec3, Level level) {
         this(type, level);
-        this.setPos(getX, gety, getz, this.getYRot(), this.getXRot());
+        this.setPos(getX, gety, getz);
+        this.setYRot((float)this.getYRot());
+        this.setXRot((float)this.getXRot());
         this.reapplyPosition();
         this.assignDirectionalMovement(vec3, this.accelerationPower);
     }
@@ -144,13 +146,11 @@ extends Projectile {
 
     public void readAdditionalSaveData(ValueInput p_37353_) {
         super.readAdditionalSaveData(p_37353_);
-        this.setFuse(p_37353_.getShortOr("fuse", 0));
+        this.setFuse(p_37353_.getShortOr("fuse", (short)0));
         if (p_37353_.read("Target", UUIDUtil.CODEC).isPresent()) {
             this.targetId = p_37353_.read("Target", UUIDUtil.CODEC).orElse(null);
         }
-        if (p_37353_.contains("acceleration_power", 6)) {
-            this.accelerationPower = p_37353_.getDoubleOr("acceleration_power", 0.0D);
-        }
+        this.accelerationPower = p_37353_.getDoubleOr("acceleration_power", 0.0D);
     }
 
     public void tick() {
@@ -161,7 +161,7 @@ extends Projectile {
             if (hitresult.getType() != HitResult.Type.MISS && !EventHooks.onProjectileImpact((Projectile)this, (HitResult)hitresult)) {
                 this.hitTargetOrDeflectSelf(hitresult);
             }
-            this.checkInsideBlocks();
+            this.applyEffectsFromBlocks();
             Vec3 vec3 = this.getDeltaMovement();
             double d0 = this.getX() + vec3.x;
             double d1 = this.getY() + vec3.y;

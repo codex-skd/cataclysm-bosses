@@ -96,7 +96,8 @@ extends ThrowableProjectile {
     }
 
     public Accretion_Entity(EntityType<Accretion_Entity> type, Level world, LivingEntity thrower) {
-        super(type, thrower, world, net.minecraft.world.item.ItemStack.EMPTY);
+        super(type, thrower.getX(), thrower.getEyeY() - 0.10000000149011612D, thrower.getZ(), world);
+        this.setOwner(thrower);
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
@@ -183,7 +184,7 @@ extends ThrowableProjectile {
             Entity entity = entityhitresult.getEntity();
             if (entity.getType().builtInRegistryHolder().is(EntityTypeTags.REDIRECTABLE_PROJECTILE) && entity instanceof Projectile) {
                 Projectile projectile = (Projectile)entity;
-                projectile.deflect(ProjectileDeflection.AIM_DEFLECT, this.getOwner(), true);
+                projectile.deflect(ProjectileDeflection.AIM_DEFLECT, this.getOwner(), null, true);
             }
             this.onHitEntity(entityhitresult);
             this.level().gameEvent((Holder)GameEvent.PROJECTILE_LAND, result.getLocation(), GameEvent.Context.of((Entity)this, (BlockState)null));

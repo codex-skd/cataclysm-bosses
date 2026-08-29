@@ -57,7 +57,8 @@ extends ThrowableProjectile {
     }
 
     public Amethyst_Cluster_Projectile_Entity(EntityType<Amethyst_Cluster_Projectile_Entity> type, Level world, LivingEntity thrower, float damage) {
-        super(type, thrower, world);
+        super(type, thrower.getX(), thrower.getEyeY() - 0.10000000149011612D, thrower.getZ(), world);
+        this.setOwner(thrower);
         this.setDamage(damage);
     }
 

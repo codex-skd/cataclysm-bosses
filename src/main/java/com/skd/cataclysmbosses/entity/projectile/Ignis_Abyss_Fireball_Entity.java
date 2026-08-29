@@ -304,5 +304,10 @@ extends CMAbstractHurtingProjectile {
     public float getPickRadius() {
         return 1.0f;
     }
+
+    @Override
+    protected float getInertia() {
+        return 0.95f;
+    }
 }
 

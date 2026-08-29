@@ -208,7 +208,7 @@ extends CMAbstractHurtingProjectile {
             Entity entity = entityhitresult.getEntity();
             if (entity.getType().builtInRegistryHolder().is(EntityTypeTags.REDIRECTABLE_PROJECTILE) && entity instanceof Projectile) {
                 Projectile projectile = (Projectile)entity;
-                projectile.deflect(ProjectileDeflection.AIM_DEFLECT, this.getOwner(), this.getOwner(), true);
+                projectile.deflect(ProjectileDeflection.AIM_DEFLECT, this.getOwner(), null, true);
             }
             this.onHitEntity(entityhitresult);
             this.level().gameEvent((Holder)GameEvent.PROJECTILE_LAND, result.getLocation(), GameEvent.Context.of((Entity)this, (BlockState)null));
@@ -225,6 +225,9 @@ extends CMAbstractHurtingProjectile {
     }
 
     @Override
+    protected float getInertia() {
+        return 0.95f;
+    }
 
     public Vec3 getTrailPosition(int pointer, float partialTick) {
         if (this.isRemoved()) {

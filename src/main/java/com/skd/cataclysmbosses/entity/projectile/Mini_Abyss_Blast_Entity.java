@@ -89,7 +89,6 @@ extends Entity {
 
     public Mini_Abyss_Blast_Entity(EntityType<? extends Mini_Abyss_Blast_Entity> type, Level world) {
         super(type, world);
-        this.noCulling(true);
         if (world.isClientSide()) {
             this.attractorPos = new Vec3[]{new Vec3(0.0, 0.0, 0.0)};
         }
@@ -262,7 +261,7 @@ extends Entity {
             this.collidePosZ = this.endPosZ;
             this.blockSide = null;
         }
-        List entities = world.getEntitiesOfClass(LivingEntity.class, new AABB(Math.min(this.getX(), this.collidePosX), Math.min(this.getY(), this.collidePosY), Math.min(this.getZ(), this.collidePosZ), Math.max(this.getX(), this.collidePosX), Math.max(this.getY(), this.collidePosY), Math.max(this.getZ(), this.collidePosZ)).inflate(2.0, 2.0, 2.0));
+        List<LivingEntity> entities = world.getEntitiesOfClass(LivingEntity.class, new AABB(Math.min(this.getX(), this.collidePosX), Math.min(this.getY(), this.collidePosY), Math.min(this.getZ(), this.collidePosZ), Math.max(this.getX(), this.collidePosX), Math.max(this.getY(), this.collidePosY), Math.max(this.getZ(), this.collidePosZ)).inflate(2.0, 2.0, 2.0));
         for (LivingEntity entity : entities) {
             if (entity == this.caster) continue;
             float pad = entity.getPickRadius() + 0.15f;
@@ -299,6 +298,11 @@ extends Entity {
             d0 = 4.0;
         }
         return p_36837_ < (d0 *= 64.0) * d0;
+    }
+
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return false;
     }
 
     private void updateWithHarbinger() {

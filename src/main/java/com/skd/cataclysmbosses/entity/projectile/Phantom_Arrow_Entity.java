@@ -72,6 +72,8 @@ extends AbstractArrow {
     private UUID targetId;
     private boolean stopSeeking;
     private boolean impactParticleSpawn = false;
+    private int life = 0;
+    private double baseDamage = 2.0;
 
     public Phantom_Arrow_Entity(EntityType type, Level worldIn) {
         super(type, worldIn);
@@ -138,7 +140,7 @@ extends AbstractArrow {
                 }
             }
             this.setTransparency(this.life);
-            if (!this.inGround && !this.stopSeeking && (this.finalTarget != null && this.finalTarget.isAlive() || this.finalTarget instanceof Player && !this.finalTarget.isSpectator()) && (sqrt = (float)this.getDeltaMovement().length()) > 1.25f && this.tickCount > 2 && this.finalTarget != null && (arcVec = this.finalTarget.position().add(0.0, (double)(0.65f * this.finalTarget.getBbHeight()), 0.0).subtract(this.position())).length() > (double)this.finalTarget.getBbWidth()) {
+            if (!this.isInGround() && !this.stopSeeking && (this.finalTarget != null && this.finalTarget.isAlive() || this.finalTarget instanceof Player && !this.finalTarget.isSpectator()) && (sqrt = (float)this.getDeltaMovement().length()) > 1.25f && this.tickCount > 2 && this.finalTarget != null && (arcVec = this.finalTarget.position().add(0.0, (double)(0.65f * this.finalTarget.getBbHeight()), 0.0).subtract(this.position())).length() > (double)this.finalTarget.getBbWidth()) {
                 this.setDeltaMovement(this.getDeltaMovement().scale(0.625).add(arcVec.normalize().scale((double)0.4775f)));
             }
         } else {
@@ -153,6 +155,11 @@ extends AbstractArrow {
                 this.level().addParticle((ParticleOptions)ModParticle.CURSED_FLAME.get(), this.getX() + d5 * (double)i / 4.0, this.getY() + d6 * (double)i / 4.0, this.getZ() + d1 * (double)i / 4.0, 0.0, 0.0, 0.0);
             }
         }
+    }
+
+    @Override
+    public void setBaseDamage(double damage) {
+        this.baseDamage = damage;
     }
 
     protected void tickDespawn() {
@@ -174,7 +181,7 @@ extends AbstractArrow {
 
     protected void onHitEntity(EntityHitResult p_37573_) {
         Entity entity = p_37573_.getEntity();
-        float f = (float)this.getBaseDamage();
+        float f = (float)this.baseDamage;
         Entity entity1 = this.getOwner();
         DamageSource damagesource = CMDamageTypes.causeMaledictioSagittaDamage((Entity)this, (Entity)(entity1 == null ? this : entity1));
         Level level = this.level();
@@ -182,7 +189,7 @@ extends AbstractArrow {
             ServerLevel serverlevel = (ServerLevel)level;
             f = EnchantmentHelper.modifyDamage((ServerLevel)serverlevel, (ItemStack)this.getWeaponItem(), (Entity)entity, (DamageSource)damagesource, (float)f);
         }
-        boolean flag = entity.getType() == EntityType.ENDERMAN;
+        boolean flag = entity.getType() == net.minecraft.world.entity.EntityTypes.ENDERMAN;
         this.stopSeeking = true;
         if (this.isOnFire() && !flag) {
             entity.igniteForSeconds(5.0f);

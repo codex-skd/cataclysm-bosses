@@ -211,5 +211,10 @@ extends Entity {
     public boolean isPushable() {
         return false;
     }
+
+    @Override
+    public boolean hurtServer(ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return false;
+    }
 }
 

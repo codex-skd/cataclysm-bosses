@@ -72,6 +72,7 @@ implements IEntityWithComplexSpawn {
     private static final EntityDataAccessor<Boolean> RETURN = SynchedEntityData.defineId(Player_Ceraunus_Entity.class, (EntityDataSerializer)EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Float> Y_ROT_OLD = SynchedEntityData.defineId(Player_Ceraunus_Entity.class, (EntityDataSerializer)EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> X_ROT_OLD = SynchedEntityData.defineId(Player_Ceraunus_Entity.class, (EntityDataSerializer)EntityDataSerializers.FLOAT);
+    private double baseDamage = 2.0;
 
     public Player_Ceraunus_Entity(EntityType type, Level worldIn) {
         super(type, worldIn);
@@ -177,8 +178,8 @@ implements IEntityWithComplexSpawn {
         Entity entity1;
         DamageSource damagesource;
         Entity entity = p_37573_.getEntity();
-        if (entity.hurtOrSimulate(damagesource = CMDamageTypes.causePlayerCeraunusDamage((Entity)this, (Entity)((entity1 = this.getOwner()) == null ? this : entity1)), (float)this.getBaseDamage())) {
-            if (entity.getType() == EntityType.ENDERMAN) {
+        if (entity.hurtOrSimulate(damagesource = CMDamageTypes.causePlayerCeraunusDamage((Entity)this, (Entity)((entity1 = this.getOwner()) == null ? this : entity1)), (float)this.baseDamage)) {
+            if (entity.getType() == net.minecraft.world.entity.EntityTypes.ENDERMAN) {
                 return;
             }
             if (entity instanceof LivingEntity) {
@@ -251,6 +252,11 @@ implements IEntityWithComplexSpawn {
 
     public boolean canUsePortal(boolean allowPassengers) {
         return false;
+    }
+
+    @Override
+    public void setBaseDamage(double damage) {
+        this.baseDamage = damage;
     }
 
     protected double getDefaultGravity() {

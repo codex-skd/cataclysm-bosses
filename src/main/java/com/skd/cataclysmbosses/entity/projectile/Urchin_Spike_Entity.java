@@ -51,7 +51,7 @@ extends ThrowableItemProjectile {
     }
 
     public Urchin_Spike_Entity(Level worldIn, LivingEntity throwerIn) {
-        super((EntityType)ModEntities.URCHIN_SPIKE.get(), throwerIn, worldIn);
+        super((EntityType)ModEntities.URCHIN_SPIKE.get(), throwerIn, worldIn, new ItemStack(ModItems.URCHIN_SPIKE.get()));
     }
 
     public void addAdditionalSaveData(ValueOutput tag) {
@@ -102,7 +102,7 @@ extends ThrowableItemProjectile {
             for (int i = 0; i < 8; ++i) {
                 ItemStack itemstack = this.getItem();
                 if (itemstack.isEmpty()) continue;
-                this.level().addParticle((ParticleOptions)new ItemParticleOption(ParticleTypes.ITEM, itemstack), this.getX(), this.getY(), this.getZ(), this.random.nextGaussian() * 0.2, this.random.nextGaussian() * 0.2, this.random.nextGaussian() * 0.2);
+                this.level().addParticle((ParticleOptions)new ItemParticleOption(ParticleTypes.ITEM, this.getDefaultItem()), this.getX(), this.getY(), this.getZ(), this.random.nextGaussian() * 0.2, this.random.nextGaussian() * 0.2, this.random.nextGaussian() * 0.2);
             }
         }
     }

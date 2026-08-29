@@ -76,7 +76,7 @@ extends Projectile {
         float f = 0.99f;
         if (this.level().getBlockStates(this.getBoundingBox()).noneMatch(BlockBehaviour.BlockStateBase::isAir)) {
             this.discard();
-        } else if (this.isInWaterOrBubble()) {
+        } else if (this.isInWaterOrRain()) {
             this.discard();
         } else {
             this.setDeltaMovement(vec3.scale((double)0.99f));
@@ -112,6 +112,7 @@ extends Projectile {
 
     public void recreateFromPacket(ClientboundAddEntityPacket packet) {
         super.recreateFromPacket(packet);
+        Vec3 vec3 = packet.getMovement();
         double d0 = vec3.x();
         double d1 = vec3.y();
         double d2 = vec3.z();
