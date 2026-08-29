@@ -1,7 +1,62 @@
 SESSION STATUS — NeoForge 26.2.0.45-beta -> 26.2.0.57 compile port
 ================================================================
 
-== 2026-08-29 — Limpieza de repo + estado de compilación ==
+== 2026-08-29 (tarde) — HANDOFF: dónde retomar mañana ==
+
+ESTADO: `./gradlew compileJava` FALLA con **1.397 errores** (empezamos la sesión en 1.767).
+Progreso de la sesión, todo commiteado en `minecraft/26.2/neoforge-26.2.0.57/production` (SIN pushear):
+  8482b2a  chore(repo): limpieza de basura versionada + rename the_sundering -> cataclysm_bosses
+  b27c897  blocks/ compila (1767 -> 1708)          [OpenCode Go / longcat-2.0]
+  698cfbe  particle/Options/ compila (1708 -> 1579)[Nvidia deepseek-v4-pro — lento, se descartó a media]
+  a42756b  client/particle/ compila (1579 -> 1397) [OpenCode Go / longcat-2.0]
+
+PAQUETES QUE YA COMPILAN (0 errores): blocks/, client/particle/, client/particle/Options/,
+  client/render/CMRenderTypes.java (ya estaba hecho de antes; el "209 errores" del histórico era obsoleto).
+
+REPARTO ACTUAL DE LOS 1.397 (aprox, sacar recuento fresco con:
+  cd scratchpad && python3 an3.py <logfile>  — o el snippet de abajo):
+  client/  ~640   (renderers de entidad/boss, modelos, ClientEvent.java ~61)
+  entity/  ~560   (cascada de API de entidad; ver histórico "Entity API cascade roots")
+  structures/ ~120 (Jigsaw: SpawnerData record, ChunkPos(BlockPos), getMinBuildHeight)
+  items/   ~100
+  world/   ~40    (DataFixTypes.LEVEL_DATA, getBooleanOr, SpawnerData)
+  resto (init, mixin, jei, crafting, effects, inventory, message) ~35
+
+PRÓXIMO CLUSTER SUGERIDO (por orden de rentabilidad / aislamiento):
+  1. structures/ + world/  (~160, mecánico: SpawnerData(EntityType,int,int)->record nuevo,
+     new ChunkPos(BlockPos)-> ChunkPos(pos) o SectionPos, getMinBuildHeight->getMinY,
+     DataFixTypes.LEVEL_DATA renombrado, nbt.getBoolean->getBooleanOr). Bien acotado, no cascada.
+  2. entity/ base classes primero (Animation_Monster, Internal_Animation_Monster ya tocadas;
+     revisar hurtServer/ValueInput-Output/EntityReference) — al compilar las bases caen
+     cientos de errores hijos. Es el bloque de mayor efecto pero el más delicado.
+  3. client/ renderers (~640) — el más grande; depende en parte de que entity/ compile.
+     Ya hay puentes CmEntityRenderer/CmMobRenderer/CmHierarchicalModel de sesiones previas.
+
+CÓMO SE ESTÁ TRABAJANDO (repetir el patrón):
+  - Delegar cada paquete a OpenCode con `opencode run -m opencode-go/longcat-2.0 -- "$(cat prompt.md)"`.
+    longcat-2.0 (OpenCode Go) es el modelo elegido: rápido y limpio en blocks/ y particle/.
+    Nvidia deepseek-v4-pro responde al test pero es DEMASIADO lento para trabajo real (~45min/24
+    ficheros y se cuelga) — no usar salvo que Go agote cuota.
+  - El prompt SIEMPRE incluye: restricciones (no tocar versiones/deps, no borrar/renombrar,
+    no git add/commit/push, no ./gradlew), scope al paquete, y apuntar a las fuentes reales
+    en tmp_scratch/mc_src y tmp_scratch/neo_src (RESTAURADAS en el repo, gitignored).
+  - Se le pasa el fichero de errores del paquete: extraer con
+      grep -A3 -F 'cataclysmbosses\<pkg>\' scratchpad/compile_pN.txt | grep -vE '^\s+location:|^--$' > tmp_scratch/<pkg>_errors.txt
+  - Claude compila y verifica DESPUÉS (OpenCode no puede: sandbox bloquea gradle).
+  - Cerrar SIEMPRE el proceso opencode al acabar (Stop-Process nombre 'opencode') y `./gradlew --stop`.
+  - Los prompts de delegación de hoy: scratchpad/deleg_blocks.md, deleg_particles_v2.md (plantillas).
+
+OJO / PENDIENTES:
+  - Rename the_sundering->cataclysm_bosses hecho en código y mixins.json pero SIN verificar en
+    runtime (imposible hasta compilar). Revisar carga de mixins y regen de refmap cuando compile.
+  - `src/main/java/com/skd/cataclysmbosses/blocks/Property/CustomNoteBlockInstrument.java`:
+    fichero en subcarpeta con nombre raro (package ...blocks.Property). Compila; no tocado.
+    Plantear moverlo a un paquete normal en un pase de limpieza posterior.
+  - `Cataclysm.java` es un shim de compatibilidad legacy (la clase @Mod real es Cataclysm_Bosses.java).
+  - Line endings: el repo no tiene .gitattributes; git avisa LF->CRLF en cada commit. Inofensivo
+    pero conviene añadir un .gitattributes con `* text=auto eol=lf` en algún momento.
+
+== 2026-08-29 (mañana) — Limpieza de repo + estado de compilación ==
 - `./gradlew compileJava`: FALLA con 1.767 errores (baseline del port 5.548). Nunca ha compilado limpio, nunca se ha ejecutado.
 - Distribución: client 796 / entity 566 / structures 122 / items 105 / blocks 60 / world 43 / resto 75.
   Ficheros peores: ClientEvent.java (61), Clawdian_Entity.java (57), Ignis_Entity.java (24), Scylla_Entity.java (23),
