@@ -52,17 +52,17 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 
 public class Ink_Mural_Block
 extends Mural_Block {
-    private static final List<DeferredBlock<Block>> RANDOM_INK = (List)Util.make((Object)Lists.newArrayList(), list -> {
-        list.add(ModBlocks.AZURE_SEASTONE_MURAL_URCHINKIN);
-        list.add(ModBlocks.AZURE_SEASTONE_MURAL_CINDARIA);
-        list.add(ModBlocks.AZURE_SEASTONE_MURAL_HIPPOCAMTUS);
-        list.add(ModBlocks.AZURE_SEASTONE_MURAL_CLAWDIAN);
-        list.add(ModBlocks.AZURE_SEASTONE_MURAL_THUNDER);
-        list.add(ModBlocks.AZURE_SEASTONE_MURAL_SEA);
-        list.add(ModBlocks.AZURE_SEASTONE_MURAL_UNDERWORLD);
-        list.add(ModBlocks.AZURE_SEASTONE_MURAL_HARVEST);
-        list.add(ModBlocks.AZURE_SEASTONE_MURAL_WISDOM);
-        list.add(ModBlocks.AZURE_SEASTONE_MURAL_SMITHING);
+    private static final List<Block> RANDOM_INK = Util.make(Lists.newArrayList(), list -> {
+        list.add(ModBlocks.AZURE_SEASTONE_MURAL_URCHINKIN.get());
+        list.add(ModBlocks.AZURE_SEASTONE_MURAL_CINDARIA.get());
+        list.add(ModBlocks.AZURE_SEASTONE_MURAL_HIPPOCAMTUS.get());
+        list.add(ModBlocks.AZURE_SEASTONE_MURAL_CLAWDIAN.get());
+        list.add(ModBlocks.AZURE_SEASTONE_MURAL_THUNDER.get());
+        list.add(ModBlocks.AZURE_SEASTONE_MURAL_SEA.get());
+        list.add(ModBlocks.AZURE_SEASTONE_MURAL_UNDERWORLD.get());
+        list.add(ModBlocks.AZURE_SEASTONE_MURAL_HARVEST.get());
+        list.add(ModBlocks.AZURE_SEASTONE_MURAL_WISDOM.get());
+        list.add(ModBlocks.AZURE_SEASTONE_MURAL_SMITHING.get());
     });
 
     public Ink_Mural_Block(BlockBehaviour.Properties properties) {

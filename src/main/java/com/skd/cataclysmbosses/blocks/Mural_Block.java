@@ -33,6 +33,7 @@ import com.mojang.serialization.MapCodec;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelReader;
@@ -72,7 +73,7 @@ implements SimpleWaterloggedBlock {
 
     public Mural_Block(BlockBehaviour.Properties properties) {
         super(properties);
-        this.registerDefaultState((BlockState)((BlockState)((BlockState)((BlockState)this.stateDefinition.any()).setValue((Property)FACING, (Comparable)Direction.NORTH)).setValue((Property)FACE, (Comparable)AttachFace.WALL)).setValue((Property)WATERLOGGED, (Comparable)Boolean.FALSE));
+        this.registerDefaultState((BlockState)((BlockState)((BlockState)((BlockState)this.stateDefinition.any().setValue(FACING, Direction.NORTH)).setValue(FACE, AttachFace.WALL)).setValue(WATERLOGGED, false)));
     }
 
     protected boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
@@ -106,7 +107,7 @@ implements SimpleWaterloggedBlock {
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         FluidState fluidstate = context.getLevel().getFluidState(context.getClickedPos());
         for (Direction direction : context.getNearestLookingDirections()) {
-            BlockState blockstate = direction.getAxis() == Direction.Axis.Y ? (BlockState)((BlockState)((BlockState)this.defaultBlockState().setValue((Property)FACE, (Comparable)(direction == Direction.UP ? AttachFace.CEILING : AttachFace.FLOOR))).setValue((Property)FACING, (Comparable)context.getHorizontalDirection())).setValue((Property)WATERLOGGED, (Comparable)Boolean.valueOf(fluidstate.getType() == Fluids.WATER)) : (BlockState)((BlockState)((BlockState)this.defaultBlockState().setValue((Property)FACE, (Comparable)AttachFace.WALL)).setValue((Property)FACING, (Comparable)direction.getOpposite())).setValue((Property)WATERLOGGED, (Comparable)Boolean.valueOf(fluidstate.getType() == Fluids.WATER));
+            BlockState blockstate = direction.getAxis() == Direction.Axis.Y ? (BlockState)((BlockState)((BlockState)this.defaultBlockState().setValue(FACE, direction == Direction.UP ? AttachFace.CEILING : AttachFace.FLOOR)).setValue(FACING, context.getHorizontalDirection())).setValue(WATERLOGGED, fluidstate.getType() == Fluids.WATER) : (BlockState)((BlockState)((BlockState)this.defaultBlockState().setValue(FACE, AttachFace.WALL)).setValue(FACING, direction.getOpposite())).setValue(WATERLOGGED, fluidstate.getType() == Fluids.WATER);
             if (!blockstate.canSurvive((LevelReader)context.getLevel(), context.getClickedPos())) continue;
             return blockstate;
         }

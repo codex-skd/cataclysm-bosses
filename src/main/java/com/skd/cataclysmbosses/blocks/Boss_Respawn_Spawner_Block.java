@@ -69,7 +69,7 @@ extends BaseEntityBlock {
 
     public Boss_Respawn_Spawner_Block(BlockBehaviour.Properties properties) {
         super(properties);
-        this.registerDefaultState((BlockState)((BlockState)this.stateDefinition.any()).setValue((Property)LIT, (Comparable)Boolean.valueOf(false)));
+        this.registerDefaultState((BlockState)((BlockState)this.stateDefinition.any()).setValue(LIT, false));
     }
 
     @Nullable
@@ -102,7 +102,7 @@ extends BaseEntityBlock {
     }
 
     protected RenderShape getRenderShape(BlockState state) {
-        return RenderShape.ENTITYBLOCK_ANIMATED;
+        return RenderShape.INVISIBLE;
     }
 }
 

@@ -46,6 +46,7 @@ import com.mojang.serialization.MapCodec;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -104,7 +105,7 @@ implements SimpleWaterloggedBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level p_152123_, BlockState p_152124_, BlockEntityType<T> p_152125_) {
-        return p_152125_ == ModTileentites.ALTAR_OF_AMETHYST.get() ? (level, pos, state, entity) -> ((AltarOfAmethyst_Block_Entity)entity).tick() : null;
+        return p_152125_ == ModTileentites.ALTAR_OF_AMETHYST.get() ? (level, pos, state, entity) -> AltarOfAmethyst_Block_Entity.cookingTick(level, pos, state, (AltarOfAmethyst_Block_Entity)entity) : null;
     }
 
     @Override

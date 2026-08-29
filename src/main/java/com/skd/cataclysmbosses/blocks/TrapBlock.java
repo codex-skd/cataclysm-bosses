@@ -56,7 +56,7 @@ extends Block {
 
     public TrapBlock(BlockBehaviour.Properties properties) {
         super(properties);
-        this.registerDefaultState((BlockState)this.defaultBlockState().setValue((Property)LIT, (Comparable)Boolean.valueOf(false)));
+        this.registerDefaultState((BlockState)this.defaultBlockState().setValue(LIT, false));
     }
 
     public boolean isRandomlyTicking(BlockState state) {
@@ -65,7 +65,7 @@ extends Block {
 
     public void randomTick(BlockState state, ServerLevel worldIn, BlockPos pos, RandomSource random) {
         if (((Boolean)state.getValue((Property)LIT)).booleanValue()) {
-            worldIn.setBlock(pos, (BlockState)state.setValue((Property)LIT, (Comparable)Boolean.valueOf(false)), 3);
+            worldIn.setBlock(pos, (BlockState)state.setValue(LIT, false), 3);
         }
     }
 
@@ -85,7 +85,7 @@ extends Block {
         RandomSource random = world.getRandom();
         for (Direction direction : Direction.values()) {
             BlockPos blockpos = worldIn.relative(direction);
-            if (world.getBlockState(blockpos).isSolidRender((BlockGetter)world, blockpos)) continue;
+            if (world.getBlockState(blockpos).isSolidRender()) continue;
             Direction.Axis direction$axis = direction.getAxis();
             double d1 = direction$axis == Direction.Axis.X ? 0.5 + d0 * (double)direction.getStepX() : (double)random.nextFloat();
             double d2 = direction$axis == Direction.Axis.Y ? 0.5 + d0 * (double)direction.getStepY() : (double)random.nextFloat();

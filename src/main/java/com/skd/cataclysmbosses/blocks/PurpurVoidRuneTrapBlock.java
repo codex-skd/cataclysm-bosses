@@ -46,12 +46,12 @@ extends TrapBlock {
         if (!((Boolean)state.getValue((Property)LIT)).booleanValue() && PurpurVoidRuneTrapBlock.shouldTrigger(entity)) {
             Void_Rune_Entity voidrune = (Void_Rune_Entity)((EntityType)ModEntities.VOID_RUNE.get()).create(world, EntitySpawnReason.EVENT);
             if (voidrune != null) {
-                voidrune.setPos((double)pos.getX() + 0.5, pos.getY() + 1, (double)pos.getZ() + 0.5); voidrune.setYRot((double)pos.getZ() + 0.5); voidrune.setXRot(0.0f);
+                voidrune.setPos((double)pos.getX() + 0.5, pos.getY() + 1, (double)pos.getZ() + 0.5); voidrune.setYRot((float)pos.getZ() + 0.5f); voidrune.setXRot(0.0f);
                 voidrune.setDamage(7.0f);
                 world.addFreshEntity((Entity)voidrune);
             }
-            ((LivingEntity)entity).addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 50, 3));
-            world.setBlock(pos, (BlockState)state.setValue((Property)LIT, (Comparable)Boolean.valueOf(true)), 3);
+            ((LivingEntity)entity).addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 50, 3));
+            world.setBlock(pos, (BlockState)state.setValue(LIT, true), 3);
         }
     }
 }

@@ -43,12 +43,12 @@ extends TrapBlock {
 
     private static void activate(BlockState state, Level world, BlockPos pos, Entity entity) {
         if (!((Boolean)state.getValue((Property)LIT)).booleanValue() && EndStoneTeleportTrapBricks.shouldTrigger(entity)) {
-            double d0 = entity.getX() + (entitylevel().getRandom().nextDouble() - 0.5) * 16.0;
+            double d0 = entity.getX() + (entity.level().getRandom().nextDouble() - 0.5) * 16.0;
             double d1 = entity.getY();
-            double d2 = entity.getZ() + (entitylevel().getRandom().nextDouble() - 0.5) * 16.0;
+            double d2 = entity.getZ() + (entity.level().getRandom().nextDouble() - 0.5) * 16.0;
             ((LivingEntity)entity).randomTeleport(d0, d1, d2, false);
             ((LivingEntity)entity).addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 25));
-            world.setBlock(pos, (BlockState)state.setValue((Property)LIT, (Comparable)Boolean.valueOf(true)), 3);
+            world.setBlock(pos, (BlockState)state.setValue(LIT, true), 3);
             world.playSound(null, pos, SoundEvents.ENDERMAN_TELEPORT, SoundSource.BLOCKS, 1.0f, 1.0f);
         }
     }

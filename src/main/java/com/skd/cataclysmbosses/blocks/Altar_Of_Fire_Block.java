@@ -34,7 +34,6 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -47,7 +46,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.level.block.state.InsideBlockEffectApplier;
+import net.minecraft.world.entity.InsideBlockEffectApplier;
 
 public class Altar_Of_Fire_Block
 extends BaseEntityBlock {
@@ -104,6 +103,6 @@ extends BaseEntityBlock {
 
     @Nullable
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level p_152180_, BlockState p_152181_, BlockEntityType<T> p_152182_) {
-        return p_152182_ == ModTileentites.ALTAR_OF_FIRE.get() ? (level, pos, state, entity) -> ((AltarOfFire_Block_Entity)entity).commonTick(level, pos, state) : null;
+        return p_152182_ == ModTileentites.ALTAR_OF_FIRE.get() ? (level, pos, state, entity) -> ((AltarOfFire_Block_Entity)entity).commonTick(level, pos, state, (AltarOfFire_Block_Entity)entity) : null;
     }
 }

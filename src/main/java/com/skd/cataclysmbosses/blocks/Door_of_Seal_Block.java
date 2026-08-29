@@ -222,7 +222,7 @@ extends BaseEntityBlock {
                 if (blockpos2 != pos) {
                     level.setBlock(blockpos2, defaultGongPart.setValue(FACING, state.getValue(FACING)).setValue(PART, Door_Of_Seal_Part.CENTER).setValue(Y_OFFSET, i), 3);
                 }
-                level.blockUpdated(abovePos, Blocks.AIR);
+                level.updateNeighborsAt(abovePos, Blocks.AIR);
                 state.updateNeighbourShapes(level, abovePos, 3);
             }
         }
