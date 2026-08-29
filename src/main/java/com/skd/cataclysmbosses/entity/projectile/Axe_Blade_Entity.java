@@ -108,7 +108,9 @@ extends Entity {
 
     public Axe_Blade_Entity(EntityType<? extends Axe_Blade_Entity> type, LivingEntity p_36827_, double getX, double gety, double getz, double p_36821_, double p_36822_, double p_36823_, float damage, Level level) {
         this(type, level);
-        this.setPos(getX, gety, getz, this.getYRot(), this.getXRot());
+        this.setPos(getX, gety, getz);
+        this.setYRot((float)this.getYRot());
+        this.setXRot((float)this.getXRot());
         this.setOwner(p_36827_);
         this.setDamage(damage);
         this.reapplyPosition();
@@ -188,7 +190,7 @@ extends Entity {
         if ((raytraceresult = ProjectileUtil.getHitResultOnMoveVector((Entity)this, this::canHitEntity)).getType() != HitResult.Type.MISS) {
             this.onHit(raytraceresult);
         }
-        this.checkInsideBlocks();
+        this.applyEffectsFromBlocks();
         Vec3 vec3 = this.getDeltaMovement();
         double d0 = this.getX() + vec3.x;
         double d1 = this.getY() + vec3.y;
@@ -245,16 +247,19 @@ extends Entity {
         return 0.85f;
     }
 
+    @Override
+    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
+        return false;
+    }
+
     protected void readAdditionalSaveData(ValueInput compound) {
         ListTag listtag;
         if (compound.read("Owner", UUIDUtil.CODEC).isPresent()) {
             this.casterUuid = compound.read("Owner", UUIDUtil.CODEC).orElse(null);
         }
-        if (compound.contains("power", 9) && (listtag = compound.getList("power", 6)).size() == 3) {
-            this.xPower = listtag.getDouble(0);
-            this.yPower = listtag.getDouble(1);
-            this.zPower = listtag.getDouble(2);
-        }
+        this.xPower = compound.getDoubleOr("power_x", 0.0);
+        this.yPower = compound.getDoubleOr("power_y", 0.0);
+        this.zPower = compound.getDoubleOr("power_z", 0.0);
         this.leftOwner = compound.getBooleanOr("LeftOwner", false);
     }
 
@@ -265,7 +270,9 @@ extends Entity {
         if (this.leftOwner) {
             compound.putBoolean("LeftOwner", true);
         }
-        compound.put("power", (Tag)this.newDoubleList(new double[]{this.xPower, this.yPower, this.zPower}));
+        compound.putDouble("power_x", this.xPower);
+        compound.putDouble("power_y", this.yPower);
+        compound.putDouble("power_z", this.zPower);
     }
 
     private boolean checkLeftOwner() {

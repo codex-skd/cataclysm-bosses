@@ -79,7 +79,9 @@ implements ItemSupplier {
     }
 
     public void setItem(ItemStack p_32046_) {
-        this.getEntityData().set(DATA_ITEM_STACK, ((ItemStack)Util.make((Object)p_32046_.copy(), p_36978_ -> p_36978_.setCount(1))));
+        ItemStack stack = p_32046_.copy();
+        stack.setCount(1);
+        this.getEntityData().set(DATA_ITEM_STACK, stack);
     }
 
     private ItemStack getItemRaw() {
@@ -217,7 +219,7 @@ implements ItemSupplier {
     public void addAdditionalSaveData(ValueOutput p_36975_) {
         ItemStack itemstack = this.getItemRaw();
         if (!itemstack.isEmpty()) {
-            p_36975_.put("Item", this.getItem().save((HolderLookup.Provider)this.registryAccess()));
+            p_36975_.store("Item", ItemStack.CODEC, this.getItem());
         }
         p_36975_.putInt("R", this.getR());
         p_36975_.putInt("G", this.getG());
@@ -225,11 +227,7 @@ implements ItemSupplier {
     }
 
     public void readAdditionalSaveData(ValueInput p_36970_) {
-        if (p_36970_.contains("Item", 10)) {
-            this.setItem(ItemStack.parse((HolderLookup.Provider)this.registryAccess(), (Tag)p_36970_.getCompound("Item")).orElse(this.getDefaultItem()));
-        } else {
-            this.setItem(this.getDefaultItem());
-        }
+        this.setItem(p_36970_.read("Item", ItemStack.CODEC).orElse(this.getDefaultItem()));
         this.setR(p_36970_.getIntOr("R", 0));
         this.setG(p_36970_.getIntOr("G", 0));
         this.setB(p_36970_.getIntOr("B", 0));
@@ -244,6 +242,11 @@ implements ItemSupplier {
     }
 
     public boolean isAttackable() {
+        return false;
+    }
+
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
         return false;
     }
 

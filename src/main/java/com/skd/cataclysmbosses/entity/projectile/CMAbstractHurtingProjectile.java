@@ -31,9 +31,6 @@ package com.skd.cataclysmbosses.entity.projectile;
 import javax.annotation.Nullable;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundAddEntityPacket;
@@ -65,7 +62,9 @@ extends Projectile {
 
     public CMAbstractHurtingProjectile(EntityType<? extends CMAbstractHurtingProjectile> p_36817_, double p_36818_, double p_36819_, double p_36820_, double p_36821_, double p_36822_, double p_36823_, Level p_36824_) {
         this(p_36817_, p_36824_);
-        this.setPos(p_36818_, p_36819_, p_36820_, this.getYRot(), this.getXRot());
+        this.setPos(p_36818_, p_36819_, p_36820_);
+        this.setYRot((float)this.getYRot());
+        this.setXRot((float)this.getXRot());
         this.reapplyPosition();
         double d0 = Math.sqrt(p_36821_ * p_36821_ + p_36822_ * p_36822_ + p_36823_ * p_36823_);
         if (d0 != 0.0) {
@@ -108,7 +107,7 @@ extends Projectile {
             if ((hitresult = ProjectileUtil.getHitResultOnMoveVector((Entity)this, this::canHitEntity, (ClipContext.Block)this.getClipType())).getType() != HitResult.Type.MISS && !EventHooks.onProjectileImpact((Projectile)this, (HitResult)hitresult)) {
                 this.hitTargetOrDeflectSelf(hitresult);
             }
-            this.checkInsideBlocks();
+            this.applyEffectsFromBlocks();
             Vec3 vec3 = this.getDeltaMovement();
             double d0 = this.getX() + vec3.x;
             double d1 = this.getY() + vec3.y;
@@ -134,23 +133,32 @@ extends Projectile {
         }
     }
 
+    protected boolean shouldBurn() {
+        return false;
+    }
+
+    protected abstract float getInertia();
+
+    protected ParticleOptions getTrailParticle() {
+        return null;
+    }
+
     protected float getLiquidInertia() {
         return 0.8f;
     }
 
     public void addAdditionalSaveData(ValueOutput p_36848_) {
         super.addAdditionalSaveData(p_36848_);
-        p_36848_.put("power", (Tag)this.newDoubleList(new double[]{this.xPower, this.yPower, this.zPower}));
+        p_36848_.putDouble("power_x", this.xPower);
+        p_36848_.putDouble("power_y", this.yPower);
+        p_36848_.putDouble("power_z", this.zPower);
     }
 
     public void readAdditionalSaveData(ValueInput p_36844_) {
-        ListTag listtag;
         super.readAdditionalSaveData(p_36844_);
-        if (p_36844_.contains("power", 9) && (listtag = p_36844_.getList("power", 6)).size() == 3) {
-            this.xPower = listtag.getDouble(0);
-            this.yPower = listtag.getDouble(1);
-            this.zPower = listtag.getDouble(2);
-        }
+        this.xPower = p_36844_.getDoubleOr("power_x", 0.0);
+        this.yPower = p_36844_.getDoubleOr("power_y", 0.0);
+        this.zPower = p_36844_.getDoubleOr("power_z", 0.0);
     }
 
     public float getLightLevelDependentMagicValue() {

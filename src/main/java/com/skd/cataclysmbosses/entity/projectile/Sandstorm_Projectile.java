@@ -96,7 +96,9 @@ extends Projectile {
 
     public Sandstorm_Projectile(EntityType<? extends Sandstorm_Projectile> type, double getX, double gety, double getz, double p_36821_, double p_36822_, double p_36823_, Level level) {
         this(type, level);
-        this.setPos(getX, gety, getz, this.getYRot(), this.getXRot());
+        this.setPos(getX, gety, getz);
+        this.setYRot((float)this.getYRot());
+        this.setXRot((float)this.getXRot());
         this.reapplyPosition();
         double d0 = Math.sqrt(p_36821_ * p_36821_ + p_36822_ * p_36822_ + p_36823_ * p_36823_);
         if (d0 != 0.0) {
@@ -115,7 +117,9 @@ extends Projectile {
 
     public Sandstorm_Projectile(EntityType<? extends Sandstorm_Projectile> type, LivingEntity p_36827_, double getX, double gety, double getz, double p_36821_, double p_36822_, double p_36823_, float damage, Level level) {
         this(type, level);
-        this.setPos(getX, gety, getz, this.getYRot(), this.getXRot());
+        this.setPos(getX, gety, getz);
+        this.setYRot((float)this.getYRot());
+        this.setXRot((float)this.getXRot());
         this.setOwner((Entity)p_36827_);
         this.setDamage(damage);
         this.reapplyPosition();
@@ -213,7 +217,7 @@ extends Projectile {
                     this.discard();
                 }
             }
-            this.checkInsideBlocks();
+            this.applyEffectsFromBlocks();
             Vec3 vec3 = this.getDeltaMovement();
             double d0 = this.getX() + vec3.x;
             double d1 = this.getY() + vec3.y;
@@ -270,7 +274,7 @@ extends Projectile {
             Entity entity = entityhitresult.getEntity();
             if (entity.getType().builtInRegistryHolder().is(EntityTypeTags.REDIRECTABLE_PROJECTILE) && entity instanceof Projectile) {
                 Projectile projectile = (Projectile)entity;
-                projectile.deflect(ProjectileDeflection.AIM_DEFLECT, this.getOwner(), this.getOwner(), true);
+                projectile.deflect(ProjectileDeflection.AIM_DEFLECT, this.getOwner(), true);
             }
             this.onHitEntity(entityhitresult);
             this.level().gameEvent((Holder)GameEvent.PROJECTILE_LAND, p_37260_.getLocation(), GameEvent.Context.of((Entity)this, null));
@@ -292,19 +296,18 @@ extends Projectile {
 
     public void addAdditionalSaveData(ValueOutput p_36848_) {
         super.addAdditionalSaveData(p_36848_);
-        p_36848_.put("power", (Tag)this.newDoubleList(new double[]{this.xPower, this.yPower, this.zPower}));
+        p_36848_.putDouble("power_x", this.xPower);
+        p_36848_.putDouble("power_y", this.yPower);
+        p_36848_.putDouble("power_z", this.zPower);
         p_36848_.putInt("state", this.getState());
         p_36848_.putFloat("damage", this.getDamage());
     }
 
     public void readAdditionalSaveData(ValueInput p_36844_) {
-        ListTag listtag;
         super.readAdditionalSaveData(p_36844_);
-        if (p_36844_.contains("power", 9) && (listtag = p_36844_.getList("power", 6)).size() == 3) {
-            this.xPower = listtag.getDouble(0);
-            this.yPower = listtag.getDouble(1);
-            this.zPower = listtag.getDouble(2);
-        }
+        this.xPower = p_36844_.getDoubleOr("power_x", 0.0);
+        this.yPower = p_36844_.getDoubleOr("power_y", 0.0);
+        this.zPower = p_36844_.getDoubleOr("power_z", 0.0);
         this.setState(p_36844_.getIntOr("state", 0));
         this.setDamage(p_36844_.getFloatOr("damage", 0.0F));
     }
@@ -326,9 +329,10 @@ extends Projectile {
 
     public void recreateFromPacket(ClientboundAddEntityPacket p_150128_) {
         super.recreateFromPacket(p_150128_);
-        double d0 = p_150128_.getXa();
-        double d1 = p_150128_.getYa();
-        double d2 = p_150128_.getZa();
+        Vec3 vec3 = p_150128_.getMovement();
+        double d0 = vec3.x();
+        double d1 = vec3.y();
+        double d2 = vec3.z();
         double d3 = Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
         if (d3 != 0.0) {
             this.xPower = d0 / d3 * 0.1;

@@ -77,7 +77,9 @@ extends Projectile {
 
     public AbstractElemental_Spear(EntityType<? extends AbstractElemental_Spear> entityType, double x, double y, double z, Vec3 movement, Level level) {
         this(entityType, level);
-        this.setPos(x, y, z, this.getYRot(), this.getXRot());
+        this.setPos(x, y, z);
+        this.setYRot((float)this.getYRot());
+        this.setXRot((float)this.getXRot());
         this.reapplyPosition();
         this.assignDirectionalMovement(movement, this.accelerationPower);
     }
@@ -111,7 +113,7 @@ extends Projectile {
         double d1 = this.getY() + vec3.y;
         double d2 = this.getZ() + vec3.z;
         ProjectileUtil.rotateTowardsMovement((Entity)this, (float)1.0f);
-        this.checkInsideBlocks();
+        this.applyEffectsFromBlocks();
         if ((entity == null || !entity.isRemoved()) && this.level().hasChunkAt(this.blockPosition())) {
             HitResult hitresult = ProjectileUtil.getHitResultOnMoveVector((Entity)this, this::canHitEntity, (ClipContext.Block)this.getClipType());
             if (hitresult.getType() != HitResult.Type.MISS && !EventHooks.onProjectileImpact((Projectile)this, (HitResult)hitresult)) {
@@ -138,6 +140,8 @@ extends Projectile {
         }
     }
 
+    protected abstract float getInertia();
+
     protected float getLiquidInertia() {
         return 0.95f;
     }
@@ -149,9 +153,7 @@ extends Projectile {
 
     public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        if (compound.contains("acceleration_power", 6)) {
-            this.accelerationPower = compound.getDoubleOr("acceleration_power", 0.0);
-        }
+        this.accelerationPower = compound.getDoubleOr("acceleration_power", 0.1);
     }
 
     public float getLightLevelDependentMagicValue() {
@@ -167,7 +169,7 @@ extends Projectile {
 
     public void recreateFromPacket(ClientboundAddEntityPacket packet) {
         super.recreateFromPacket(packet);
-        Vec3 vec3 = new Vec3(packet.getXa(), packet.getYa(), packet.getZa());
+        Vec3 vec3 = packet.getMovement();
         this.setDeltaMovement(vec3);
     }
 

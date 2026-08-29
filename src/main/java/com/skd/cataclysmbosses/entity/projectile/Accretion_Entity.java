@@ -96,7 +96,7 @@ extends ThrowableProjectile {
     }
 
     public Accretion_Entity(EntityType<Accretion_Entity> type, Level world, LivingEntity thrower) {
-        super(type, thrower, world);
+        super(type, thrower, world, net.minecraft.world.item.ItemStack.EMPTY);
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
@@ -118,7 +118,7 @@ extends ThrowableProjectile {
 
     @Nullable
     public BlockState getBlockState() {
-        return ((Optional)this.entityData.get(BLOCK_STATE)).orElse(null);
+        return (BlockState)((Optional)this.entityData.get(BLOCK_STATE)).orElse(null);
     }
 
     public boolean shouldRiderSit() {
@@ -183,7 +183,7 @@ extends ThrowableProjectile {
             Entity entity = entityhitresult.getEntity();
             if (entity.getType().builtInRegistryHolder().is(EntityTypeTags.REDIRECTABLE_PROJECTILE) && entity instanceof Projectile) {
                 Projectile projectile = (Projectile)entity;
-                projectile.deflect(ProjectileDeflection.AIM_DEFLECT, this.getOwner(), this.getOwner(), true);
+                projectile.deflect(ProjectileDeflection.AIM_DEFLECT, this.getOwner(), true);
             }
             this.onHitEntity(entityhitresult);
             this.level().gameEvent((Holder)GameEvent.PROJECTILE_LAND, result.getLocation(), GameEvent.Context.of((Entity)this, (BlockState)null));
@@ -199,15 +199,17 @@ extends ThrowableProjectile {
         super.addAdditionalSaveData(compound);
         BlockState blockstate = this.getBlockState();
         if (blockstate != null) {
-            compound.put("AccretionBlockState", (Tag)NbtUtils.writeBlockState((BlockState)blockstate));
+            compound.store("AccretionBlockState", CompoundTag.CODEC, NbtUtils.writeBlockState((BlockState)blockstate));
         }
         compound.putFloat("Damage", this.getDamage());
     }
 
     public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        BlockState blockstate = null;
-        if (compound.contains("AccretionBlockState", 10) && (blockstate = NbtUtils.readBlockState((HolderGetter)this.level().holderLookup(Registries.BLOCK), (CompoundTag)compound.getCompound("AccretionBlockState"))).isAir()) {
+        BlockState blockstate = compound.read("AccretionBlockState", CompoundTag.CODEC)
+            .map(tag -> NbtUtils.readBlockState(this.level().holderLookup(Registries.BLOCK), tag))
+            .orElse(null);
+        if (blockstate != null && blockstate.isAir()) {
             blockstate = null;
         }
         this.setBlockState(blockstate);

@@ -77,7 +77,9 @@ extends Projectile {
 
     public Wither_Missile_Entity(EntityType<? extends Wither_Missile_Entity> type, double getX, double gety, double getz, Vec3 vec3, Level level) {
         this(type, level);
-        this.setPos(getX, gety, getz, this.getYRot(), this.getXRot());
+        this.setPos(getX, gety, getz);
+        this.setYRot((float)this.getYRot());
+        this.setXRot((float)this.getXRot());
         this.reapplyPosition();
         this.assignDirectionalMovement(vec3, this.accelerationPower);
     }
@@ -91,7 +93,9 @@ extends Projectile {
 
     public Wither_Missile_Entity(EntityType<? extends Wither_Missile_Entity> type, LivingEntity p_36827_, double getX, double gety, double getz, Vec3 vec3, float damage, Level level) {
         this(type, level);
-        this.setPos(getX, gety, getz, this.getYRot(), this.getXRot());
+        this.setPos(getX, gety, getz);
+        this.setYRot((float)this.getYRot());
+        this.setXRot((float)this.getXRot());
         this.setOwner((Entity)p_36827_);
         this.setDamage(damage);
         this.reapplyPosition();
@@ -130,7 +134,7 @@ extends Projectile {
             if (hitresult.getType() != HitResult.Type.MISS && !EventHooks.onProjectileImpact((Projectile)this, (HitResult)hitresult)) {
                 this.hitTargetOrDeflectSelf(hitresult);
             }
-            this.checkInsideBlocks();
+            this.applyEffectsFromBlocks();
             Vec3 vec3 = this.getDeltaMovement();
             double d0 = this.getX() + vec3.x;
             double d1 = this.getY() + vec3.y;
@@ -219,9 +223,7 @@ extends Projectile {
 
     public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        if (compound.contains("acceleration_power", 6)) {
-            this.accelerationPower = compound.getDoubleOr("acceleration_power", 0.0);
-        }
+        this.accelerationPower = compound.getDoubleOr("acceleration_power", 0.1);
     }
 
     public boolean isPickable() {
@@ -238,7 +240,7 @@ extends Projectile {
 
     public void recreateFromPacket(ClientboundAddEntityPacket packet) {
         super.recreateFromPacket(packet);
-        Vec3 vec3 = new Vec3(packet.getXa(), packet.getYa(), packet.getZa());
+        Vec3 vec3 = packet.getMovement();
         this.setDeltaMovement(vec3);
         this.xRotO = this.getXRot();
         this.yRotO = this.getYRot();
