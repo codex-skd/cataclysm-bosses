@@ -1,6 +1,76 @@
 SESSION STATUS — NeoForge 26.2.0.45-beta -> 26.2.0.57 compile port
 ================================================================
 
+== 2026-08-30 — HANDOFF (sesión 2, FINAL): 1.397 -> ~1.015 errores ==
+
+Commits nuevos en `minecraft/26.2/neoforge-26.2.0.57/production` (SIN pushear):
+  23b8531  structures/ + world/ compila (1397 -> 1231)   [longcat-2.0 + ~19 fixes a mano]
+  7821b99  entity/projectile/ base classes + top files (1231 -> 1164)  [longcat-2.0]
+  2456d52  entity/projectile/ COMPLETO, 0 errores (1164 -> 1076)  [longcat-2.0 batch 2 + ~20 fixes a mano]
+  c4da1dd  entity/effect/ + AI/ compilan; Pet/ casi (1076 -> 1015)  [longcat-2.0 + fixes a mano]
+
+PAQUETES QUE YA COMPILAN (0 errores): blocks/, client/particle/ (+Options/),
+  client/render/CMRenderTypes.java, structures/ (incl. jisaw/), world/, util/,
+  entity/projectile/, entity/effect/, entity/AI/.
+
+UN FICHERO PENDIENTE AISLADO: entity/Pet/Netherite_Ministrosity_Entity.java (21 errores).
+  Pet con HasCustomInventoryScreen que abre menú a mano tocando privados de ServerPlayer
+  (nextContainerCounter/containerCounter/initMenu) + interfaz world.inventory.ContainerListener
+  cambiada (dataChanged) + bodies ValueInput/Output. El reemplazo público 26.2 del hack de
+  abrir menú es player.openMenu(MenuProvider). Merece pase dedicado solo-ese-fichero.
+
+REPARTO DE LOS ~1.011 RESTANTES (recuento fresco: scratchpad/an4.py <logfile>):
+  client/  486   (renderers de entidad/boss, modelos, ClientEvent.java ~61) -- EL MÁS GRANDE
+  entity/  350   (SIN projectile/effect/AI/ ya hechos):
+     InternalAnimationMonster/AcropolisMonsters/ 68  (Clawdian_Entity.java 57 - fichero gigante)
+     AnimationMonster/BossMonsters/ 60  (Ignis 24, Harbinger 12, Ender_Guardian 11) + The_Leviathan/ 48
+     InternalAnimationMonster/Draugar/ 27  |  IABossMonsters/Scylla/ 27  |  Deepling/ 20
+     InternalAnimationMonster/ (root, mobs sueltos: Endermaptera, The_Prowler, Coralssus,
+       Kobolediator, Wadjet...) 21  |  Ancient_Remnant/ 14  |  Maledictus/ 11  |  NewNetherite_Monstrosity/ 11
+     + Pet/Netherite_Ministrosity (21, ver arriba)
+  items/   105  (data-driven rewrite - ver histórico "items data-driven rewrite" más abajo)
+  init/    32   |  mixin/ 18  |  effects/ 5  inventory/ 5  message/ 5  crafting/ 2  jei/ 2
+
+PATRONES 26.2 CONFIRMADOS ESTA SESIÓN (para el prompt de delegación):
+  - setPos(x,y,z,yaw,pitch) -> setPos(x,y,z)+setYRot((float)yaw)+setXRot((float)pitch)
+  - CompoundTag getX -> getXOr(k,def) ; getCompound -> getCompoundOrEmpty ; read/store(CODEC)
+  - Entity.kill() -> discard() (proyectiles) ó kill(ServerLevel)
+  - hurtServer(ServerLevel,DamageSource,float) es el override abstracto nuevo (marca/effect entities: return false)
+  - EntityDataSerializers.OPTIONAL_UUID ELIMINADO -> slot STRING + uuid.toString()/UUID.fromString
+    (afecta a Tidal_Tentacle ya hecho, Abyss_Mark, Abyss_Portal, The_Leviathan, etc.)
+  - Entity.setNoCulling(boolean) ELIMINADO (noCulling solo en Display) -> borrar la llamada
+  - EntityTypeTags.SENSITIVE_TO_ENDER ELIMINADO -> entity.getType() == EntityTypes.ENDERMAN
+  - ThrowableProjectile perdió el ctor (type,thrower,level) -> super(type, thrower.getX(),
+    thrower.getEyeY()-0.1, thrower.getZ(), level) + this.setOwner(thrower)
+  - ThrowableItemProjectile movido a ...projectile.throwableitemprojectile.* y +param ItemStack
+  - ItemParticleOption(ParticleType, Item)  (NO ItemStack)
+  - ChunkPos.x/.z campos -> .x()/.z() ; MobSpawnSettings.SpawnerData sin weight (weight en addSpawn)
+  - getShuffledJigsawBlocks -> List<StructureTemplate.JigsawBlockInfo> (.info()/.pool()/.name())
+  - RecordCodecBuilder.mapCodec con >~10 campos: hace falta el witness <T> explícito
+  - HurtByTargetGoal.timestamp privado -> getTimestamp()/setTimestamp() ; TargetingConditions.Selector
+    en vez de Predicate<LivingEntity> ; PathfinderMob restriction API renombrada (verificar en mc_src)
+
+PROCESO DE DELEGACIÓN (lo que funciona):
+  - Modelo: `opencode-go/longcat-2.0`. Fiable para port Java. Nvidia deepseek-v4-pro = demasiado lento.
+  - Prompt TIGHT: prohibir "leer todos los ficheros primero"; una-a-una; dar los patrones inline;
+    NO dejar que investigue cada API (solo si un error concreto lo pide). Plantillas:
+    scratchpad/deleg_projectile_v2.md , deleg_entity_misc.md , deleg_structures.md
+  - longcat hace ~8-15 ficheros por invocación y a veces sale limpio (exit 0) a mitad -> NO es cuelgue,
+    simplemente relanzar con el fichero de errores regenerado. Repetir hasta 0.
+  - Extraer errores del paquete:
+      grep -A2 -F 'cataclysmbosses\<pkg>\' scratchpad/compile_XX.txt | grep -vE '^\s+location:|^--$' > tmp_scratch/<pkg>_errors.txt
+  - Claude compila y verifica DESPUÉS (OpenCode no puede). Cerrar opencode al acabar:
+      powershell "Get-Process opencode | ? {$_.ProcessName -ceq 'opencode'} | Stop-Process -Force" ; ./gradlew --stop
+
+ORDEN SUGERIDO PARA MAÑANA:
+  1. Terminar entity/effect/+Pet/+AI/ (delegación ya lanzada; revisar resultado, compilar, commitear).
+  2. entity/ resto por subpaquete: AnimationMonster/BossMonsters/ (+The_Leviathan/), luego
+     InternalAnimationMonster/{AcropolisMonsters(Clawdian),Draugar,IABossMonsters/Scylla,...}, Deepling/.
+     Clawdian_Entity.java (57) probablemente merece pase a mano o delegación solo-ese-fichero.
+  3. items/ (~105) - data-driven, mirar PORT_STATUS histórico "items data-driven rewrite".
+  4. client/ (~486) - lo más grande; renderers dependían de entity/. Puentes Cm* ya existen.
+  5. init/ (~32), mixin/ (~18), y el resto pequeño.
+
 == 2026-08-29 (tarde) — HANDOFF: dónde retomar mañana ==
 
 ESTADO: `./gradlew compileJava` FALLA con **1.397 errores** (empezamos la sesión en 1.767).
