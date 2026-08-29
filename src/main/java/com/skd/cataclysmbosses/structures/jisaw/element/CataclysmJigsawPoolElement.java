@@ -112,15 +112,15 @@ extends StructurePoolElement {
     }
 
     public static <E extends CataclysmJigsawPoolElement> RecordCodecBuilder<E, Boolean> isPriorityCodec() {
-        return Codec.BOOL.optionalFieldOf("is_priority", (Object)false).forGetter(CataclysmJigsawPoolElement::isPriorityPiece);
+        return Codec.BOOL.optionalFieldOf("is_priority", false).forGetter(CataclysmJigsawPoolElement::isPriorityPiece);
     }
 
     public static <E extends CataclysmJigsawPoolElement> RecordCodecBuilder<E, Boolean> ignoreBoundsCodec() {
-        return Codec.BOOL.optionalFieldOf("ignore_bounds", (Object)false).forGetter(CataclysmJigsawPoolElement::ignoresBounds);
+        return Codec.BOOL.optionalFieldOf("ignore_bounds", false).forGetter(CataclysmJigsawPoolElement::ignoresBounds);
     }
 
     public static <E extends CataclysmJigsawPoolElement> RecordCodecBuilder<E, StructureCondition> conditionCodec() {
-        return StructureConditionType.CONDITION_CODEC.optionalFieldOf("condition", (Object)StructureCondition.ALWAYS_TRUE).forGetter(CataclysmJigsawPoolElement::getCondition);
+        return StructureConditionType.CONDITION_CODEC.optionalFieldOf("condition", StructureCondition.ALWAYS_TRUE).forGetter(CataclysmJigsawPoolElement::getCondition);
     }
 
     public static <E extends CataclysmJigsawPoolElement> RecordCodecBuilder<E, Optional<EnhancedTerrainAdaptation>> enhancedTerrainAdaptationCodec() {

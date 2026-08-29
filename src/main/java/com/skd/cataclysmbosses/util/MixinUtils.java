@@ -51,8 +51,8 @@ public class MixinUtils {
         if (!chunkAccess.getHighestGeneratedStatus().isOrAfter(ChunkStatus.STRUCTURE_REFERENCES)) {
             return false;
         }
-        Map allReferencesInChunk = chunkAccess.getAllReferences();
-        for (Map.Entry entry : allReferencesInChunk.entrySet()) {
+        Map<Structure, LongSet> allReferencesInChunk = chunkAccess.getAllReferences();
+        for (Map.Entry<Structure, LongSet> entry : allReferencesInChunk.entrySet()) {
             Structure structure = (Structure)entry.getKey();
             LongSet references = (LongSet)entry.getValue();
             Optional structureKey = structureRegistry.getResourceKey((Object)structure);

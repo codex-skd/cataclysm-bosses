@@ -41,7 +41,7 @@ public abstract class EnhancedTerrainAdaptation {
         this.bottomOffset = bottomOffset;
         this.padding = padding;
         int kernelRadius = this.getKernelRadius();
-        this.kernel = (float[])Util.make((Object)new float[kernelSize * kernelSize * kernelSize], kernel -> {
+        this.kernel = Util.make(new float[kernelSize * kernelSize * kernelSize], kernel -> {
             for (int x = 0; x < kernelSize; ++x) {
                 for (int y = 0; y < kernelSize; ++y) {
                     for (int z = 0; z < kernelSize; ++z) {
@@ -121,7 +121,7 @@ public abstract class EnhancedTerrainAdaptation {
 
     public record Padding(int x, int top, int bottom, int z) {
         public static final Padding ZERO = new Padding(0, 0, 0, 0);
-        public static final Codec<Padding> CODEC = RecordCodecBuilder.create(instance -> instance.group((App)Codec.INT.optionalFieldOf("x", (Object)0).forGetter(padding -> padding.x), (App)Codec.INT.optionalFieldOf("top", (Object)0).forGetter(padding -> padding.top), (App)Codec.INT.optionalFieldOf("bottom", (Object)0).forGetter(padding -> padding.bottom), (App)Codec.INT.optionalFieldOf("z", (Object)0).forGetter(padding -> padding.z)).apply((Applicative)instance, Padding::new));
+            public static final Codec<Padding> CODEC = RecordCodecBuilder.create(instance -> instance.group(Codec.INT.optionalFieldOf("x", 0).forGetter(padding -> padding.x), Codec.INT.optionalFieldOf("top", 0).forGetter(padding -> padding.top), Codec.INT.optionalFieldOf("bottom", 0).forGetter(padding -> padding.bottom), Codec.INT.optionalFieldOf("z", 0).forGetter(padding -> padding.z)).apply(instance, Padding::new));
     }
 }
 

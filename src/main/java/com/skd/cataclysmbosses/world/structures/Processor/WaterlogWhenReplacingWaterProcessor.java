@@ -56,14 +56,14 @@ implements StructureProcessor {
     ) {
         if (infoIn.state().hasProperty((Property)BlockStateProperties.WATERLOGGED)) {
             WorldGenRegion worldGenRegion;
-            if (levelReader instanceof WorldGenRegion && !(worldGenRegion = (WorldGenRegion)levelReader).getCenter().equals((Object)new ChunkPos(infoIn.pos()))) {
+            if (levelReader instanceof WorldGenRegion && !(worldGenRegion = (WorldGenRegion)levelReader).getCenter().equals(ChunkPos.containing(infoIn.pos()))) {
                 return infoIn;
             }
             BlockState blockState = levelReader.getChunk(infoIn.pos()).getBlockState(infoIn.pos());
             boolean isWater = blockState.getFluidState().is(FluidTags.WATER);
             if (isWater) {
                 ChunkAccess chunk = levelReader.getChunk(infoIn.pos());
-                int minY = chunk.getMinBuildHeight();
+                int minY = chunk.getMinY();
                 int maxY = chunk.getMaxY() + 1;
                 int currentY = infoIn.pos().getY();
                 if (currentY >= minY && currentY <= maxY) {

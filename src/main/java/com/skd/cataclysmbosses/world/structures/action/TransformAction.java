@@ -60,15 +60,15 @@ import net.minecraft.world.phys.AABB;
 
 public class TransformAction
 extends StructureAction {
-    private static final Codec<Either<Identifier, StructureTemplate>> TEMPLATE_CODEC = Codec.of(TransformAction::encodeTemplate, (Decoder)Identifier.CODEC.map(Either::left));
-    public static final MapCodec<TransformAction> CODEC = RecordCodecBuilder.mapCodec(builder -> builder.group((App)TEMPLATE_CODEC.listOf().fieldOf("output").forGetter(action -> action.output), (App)Codec.INT.optionalFieldOf("x_offset", (Object)0).forGetter(action -> action.xOffset), (App)Codec.INT.optionalFieldOf("y_offset", (Object)0).forGetter(action -> action.yOffset), (App)Codec.INT.optionalFieldOf("z_offset", (Object)0).forGetter(action -> action.zOffset)).apply((Applicative)builder, TransformAction::new));
+    private static final Codec<Either<Identifier, StructureTemplate>> TEMPLATE_CODEC = Codec.of(TransformAction::encodeTemplate, Identifier.CODEC.map(Either::left));
+    public static final MapCodec<TransformAction> CODEC = RecordCodecBuilder.mapCodec(builder -> builder.group(TEMPLATE_CODEC.listOf().fieldOf("output").forGetter(action -> action.output), Codec.INT.optionalFieldOf("x_offset", 0).forGetter(action -> action.xOffset), Codec.INT.optionalFieldOf("y_offset", 0).forGetter(action -> action.yOffset), Codec.INT.optionalFieldOf("z_offset", 0).forGetter(action -> action.zOffset)).apply(builder, TransformAction::new));
     private final List<Either<Identifier, StructureTemplate>> output;
     private final int xOffset;
     private final int yOffset;
     private final int zOffset;
 
     private static <T> DataResult<T> encodeTemplate(Either<Identifier, StructureTemplate> either, DynamicOps<T> ops, T data) {
-        return either.left().isEmpty() ? DataResult.error(() -> "cataclysm - Cannot serialize a runtime pool element") : Identifier.CODEC.encode((Object)((Identifier)either.left().get()), ops, data);
+        return either.left().isEmpty() ? DataResult.error(() -> "cataclysm - Cannot serialize a runtime pool element") : Identifier.CODEC.encode(either.left().get(), ops, data);
     }
 
     public TransformAction(List<Either<Identifier, StructureTemplate>> output, int xOffset, int yOffset, int zOffset) {

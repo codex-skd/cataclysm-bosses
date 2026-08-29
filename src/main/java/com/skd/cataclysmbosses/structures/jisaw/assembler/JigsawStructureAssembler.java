@@ -122,32 +122,32 @@ public class JigsawStructureAssembler {
     }
 
     private void addChildrenForPiece(PieceEntry pieceEntry) {
-        Holder fallbackPoolHolder;
+        Holder<StructureTemplatePool> fallbackPoolHolder;
         PoolElementStructurePiece piece = pieceEntry.getPiece();
-        MutableObject parentOctree = new MutableObject();
-        List pieceJigsawBlocks = piece.getElement().getShuffledJigsawBlocks(this.settings.structureTemplateManager, piece.getPosition(), piece.getRotation(), this.settings.rand);
+        MutableObject<BoxOctree> parentOctree = new MutableObject<>();
+        List<StructureTemplate.JigsawBlockInfo> pieceJigsawBlocks = piece.getElement().getShuffledJigsawBlocks(this.settings.structureTemplateManager, piece.getPosition(), piece.getRotation(), this.settings.rand);
         boolean generatedAtLeastOneChildPiece = false;
-        for (StructureTemplate.StructureBlockInfo jigsawBlockInfo : pieceJigsawBlocks) {
-            ResourceKey<StructureTemplatePool> poolKey = JigsawStructureAssembler.readPoolName(jigsawBlockInfo);
-            Optional optionalPoolHolder = this.settings.poolRegistry.getHolder(poolKey);
+        for (StructureTemplate.JigsawBlockInfo jigsawBlockInfo : pieceJigsawBlocks) {
+            ResourceKey<StructureTemplatePool> poolKey = jigsawBlockInfo.pool();
+            Optional<Holder.Reference<StructureTemplatePool>> optionalPoolHolder = this.settings.poolRegistry.get(poolKey);
             if (optionalPoolHolder.isEmpty()) {
-                Cataclysm.LOGGER.warn("Empty or nonexistent pool: {}", (Object)poolKey.location());
+                Cataclysm.LOGGER.warn("Empty or nonexistent pool: {}", (Object)poolKey.identifier());
                 continue;
             }
-            Holder targetPoolHolder = (Holder)optionalPoolHolder.get();
-            StructureTemplatePool targetPool = (StructureTemplatePool)targetPoolHolder.value();
+            Holder<StructureTemplatePool> targetPoolHolder = optionalPoolHolder.get();
+            StructureTemplatePool targetPool = targetPoolHolder.value();
             if (targetPool.size() == 0 && !targetPoolHolder.is(Pools.EMPTY)) {
-                Cataclysm.LOGGER.warn("Empty or nonexistent pool: {}", (Object)poolKey.location());
+                Cataclysm.LOGGER.warn("Empty or nonexistent pool: {}", (Object)poolKey.identifier());
                 continue;
             }
-            fallbackPoolHolder = ((StructureTemplatePool)targetPoolHolder.value()).getFallback();
-            StructureTemplatePool fallbackPool = (StructureTemplatePool)fallbackPoolHolder.value();
+            fallbackPoolHolder = targetPoolHolder.value().getFallback();
+            StructureTemplatePool fallbackPool = fallbackPoolHolder.value();
             if (fallbackPool.size() == 0 && !fallbackPoolHolder.is(Pools.EMPTY)) {
-                Cataclysm.LOGGER.warn("Empty or nonexistent fallback pool: {}", (Object)fallbackPoolHolder.unwrapKey().map(key -> key.location().toString()).orElse("<unregistered>"));
+                Cataclysm.LOGGER.warn("Empty or nonexistent fallback pool: {}", (Object)fallbackPoolHolder.unwrapKey().map(key -> key.identifier().toString()).orElse("<unregistered>"));
                 continue;
             }
-            PieceContext pieceContext = this.createPieceContextForJigsawBlock(jigsawBlockInfo, pieceEntry, (MutableObject<BoxOctree>)parentOctree);
-            Optional<Object> newlyGeneratedPiece = Optional.empty();
+            PieceContext pieceContext = this.createPieceContextForJigsawBlock(jigsawBlockInfo, pieceEntry, parentOctree);
+            Optional<StructurePoolElement> newlyGeneratedPiece = Optional.empty();
             if (pieceEntry.getDepth() != this.settings.maxDepth) {
                 pieceContext.candidatePoolElements = new ObjectArrayList(((StructureTemplatePoolAccessor)targetPool).getRawTemplates());
                 newlyGeneratedPiece = this.chooseCandidateFromPool(pieceContext);
@@ -161,7 +161,7 @@ public class JigsawStructureAssembler {
         }
         if (pieceEntry.getDeadendPool().isPresent() && !generatedAtLeastOneChildPiece && pieceJigsawBlocks.size() > 1) {
             Identifier deadendPoolId = pieceEntry.getDeadendPool().get();
-            Optional deadendPool = this.settings.poolRegistry.getOptional(deadendPoolId);
+            Optional<StructureTemplatePool> deadendPool = this.settings.poolRegistry.getOptional(deadendPoolId);
             if (deadendPool.isEmpty()) {
                 Cataclysm.LOGGER.error("Unable to find deadend pool {} for element {}", (Object)deadendPoolId, (Object)piece.getElement());
                 return;
@@ -176,9 +176,9 @@ public class JigsawStructureAssembler {
                 parentEntry.getPiece().getJunctions().remove(pieceEntry.getParentJunction());
                 ((BoxOctree)pieceEntry.getBoxOctree().getValue()).removeBox(pieceAabb);
                 this.pieces.remove(pieceEntry);
-                fallbackPoolHolder = pieceEntry.getPiece().getElement();
-                if (fallbackPoolHolder instanceof CataclysmJigsawPoolElement) {
-                    CataclysmJigsawPoolElement yungElement = (CataclysmJigsawPoolElement)fallbackPoolHolder;
+                StructurePoolElement fallbackElement = pieceEntry.getPiece().getElement();
+                if (fallbackElement instanceof CataclysmJigsawPoolElement) {
+                    CataclysmJigsawPoolElement yungElement = (CataclysmJigsawPoolElement)fallbackElement;
                     if (yungElement.maxCount.isPresent() && yungElement.name.isPresent() && this.pieceCounts.containsKey(yungElement.name.get())) {
                         pieceName = yungElement.name.get();
                         this.pieceCounts.put((String)pieceName, this.pieceCounts.get(pieceName) - 1);
@@ -193,19 +193,19 @@ public class JigsawStructureAssembler {
         }
     }
 
-    private PieceContext createPieceContextForJigsawBlock(StructureTemplate.StructureBlockInfo jigsawBlockInfo, PieceEntry pieceEntry, MutableObject<BoxOctree> parentOctree) {
+    private PieceContext createPieceContextForJigsawBlock(StructureTemplate.JigsawBlockInfo jigsawBlockInfo, PieceEntry pieceEntry, MutableObject<BoxOctree> parentOctree) {
         BoundingBox pieceBoundingBox = pieceEntry.getPiece().getBoundingBox();
         MutableObject<BoxOctree> pieceOctree = pieceEntry.getBoxOctree();
-        Direction direction = JigsawBlock.getFrontFacing((BlockState)jigsawBlockInfo.state());
-        BlockPos jigsawBlockTargetPos = jigsawBlockInfo.pos().relative(direction);
+        Direction direction = JigsawBlock.getFrontFacing(jigsawBlockInfo.info().state());
+        BlockPos jigsawBlockTargetPos = jigsawBlockInfo.info().pos().relative(direction);
         boolean isTargetInsideCurrentPiece = pieceBoundingBox.isInside((Vec3i)jigsawBlockTargetPos);
         if (isTargetInsideCurrentPiece) {
             pieceOctree = parentOctree;
             if (parentOctree.getValue() == null) {
-                parentOctree.setValue((Object)new BoxOctree(AABB.of((BoundingBox)pieceBoundingBox)));
+                parentOctree.setValue(new BoxOctree(AABB.of((BoundingBox)pieceBoundingBox)));
             }
         }
-        return new PieceContext(null, jigsawBlockInfo, jigsawBlockTargetPos, pieceBoundingBox.minY(), jigsawBlockInfo.pos(), pieceOctree, pieceEntry, pieceEntry.getDepth());
+        return new PieceContext(null, jigsawBlockInfo, jigsawBlockTargetPos, pieceBoundingBox.minY(), jigsawBlockInfo.info().pos(), pieceOctree, pieceEntry, pieceEntry.getDepth());
     }
 
     private Optional<StructurePoolElement> chooseCandidateFromPool(PieceContext context) {
@@ -214,31 +214,28 @@ public class JigsawStructureAssembler {
         boolean isPieceRigid = piece.getElement().getProjection() == StructureTemplatePool.Projection.RIGID;
         int jigsawBlockRelativeY = context.jigsawBlockPos.getY() - context.pieceMinY;
         int surfaceHeight = -1;
-        Util.shuffle(candidatePoolElements, (RandomSource)this.settings.rand);
-        int totalWeightSum = candidatePoolElements.stream().mapToInt(Pair::getSecond).reduce(0, Integer::sum);
+        Util.shuffle(candidatePoolElements, this.settings.rand);
+        int totalWeightSum = candidatePoolElements.stream().mapToInt(p -> p.getSecond()).reduce(0, Integer::sum);
         while (candidatePoolElements.size() > 0 && totalWeightSum > 0) {
             CataclysmJigsawPoolElement yungElement;
-            Pair chosenPoolElementPair = null;
-            for (Pair candidatePiecePair : candidatePoolElements) {
+            Pair<StructurePoolElement, Integer> chosenPoolElementPair = null;
+            for (Pair<StructurePoolElement, Integer> candidatePiecePair : candidatePoolElements) {
                 CataclysmJigsawPoolElement yungElement2;
-                StructurePoolElement candidatePiece = (StructurePoolElement)candidatePiecePair.getFirst();
+                StructurePoolElement candidatePiece = candidatePiecePair.getFirst();
                 if (!(candidatePiece instanceof CataclysmJigsawPoolElement) || !(yungElement2 = (CataclysmJigsawPoolElement)candidatePiece).isPriorityPiece()) continue;
                 chosenPoolElementPair = candidatePiecePair;
                 break;
             }
             if (chosenPoolElementPair == null) {
-                Pair candidatePiecePair;
                 int chosenWeight = this.settings.rand.nextInt(totalWeightSum) + 1;
-                candidatePiecePair = candidatePoolElements.iterator();
-                while (candidatePiecePair.hasNext()) {
-                    Pair candidate = (Pair)candidatePiecePair.next();
-                    if ((chosenWeight -= ((Integer)candidate.getSecond()).intValue()) > 0) continue;
+                for (Pair<StructurePoolElement, Integer> candidate : candidatePoolElements) {
+                    if ((chosenWeight -= candidate.getSecond()) > 0) continue;
                     chosenPoolElementPair = candidate;
                     break;
                 }
             }
-            StructurePoolElement chosenPoolElement = (StructurePoolElement)chosenPoolElementPair.getFirst();
-            int chosenPieceWeight = (Integer)chosenPoolElementPair.getSecond();
+            StructurePoolElement chosenPoolElement = chosenPoolElementPair.getFirst();
+            int chosenPieceWeight = chosenPoolElementPair.getSecond();
             if (chosenPoolElement == EmptyPoolElement.INSTANCE) {
                 return Optional.empty();
             }
@@ -260,7 +257,7 @@ public class JigsawStructureAssembler {
                         this.maxPieceCounts.put(pieceName, pieceMaxCount);
                         if (this.pieceCounts.getOrDefault(pieceName, 0) >= pieceMaxCount) {
                             totalWeightSum -= chosenPieceWeight;
-                            candidatePoolElements.remove((Object)chosenPoolElementPair);
+                            candidatePoolElements.remove(chosenPoolElementPair);
                             continue;
                         }
                     }
@@ -276,46 +273,46 @@ public class JigsawStructureAssembler {
                 }
                 this.maxPieceCounts.put(pieceName, maxCount);
                 if (this.pieceCounts.getOrDefault(pieceName, 0) >= maxCount) {
-                    totalWeightSum -= ((Integer)chosenPoolElementPair.getSecond()).intValue();
-                    candidatePoolElements.remove((Object)chosenPoolElementPair);
+                    totalWeightSum -= chosenPoolElementPair.getSecond();
+                    candidatePoolElements.remove(chosenPoolElementPair);
                     continue;
                 }
             }
             if (chosenPoolElement instanceof CataclysmJigsawPoolElement && !(yungElement = (CataclysmJigsawPoolElement)chosenPoolElement).isAtValidDepth(context.depth)) {
                 totalWeightSum -= chosenPieceWeight;
-                candidatePoolElements.remove((Object)chosenPoolElementPair);
+                candidatePoolElements.remove(chosenPoolElementPair);
                 continue;
             }
-            for (Rotation rotation : Rotation.getShuffled((RandomSource)this.settings.rand)) {
-                List candidateJigsawBlocks = chosenPoolElement.getShuffledJigsawBlocks(this.settings.structureTemplateManager, BlockPos.ZERO, rotation, this.settings.rand);
+            for (Rotation rotation : Rotation.getShuffled(this.settings.rand)) {
+                List<StructureTemplate.JigsawBlockInfo> candidateJigsawBlocks = chosenPoolElement.getShuffledJigsawBlocks(this.settings.structureTemplateManager, BlockPos.ZERO, rotation, this.settings.rand);
                 BoundingBox tempCandidateBoundingBox = chosenPoolElement.getBoundingBox(this.settings.structureTemplateManager, BlockPos.ZERO, rotation);
                 int candidateHeightAdjustments = 0;
                 if (this.settings.useExpansionHack && tempCandidateBoundingBox.getYSpan() <= 16) {
                     candidateHeightAdjustments = candidateJigsawBlocks.stream().mapToInt(pieceCandidateJigsawBlock -> {
-                        if (!tempCandidateBoundingBox.isInside((Vec3i)pieceCandidateJigsawBlock.pos().relative(JigsawBlock.getFrontFacing((BlockState)pieceCandidateJigsawBlock.state())))) {
+                        if (!tempCandidateBoundingBox.isInside((Vec3i)pieceCandidateJigsawBlock.info().pos().relative(JigsawBlock.getFrontFacing(pieceCandidateJigsawBlock.info().state())))) {
                             return 0;
                         }
-                        ResourceKey<StructureTemplatePool> candidateTargetPoolKey = JigsawStructureAssembler.readPoolName(pieceCandidateJigsawBlock);
-                        Optional candidateTargetPool = this.settings.poolRegistry.getHolder(candidateTargetPoolKey);
-                        Optional<Holder> candidateFallbackPool = candidateTargetPool.map(poolHolder -> ((StructureTemplatePool)poolHolder.value()).getFallback());
-                        int candidateMaxSize = candidateTargetPool.map(poolHolder -> ((StructureTemplatePool)poolHolder.value()).getMaxSize(this.settings.structureTemplateManager)).orElse(0);
-                        int candidateFallbackMaxSize = candidateFallbackPool.map(poolHolder -> ((StructureTemplatePool)poolHolder.value()).getMaxSize(this.settings.structureTemplateManager)).orElse(0);
+                        ResourceKey<StructureTemplatePool> candidateTargetPoolKey = pieceCandidateJigsawBlock.pool();
+                        Optional<Holder.Reference<StructureTemplatePool>> candidateTargetPool = this.settings.poolRegistry.get(candidateTargetPoolKey);
+                        Optional<Holder<StructureTemplatePool>> candidateFallbackPool = candidateTargetPool.map(poolHolder -> poolHolder.value().getFallback());
+                        int candidateMaxSize = candidateTargetPool.map(poolHolder -> poolHolder.value().getMaxSize(this.settings.structureTemplateManager)).orElse(0);
+                        int candidateFallbackMaxSize = candidateFallbackPool.map(poolHolder -> poolHolder.value().getMaxSize(this.settings.structureTemplateManager)).orElse(0);
                         return Math.max(candidateMaxSize, candidateFallbackMaxSize);
                     }).max().orElse(0);
                 }
-                for (StructureTemplate.StructureBlockInfo candidateJigsawBlock : candidateJigsawBlocks) {
+                for (StructureTemplate.JigsawBlockInfo candidateJigsawBlock : candidateJigsawBlocks) {
                     StructureContext ctx;
                     CataclysmJigsawPoolElement yungElement3;
                     int candidateJigsawBlockY;
                     int adjustedCandidatePieceMinY;
-                    if (!JigsawBlock.canAttach((StructureTemplate.StructureBlockInfo)context.jigsawBlock, (StructureTemplate.StructureBlockInfo)candidateJigsawBlock)) continue;
-                    BlockPos candidateJigsawBlockPos = candidateJigsawBlock.pos();
+                    if (!JigsawBlock.canAttach(context.jigsawBlock, candidateJigsawBlock)) continue;
+                    BlockPos candidateJigsawBlockPos = candidateJigsawBlock.info().pos();
                     BlockPos candidateJigsawBlockRelativePos = context.jigsawBlockTargetPos.subtract((Vec3i)candidateJigsawBlockPos);
                     BoundingBox rotatedCandidateBoundingBox = chosenPoolElement.getBoundingBox(this.settings.structureTemplateManager, candidateJigsawBlockRelativePos, rotation);
                     StructureTemplatePool.Projection candidateProjection = chosenPoolElement.getProjection();
                     boolean isCandidateRigid = candidateProjection == StructureTemplatePool.Projection.RIGID;
                     int candidateJigsawBlockRelativeY = candidateJigsawBlockPos.getY();
-                    int candidateJigsawYOffsetNeeded = jigsawBlockRelativeY - candidateJigsawBlockRelativeY + JigsawBlock.getFrontFacing((BlockState)context.jigsawBlock.state()).getStepY();
+                    int candidateJigsawYOffsetNeeded = jigsawBlockRelativeY - candidateJigsawBlockRelativeY + JigsawBlock.getFrontFacing(context.jigsawBlock.info().state()).getStepY();
                     if (isPieceRigid && isCandidateRigid) {
                         adjustedCandidatePieceMinY = context.pieceMinY + candidateJigsawYOffsetNeeded;
                     } else {
@@ -405,8 +402,8 @@ public class JigsawStructureAssembler {
         this.pieces.addAll(delayedEntries);
     }
 
-    private static ResourceKey<StructureTemplatePool> readPoolName(StructureTemplate.StructureBlockInfo jigsawBlockInfo) {
-        return ResourceKey.create((ResourceKey)Registries.TEMPLATE_POOL, (Identifier)Identifier.parse((String)jigsawBlockInfo.nbt().getString("pool")));
+    private static ResourceKey<StructureTemplatePool> readPoolName(StructureTemplate.JigsawBlockInfo jigsawBlockInfo) {
+        return jigsawBlockInfo.pool();
     }
 
     public static class Settings {
@@ -496,7 +493,7 @@ public class JigsawStructureAssembler {
             if (this.minY.isPresent() && y < this.minY.get()) {
                 return false;
             }
-            if (y < this.levelHeightAccessor.getMinBuildHeight() + this.dimensionPadding.bottom()) {
+            if (y < this.levelHeightAccessor.getMinY() + this.dimensionPadding.bottom()) {
                 return false;
             }
             return y <= this.levelHeightAccessor.getMaxY() + 1 - this.dimensionPadding.top();

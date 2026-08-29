@@ -38,7 +38,7 @@ extends SavedData {
             Identifier.withDefaultNamespace(IDENTIFIER),
             CMWorldData::new,
             null, // Codec - will use default compound tag
-            DataFixTypes.LEVEL_DATA
+            DataFixTypes.LEVEL
         );
     }
 
@@ -62,8 +62,8 @@ extends SavedData {
     // Legacy method for backward compatibility - will be called via SavedDataStorage
     public static CMWorldData load(CompoundTag nbt, HolderLookup.Provider p_323806_) {
         CMWorldData data = new CMWorldData();
-        data.LeviathanBossDefeatedOnce = nbt.getBoolean("LeviathanDefeatedOnce");
-        data.IgnisBossDefeatedOnce = nbt.getBoolean("IgnisDefeatedOnce");
+        data.LeviathanBossDefeatedOnce = nbt.getBooleanOr("LeviathanDefeatedOnce", false);
+        data.IgnisBossDefeatedOnce = nbt.getBooleanOr("IgnisDefeatedOnce", false);
         return data;
     }
 

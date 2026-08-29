@@ -112,15 +112,15 @@ extends StructurePoolElement {
     }
 
     public static <E extends CataclysmPoolElement> RecordCodecBuilder<E, Boolean> isPriorityCodec() {
-        return Codec.BOOL.optionalFieldOf("is_priority", (Object)false).forGetter(CataclysmPoolElement::isPriorityPiece);
+        return Codec.BOOL.optionalFieldOf("is_priority", false).forGetter(CataclysmPoolElement::isPriorityPiece);
     }
 
     public static <E extends CataclysmPoolElement> RecordCodecBuilder<E, Boolean> ignoreBoundsCodec() {
-        return Codec.BOOL.optionalFieldOf("ignore_bounds", (Object)false).forGetter(CataclysmPoolElement::ignoresBounds);
+        return Codec.BOOL.optionalFieldOf("ignore_bounds", false).forGetter(CataclysmPoolElement::ignoresBounds);
     }
 
     public static <E extends CataclysmPoolElement> RecordCodecBuilder<E, StructureCondition> conditionCodec() {
-        return StructureConditionType.CONDITION_CODEC.optionalFieldOf("condition", (Object)StructureCondition.ALWAYS_TRUE).forGetter(CataclysmPoolElement::getCondition);
+        return StructureConditionType.CONDITION_CODEC.optionalFieldOf("condition", StructureCondition.ALWAYS_TRUE).forGetter(CataclysmPoolElement::getCondition);
     }
 
     public static <E extends CataclysmPoolElement> RecordCodecBuilder<E, Optional<EnhancedTerrainAdaptation>> enhancedTerrainAdaptationCodec() {

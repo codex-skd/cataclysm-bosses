@@ -74,7 +74,7 @@ extends Structure {
 
     protected boolean checkLocation(Structure.GenerationContext context, Set<Holder<Biome>> allowedBiomes, boolean checkHeight, boolean avoidWater, boolean avoidStructures) {
         ChunkPos chunkPos = context.chunkPos();
-        BlockPos centerOfChunk = new BlockPos((chunkPos.x << 4) + 7, 0, (chunkPos.z << 4) + 7);
+        BlockPos centerOfChunk = new BlockPos((chunkPos.x() << 4) + 7, 0, (chunkPos.z() << 4) + 7);
         if (avoidWater) {
             ChunkGenerator chunkGenerator = context.chunkGenerator();
             LevelHeightAccessor heightLimitView = context.heightAccessor();

@@ -75,7 +75,7 @@ import net.minecraft.world.phys.AABB;
 public class CataclysmJigsawManager {
     public static Optional<Structure.GenerationStub> assembleJigsawStructure(Structure.GenerationContext generationContext, Holder<StructureTemplatePool> startPool, Optional<Identifier> startJigsawNameOptional, int maxDepth, BlockPos locatePos, boolean useExpansionHack, Optional<Heightmap.Types> projectStartToHeightmap, int maxDistanceFromCenter, Optional<Integer> maxY, Optional<Integer> minY, DimensionPadding dimensionPadding, LiquidSettings liquidSettings) {
         RegistryAccess registryAccess = generationContext.registryAccess();
-        Registry registry = registryAccess.registryOrThrow(Registries.TEMPLATE_POOL);
+        Registry registry = registryAccess.lookupOrThrow(Registries.TEMPLATE_POOL);
         ChunkGenerator chunkGenerator = generationContext.chunkGenerator();
         StructureTemplateManager structureManager = generationContext.structureTemplateManager();
         LevelHeightAccessor levelHeightAccessor = generationContext.heightAccessor();
@@ -111,42 +111,39 @@ public class CataclysmJigsawManager {
         StructureTemplateManager structureTemplateManager = generationContext.structureTemplateManager();
         WorldgenRandom rand = generationContext.random();
         StructureTemplatePool startPool = (StructureTemplatePool)startPoolHolder.value();
-        ObjectArrayList candidatePoolElements = new ObjectArrayList(((StructureTemplatePoolAccessor)startPool).getRawTemplates());
-        Util.shuffle((List)candidatePoolElements, (RandomSource)rand);
-        Rotation rotation = Rotation.getRandom((RandomSource)rand);
-        for (int totalWeightSum = candidatePoolElements.stream().mapToInt(Pair::getSecond).reduce(0, Integer::sum); candidatePoolElements.size() > 0 && totalWeightSum > 0; totalWeightSum -= chosenPieceWeight) {
+        ObjectArrayList<Pair<StructurePoolElement, Integer>> candidatePoolElements = new ObjectArrayList(((StructureTemplatePoolAccessor)startPool).getRawTemplates());
+        Util.shuffle((List)candidatePoolElements, rand);
+        Rotation rotation = Rotation.getRandom(rand);
+        for (int totalWeightSum = candidatePoolElements.stream().mapToInt(p -> p.getSecond()).reduce(0, Integer::sum); candidatePoolElements.size() > 0 && totalWeightSum > 0; totalWeightSum -= chosenPieceWeight) {
             StructureContext ctx;
             CataclysmJigsawPoolElement yungElement;
             BlockPos anchorPos;
-            Pair chosenPoolElementPair = null;
-            for (Pair candidatePiecePair : candidatePoolElements) {
+            Pair<StructurePoolElement, Integer> chosenPoolElementPair = null;
+            for (Pair<StructurePoolElement, Integer> candidatePiecePair : candidatePoolElements) {
                 CataclysmJigsawPoolElement yungElement2;
-                StructurePoolElement candidatePiece = (StructurePoolElement)candidatePiecePair.getFirst();
+                StructurePoolElement candidatePiece = candidatePiecePair.getFirst();
                 if (!(candidatePiece instanceof CataclysmJigsawPoolElement) || !(yungElement2 = (CataclysmJigsawPoolElement)candidatePiece).isPriorityPiece()) continue;
                 chosenPoolElementPair = candidatePiecePair;
                 break;
             }
             if (chosenPoolElementPair == null) {
-                Pair candidatePiecePair;
                 int chosenWeight = rand.nextInt(totalWeightSum) + 1;
-                candidatePiecePair = candidatePoolElements.iterator();
-                while (candidatePiecePair.hasNext()) {
-                    Pair candidate = (Pair)candidatePiecePair.next();
-                    if ((chosenWeight -= ((Integer)candidate.getSecond()).intValue()) > 0) continue;
+                for (Pair<StructurePoolElement, Integer> candidate : candidatePoolElements) {
+                    if ((chosenWeight -= candidate.getSecond()) > 0) continue;
                     chosenPoolElementPair = candidate;
                     break;
                 }
             }
-            StructurePoolElement chosenPoolElement = (StructurePoolElement)chosenPoolElementPair.getFirst();
-            chosenPieceWeight = (Integer)chosenPoolElementPair.getSecond();
+            StructurePoolElement chosenPoolElement = chosenPoolElementPair.getFirst();
+            chosenPieceWeight = chosenPoolElementPair.getSecond();
             if (chosenPoolElement == EmptyPoolElement.INSTANCE) {
                 return Optional.empty();
             }
             if (startJigsawNameOptional.isPresent()) {
                 Identifier name = startJigsawNameOptional.get();
-                Optional<BlockPos> optional = CataclysmJigsawManager.getPosOfJigsawBlockWithName(chosenPoolElement, name, locatePos, rotation, structureTemplateManager, (RandomSource)rand);
+                Optional<BlockPos> optional = CataclysmJigsawManager.getPosOfJigsawBlockWithName(chosenPoolElement, name, locatePos, rotation, structureTemplateManager, rand);
                 if (optional.isEmpty()) {
-                    Cataclysm.LOGGER.error("No starting jigsaw with Name {} found in start pool {}", (Object)name, (Object)startPoolHolder.unwrapKey().map(pool -> pool.location().toString()).orElse("<unregistered>"));
+                    Cataclysm.LOGGER.error("No starting jigsaw with Name {} found in start pool {}", (Object)name, (Object)startPoolHolder.unwrapKey().map(pool -> pool.identifier().toString()).orElse("<unregistered>"));
                     return Optional.empty();
                 }
                 anchorPos = optional.get();
@@ -155,8 +152,8 @@ public class CataclysmJigsawManager {
             }
             BlockPos startingPosOffset = anchorPos.subtract((Vec3i)locatePos);
             BlockPos adjustedStartPos = locatePos.subtract((Vec3i)startingPosOffset);
-            if (chosenPoolElement instanceof CataclysmJigsawPoolElement && !(yungElement = (CataclysmJigsawPoolElement)chosenPoolElement).passesConditions(ctx = new StructureContext.Builder().structureTemplateManager(structureTemplateManager).pos(adjustedStartPos).rotation(rotation).depth(0).random((RandomSource)rand).randomState(generationContext.randomState()).biomeSource(generationContext.biomeSource()).build())) {
-                candidatePoolElements.remove((Object)chosenPoolElementPair);
+            if (chosenPoolElement instanceof CataclysmJigsawPoolElement && !(yungElement = (CataclysmJigsawPoolElement)chosenPoolElement).passesConditions(ctx = new StructureContext.Builder().structureTemplateManager(structureTemplateManager).pos(adjustedStartPos).rotation(rotation).depth(0).random(rand).randomState(generationContext.randomState()).biomeSource(generationContext.biomeSource()).build())) {
+                candidatePoolElements.remove(chosenPoolElementPair);
                 continue;
             }
             return Optional.of(new PoolElementStructurePiece(structureTemplateManager, chosenPoolElement, adjustedStartPos, chosenPoolElement.getGroundLevelDelta(), rotation, chosenPoolElement.getBoundingBox(structureTemplateManager, adjustedStartPos, rotation), liquidSettings));
@@ -166,11 +163,10 @@ public class CataclysmJigsawManager {
 
     private static Optional<BlockPos> getPosOfJigsawBlockWithName(StructurePoolElement structurePoolElement, Identifier name, BlockPos startPos, Rotation rotation, StructureTemplateManager structureTemplateManager, RandomSource rand) {
         try {
-            List shuffledJigsawBlocks = structurePoolElement.getShuffledJigsawBlocks(structureTemplateManager, startPos, rotation, rand);
-            for (StructureTemplate.StructureBlockInfo jigsawBlockInfo : shuffledJigsawBlocks) {
-                Identifier jigsawBlockName = Identifier.tryParse((String)jigsawBlockInfo.nbt().getString("name"));
-                if (!name.equals((Object)jigsawBlockName)) continue;
-                return Optional.of(jigsawBlockInfo.pos());
+            List<StructureTemplate.JigsawBlockInfo> shuffledJigsawBlocks = structurePoolElement.getShuffledJigsawBlocks(structureTemplateManager, startPos, rotation, rand);
+            for (StructureTemplate.JigsawBlockInfo jigsawBlockInfo : shuffledJigsawBlocks) {
+                if (!name.equals((Object)jigsawBlockInfo.name())) continue;
+                return Optional.of(jigsawBlockInfo.info().pos());
             }
         }
         catch (ConcurrentModificationException e) {

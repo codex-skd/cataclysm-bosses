@@ -51,6 +51,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.valueproviders.ConstantInt;
 import net.minecraft.util.valueproviders.IntProvider;
+import net.minecraft.util.valueproviders.IntProviders;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.WorldGenerationContext;
@@ -68,7 +69,7 @@ import org.jetbrains.annotations.NotNull;
 public class CataclysmJigsawStructure
 extends Structure {
     public static final int MAX_TOTAL_STRUCTURE_RADIUS = 192;
-    public static final MapCodec<CataclysmJigsawStructure> CODEC = RecordCodecBuilder.mapCodec(builder -> builder.group((App)CataclysmJigsawStructure.settingsCodec((RecordCodecBuilder.Instance)builder), (App)StructureTemplatePool.CODEC.fieldOf("start_pool").forGetter(structure -> structure.startPool), (App)Identifier.CODEC.optionalFieldOf("start_jigsaw_name").forGetter(structure -> structure.startJigsawName), (App)Codec.intRange((int)0, (int)128).fieldOf("size").forGetter(structure -> structure.maxDepth), (App)HeightProvider.CODEC.fieldOf("start_height").forGetter(structure -> structure.startHeight), (App)IntProvider.codec((int)0, (int)15).optionalFieldOf("x_offset_in_chunk", (Object)ConstantInt.of((int)0)).forGetter(structure -> structure.xOffsetInChunk), (App)IntProvider.codec((int)0, (int)15).optionalFieldOf("z_offset_in_chunk", (Object)ConstantInt.of((int)0)).forGetter(structure -> structure.zOffsetInChunk), (App)Codec.BOOL.optionalFieldOf("use_expansion_hack", (Object)false).forGetter(structure -> structure.useExpansionHack), (App)Heightmap.Types.CODEC.optionalFieldOf("project_start_to_heightmap").forGetter(structure -> structure.projectStartToHeightmap), (App)Codec.intRange((int)1, (int)192).fieldOf("max_distance_from_center").forGetter(structure -> structure.maxDistanceFromCenter), (App)Codec.INT.optionalFieldOf("max_y").forGetter(structure -> structure.maxY), (App)Codec.INT.optionalFieldOf("min_y").forGetter(structure -> structure.minY), (App)EnhancedTerrainAdaptationType.ADAPTATION_CODEC.optionalFieldOf("enhanced_terrain_adaptation", (Object)EnhancedTerrainAdaptation.NONE).forGetter(structure -> structure.enhancedTerrainAdaptation), (App)DimensionPadding.CODEC.optionalFieldOf("dimension_padding", (Object)DimensionPadding.ZERO).forGetter(structure -> structure.dimensionPadding), (App)LiquidSettings.CODEC.optionalFieldOf("liquid_settings", (Object)LiquidSettings.APPLY_WATERLOGGING).forGetter(structure -> structure.liquidSettings)).apply((Applicative)builder, CataclysmJigsawStructure::new)).validate(CataclysmJigsawStructure::validateRange);
+    public static final MapCodec<CataclysmJigsawStructure> CODEC = RecordCodecBuilder.<CataclysmJigsawStructure>mapCodec(builder -> builder.group(CataclysmJigsawStructure.settingsCodec(builder), StructureTemplatePool.CODEC.fieldOf("start_pool").forGetter(structure -> structure.startPool), Identifier.CODEC.optionalFieldOf("start_jigsaw_name").forGetter(structure -> structure.startJigsawName), Codec.intRange(0, 128).fieldOf("size").forGetter(structure -> structure.maxDepth), HeightProvider.CODEC.fieldOf("start_height").forGetter(structure -> structure.startHeight), IntProviders.codec(0, 15).optionalFieldOf("x_offset_in_chunk", ConstantInt.of(0)).forGetter(structure -> structure.xOffsetInChunk), IntProviders.codec(0, 15).optionalFieldOf("z_offset_in_chunk", ConstantInt.of(0)).forGetter(structure -> structure.zOffsetInChunk), Codec.BOOL.optionalFieldOf("use_expansion_hack", false).forGetter(structure -> structure.useExpansionHack), Heightmap.Types.CODEC.optionalFieldOf("project_start_to_heightmap").forGetter(structure -> structure.projectStartToHeightmap), Codec.intRange(1, 192).fieldOf("max_distance_from_center").forGetter(structure -> structure.maxDistanceFromCenter), Codec.INT.optionalFieldOf("max_y").forGetter(structure -> structure.maxY), Codec.INT.optionalFieldOf("min_y").forGetter(structure -> structure.minY), EnhancedTerrainAdaptationType.ADAPTATION_CODEC.optionalFieldOf("enhanced_terrain_adaptation", EnhancedTerrainAdaptation.NONE).forGetter(structure -> structure.enhancedTerrainAdaptation), DimensionPadding.CODEC.optionalFieldOf("dimension_padding", DimensionPadding.ZERO).forGetter(structure -> structure.dimensionPadding), LiquidSettings.CODEC.optionalFieldOf("liquid_settings", LiquidSettings.APPLY_WATERLOGGING).forGetter(structure -> structure.liquidSettings)).apply(builder, CataclysmJigsawStructure::new)).validate(CataclysmJigsawStructure::validateRange);
     public final Holder<StructureTemplatePool> startPool;
     private final Optional<Identifier> startJigsawName;
     public final int maxDepth;
@@ -129,7 +130,7 @@ extends Structure {
         if (structure.maxDistanceFromCenter + enhancedEdgeBuffer > 192) {
             return DataResult.error(() -> "Cataclysm Structure's max_distance_from_center + kernel radius (equal to half the enhanced_terrain_adaptation's kernel size) must not exceed 128");
         }
-        return DataResult.success((Object)((Object)structure));
+        return DataResult.success(structure);
     }
 
     @NotNull

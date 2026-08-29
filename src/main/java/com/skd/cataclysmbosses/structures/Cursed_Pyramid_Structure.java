@@ -55,6 +55,7 @@ import com.google.common.collect.ImmutableMap;
 import com.mojang.serialization.MapCodec;
 import java.util.Map;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -71,7 +72,7 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
-import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.BlockEntityTypes;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.levelgen.Heightmap;
@@ -104,7 +105,7 @@ extends CataclysmStructure {
     private static final Identifier UPPER4 = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"cursed_pyramid_upper4");
     private static final Identifier OBELISK1 = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"cursed_pyramid_obelisk1");
     private static final Identifier OBELISK2 = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"cursed_pyramid_obelisk2");
-    private static final Map<Identifier, BlockPos> OFFSET = ImmutableMap.builder().put((Object)LOWER1, (Object)new BlockPos(0, 1, 0)).put((Object)LOWER2, (Object)new BlockPos(0, 1, 0)).put((Object)LOWER3, (Object)new BlockPos(0, 1, 0)).put((Object)LOWER4, (Object)new BlockPos(0, 1, 0)).put((Object)UPPER1, (Object)new BlockPos(0, 1, 0)).put((Object)UPPER2, (Object)new BlockPos(0, 1, 0)).put((Object)UPPER3, (Object)new BlockPos(0, 1, 0)).put((Object)UPPER4, (Object)new BlockPos(0, 1, 0)).put((Object)OBELISK1, (Object)new BlockPos(0, 1, 0)).put((Object)OBELISK2, (Object)new BlockPos(0, 1, 0)).build();
+    private static final Map<Identifier, BlockPos> OFFSET = ImmutableMap.<Identifier, BlockPos>builder().put(LOWER1, new BlockPos(0, 1, 0)).put(LOWER2, new BlockPos(0, 1, 0)).put(LOWER3, new BlockPos(0, 1, 0)).put(LOWER4, new BlockPos(0, 1, 0)).put(UPPER1, new BlockPos(0, 1, 0)).put(UPPER2, new BlockPos(0, 1, 0)).put(UPPER3, new BlockPos(0, 1, 0)).put(UPPER4, new BlockPos(0, 1, 0)).put(OBELISK1, new BlockPos(0, 1, 0)).put(OBELISK2, new BlockPos(0, 1, 0)).build();
 
     public Cursed_Pyramid_Structure(Structure.StructureSettings p_227593_) {
         super(p_227593_);
@@ -119,8 +120,8 @@ extends CataclysmStructure {
     public void generatePieces(StructurePiecesBuilder builder, Structure.GenerationContext context) {
         StructureTemplateManager templateManager = context.structureTemplateManager();
         Rotation rotation = Rotation.values()[context.random().nextInt(Rotation.values().length)];
-        int x = (context.chunkPos().x << 4) + 7;
-        int z = (context.chunkPos().z << 4) + 7;
+        int x = (context.chunkPos().x() << 4) + 7;
+        int z = (context.chunkPos().z() << 4) + 7;
         BlockPos centerPos = new BlockPos(x, 1, z);
         ChunkGenerator generator = context.chunkGenerator();
         LevelHeightAccessor heightLimitView = context.heightAccessor();
@@ -140,16 +141,17 @@ extends CataclysmStructure {
         BlockPos upper2Offset = spawncenterPos.offset((Vec3i)new BlockPos(0, 9, 47).rotate(rotation));
         BlockPos upper3Offset = spawncenterPos.offset((Vec3i)new BlockPos(47, 9, 0).rotate(rotation));
         BlockPos upper4Offset = spawncenterPos.offset((Vec3i)new BlockPos(47, 9, 47).rotate(rotation));
-        builder.addPiece((StructurePiece)new Piece(templateManager, LOWER1, lower1Offset, rotation));
-        builder.addPiece((StructurePiece)new Piece(templateManager, LOWER2, lower2Offset, rotation));
-        builder.addPiece((StructurePiece)new Piece(templateManager, LOWER3, lower3Offset, rotation));
-        builder.addPiece((StructurePiece)new Piece(templateManager, LOWER4, lower4Offset, rotation));
-        builder.addPiece((StructurePiece)new Piece(templateManager, UPPER1, upper1Offset, rotation));
-        builder.addPiece((StructurePiece)new Piece(templateManager, UPPER2, upper2Offset, rotation));
-        builder.addPiece((StructurePiece)new Piece(templateManager, UPPER3, upper3Offset, rotation));
-        builder.addPiece((StructurePiece)new Piece(templateManager, UPPER4, upper4Offset, rotation));
-        builder.addPiece((StructurePiece)new Piece(templateManager, OBELISK1, obelisk1Offset, rotation));
-        builder.addPiece((StructurePiece)new Piece(templateManager, OBELISK2, obelisk2Offset, rotation));
+        RegistryAccess regAccess = context.registryAccess();
+        builder.addPiece((StructurePiece)new Piece(templateManager, LOWER1, lower1Offset, rotation, regAccess));
+        builder.addPiece((StructurePiece)new Piece(templateManager, LOWER2, lower2Offset, rotation, regAccess));
+        builder.addPiece((StructurePiece)new Piece(templateManager, LOWER3, lower3Offset, rotation, regAccess));
+        builder.addPiece((StructurePiece)new Piece(templateManager, LOWER4, lower4Offset, rotation, regAccess));
+        builder.addPiece((StructurePiece)new Piece(templateManager, UPPER1, upper1Offset, rotation, regAccess));
+        builder.addPiece((StructurePiece)new Piece(templateManager, UPPER2, upper2Offset, rotation, regAccess));
+        builder.addPiece((StructurePiece)new Piece(templateManager, UPPER3, upper3Offset, rotation, regAccess));
+        builder.addPiece((StructurePiece)new Piece(templateManager, UPPER4, upper4Offset, rotation, regAccess));
+        builder.addPiece((StructurePiece)new Piece(templateManager, OBELISK1, obelisk1Offset, rotation, regAccess));
+        builder.addPiece((StructurePiece)new Piece(templateManager, OBELISK2, obelisk2Offset, rotation, regAccess));
     }
 
     public StructureType<?> type() {
@@ -163,21 +165,21 @@ extends CataclysmStructure {
 
     public static class Piece
     extends TemplateStructurePiece {
-        public Piece(StructureTemplateManager templateManagerIn, Identifier resourceLocationIn, BlockPos pos, Rotation rotation) {
-            super((StructurePieceType)ModStructures.CPD.get(), 0, templateManagerIn, resourceLocationIn, resourceLocationIn.toString(), Piece.makeSettings(rotation), Piece.makecenterPos(resourceLocationIn, pos));
+        public Piece(StructureTemplateManager templateManagerIn, Identifier resourceLocationIn, BlockPos pos, Rotation rotation, RegistryAccess registryAccess) {
+            super((StructurePieceType)ModStructures.CPD.get(), 0, templateManagerIn, resourceLocationIn, resourceLocationIn.toString(), Piece.makeSettings(rotation, registryAccess), Piece.makecenterPos(resourceLocationIn, pos));
         }
 
-        public Piece(StructureTemplateManager templateManagerIn, CompoundTag tagCompound) {
-            super((StructurePieceType)ModStructures.CPD.get(), tagCompound, templateManagerIn, p_162451_ -> Piece.makeSettings(Rotation.valueOf((String)tagCompound.getString("Rot"))));
+        public Piece(StructureTemplateManager templateManagerIn, CompoundTag tagCompound, RegistryAccess registryAccess) {
+            super((StructurePieceType)ModStructures.CPD.get(), tagCompound, templateManagerIn, p_162451_ -> Piece.makeSettings(Rotation.valueOf(tagCompound.getStringOr("Rot", "NONE")), registryAccess));
         }
 
         public Piece(StructurePieceSerializationContext context, CompoundTag tag) {
-            this(context.structureTemplateManager(), tag);
+            this(context.structureTemplateManager(), tag, context.registryAccess());
         }
 
-        private static StructurePlaceSettings makeSettings(Rotation p_163156_) {
+        private static StructurePlaceSettings makeSettings(Rotation p_163156_, RegistryAccess registryAccess) {
             BlockIgnoreProcessor blockignoreprocessor = BlockIgnoreProcessor.STRUCTURE_BLOCK;
-            StructurePlaceSettings structureplacesettings = new StructurePlaceSettings().setRotation(p_163156_).setMirror(Mirror.NONE).addProcessor((StructureProcessor)blockignoreprocessor).setLiquidSettings(LiquidSettings.IGNORE_WATERLOGGING).addProcessor((StructureProcessor)new ProtectedBlockProcessor(BlockTags.FEATURES_CANNOT_REPLACE));
+            StructurePlaceSettings structureplacesettings = new StructurePlaceSettings().setRotation(p_163156_).setMirror(Mirror.NONE).addProcessor((StructureProcessor)blockignoreprocessor).setLiquidSettings(LiquidSettings.IGNORE_WATERLOGGING).addProcessor((StructureProcessor)new ProtectedBlockProcessor(registryAccess.getOrThrow(BlockTags.FEATURES_CANNOT_REPLACE)));
             return structureplacesettings;
         }
 
@@ -194,7 +196,7 @@ extends CataclysmStructure {
             switch (function) {
                 case "necklace": {
                     worldIn.setBlock(pos, Blocks.SUSPICIOUS_SAND.defaultBlockState(), 2);
-                    worldIn.getBlockEntity(pos, BlockEntityType.BRUSHABLE_BLOCK).ifPresent(blockEntity -> {
+                    worldIn.getBlockEntity(pos, BlockEntityTypes.BRUSHABLE_BLOCK).ifPresent(blockEntity -> {
                         ResourceKey lootTableLocation = ResourceKey.create((ResourceKey)Registries.LOOT_TABLE, (Identifier)Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"archaeology/cursed_pyramid_necklace"));
                         blockEntity.setLootTable(lootTableLocation, pos.asLong());
                     });
@@ -202,7 +204,7 @@ extends CataclysmStructure {
                 }
                 case "sus": {
                     worldIn.setBlock(pos, Blocks.SUSPICIOUS_SAND.defaultBlockState(), 2);
-                    worldIn.getBlockEntity(pos, BlockEntityType.BRUSHABLE_BLOCK).ifPresent(blockEntity -> {
+                    worldIn.getBlockEntity(pos, BlockEntityTypes.BRUSHABLE_BLOCK).ifPresent(blockEntity -> {
                         ResourceKey lootTableLocation = ResourceKey.create((ResourceKey)Registries.LOOT_TABLE, (Identifier)Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"archaeology/cursed_pyramid"));
                         blockEntity.setLootTable(lootTableLocation, pos.asLong());
                     });
@@ -212,9 +214,10 @@ extends CataclysmStructure {
                     Koboleton_Entity koboleton = (Koboleton_Entity)((EntityType)ModEntities.KOBOLETON.get()).create((Level)worldIn.getLevel(), EntitySpawnReason.STRUCTURE);
                     if (koboleton == null) break;
                     koboleton.setPersistenceRequired();
-                    koboleton.setPos(pos, 0.0f, 0.0f);
-                    koboleton.finalizeSpawn(worldIn); koboleton.setYRot(0.0f);
-                    koboleton.finalizeSpawn(worldIn); koboleton.setXRot(worldIn.getCurrentDifficultyAt(koboleton.blockPosition()));
+                    koboleton.setPos((double)pos.getX() + 0.5, (double)pos.getY(), (double)pos.getZ() + 0.5);
+                    koboleton.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(koboleton.blockPosition()), EntitySpawnReason.STRUCTURE, null);
+                    koboleton.setYRot(0.0f);
+                    koboleton.setXRot(0.0f);
                     worldIn.addFreshEntityWithPassengers((Entity)koboleton);
                     worldIn.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
                     break;
@@ -223,9 +226,10 @@ extends CataclysmStructure {
                     Wadjet_Entity wadjet = (Wadjet_Entity)((EntityType)ModEntities.WADJET.get()).create((Level)worldIn.getLevel(), EntitySpawnReason.STRUCTURE);
                     if (wadjet == null) break;
                     wadjet.setPersistenceRequired();
-                    wadjet.setPos(pos, 0.0f, 0.0f);
-                    wadjet.finalizeSpawn(worldIn); wadjet.setYRot(0.0f);
-                    wadjet.finalizeSpawn(worldIn); wadjet.setXRot(worldIn.getCurrentDifficultyAt(wadjet.blockPosition()));
+                    wadjet.setPos((double)pos.getX() + 0.5, (double)pos.getY(), (double)pos.getZ() + 0.5);
+                    wadjet.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(wadjet.blockPosition()), EntitySpawnReason.STRUCTURE, null);
+                    wadjet.setYRot(0.0f);
+                    wadjet.setXRot(0.0f);
                     worldIn.addFreshEntityWithPassengers((Entity)wadjet);
                     worldIn.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
                     break;
@@ -234,11 +238,11 @@ extends CataclysmStructure {
                     Kobolediator_Entity kobolediator = (Kobolediator_Entity)((EntityType)ModEntities.KOBOLEDIATOR.get()).create((Level)worldIn.getLevel(), EntitySpawnReason.STRUCTURE);
                     if (kobolediator == null) break;
                     kobolediator.setPersistenceRequired();
-                    kobolediator.setPos(pos, 0.0f, 0.0f);
+                    kobolediator.setPos((double)pos.getX() + 0.5, (double)pos.getY(), (double)pos.getZ() + 0.5);
                     kobolediator.setSleep(true);
-                    kobolediator.finalizeSpawn(worldIn); kobolediator.setYRot(0.0f);
-                    kobolediator.setSleep(true);
-                    kobolediator.finalizeSpawn(worldIn); kobolediator.setXRot(worldIn.getCurrentDifficultyAt(kobolediator.blockPosition()));
+                    kobolediator.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(kobolediator.blockPosition()), EntitySpawnReason.STRUCTURE, null);
+                    kobolediator.setYRot(0.0f);
+                    kobolediator.setXRot(0.0f);
                     worldIn.addFreshEntityWithPassengers((Entity)kobolediator);
                     worldIn.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
                     break;
@@ -248,9 +252,10 @@ extends CataclysmStructure {
                     if (remnant == null) break;
                     remnant.setNecklace(false);
                     remnant.setPersistenceRequired();
-                    remnant.setPos(pos, 0.0f, 0.0f);
-                    remnant.finalizeSpawn(worldIn); remnant.setYRot(0.0f);
-                    remnant.finalizeSpawn(worldIn); remnant.setXRot(worldIn.getCurrentDifficultyAt(remnant.blockPosition()));
+                    remnant.setPos((double)pos.getX() + 0.5, (double)pos.getY(), (double)pos.getZ() + 0.5);
+                    remnant.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(remnant.blockPosition()), EntitySpawnReason.STRUCTURE, null);
+                    remnant.setYRot(0.0f);
+                    remnant.setXRot(0.0f);
                     worldIn.addFreshEntityWithPassengers((Entity)remnant);
                     worldIn.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
                 }
