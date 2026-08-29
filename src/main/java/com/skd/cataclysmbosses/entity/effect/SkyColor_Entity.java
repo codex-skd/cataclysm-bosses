@@ -164,5 +164,10 @@ extends Entity {
             world.addFreshEntity((Entity)skyColorEntity);
         }
     }
+
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return false;
+    }
 }
 

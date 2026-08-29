@@ -236,6 +236,11 @@ extends Entity {
         this.SpawnAnimationState.stop();
     }
 
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return false;
+    }
+
     public int getState() {
         return (Integer)this.entityData.get(STATE);
     }

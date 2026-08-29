@@ -162,5 +162,10 @@ extends Entity {
         compound.putInt("Lifespan", this.getLifespan());
         compound.putInt("CasterId", this.getCasterID());
     }
+
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return false;
+    }
 }
 

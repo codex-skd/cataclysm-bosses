@@ -185,7 +185,7 @@ implements Bucketable {
         this.targetSelector.addGoal(1, (Goal)new OwnerHurtByTargetGoal((TamableAnimal)this));
         this.targetSelector.addGoal(2, (Goal)new OwnerHurtTargetGoal((TamableAnimal)this));
         this.targetSelector.addGoal(4, (Goal)new HurtByTargetGoal((PathfinderMob)this, new Class[0]));
-        this.targetSelector.addGoal(5, (Goal)new NonTameRandomTargetGoal((TamableAnimal)this, LivingEntity.class, false, ModEntities.buildPredicateFromTag(ModTag.MODERN_REMNANT_TARGET)));
+        this.targetSelector.addGoal(5, (Goal)new NonTameRandomTargetGoal((TamableAnimal)this, LivingEntity.class, false, (entity, level) -> ModEntities.buildPredicateFromTag(ModTag.MODERN_REMNANT_TARGET).test(entity)));
     }
 
     public void travel(Vec3 vec3d) {
@@ -198,8 +198,8 @@ implements Bucketable {
         super.travel(vec3d);
     }
 
-    public boolean isInvulnerableTo(DamageSource source) {
-        return source.is(DamageTypes.IN_WALL) || source.is(DamageTypes.FALLING_BLOCK) || super.isInvulnerableTo(source);
+    public boolean isInvulnerableTo(net.minecraft.server.level.ServerLevel level, DamageSource source) {
+        return source.is(DamageTypes.IN_WALL) || source.is(DamageTypes.FALLING_BLOCK) || super.isInvulnerableTo(level, source);
     }
 
     @Override
@@ -235,11 +235,13 @@ implements Bucketable {
 
     public void saveToBucketTag(@Nonnull ItemStack bucket) {
         Bucketable.saveDefaultDataToBucketTag((Mob)this, (ItemStack)bucket);
-        CustomData.update((DataComponentType)DataComponents.BUCKET_ENTITY_DATA, (ItemStack)bucket, this::addAdditionalSaveData);
+        CustomData.update((DataComponentType)DataComponents.BUCKET_ENTITY_DATA, (ItemStack)bucket, tag -> {
+            tag.putBoolean("FromBucket", this.fromBucket());
+        });
     }
 
     public void loadFromBucketTag(CompoundTag p_148832_) {
-        this.readAdditionalSaveData(p_148832_);
+        this.setFromBucket(p_148832_.getBooleanOr("FromBucket", false));
         Bucketable.loadDefaultDataFromBucketTag((Mob)this, (CompoundTag)p_148832_);
     }
 
@@ -288,7 +290,7 @@ implements Bucketable {
             if (this.getCommand() == 3) {
                 this.setCommand(0);
             }
-            player.displayClientMessage((Component)Component.translatable((String)("entity.cataclysm.all.command_" + this.getCommand()), (Object[])new Object[]{this.getName()}), true);
+            player.sendSystemMessage((Component)Component.translatable((String)("entity.cataclysm.all.command_" + this.getCommand()), (Object[])new Object[]{this.getName()}));
             boolean bl = sit = this.getCommand() == 2;
             if (sit) {
                 this.setOrderedToSit(true);
@@ -313,7 +315,7 @@ implements Bucketable {
                 CriteriaTriggers.FILLED_BUCKET.trigger((ServerPlayer)p_148829_, itemstack1);
             }
             p_148831_.discard();
-            return Optional.of(InteractionResult.sidedSuccess((boolean)level.isClientSide()));
+            return Optional.of(level.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.SUCCESS_SERVER);
         }
         return Optional.empty();
     }

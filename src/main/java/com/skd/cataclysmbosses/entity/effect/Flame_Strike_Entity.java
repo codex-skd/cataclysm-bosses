@@ -361,5 +361,10 @@ extends Entity {
     public EntityDimensions getDimensions(Pose p_19721_) {
         return EntityDimensions.scalable((float)(this.getRadius() * 1.8f), (float)(this.getRadius() * 3.0f));
     }
+
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return false;
+    }
 }
 

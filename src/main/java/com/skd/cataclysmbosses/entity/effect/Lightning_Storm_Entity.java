@@ -262,5 +262,10 @@ extends Entity {
         this.setHpDamage(compound.getFloatOr("Hpdamage", 0.0f));
         this.setSize(compound.getFloatOr("size", 0.0f));
     }
+
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return false;
+    }
 }
 

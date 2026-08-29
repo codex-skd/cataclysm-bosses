@@ -72,7 +72,7 @@ IFollower {
     private boolean hasLimitedLife;
     private int limitedLifeTicks;
     protected static final EntityDataAccessor<Byte> DATA_FLAGS_ID = SynchedEntityData.defineId(Abstract_Summoned_Entity.class, (EntityDataSerializer)EntityDataSerializers.BYTE);
-    protected static final EntityDataAccessor<Optional<UUID>> DATA_OWNERUUID_ID = SynchedEntityData.defineId(Abstract_Summoned_Entity.class, (EntityDataSerializer)EntityDataSerializers.OPTIONAL_UUID);
+    protected static final EntityDataAccessor<String> DATA_OWNERUUID_ID = SynchedEntityData.defineId(Abstract_Summoned_Entity.class, (EntityDataSerializer)EntityDataSerializers.STRING);
 
     public Abstract_Summoned_Entity(EntityType entity, Level world) {
         super(entity, world);
@@ -80,8 +80,8 @@ IFollower {
 
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
-        builder.define(DATA_FLAGS_ID, 0);
-        builder.define(DATA_OWNERUUID_ID, Optional.empty());
+        builder.define(DATA_FLAGS_ID, (byte)0);
+        builder.define(DATA_OWNERUUID_ID, "");
     }
 
     public void addAdditionalSaveData(ValueOutput compound) {
@@ -101,7 +101,7 @@ IFollower {
             uuid = compound.read("Owner", UUIDUtil.CODEC).orElse(null);
         } else {
             String s = compound.getStringOr("Owner", "");
-            uuid = OldUsersConverter.convertMobOwnerIfNecessary((MinecraftServer)this.getServer(), (String)s);
+            uuid = OldUsersConverter.convertMobOwnerIfNecessary((MinecraftServer)this.level().getServer(), (String)s);
         }
         if (uuid != null) {
             try {
@@ -112,7 +112,7 @@ IFollower {
                 this.setTame(false, true);
             }
         }
-        if (compound.contains("LifeTicks")) {
+        if (compound.getInt("LifeTicks").isPresent()) {
             this.setLimitedLife(compound.getIntOr("LifeTicks", 0));
         }
     }
@@ -177,11 +177,17 @@ IFollower {
 
     @Nullable
     public UUID getOwnerUUID() {
-        return ((Optional)this.entityData.get(DATA_OWNERUUID_ID)).orElse(null);
+        String s = this.entityData.get(DATA_OWNERUUID_ID);
+        return s.isEmpty() ? null : java.util.UUID.fromString(s);
     }
 
     public void setOwnerUUID(@Nullable UUID uuid) {
-        this.entityData.set(DATA_OWNERUUID_ID, Optional.ofNullable(uuid));
+        this.entityData.set(DATA_OWNERUUID_ID, uuid == null ? "" : uuid.toString());
+    }
+
+    @Override
+    public net.minecraft.world.entity.EntityReference<LivingEntity> getOwnerReference() {
+        return net.minecraft.world.entity.EntityReference.of(this.getOwnerUUID());
     }
 
     public void tame(Player player) {
@@ -249,7 +255,8 @@ IFollower {
         if (!this.canTeleportTo(new BlockPos(x, y, z))) {
             return false;
         }
-        this.setPos((double)x + 0.5, y, (double)z + 0.5, this.getYRot(), this.getXRot());
+        this.setPos((double)x + 0.5, (double)y, (double)z + 0.5);
+        this.setRot(this.getYRot(), this.getXRot());
         this.navigation.stop();
         return true;
     }

@@ -186,12 +186,8 @@ extends Entity {
         if (tag.read("Owner", UUIDUtil.CODEC).isPresent()) {
             this.ownerUUID = tag.read("Owner", UUIDUtil.CODEC).orElse(null);
         }
-        if (tag.contains("Lifespan")) {
-            this.setLifespan(tag.getIntOr("Lifespan", 0));
-        }
-        if (tag.contains("Maxticks")) {
-            this.setMaxTicks(tag.getIntOr("Maxticks", 0));
-        }
+        this.setLifespan(tag.getIntOr("Lifespan", 0));
+        this.setMaxTicks(tag.getIntOr("Maxticks", 0));
     }
 
     protected void addAdditionalSaveData(ValueOutput compoundTag) {
@@ -233,7 +229,7 @@ extends Entity {
 
     public void tick() {
         super.tick();
-        if (!this.isNoGravity() && !this.isInWaterOrBubble()) {
+        if (!this.isNoGravity() && !this.isInWater()) {
             this.setDeltaMovement(this.getDeltaMovement().add(0.0, (double)-0.04f, 0.0));
         }
         if (this.getState() == 1 && this.getLifespan() >= 5) {
@@ -305,7 +301,6 @@ extends Entity {
                 MobEffectInstance effectinstance = new MobEffectInstance(ModEffect.EFFECTWETNESS, 200, i, false, true, true);
                 entity.addEffect(effectinstance);
             }
-            entity.hasImpulse = true;
             Vec3 vec3 = entity.getDeltaMovement();
             while (x * x + z * z < (double)1.0E-5f) {
                 x = (Math.random() - Math.random()) * 0.01;
@@ -344,6 +339,11 @@ extends Entity {
         this.lyd = lerpY;
         this.lzd = lerpZ;
         this.setDeltaMovement(this.lxd, this.lyd, this.lzd);
+    }
+
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return false;
     }
 }
 

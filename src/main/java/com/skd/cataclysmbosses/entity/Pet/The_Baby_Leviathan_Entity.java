@@ -271,8 +271,8 @@ Bucketable {
         }
     }
 
-    public boolean isInvulnerableTo(DamageSource source) {
-        return source.is(DamageTypes.IN_WALL) || source.is(DamageTypes.FALLING_BLOCK) || super.isInvulnerableTo(source);
+    public boolean isInvulnerableTo(net.minecraft.server.level.ServerLevel level, DamageSource source) {
+        return source.is(DamageTypes.IN_WALL) || source.is(DamageTypes.FALLING_BLOCK) || super.isInvulnerableTo(level, source);
     }
 
     @Override
@@ -308,11 +308,13 @@ Bucketable {
 
     public void saveToBucketTag(@Nonnull ItemStack bucket) {
         Bucketable.saveDefaultDataToBucketTag((Mob)this, (ItemStack)bucket);
-        CustomData.update((DataComponentType)DataComponents.BUCKET_ENTITY_DATA, (ItemStack)bucket, this::addAdditionalSaveData);
+        CustomData.update((DataComponentType)DataComponents.BUCKET_ENTITY_DATA, (ItemStack)bucket, tag -> {
+            tag.putBoolean("FromBucket", this.fromBucket());
+        });
     }
 
     public void loadFromBucketTag(CompoundTag p_148832_) {
-        this.readAdditionalSaveData(p_148832_);
+        this.setFromBucket(p_148832_.getBooleanOr("FromBucket", false));
         Bucketable.loadDefaultDataFromBucketTag((Mob)this, (CompoundTag)p_148832_);
     }
 
@@ -352,7 +354,7 @@ Bucketable {
             }
             return InteractionResult.PASS;
         }
-        if (this.isTame() && (result = Bucketable.bucketMobPickup((Player)player, (InteractionHand)hand, (LivingEntity)this)).isPresent()) {
+        if (this.isTame() && (result = Bucketable.bucketMobPickup((Player)player, (InteractionHand)hand, this)).isPresent()) {
             return (InteractionResult)result.get();
         }
         InteractionResult interactionresult = itemstack.interactLivingEntity(player, (LivingEntity)this, hand);
@@ -362,7 +364,7 @@ Bucketable {
             if (this.getCommand() == 3) {
                 this.setCommand(0);
             }
-            player.displayClientMessage((Component)Component.translatable((String)("entity.cataclysm.all.command_" + this.getCommand()), (Object[])new Object[]{this.getName()}), true);
+            player.sendSystemMessage((Component)Component.translatable((String)("entity.cataclysm.all.command_" + this.getCommand()), (Object[])new Object[]{this.getName()}));
             boolean bl = sit = this.getCommand() == 2;
             if (sit) {
                 this.setOrderedToSit(true);
@@ -434,7 +436,7 @@ Bucketable {
         this.collidePosX = this.endPosX;
         this.collidePosY = this.endPosY;
         this.collidePosZ = this.endPosZ;
-        List entities = world.getEntitiesOfClass(LivingEntity.class, new AABB(Math.min(this.getX(), this.collidePosX), Math.min(this.getY(), this.collidePosY), Math.min(this.getZ(), this.collidePosZ), Math.max(this.getX(), this.collidePosX), Math.max(this.getY(), this.collidePosY), Math.max(this.getZ(), this.collidePosZ)).inflate(inflateX, inflateY, inflateZ));
+        List<LivingEntity> entities = world.getEntitiesOfClass(LivingEntity.class, new AABB(Math.min(this.getX(), this.collidePosX), Math.min(this.getY(), this.collidePosY), Math.min(this.getZ(), this.collidePosZ), Math.max(this.getX(), this.collidePosX), Math.max(this.getY(), this.collidePosY), Math.max(this.getZ(), this.collidePosZ)).inflate(inflateX, inflateY, inflateZ));
         for (LivingEntity entity : entities) {
             float pad = 2.5f;
             AABB aabb = entity.getBoundingBox().inflate((double)pad, (double)pad, (double)pad);

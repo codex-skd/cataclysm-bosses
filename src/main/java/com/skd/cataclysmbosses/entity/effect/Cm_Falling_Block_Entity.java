@@ -112,13 +112,12 @@ extends Entity {
     }
 
     protected void addAdditionalSaveData(ValueOutput p_31973_) {
-        BlockState blockState = this.getBlockState();
-        p_31973_.put("block_state", (Tag)NbtUtils.writeBlockState((BlockState)blockState));
+        p_31973_.store("block_state", net.minecraft.world.level.block.state.BlockState.CODEC, this.getBlockState());
         p_31973_.putInt("Time", this.duration);
     }
 
     protected void readAdditionalSaveData(ValueInput p_31964_) {
-        this.setBlockState(NbtUtils.readBlockState((HolderGetter)this.level().holderLookup(Registries.BLOCK), (CompoundTag)p_31964_.getCompound("block_state")));
+        this.setBlockState(p_31964_.read("block_state", net.minecraft.world.level.block.state.BlockState.CODEC).orElse(Blocks.AIR.defaultBlockState()));
         this.duration = p_31964_.getIntOr("Time", 0);
     }
 
@@ -127,6 +126,11 @@ extends Entity {
     }
 
     public boolean displayFireAnimation() {
+        return false;
+    }
+
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
         return false;
     }
 }

@@ -137,6 +137,11 @@ extends Entity {
         p_326229_.define(TIMER, 0);
     }
 
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return false;
+    }
+
     static class YUnchangedLivingEntity {
         LivingEntity livingEntity;
         double Y;

@@ -64,7 +64,7 @@ extends Entity {
     private Entity finalTarget;
     @Nullable
     private UUID targetId;
-    private static final EntityDataAccessor<Optional<UUID>> CREATOR_ID = SynchedEntityData.defineId(Abyss_Mark_Entity.class, (EntityDataSerializer)EntityDataSerializers.OPTIONAL_UUID);
+    private static final EntityDataAccessor<String> CREATOR_ID = SynchedEntityData.defineId(Abyss_Mark_Entity.class, (EntityDataSerializer)EntityDataSerializers.STRING);
     protected static final EntityDataAccessor<Integer> LIFESPAN = SynchedEntityData.defineId(Abyss_Mark_Entity.class, (EntityDataSerializer)EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(Abyss_Mark_Entity.class, (EntityDataSerializer)EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> HPDAMAGE = SynchedEntityData.defineId(Abyss_Mark_Entity.class, (EntityDataSerializer)EntityDataSerializers.FLOAT);
@@ -114,11 +114,12 @@ extends Entity {
     }
 
     public UUID getCreatorEntityUUID() {
-        return ((Optional)this.entityData.get(CREATOR_ID)).orElse(null);
+        String s = this.entityData.get(CREATOR_ID);
+        return s.isEmpty() ? null : java.util.UUID.fromString(s);
     }
 
     public void setCreatorEntityUUID(UUID id) {
-        this.entityData.set(CREATOR_ID, Optional.ofNullable(id));
+        this.entityData.set(CREATOR_ID, id == null ? "" : id.toString());
     }
 
     public Entity getCreatorEntity() {
@@ -157,7 +158,7 @@ extends Entity {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(CREATOR_ID, Optional.empty());
+        p_326229_.define(CREATOR_ID, "");
         p_326229_.define(LIFESPAN, 300);
         p_326229_.define(DAMAGE, Float.valueOf(0.0f));
         p_326229_.define(HPDAMAGE, Float.valueOf(0.0f));
@@ -186,7 +187,7 @@ extends Entity {
             uuid = compound.read("Owner", UUIDUtil.CODEC).orElse(null);
         } else {
             String s = compound.getStringOr("Owner", "");
-            uuid = OldUsersConverter.convertMobOwnerIfNecessary((MinecraftServer)this.getServer(), (String)s);
+            uuid = OldUsersConverter.convertMobOwnerIfNecessary((MinecraftServer)this.level().getServer(), (String)s);
         }
         if (compound.read("Target", UUIDUtil.CODEC).isPresent()) {
             this.targetId = compound.read("Target", UUIDUtil.CODEC).orElse(null);
@@ -213,6 +214,11 @@ extends Entity {
         }
         compound.putFloat("damage", this.getDamage());
         compound.putFloat("Hpdamage", this.getHpDamage());
+    }
+
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return false;
     }
 }
 

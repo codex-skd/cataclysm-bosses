@@ -187,7 +187,7 @@ extends Entity {
 
     public void damageEntityLivingBaseNearby(double radius) {
         AABB region = new AABB(this.getX() - radius, this.getY() - 0.5, this.getZ() - radius, this.getX() + radius, (double)(this.level().getMaxY() + 1 + 20), this.getZ() + radius);
-        List entities = this.level().getEntitiesOfClass(LivingEntity.class, region);
+        List<LivingEntity> entities = this.level().getEntitiesOfClass(LivingEntity.class, region);
         for (LivingEntity entity : entities) {
             this.damage(entity);
         }
@@ -243,6 +243,11 @@ extends Entity {
         this.setR(compound.getIntOr("r", 0));
         this.setG(compound.getIntOr("g", 0));
         this.setB(compound.getIntOr("b", 0));
+    }
+
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return false;
     }
 }
 

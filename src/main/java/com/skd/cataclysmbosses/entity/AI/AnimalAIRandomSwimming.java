@@ -68,8 +68,8 @@ extends RandomStrollGoal {
     @Nullable
     protected Vec3 getPosition() {
         Vec3 vector3d;
-        if (this.mob.hasRestriction() && this.mob.distanceToSqr(Vec3.atCenterOf((Vec3i)this.mob.getRestrictCenter())) > (double)(this.mob.getRestrictRadius() * this.mob.getRestrictRadius())) {
-            return DefaultRandomPos.getPosTowards((PathfinderMob)this.mob, (int)this.xzSpread, (int)3, (Vec3)Vec3.atBottomCenterOf((Vec3i)this.mob.getRestrictCenter()), (double)3.0);
+        if (this.mob.hasHome() && !this.mob.isWithinHome()) {
+            return DefaultRandomPos.getPosTowards((PathfinderMob)this.mob, (int)this.xzSpread, (int)3, (Vec3)Vec3.atBottomCenterOf(this.mob.getHomePosition()), (double)3.0);
         }
         if (this.mob.getRandom().nextFloat() < 0.3f && (vector3d = this.findSurfaceTarget(this.mob, this.xzSpread, this.ySpread * 2)) != null) {
             return vector3d;
