@@ -288,7 +288,7 @@ implements NeutralMob {
                 float entityHitDistance = (float)Math.sqrt((entityHit.getZ() - this.getZ()) * (entityHit.getZ() - this.getZ()) + (entityHit.getX() - this.getX()) * (entityHit.getX() - this.getX()));
                 if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || entityHit instanceof Amethyst_Crab_Entity) continue;
                 entityHit.hurtOrSimulate(damagesource, (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) * damage);
-                if (!entityHit.isDamageSourceBlocked(damagesource) || !(entityHit instanceof Player)) continue;
+                if (!entityHit.isBlocking() || !(entityHit instanceof Player)) continue;
                 Player player = (Player)entityHit;
                 if (shieldbreakticks <= 0) continue;
                 EntityUtil.disableShield(player, shieldbreakticks);
@@ -410,6 +410,14 @@ implements NeutralMob {
         return new CMPathNavigateGround((Mob)this, worldIn);
     }
 
+    public long getPersistentAngerEndTime() {
+        return this.remainingPersistentAngerTime;
+    }
+
+    public void setPersistentAngerEndTime(long endTime) {
+        this.remainingPersistentAngerTime = (int)endTime;
+    }
+
     public void setRemainingPersistentAngerTime(int p_32515_) {
         this.remainingPersistentAngerTime = p_32515_;
     }
@@ -428,16 +436,16 @@ implements NeutralMob {
 
 
     @Nullable
-    public UUID getPersistentAngerTarget() {
-        return this.persistentAngerTarget;
+    public net.minecraft.world.entity.EntityReference<LivingEntity> getPersistentAngerTarget() {
+        return this.persistentAngerTarget == null ? null : net.minecraft.world.entity.EntityReference.of(this.persistentAngerTarget);
     }
 
-    public void setPersistentAngerTarget(@javax.annotation.Nullable UUID p_32509_) {
-        this.persistentAngerTarget = p_32509_;
+    public void setPersistentAngerTarget(@javax.annotation.Nullable net.minecraft.world.entity.EntityReference<LivingEntity> p_32509_) {
+        this.persistentAngerTarget = p_32509_ == null ? null : p_32509_.getUUID();
     }
 
     public void startPersistentAngerTimer() {
-        this.setRemainingPersistentAngerTime(PERSISTENT_ANGER_TIME.sample(this.random));
+        this.setPersistentAngerEndTime(this.level().getGameTime() + (long)PERSISTENT_ANGER_TIME.sample(this.random));
     }
 
     static class CrabMoveGoal
@@ -481,7 +489,7 @@ implements NeutralMob {
             if (!this.followingTargetEvenIfNotSeen) {
                 return !this.crab.getNavigation().isDone();
             }
-            if (!this.crab.isWithinRestriction(target.blockPosition())) {
+            if (!this.crab.isWithinHome(target.blockPosition())) {
                 return false;
             }
             return !(target instanceof Player) || !target.isSpectator() && !((Player)target).isCreative();

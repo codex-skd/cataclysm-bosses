@@ -257,7 +257,7 @@ IHoldEntity {
     private static final EntityDataAccessor<Integer> BLAST_CHANCE = SynchedEntityData.defineId(The_Leviathan_Entity.class, (EntityDataSerializer)EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> MODE_CHANCE = SynchedEntityData.defineId(The_Leviathan_Entity.class, (EntityDataSerializer)EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> MELT_DOWN = SynchedEntityData.defineId(The_Leviathan_Entity.class, (EntityDataSerializer)EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Optional<UUID>> TONGUE_UUID = SynchedEntityData.defineId(The_Leviathan_Entity.class, (EntityDataSerializer)EntityDataSerializers.OPTIONAL_UUID);
+    private static final EntityDataAccessor<String> TONGUE_UUID = SynchedEntityData.defineId(The_Leviathan_Entity.class, (EntityDataSerializer)EntityDataSerializers.STRING);
     private static final EntityDataAccessor<Integer> TONGUE_ID = SynchedEntityData.defineId(The_Leviathan_Entity.class, (EntityDataSerializer)EntityDataSerializers.INT);
 
     public The_Leviathan_Entity(EntityType type, Level worldIn) {
@@ -313,7 +313,7 @@ IHoldEntity {
         p_326229_.define(BLAST_CHANCE, 0);
         p_326229_.define(MODE_CHANCE, 0);
         p_326229_.define(MELT_DOWN, false);
-        p_326229_.define(TONGUE_UUID, Optional.empty());
+        p_326229_.define(TONGUE_UUID, "");
         p_326229_.define(TONGUE_ID, -1);
     }
 
@@ -414,11 +414,11 @@ IHoldEntity {
             this.destroyBlocksTick = 20;
         }
         double range = this.calculateRange(source);
-        boolean flag1 = this.canInFluidType(this.getEyeInFluidType());
+        boolean flag1 = this.isEyeInFluid(net.minecraft.tags.FluidTags.WATER);
         if (!flag1 && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY) && CMCommonConfig.Leviathan.ImmuneOutofWater) {
-            if (entity instanceof Player) {
-                Player player = (Player)entity;
-                player.displayClientMessage((Component)Component.translatable((String)"entity.cataclysm.the_leviathan_immune"), true);
+            if (entity instanceof ServerPlayer) {
+                ServerPlayer player = (ServerPlayer)entity;
+                player.sendSystemMessage((Component)Component.translatable((String)"entity.cataclysm.the_leviathan_immune"), true);
             }
             return false;
         }
@@ -559,7 +559,7 @@ IHoldEntity {
                     if (this.destroyBlocksTick == 0) {
                         if (CMCommonConfig.Leviathan.ignoreMobGriefing) {
                             this.blockbreak(0.5, 0.5, 0.5);
-                        } else if (EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+                        } else if (this.level() instanceof ServerLevel && EventHooks.canEntityGrief((ServerLevel)this.level(), (Entity)this)) {
                             this.blockbreak(0.5, 0.5, 0.5);
                         }
                     }
@@ -567,7 +567,7 @@ IHoldEntity {
                 if (this.mode == AttackMode.MELEE) {
                     if (CMCommonConfig.Leviathan.ignoreMobGriefing) {
                         this.blockbreak2();
-                    } else if (EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+                    } else if (this.level() instanceof ServerLevel && EventHooks.canEntityGrief((ServerLevel)this.level(), (Entity)this)) {
                         this.blockbreak2();
                     }
                 }
@@ -701,7 +701,7 @@ IHoldEntity {
                 if (!this.level().isClientSide()) {
                     if (CMCommonConfig.Leviathan.ignoreMobGriefing) {
                         this.chargeblockbreaking();
-                    } else if (EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+                    } else if (this.level() instanceof ServerLevel && EventHooks.canEntityGrief((ServerLevel)this.level(), (Entity)this)) {
                         this.chargeblockbreaking();
                     }
                 }
@@ -944,7 +944,9 @@ IHoldEntity {
             Level level = this.level();
             if (level instanceof ServerLevel) {
                 ServerLevel serverLevel = (ServerLevel)level;
-                serverLevel.getPlayers(EntitySelector.NO_SPECTATORS).forEach(serverPlayer -> serverPlayer.displayClientMessage((Component)Component.translatable((String)"entity.cataclysm.the_leviathan.defeat_message").withStyle(ChatFormatting.DARK_PURPLE), true));
+                for (ServerPlayer serverPlayer : serverLevel.getPlayers(p -> EntitySelector.NO_SPECTATORS.test(p))) {
+                    serverPlayer.sendSystemMessage((Component)Component.translatable((String)"entity.cataclysm.the_leviathan.defeat_message").withStyle(ChatFormatting.DARK_PURPLE), true);
+                }
             }
         }
     }
@@ -955,7 +957,7 @@ IHoldEntity {
                 if (this.isAlliedTo((Entity)entity) || entity instanceof The_Leviathan_Entity || entity == this) continue;
                 DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
                 boolean flag = entity.hurtOrSimulate(damagesource, (float)((double)((float)this.getAttributeValue(Attributes.ATTACK_DAMAGE)) + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE), (double)(entity.getMaxHealth() * (float)CMCommonConfig.Leviathan.TailSwingHpDamage))));
-                if (entity.isDamageSourceBlocked(damagesource) && entity instanceof Player) {
+                if (entity.isBlocking() && entity instanceof Player) {
                     Player player = (Player)entity;
                     EntityUtil.disableShield(player, 120);
                 }
@@ -1097,7 +1099,7 @@ IHoldEntity {
                 boolean flag = Lentity.hurtOrSimulate(damagesource, (float)((double)((float)this.getAttributeValue(Attributes.ATTACK_DAMAGE)) + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE), (double)(Lentity.getMaxHealth() * (float)CMCommonConfig.Leviathan.RushHpDamage))));
                 if (Lentity instanceof Player) {
                     Player player = (Player)Lentity;
-                    if (Lentity.isDamageSourceBlocked(damagesource)) {
+                    if (Lentity.isBlocking()) {
                         EntityUtil.disableShield(player, 120);
                     }
                 }
@@ -1125,7 +1127,7 @@ IHoldEntity {
                 boolean flag = target.hurtOrSimulate(damagesource, (float)((double)((float)this.getAttributeValue(Attributes.ATTACK_DAMAGE)) * 1.5 + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * 1.5, (double)(target.getMaxHealth() * (float)CMCommonConfig.Leviathan.TentacleHpDamage))));
                 if (target instanceof Player) {
                     Player player = (Player)target;
-                    if (target.isDamageSourceBlocked(damagesource)) {
+                    if (target.isBlocking()) {
                         EntityUtil.disableShield(player, 200);
                     }
                 }
@@ -1151,7 +1153,7 @@ IHoldEntity {
                     boolean flag = target.hurtOrSimulate(damagesource, (float)((double)((float)this.getAttributeValue(Attributes.ATTACK_DAMAGE)) + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE), (double)(target.getMaxHealth() * (float)CMCommonConfig.Leviathan.TentacleHpDamage))));
                     if (target instanceof Player) {
                         Player player = (Player)target;
-                        if (target.isDamageSourceBlocked(damagesource)) {
+                        if (target.isBlocking()) {
                             EntityUtil.disableShield(player, 90);
                         }
                     }
@@ -1177,12 +1179,12 @@ IHoldEntity {
                 if (this.isAlliedTo((Entity)target) || target instanceof The_Leviathan_Entity || target == this) continue;
                 DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
                 boolean flag = target.hurtOrSimulate(damagesource, (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) + target.getMaxHealth() * 0.1f);
-                if (target instanceof Player) {
-                    Player player = (Player)target;
-                    if (target.isDamageSourceBlocked(damagesource) && shieldbreakticks > 0) {
-                        EntityUtil.disableShield(player, shieldbreakticks);
+                    if (target instanceof Player) {
+                        Player player = (Player)target;
+                        if (target.isBlocking() && shieldbreakticks > 0) {
+                            EntityUtil.disableShield(player, shieldbreakticks);
+                        }
                     }
-                }
                 if (!flag || target.getType().builtInRegistryHolder().is(ModTag.IGNIS_CANT_POKE) || !target.isAlive()) continue;
                 if (target.isShiftKeyDown()) {
                     target.setShiftKeyDown(false);
@@ -1233,7 +1235,7 @@ IHoldEntity {
         this.collidePosX = this.endPosX;
         this.collidePosY = this.endPosY;
         this.collidePosZ = this.endPosZ;
-        List entities = world.getEntitiesOfClass(LivingEntity.class, new AABB(Math.min(this.getX(), this.collidePosX), Math.min(this.getY(), this.collidePosY), Math.min(this.getZ(), this.collidePosZ), Math.max(this.getX(), this.collidePosX), Math.max(this.getY(), this.collidePosY), Math.max(this.getZ(), this.collidePosZ)).inflate(inflateX, inflateY, inflateZ));
+        List<LivingEntity> entities = world.getEntitiesOfClass(LivingEntity.class, new AABB(Math.min(this.getX(), this.collidePosX), Math.min(this.getY(), this.collidePosY), Math.min(this.getZ(), this.collidePosZ), Math.max(this.getX(), this.collidePosX), Math.max(this.getY(), this.collidePosY), Math.max(this.getZ(), this.collidePosZ)).inflate(inflateX, inflateY, inflateZ));
         for (LivingEntity entity : entities) {
             float pad = 2.5f;
             AABB aabb = entity.getBoundingBox().inflate((double)pad, (double)pad, (double)pad);
@@ -1316,11 +1318,12 @@ IHoldEntity {
 
     @Nullable
     public UUID getTongueUUID() {
-        return ((Optional)this.entityData.get(TONGUE_UUID)).orElse(null);
+        String s = (String)this.entityData.get(TONGUE_UUID);
+        return s.isEmpty() ? null : java.util.UUID.fromString(s);
     }
 
     public void setTongueUUID(@Nullable UUID uniqueId) {
-        this.entityData.set(TONGUE_UUID, Optional.ofNullable(uniqueId));
+        this.entityData.set(TONGUE_UUID, uniqueId == null ? "" : uniqueId.toString());
     }
 
     public Entity getTongue() {
@@ -1619,7 +1622,7 @@ IHoldEntity {
                 ((The_Leviathan_Entity)this.entity).getLookControl().setLookAt((Entity)target, 30.0f, 90.0f);
             }
             if (((The_Leviathan_Entity)this.entity).getAnimationTick() == 25 && target != null && ((The_Leviathan_Entity)this.entity).getTongue() == null && !((The_Leviathan_Entity)this.entity).level().isClientSide()) {
-                The_Leviathan_Tongue_Entity segment = (The_Leviathan_Tongue_Entity)((EntityType)ModEntities.THE_LEVIATHAN_TONGUE.get()).create(((The_Leviathan_Entity)this.entity).level());
+                The_Leviathan_Tongue_Entity segment = (The_Leviathan_Tongue_Entity)((EntityType)ModEntities.THE_LEVIATHAN_TONGUE.get()).create((net.minecraft.server.level.ServerLevel)((The_Leviathan_Entity)this.entity).level(), EntitySpawnReason.EVENT);
                 segment.copyPosition((Entity)this.entity);
                 segment.setPos(((The_Leviathan_Entity)this.entity).getTonguePosition());
                 segment.setControllerUUID(((The_Leviathan_Entity)this.entity).getUUID());
@@ -1693,7 +1696,7 @@ IHoldEntity {
         }
 
         private Dimensional_Rift_Entity getClosestDimensionalRift() {
-            List list = ((The_Leviathan_Entity)this.entity).level().getEntitiesOfClass(Dimensional_Rift_Entity.class, ((The_Leviathan_Entity)this.entity).getBoundingBox().inflate(15.0, 15.0, 15.0));
+            List<Dimensional_Rift_Entity> list = ((The_Leviathan_Entity)this.entity).level().getEntitiesOfClass(Dimensional_Rift_Entity.class, ((The_Leviathan_Entity)this.entity).getBoundingBox().inflate(15.0, 15.0, 15.0));
             Dimensional_Rift_Entity closest = null;
             if (!list.isEmpty()) {
                 for (Dimensional_Rift_Entity entity : list) {

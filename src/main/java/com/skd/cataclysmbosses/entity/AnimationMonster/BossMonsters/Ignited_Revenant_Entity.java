@@ -164,10 +164,6 @@ extends LLibrary_Boss_Monster {
             return false;
         }
         if (damage > 0.0f && this.canBlockDamageSource(source)) {
-            this.hurtCurrentlyUsedShield(damage);
-            if (!source.is(DamageTypeTags.IS_PROJECTILE) && entity instanceof LivingEntity) {
-                this.blockUsingShield((LivingEntity)entity);
-            }
             this.playSound(SoundEvents.ANVIL_PLACE, 0.3f, 0.5f);
             return false;
         }
@@ -177,7 +173,7 @@ extends LLibrary_Boss_Monster {
     private double getApproximateAttackDamageWithItem(LivingEntity living, ItemStack p_330413_) {
         ItemAttributeModifiers itemattributemodifiers = (ItemAttributeModifiers)p_330413_.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, (Object)ItemAttributeModifiers.EMPTY);
         itemattributemodifiers = p_330413_.getAttributeModifiers();
-        return itemattributemodifiers.compute(living.getAttributeBaseValue(Attributes.ATTACK_DAMAGE), EquipmentSlot.MAINHAND);
+        return itemattributemodifiers.compute(Attributes.ATTACK_DAMAGE, living.getAttributeBaseValue(Attributes.ATTACK_DAMAGE), net.minecraft.world.entity.EquipmentSlot.MAINHAND);
     }
 
     private boolean canBlockDamageSource(DamageSource damageSourceIn) {
@@ -528,7 +524,9 @@ extends LLibrary_Boss_Monster {
             mouthPos = mouthPos.add(new Vec3(0.0, 0.0, 0.0).xRot((float)Math.toRadians(-Ignited_Revenant_Entity.this.getXRot())).yRot((float)Math.toRadians(-Ignited_Revenant_Entity.this.yHeadRot)));
             Ashen_Breath_Entity breath = new Ashen_Breath_Entity((EntityType<? extends Ashen_Breath_Entity>)((EntityType)ModEntities.ASHEN_BREATH.get()), Ignited_Revenant_Entity.this.level(), (float)CMCommonConfig.IgnitedRevenant.AshenbreathDamage, (LivingEntity)Ignited_Revenant_Entity.this);
             if (Ignited_Revenant_Entity.this.getAnimationTick() == 27) {
-                breath.absMoveTo(mouthPos.x, mouthPos.y, mouthPos.z, Ignited_Revenant_Entity.this.yHeadRot, Ignited_Revenant_Entity.this.getXRot());
+                breath.snapTo(mouthPos.x, mouthPos.y, mouthPos.z);
+                breath.setYRot(Ignited_Revenant_Entity.this.yHeadRot);
+                breath.setXRot(Ignited_Revenant_Entity.this.getXRot());
                 Ignited_Revenant_Entity.this.level().addFreshEntity((Entity)breath);
             }
         }

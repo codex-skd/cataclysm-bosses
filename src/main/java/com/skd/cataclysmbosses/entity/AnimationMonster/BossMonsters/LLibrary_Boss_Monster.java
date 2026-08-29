@@ -248,7 +248,7 @@ public void addAdditionalHomePoint(ValueOutput compound) {
             
             // Check if home position is in the same dimension
             if (this.getHomePos().dimension().equals(this.level().dimension())) {
-                if (!homeBlockPos.getCenter().distanceTo(this.position()) > 16.0) {
+                if (!(homeVec.distanceTo(this.position()) > 16.0)) {
                     this.setPos(homeVec.x, homeVec.y, homeVec.z);
                     this.setYRot(this.getYRot());
                     this.setXRot(this.getXRot());

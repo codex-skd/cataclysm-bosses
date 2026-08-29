@@ -238,7 +238,7 @@ extends LLibrary_Boss_Monster {
                 if (!this.level().isClientSide()) {
                     if (CMCommonConfig.EnderGolem.ignoreMobGriefing) {
                         this.BlockBreaking(4, 4, 4);
-                    } else if (EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+                    } else if (this.level() instanceof net.minecraft.server.level.ServerLevel && EventHooks.canEntityGrief((net.minecraft.server.level.ServerLevel)this.level(), (Entity)this)) {
                         this.BlockBreaking(4, 4, 4);
                     }
                 }
@@ -247,7 +247,7 @@ extends LLibrary_Boss_Monster {
                 this.playSound((SoundEvent)ModSounds.GOLEMATTACK.get(), 1.0f, 1.0f);
                 if (target != null && target.isAlive() && this.distanceTo((Entity)target) < 4.75f) {
                     target.hurtOrSimulate(this.damageSources().mobAttack((LivingEntity)this), (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) + (float)this.random.nextInt(4));
-                    target.knockback(1.25, this.getX() - target.getX(), this.getZ() - target.getZ());
+                    target.knockback(1.25, this.getX() - target.getX(), this.getZ() - target.getZ(), this.damageSources().mobAttack((LivingEntity)this), 0.5f);
                 }
             }
             if (this.getAnimation() == VOID_RUNE_ATTACK) {
@@ -257,7 +257,7 @@ extends LLibrary_Boss_Monster {
                     if (!this.level().isClientSide()) {
                         if (CMCommonConfig.EnderGolem.ignoreMobGriefing) {
                             this.BlockBreaking(4, 4, 4);
-                        } else if (EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+                        } else if (this.level() instanceof net.minecraft.server.level.ServerLevel && EventHooks.canEntityGrief((net.minecraft.server.level.ServerLevel)this.level(), (Entity)this)) {
                             this.BlockBreaking(4, 4, 4);
                         }
                     }

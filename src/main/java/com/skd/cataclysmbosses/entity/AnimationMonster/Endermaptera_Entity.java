@@ -165,7 +165,7 @@ implements IAnimatedEntity {
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(CLIMBING, 0);
+        p_326229_.define(CLIMBING, (byte)0);
         p_326229_.define(ATTACHED_FACE, Direction.DOWN);
         p_326229_.define(HAS_JAWS, true);
     }
@@ -178,10 +178,7 @@ implements IAnimatedEntity {
         return new WallClimberNavigation((Mob)this, worldIn);
     }
 
-    @Nullable
-    protected ResourceKey<LootTable> getDefaultLootTable() {
-        return this.getHasJaws() ? this.HAS_JAWS_LOOT : super.getDefaultLootTable();
-    }
+
 
     public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
@@ -190,7 +187,7 @@ implements IAnimatedEntity {
 
     public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        this.entityData.set(ATTACHED_FACE, Direction.from3DDataValue((int)compound.getByte("AttachFace")));
+        this.entityData.set(ATTACHED_FACE, Direction.from3DDataValue(compound.getByteOr("AttachFace", (byte)0)));
         this.setHasJaw(compound.getBooleanOr("Has_Jaws", false));
     }
 
@@ -264,7 +261,7 @@ implements IAnimatedEntity {
                 Vec3 Vec32 = this.getDeltaMovement();
                 if (!this.level().isClientSide()) {
                     this.setBesideClimbableBlock(this.horizontalCollision || this.verticalCollision && !this.onGround());
-                    if (this.onGround() || this.isInWaterOrBubble() || this.isInLava()) {
+                    if (this.onGround() || this.isInWater() || this.isInLava()) {
                         this.entityData.set(ATTACHED_FACE, Direction.DOWN);
                     } else if (this.verticalCollision) {
                         this.entityData.set(ATTACHED_FACE, Direction.UP);
@@ -288,7 +285,7 @@ implements IAnimatedEntity {
                         this.setDeltaMovement(this.getDeltaMovement().add(0.0, 1.0, 0.0));
                     } else {
                         if (!this.horizontalCollision && this.getAttachmentFacing() != Direction.UP) {
-                            Vec3 vec = Vec3.atLowerCornerOf((Vec3i)this.getAttachmentFacing().getNormal());
+                            Vec3 vec = Vec3.atLowerCornerOf(this.getAttachmentFacing().getUnitVec3i());
                             this.setDeltaMovement(this.getDeltaMovement().add(vec.normalize().multiply((double)0.1f, (double)0.1f, (double)0.1f)));
                         }
                         if (!this.onGround() && Vec32.y < 0.0) {
@@ -336,7 +333,7 @@ implements IAnimatedEntity {
     }
 
     private void BrokenJaws() {
-        this.playSound(SoundEvents.ITEM_BREAK, 0.5f, 1.0f + this.getRandom().nextFloat() * 0.1f);
+        this.playSound(SoundEvents.ITEM_BREAK.value(), 0.5f, 1.0f + this.getRandom().nextFloat() * 0.1f);
         this.setHasJaw(false);
         int shardCount = 8 + this.random.nextInt(4);
         if (!this.level().isClientSide()) {

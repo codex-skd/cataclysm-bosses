@@ -191,5 +191,10 @@ extends Entity {
     public PushReaction getPistonPushReaction() {
         return PushReaction.IGNORE;
     }
+
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return false;
+    }
 }
 

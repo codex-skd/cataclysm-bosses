@@ -204,7 +204,8 @@ extends Animation_Monster {
                 target.hurtOrSimulate(this.damageSources().mobAttack((LivingEntity)this), damage);
                 ItemStack offhand = target.getOffhandItem();
                 ItemStack mainhand = target.getMainHandItem();
-                Optional slot = CuriosApi.getCuriosHelper().findFirstCurio(target, stack -> stack.is((Item)ModItems.STICKY_GLOVES.get()));
+                // TODO 26.2: CuriosApi.getCuriosHelper() removed - update Curios API call
+                Optional slot = java.util.Optional.empty(); // CuriosApi.getCuriosHelper().findFirstCurio(target, stack -> stack.is((Item)ModItems.STICKY_GLOVES.get()));
                 if (this.random.nextFloat() * 100.0f <= (float)CMCommonConfig.Koboleton.CauseKoboletontoDropItemInHandPercent && slot.isEmpty()) {
                     if (!offhand.isEmpty()) {
                         if (!offhand.is(ModTag.STICKY_ITEM)) {

@@ -57,7 +57,7 @@ import net.minecraft.world.level.storage.ValueOutput;
 
 public class The_Leviathan_Tongue_Entity
 extends Entity {
-    private static final EntityDataAccessor<Optional<UUID>> CONTROLLER_UUID = SynchedEntityData.defineId(The_Leviathan_Tongue_Entity.class, (EntityDataSerializer)EntityDataSerializers.OPTIONAL_UUID);
+    private static final EntityDataAccessor<String> CONTROLLER_UUID = SynchedEntityData.defineId(The_Leviathan_Tongue_Entity.class, (EntityDataSerializer)EntityDataSerializers.STRING);
     private static final EntityDataAccessor<Integer> CONTROLLER_ID = SynchedEntityData.defineId(The_Leviathan_Tongue_Entity.class, (EntityDataSerializer)EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> TARGET_ID = SynchedEntityData.defineId(The_Leviathan_Tongue_Entity.class, (EntityDataSerializer)EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> DURATION = SynchedEntityData.defineId(The_Leviathan_Tongue_Entity.class, (EntityDataSerializer)EntityDataSerializers.INT);
@@ -70,7 +70,7 @@ extends Entity {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(CONTROLLER_UUID, Optional.empty());
+        p_326229_.define(CONTROLLER_UUID, "");
         p_326229_.define(CONTROLLER_ID, -1);
         p_326229_.define(TARGET_ID, -1);
         p_326229_.define(DURATION, 0);
@@ -91,7 +91,7 @@ extends Entity {
         if (!this.level().isClientSide()) {
             if (CMCommonConfig.Leviathan.ignoreMobGriefing) {
                 this.blockbreak(0.25, 0.25, 0.25);
-            } else if (EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+            } else if (this.level() instanceof net.minecraft.server.level.ServerLevel && EventHooks.canEntityGrief((net.minecraft.server.level.ServerLevel)this.level(), (Entity)this)) {
                 this.blockbreak(0.25, 0.25, 0.25);
             }
         }
@@ -186,11 +186,12 @@ extends Entity {
 
     @Nullable
     public UUID getControllerUUID() {
-        return ((Optional)this.entityData.get(CONTROLLER_UUID)).orElse(null);
+        String s = (String)this.entityData.get(CONTROLLER_UUID);
+        return s.isEmpty() ? null : java.util.UUID.fromString(s);
     }
 
     public void setControllerUUID(@Nullable UUID uniqueId) {
-        this.entityData.set(CONTROLLER_UUID, Optional.ofNullable(uniqueId));
+        this.entityData.set(CONTROLLER_UUID, uniqueId == null ? "" : uniqueId.toString());
     }
 
     public int getDuration() {
@@ -229,6 +230,11 @@ extends Entity {
     public Entity getTarget() {
         int id = (Integer)this.entityData.get(TARGET_ID);
         return id == -1 ? null : this.level().getEntity(id);
+    }
+
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return false;
     }
 }
 

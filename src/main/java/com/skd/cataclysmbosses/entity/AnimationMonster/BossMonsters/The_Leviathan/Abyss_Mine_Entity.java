@@ -185,5 +185,10 @@ extends Entity {
     public float getLightLevelDependentMagicValue() {
         return 1.0f;
     }
+
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return false;
+    }
 }
 

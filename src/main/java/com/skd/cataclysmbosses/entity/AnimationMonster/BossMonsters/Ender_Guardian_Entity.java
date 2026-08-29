@@ -14,7 +14,7 @@
  *  net.minecraft.core.particles.ParticleOptions
  *  net.minecraft.core.particles.ParticleTypes
  *  net.minecraft.nbt.CompoundTag
- *  net.minecraft.nbt.NbtUtils
+
  *  net.minecraft.network.chat.Component
  *  net.minecraft.network.protocol.common.custom.CustomPacketPayload
  *  net.minecraft.network.syncher.EntityDataAccessor
@@ -116,7 +116,7 @@ import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -229,7 +229,7 @@ extends LLibrary_Boss_Monster {
     protected void registerGoals() {
         this.goalSelector.addGoal(2, (Goal)new AttackMoveGoal(this, true, 1.0));
         this.goalSelector.addGoal(1, (Goal)new PunchAttackGoal(this));
-        this.goalSelector.addGoal(1, (Goal)new AttackAnimationGoal2<Ender_Guardian_Entity>(this, this, GUARDIAN_MASS_DESTRUCTION, 39, 50){
+        this.goalSelector.addGoal(1, (Goal)new AttackAnimationGoal2<Ender_Guardian_Entity>(this, GUARDIAN_MASS_DESTRUCTION, 39, 50){
 
             public void start() {
                 super.start();
@@ -290,7 +290,7 @@ extends LLibrary_Boss_Monster {
         super.addAdditionalSaveData(compound);
         Optional<BlockPos> restPos = this.getTeleportPos();
         if (restPos.isPresent()) {
-            compound.put("TeleportPos", NbtUtils.writeBlockPos((BlockPos)this.getTeleportPos().get()));
+            compound.store("TeleportPos", BlockPos.CODEC, (BlockPos)this.getTeleportPos().get());
         }
         compound.putBoolean("is_Helmetless", this.getIsHelmetless());
         compound.putBoolean("used_mass_destruction", this.getUsedMassDestruction());
@@ -299,7 +299,7 @@ extends LLibrary_Boss_Monster {
     @Override
     public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        NbtUtils.readBlockPos((CompoundTag)compound, (String)"TeleportPos").ifPresent(this::setTeleportPos);
+        compound.read("TeleportPos", BlockPos.CODEC).ifPresent(this::setTeleportPos);
         this.setIsHelmetless(compound.getBooleanOr("is_Helmetless", false));
         this.setUsedMassDestruction(compound.getBooleanOr("used_mass_destruction", false));
         if (this.hasCustomName()) {
@@ -548,7 +548,7 @@ extends LLibrary_Boss_Monster {
                 if (!this.level().isClientSide()) {
                     if (CMCommonConfig.EnderGuardian.ignoreMobGriefing) {
                         this.BlockBreaking(CMCommonConfig.EnderGuardian.BlockBreakingX, CMCommonConfig.EnderGuardian.BlockBreakingY, CMCommonConfig.EnderGuardian.BlockBreakingZ);
-                    } else if (EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+                    } else if (this.level() instanceof ServerLevel && EventHooks.canEntityGrief((ServerLevel)this.level(), (Entity)this)) {
                         this.BlockBreaking(CMCommonConfig.EnderGuardian.BlockBreakingX, CMCommonConfig.EnderGuardian.BlockBreakingY, CMCommonConfig.EnderGuardian.BlockBreakingZ);
                     }
                 }
@@ -677,8 +677,8 @@ extends LLibrary_Boss_Monster {
         BlockEntity blockEntity = serverLevel.getBlockEntity(pos);
         if (blockEntity instanceof Boss_Respawn_Spawner_Block_Entity) {
             Boss_Respawn_Spawner_Block_Entity spawnerblockentity = (Boss_Respawn_Spawner_Block_Entity)blockEntity;
-            spawnerblockentity.setEntityId((EntityType)ModEntities.ENDER_GUARDIAN.get());
-            spawnerblockentity.setTheItem(((Item)ModItems.VOID_EYE.get()).getDefaultInstance());
+            spawnerblockentity.spawnType = (EntityType)ModEntities.ENDER_GUARDIAN.get();
+            spawnerblockentity.item = ((Item)ModItems.VOID_EYE.get()).getDefaultInstance();
         }
     }
 
@@ -705,7 +705,7 @@ extends LLibrary_Boss_Monster {
                 float entityHitDistance = (float)Math.sqrt((entityHit.getZ() - this.getZ()) * (entityHit.getZ() - this.getZ()) + (entityHit.getX() - this.getX()) * (entityHit.getX() - this.getX()));
                 if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || entityHit instanceof Ender_Guardian_Entity) continue;
                 boolean flag = entityHit.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage, (double)(entityHit.getMaxHealth() * hpdamage))));
-                if (entityHit.isDamageSourceBlocked(damagesource) && entityHit instanceof Player) {
+                if (entityHit.isBlocking() && entityHit instanceof Player) {
                     Player player = (Player)entityHit;
                     if (shieldbreakticks > 0) {
                         EntityUtil.disableShield(player, shieldbreakticks);
@@ -729,7 +729,7 @@ extends LLibrary_Boss_Monster {
             for (LivingEntity entityHit : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate((double)grow))) {
                 if (this.isAlliedTo((Entity)entityHit) || entityHit instanceof Ender_Guardian_Entity || entityHit == this) continue;
                 entityHit.hurtOrSimulate(damagesource, (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) * damage);
-                if (entityHit.isDamageSourceBlocked(damagesource) && entityHit instanceof Player) {
+                if (entityHit.isBlocking() && entityHit instanceof Player) {
                     Player player = (Player)entityHit;
                     if (ticks > 0) {
                         EntityUtil.disableShield(player, ticks);
@@ -1002,7 +1002,7 @@ extends LLibrary_Boss_Monster {
                 BlockPos Pos = this.blockPosition();
                 double sx = Pos.getX();
                 double sz = Pos.getZ();
-                Direction dir = Direction.getNearest((double)(tx - sx), (double)0.0, (double)(tz - sz));
+                Direction dir = Direction.getNearest((int)Math.round(tx - sx), 0, (int)Math.round(tz - sz), Direction.NORTH);
                 double cx = dir.getStepX();
                 double cz = dir.getStepZ();
                 double offsetangle = Math.toRadians(6.0);
@@ -1023,7 +1023,7 @@ extends LLibrary_Boss_Monster {
 
     private boolean teleport(double p_32544_, double p_32545_, double p_32546_) {
         BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos(p_32544_, p_32545_, p_32546_);
-        while (blockpos$mutableblockpos.getY() > this.level().getMinBuildHeight() && !this.level().getBlockState((BlockPos)blockpos$mutableblockpos).blocksMotion()) {
+        while (blockpos$mutableblockpos.getY() > this.level().getMinY() && !this.level().getBlockState((BlockPos)blockpos$mutableblockpos).blocksMotion()) {
             blockpos$mutableblockpos.move(Direction.DOWN);
         }
         BlockState blockstate = this.level().getBlockState((BlockPos)blockpos$mutableblockpos);
@@ -1056,7 +1056,7 @@ extends LLibrary_Boss_Monster {
         Level level = this.level();
         if (level.hasChunkAt(blockpos)) {
             boolean flag1 = false;
-            while (!flag1 && blockpos.getY() > level.getMinBuildHeight()) {
+            while (!flag1 && blockpos.getY() > level.getMinY()) {
                 BlockPos blockpos1 = blockpos.below();
                 BlockState blockstate = level.getBlockState(blockpos1);
                 if (blockstate.blocksMotion()) {

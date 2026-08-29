@@ -101,7 +101,6 @@ extends Entity {
 
     public Abyss_Blast_Entity(EntityType<? extends Abyss_Blast_Entity> type, Level world) {
         super(type, world);
-        this.noCulling(true);
         if (world.isClientSide()) {
             this.attractorPos = new Vec3[]{new Vec3(0.0, 0.0, 0.0)};
         }
@@ -166,7 +165,7 @@ extends Entity {
                 if (!this.level().isClientSide()) {
                     for (BlockPos pos : BlockPos.betweenClosed((int)Mth.floor((double)(this.collidePosX - 0.5)), (int)Mth.floor((double)(this.collidePosY - 0.5)), (int)Mth.floor((double)(this.collidePosZ - 0.5)), (int)Mth.floor((double)(this.collidePosX + 0.5)), (int)Mth.floor((double)(this.collidePosY + 0.5)), (int)Mth.floor((double)(this.collidePosZ + 0.5)))) {
                         BlockState block = this.level().getBlockState(pos);
-                        if (block.isAir() || block.is(ModTag.LEVIATHAN_IMMUNE) || !EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) continue;
+                        if (block.isAir() || block.is(ModTag.LEVIATHAN_IMMUNE) || !(this.level() instanceof net.minecraft.server.level.ServerLevel) || !EventHooks.canEntityGrief((net.minecraft.server.level.ServerLevel)this.level(), (Entity)this)) continue;
                         this.level().destroyBlock(pos, false);
                     }
                 }
@@ -316,7 +315,7 @@ extends Entity {
             this.collidePosZ = this.endPosZ;
             this.blockSide = null;
         }
-        List entities = world.getEntitiesOfClass(LivingEntity.class, new AABB(Math.min(this.getX(), this.collidePosX), Math.min(this.getY(), this.collidePosY), Math.min(this.getZ(), this.collidePosZ), Math.max(this.getX(), this.collidePosX), Math.max(this.getY(), this.collidePosY), Math.max(this.getZ(), this.collidePosZ)).inflate(2.0, 2.0, 2.0));
+        List<LivingEntity> entities = world.getEntitiesOfClass(LivingEntity.class, new AABB(Math.min(this.getX(), this.collidePosX), Math.min(this.getY(), this.collidePosY), Math.min(this.getZ(), this.collidePosZ), Math.max(this.getX(), this.collidePosX), Math.max(this.getY(), this.collidePosY), Math.max(this.getZ(), this.collidePosZ)).inflate(2.0, 2.0, 2.0));
         for (LivingEntity entity : entities) {
             if (entity == this.caster) continue;
             float pad = entity.getPickRadius() + 0.5f;
@@ -380,6 +379,11 @@ extends Entity {
         public void addEntityHit(LivingEntity entity) {
             this.entities.add(entity);
         }
+    }
+
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return false;
     }
 }
 

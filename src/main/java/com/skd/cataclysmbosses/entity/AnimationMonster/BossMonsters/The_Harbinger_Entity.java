@@ -193,7 +193,7 @@ implements RangedAttackMob {
     private int mode_change_cooldown = 0;
     private int skill_cooldown = 160;
     private static final Predicate<LivingEntity> LIVING_ENTITY_SELECTOR = p_31504_ -> p_31504_.attackable() && !p_31504_.getType().builtInRegistryHolder().is(ModTag.TEAM_THE_HARBINGER);
-    private static final TargetingConditions TARGETING_CONDITIONS = TargetingConditions.forCombat().range(20.0).selector(LIVING_ENTITY_SELECTOR);
+    private static final TargetingConditions TARGETING_CONDITIONS = TargetingConditions.forCombat().range(20.0).selector((net.minecraft.world.entity.ai.targeting.TargetingConditions.Selector)((le, srv) -> LIVING_ENTITY_SELECTOR.test(le)));
 
     public The_Harbinger_Entity(EntityType entity, Level world) {
         super(entity, world);
@@ -206,7 +206,6 @@ implements RangedAttackMob {
         FlyingPathNavigation flyingpathnavigation = new FlyingPathNavigation((Mob)this, p_186262_);
         flyingpathnavigation.setCanOpenDoors(false);
         flyingpathnavigation.setCanFloat(true);
-        flyingpathnavigation.setCanPassDoors(true);
         return flyingpathnavigation;
     }
 
@@ -228,7 +227,7 @@ implements RangedAttackMob {
         this.goalSelector.addGoal(6, (Goal)new LookAtPlayerGoal((Mob)this, Player.class, 8.0f));
         this.goalSelector.addGoal(7, (Goal)new RandomLookAroundGoal((Mob)this));
         this.targetSelector.addGoal(1, (Goal)new HurtByNearestTargetGoal((PathfinderMob)this, new Class[0]));
-        this.targetSelector.addGoal(2, (Goal)new NearestAttackableTargetGoal((Mob)this, LivingEntity.class, 0, false, false, LIVING_ENTITY_SELECTOR));
+        this.targetSelector.addGoal(2, (Goal)new NearestAttackableTargetGoal((Mob)this, LivingEntity.class, 0, false, false, (net.minecraft.world.entity.ai.targeting.TargetingConditions.Selector)((le, srv) -> LIVING_ENTITY_SELECTOR.test(le))));
     }
 
     public static AttributeSupplier.Builder harbinger() {
@@ -415,7 +414,7 @@ implements RangedAttackMob {
             this.setIsCharge(false);
         }
         if (this.getAnimation() == STUN_ANIAMATION && this.getAnimationTick() == 15) {
-            this.level().playSound((Player)null, (Entity)this, (SoundEvent)ModSounds.HARBINGER_STUN.get(), SoundSource.HOSTILE, 4.0f, thislevel().getRandom().nextFloat() * 0.2f + 1.0f);
+            this.level().playSound((Player)null, (Entity)this, (SoundEvent)ModSounds.HARBINGER_STUN.get(), SoundSource.HOSTILE, 4.0f, this.level().getRandom().nextFloat() * 0.2f + 1.0f);
         }
         if (this.getAnimation() == DEATHLASER_ANIMATION && this.getAnimationTick() == 33) {
             this.level().playSound((Player)null, (Entity)this, (SoundEvent)ModSounds.DEATH_LASER.get(), SoundSource.HOSTILE, 4.0f, 0.75f);
@@ -484,7 +483,7 @@ implements RangedAttackMob {
 
     private void blockbreak() {
         if (this.getIsCharge()) {
-            if (!this.level().isClientSide() && EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+            if (!this.level().isClientSide() && this.level() instanceof ServerLevel && EventHooks.canEntityGrief((ServerLevel)this.level(), (Entity)this)) {
                 boolean flag = false;
                 AABB aabb = this.getBoundingBox().inflate(1.5, 0.2, 1.5);
                 for (BlockPos blockpos : BlockPos.betweenClosed((int)Mth.floor((double)aabb.minX), (int)Mth.floor((double)aabb.minY), (int)Mth.floor((double)aabb.minZ), (int)Mth.floor((double)aabb.maxX), (int)Mth.floor((double)aabb.maxY), (int)Mth.floor((double)aabb.maxZ))) {
@@ -523,7 +522,7 @@ implements RangedAttackMob {
             return;
         }
         boolean flag = false;
-        if (this.getAnimation() == NO_ANIMATION && !this.getIsCharge() && !this.level().isClientSide() && this.blockBreakCounter == 0 && EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+        if (this.getAnimation() == NO_ANIMATION && !this.getIsCharge() && !this.level().isClientSide() && this.blockBreakCounter == 0 && this.level() instanceof ServerLevel && EventHooks.canEntityGrief((ServerLevel)this.level(), (Entity)this)) {
             AABB aabb = this.getBoundingBox().inflate(0.2);
             for (BlockPos pos : BlockPos.betweenClosed((int)Mth.floor((double)aabb.minX), (int)Mth.floor((double)aabb.minY), (int)Mth.floor((double)aabb.minZ), (int)Mth.floor((double)aabb.maxX), (int)Mth.floor((double)aabb.maxY), (int)Mth.floor((double)aabb.maxZ))) {
                 BlockState blockstate = this.level().getBlockState(pos);
@@ -548,7 +547,7 @@ implements RangedAttackMob {
     private void destroyBlock() {
         if (this.getAnimation() != STUN_ANIAMATION && !this.level().isClientSide() && this.destroyBlocksTick > 0) {
             --this.destroyBlocksTick;
-            if (this.destroyBlocksTick == 0 && EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+            if (this.destroyBlocksTick == 0 && this.level() instanceof ServerLevel && EventHooks.canEntityGrief((ServerLevel)this.level(), (Entity)this)) {
                 int j1 = Mth.floor((double)this.getY());
                 int i2 = Mth.floor((double)this.getX());
                 int j2 = Mth.floor((double)this.getZ());
@@ -595,7 +594,7 @@ implements RangedAttackMob {
         return super.mobInteract(player, hand);
     }
 
-    protected void customServerAiStep() {
+    protected void customServerAiStep(net.minecraft.server.level.ServerLevel level) {
         if (this.getIsAct()) {
             if (this.deactivateProgress > 0.0f) {
                 float k1 = this.deactivateProgress - 1.0f;
@@ -603,7 +602,7 @@ implements RangedAttackMob {
                     this.level().globalLevelEvent(1023, this.blockPosition(), 0);
                 }
             } else {
-                super.customServerAiStep();
+                super.customServerAiStep(level);
                 for (int i = 1; i < 3; ++i) {
                     if (this.tickCount < this.nextHeadUpdate[i - 1]) continue;
                     this.nextHeadUpdate[i - 1] = this.tickCount + 10 + this.random.nextInt(10);
@@ -620,7 +619,7 @@ implements RangedAttackMob {
                         this.setAlternativeTarget(i, 0);
                         continue;
                     }
-                    List list = this.level().getNearbyEntities(LivingEntity.class, TARGETING_CONDITIONS, (LivingEntity)this, this.getBoundingBox().inflate(20.0, 8.0, 20.0));
+                    List list = ((ServerLevel)this.level()).getNearbyEntities(LivingEntity.class, TARGETING_CONDITIONS, (LivingEntity)this, this.getBoundingBox().inflate(20.0, 8.0, 20.0));
                     if (list.isEmpty()) continue;
                     LivingEntity livingentity1 = (LivingEntity)list.get(this.random.nextInt(list.size()));
                     this.setAlternativeTarget(i, livingentity1.getId());
@@ -698,8 +697,8 @@ implements RangedAttackMob {
             BlockEntity blockEntity = targetLevel.getBlockEntity(targetPos);
             if (blockEntity instanceof Boss_Respawn_Spawner_Block_Entity) {
                 Boss_Respawn_Spawner_Block_Entity spawnerBlockEntity = (Boss_Respawn_Spawner_Block_Entity)blockEntity;
-                spawnerBlockEntity.setEntityId((EntityType)ModEntities.THE_HARBINGER.get());
-                spawnerBlockEntity.setTheItem(((Item)ModItems.MECH_EYE.get()).getDefaultInstance());
+                spawnerBlockEntity.spawnType = (EntityType)ModEntities.THE_HARBINGER.get();
+                spawnerBlockEntity.item = ((Item)ModItems.MECH_EYE.get()).getDefaultInstance();
             }
         }
     }
@@ -851,7 +850,7 @@ implements RangedAttackMob {
 
     @Override
     public boolean canBeAffected(MobEffectInstance p_31495_) {
-        return p_31495_.getEffect() != MobEffects.MOVEMENT_SLOWDOWN && p_31495_.getEffect() != MobEffects.POISON && p_31495_.getEffect() != MobEffects.WITHER && p_31495_.getEffect() != MobEffects.WEAKNESS && p_31495_.getEffect() != MobEffects.LEVITATION && super.canBeAffected(p_31495_);
+        return p_31495_.getEffect() != MobEffects.SLOWNESS && p_31495_.getEffect() != MobEffects.POISON && p_31495_.getEffect() != MobEffects.WITHER && p_31495_.getEffect() != MobEffects.WEAKNESS && p_31495_.getEffect() != MobEffects.LEVITATION && super.canBeAffected(p_31495_);
     }
 
     public BossEvent.BossBarColor bossBarColor() {

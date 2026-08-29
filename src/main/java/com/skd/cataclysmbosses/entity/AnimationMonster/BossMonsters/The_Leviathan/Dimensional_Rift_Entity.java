@@ -167,7 +167,7 @@ extends Entity {
         int MthX = Mth.floor((double)this.getX());
         int MthY = Mth.floor((double)this.getY());
         int MthZ = Mth.floor((double)this.getZ());
-        if (!this.level().isClientSide() && EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+        if (!this.level().isClientSide() && this.level() instanceof net.minecraft.server.level.ServerLevel && EventHooks.canEntityGrief((net.minecraft.server.level.ServerLevel)this.level(), (Entity)this)) {
             for (int k2 = -x; k2 <= x; ++k2) {
                 for (int l2 = -z; l2 <= z; ++l2) {
                     for (int j = -y; j <= y; ++j) {
@@ -255,6 +255,11 @@ extends Entity {
         if (this.ownerUUID != null) {
             compound.store("Owner", UUIDUtil.CODEC, this.ownerUUID);
         }
+    }
+
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return false;
     }
 }
 

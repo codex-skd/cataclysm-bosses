@@ -65,7 +65,7 @@ extends Goal {
         if (!this.followingTargetEvenIfNotSeen) {
             return !this.Boss_monster.getNavigation().isDone();
         }
-        if (!this.Boss_monster.isWithinRestriction(target.blockPosition())) {
+        if (!this.Boss_monster.isWithinHome(target.blockPosition())) {
             return false;
         }
         return !(target instanceof Player) || !target.isSpectator() && !((Player)target).isCreative();

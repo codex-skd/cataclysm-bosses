@@ -63,7 +63,7 @@
  *  net.minecraft.world.level.Level
  *  net.minecraft.world.level.ServerLevelAccessor
  *  net.minecraft.world.level.block.Blocks
- *  net.minecraft.world.level.block.LiquidBlock
+
  *  net.minecraft.world.level.block.RenderShape
  *  net.minecraft.world.level.block.state.BlockState
  *  net.minecraft.world.level.material.FluidState
@@ -168,7 +168,7 @@ import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.LiquidBlock;
+
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
@@ -390,10 +390,6 @@ implements IHoldEntity {
             return false;
         }
         if (damage > 0.0f && this.canBlockDamageSource(source)) {
-            this.hurtCurrentlyUsedShield(damage);
-            if (!source.is(DamageTypeTags.IS_PROJECTILE) && entity instanceof LivingEntity) {
-                this.blockUsingShield((LivingEntity)entity);
-            }
             this.playSound(SoundEvents.BLAZE_HURT, 0.5f, 0.4f + this.getRandom().nextFloat() * 0.1f);
             return false;
         }
@@ -461,8 +457,9 @@ implements IHoldEntity {
     }
 
     @Nullable
+    @SuppressWarnings("unchecked")
     public Vec3 getTargetPosition() {
-        return ((Optional)this.entityData.get(TARGET_VEC)).orElse(null);
+        return ((Optional<Vec3>)this.entityData.get(TARGET_VEC)).orElse(null);
     }
 
     public void setIsBlocking(boolean isBlocking) {
@@ -574,7 +571,7 @@ implements IHoldEntity {
     private void floatStrider() {
         if (this.isInLava()) {
             CollisionContext lvt_1_1_ = CollisionContext.of((Entity)this);
-            if (lvt_1_1_.isAbove(LiquidBlock.STABLE_SHAPE, this.blockPosition().below(), true) && !this.level().getFluidState(this.blockPosition().above()).is(FluidTags.LAVA)) {
+            if (lvt_1_1_.isAbove(this.getLiquidCollisionShape(), this.blockPosition().below(), true) && !this.level().getFluidState(this.blockPosition().above()).is(FluidTags.LAVA)) {
                 this.setOnGround(true);
             } else {
                 this.setDeltaMovement(this.getDeltaMovement().scale(0.5).add(0.0, (double)this.random.nextFloat() * 0.5, 0.0));
@@ -666,12 +663,12 @@ implements IHoldEntity {
                 this.level().playLocalSound(this.getX() + 0.5, this.getY() + 0.5, this.getZ() + 0.5, SoundEvents.BLAZE_BURN, this.getSoundSource(), 1.0f + this.random.nextFloat(), this.random.nextFloat() * 0.7f + 0.3f, false);
             }
             if (this.getBossPhase() > 1) {
-                int n = this.getCrackiness() == Crackiness.NONE ? 5 : (this.getCrackiness() == Crackiness.LOW ? 4 : (i = this.getCrackiness() == Crackiness.MEDIUM ? 3 : 2));
-                if (this.random.nextInt(i) == 0) {
+                int n = this.getCrackiness() == Crackiness.NONE ? 5 : (this.getCrackiness() == Crackiness.LOW ? 4 : (this.getCrackiness() == Crackiness.MEDIUM ? 3 : 2));
+                if (this.random.nextInt(n) == 0) {
                     this.level().addParticle((ParticleOptions)ModParticle.SOUL_LAVA.get(), this.getRandomX(0.5), this.getRandomY(), this.getRandomZ(0.5), 0.0, 0.0, 0.0);
                 }
             } else {
-                for (i = 0; i < 2; ++i) {
+                for (int i = 0; i < 2; ++i) {
                     this.level().addParticle((ParticleOptions)ParticleTypes.LARGE_SMOKE, this.getRandomX(0.5), this.getRandomY(), this.getRandomZ(0.5), 0.0, 0.0, 0.0);
                 }
             }
@@ -1048,7 +1045,7 @@ implements IHoldEntity {
                     for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(1.25))) {
                         if (this.isAlliedTo((Entity)entity) || entity instanceof Ignis_Entity || entity == this) continue;
                         entity.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * 1.5 + (double)(entity.getMaxHealth() * 0.15f)));
-                        if (!entity.isDamageSourceBlocked(damagesource) || !(entity instanceof Player)) continue;
+                        if (!entity.isBlocking() || !(entity instanceof Player)) continue;
                         Player player = (Player)entity;
                         EntityUtil.disableShield(player, 200);
                     }
@@ -1154,7 +1151,7 @@ implements IHoldEntity {
                     for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(1.25))) {
                         if (this.isAlliedTo((Entity)entity) || entity instanceof Ignis_Entity || entity == this) continue;
                         boolean flag = entity.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * 1.5 + (double)(entity.getMaxHealth() * 0.15f)));
-                        if (!entity.isDamageSourceBlocked(damagesource) || !(entity instanceof Player)) continue;
+                        if (!entity.isBlocking() || !(entity instanceof Player)) continue;
                         Player player = (Player)entity;
                         EntityUtil.disableShield(player, 200);
                     }
@@ -1700,7 +1697,7 @@ implements IHoldEntity {
     private void blockbreak() {
         if (!this.isNoAi() && !this.level().isClientSide() && this.destroyBlocksTick > 0) {
             --this.destroyBlocksTick;
-            if (this.destroyBlocksTick == 0 && EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+            if (this.destroyBlocksTick == 0 && this.level() instanceof ServerLevel && EventHooks.canEntityGrief((ServerLevel)this.level(), (Entity)this)) {
                 boolean flag = false;
                 AABB aabb = this.getBoundingBox().inflate(0.2);
                 for (BlockPos blockpos : BlockPos.betweenClosed((int)Mth.floor((double)aabb.minX), (int)Mth.floor((double)this.getY()), (int)Mth.floor((double)aabb.minZ), (int)Mth.floor((double)aabb.maxX), (int)Mth.floor((double)aabb.maxY), (int)Mth.floor((double)aabb.maxZ))) {
@@ -1738,7 +1735,7 @@ implements IHoldEntity {
                 float entityHitDistance = (float)Math.sqrt((entityHit.getZ() - this.getZ()) * (entityHit.getZ() - this.getZ()) + (entityHit.getX() - this.getX()) * (entityHit.getX() - this.getX()));
                 if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || entityHit instanceof Ignis_Entity) continue;
                 boolean flag = entityHit.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage + (double)(entityHit.getMaxHealth() * hpdamage)));
-                if (entityHit.isDamageSourceBlocked(damagesource) && entityHit instanceof Player) {
+                if (entityHit.isBlocking() && entityHit instanceof Player) {
                     Player player = (Player)entityHit;
                     if (shieldbreakticks > 0) {
                         EntityUtil.disableShield(player, shieldbreakticks);
@@ -1787,7 +1784,7 @@ implements IHoldEntity {
                 float entityHitDistance = (float)Math.sqrt((entityHit.getZ() - this.getZ()) * (entityHit.getZ() - this.getZ()) + (entityHit.getX() - this.getX()) * (entityHit.getX() - this.getX()));
                 if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || this.isAlliedTo((Entity)entityHit) || entityHit instanceof Ignis_Entity) continue;
                 boolean flag = entityHit.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage + (double)(entityHit.getMaxHealth() * hpdamage)));
-                if (entityHit.isDamageSourceBlocked(damagesource) && entityHit instanceof Player) {
+                if (entityHit.isBlocking() && entityHit instanceof Player) {
                     Player player = (Player)entityHit;
                     if (shieldbreakticks > 0) {
                         EntityUtil.disableShield(player, shieldbreakticks);
@@ -1821,7 +1818,7 @@ implements IHoldEntity {
                 float entityRelativeAngle = entityHitAngle - entityAttackingAngle;
                 if (!(this.distanceTo((Entity)entityHit) <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || this.isAlliedTo((Entity)entityHit) || entityHit instanceof Ignis_Entity) continue;
                 boolean flag = entityHit.hurtOrSimulate(damagesource, (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) + entityHit.getMaxHealth() * 0.1f);
-                if (entityHit.isDamageSourceBlocked(damagesource) && entityHit instanceof Player) {
+                if (entityHit.isBlocking() && entityHit instanceof Player) {
                     Player player = (Player)entityHit;
                     if (shieldbreakticks > 0) {
                         EntityUtil.disableShield(player, shieldbreakticks);
@@ -2051,16 +2048,16 @@ implements IHoldEntity {
                 Cm_Falling_Block_Entity fallingBlockEntity = new Cm_Falling_Block_Entity(this.level(), (double)hitX + 0.5, (double)hitY + 1.0, (double)hitZ + 0.5, block, 10);
                 fallingBlockEntity.push(0.0, 0.2 + this.getRandom().nextGaussian() * 0.15, 0.0);
                 this.level().addFreshEntity((Entity)fallingBlockEntity);
-                if (block.is(ModTag.IGNIS_CAN_DESTROY_CRACKED_BLOCK) && (CMCommonConfig.Ignis.ignoreMobGriefing || EventHooks.canEntityGrief((Level)this.level(), (Entity)this))) {
+                if (block.is(ModTag.IGNIS_CAN_DESTROY_CRACKED_BLOCK) && this.level() instanceof ServerLevel && (CMCommonConfig.Ignis.ignoreMobGriefing || EventHooks.canEntityGrief((ServerLevel)this.level(), (Entity)this))) {
                     this.level().destroyBlock(pos, false, (Entity)this);
                 }
                 AABB selection = new AABB(px - 0.5, minY, pz - 0.5, px + 0.5, maxY, pz + 0.5);
-                List hit = this.level().getEntitiesOfClass(LivingEntity.class, selection);
+                List<LivingEntity> hit = this.level().getEntitiesOfClass(LivingEntity.class, selection);
                 for (LivingEntity entity : hit) {
                     if (this.isAlliedTo((Entity)entity) || entity instanceof Ignis_Entity || entity == this) continue;
                     float finalDamage = baseDamage + entity.getMaxHealth() * hpdamage;
                     boolean flag = entity.hurtOrSimulate(damagesource, finalDamage);
-                    if (entity.isDamageSourceBlocked(damagesource) && entity instanceof Player) {
+                    if (entity.isBlocking() && entity instanceof Player) {
                         Player player = (Player)entity;
                         if (shieldbreakticks > 0) {
                             EntityUtil.disableShield(player, shieldbreakticks);
@@ -2075,7 +2072,7 @@ implements IHoldEntity {
                         entity.setDeltaMovement(entity.getDeltaMovement().add(x, y, z));
                         continue;
                     }
-                    entity.setDeltaMovement(entity.getDeltaMovement().add(0.0, (double)(airborne * (float)distance) + thislevel().getRandom().nextDouble() * 0.15, 0.0));
+                    entity.setDeltaMovement(entity.getDeltaMovement().add(0.0, (double)(airborne * (float)distance) + this.level().getRandom().nextDouble() * 0.15, 0.0));
                 }
             }
         }
@@ -2106,13 +2103,13 @@ implements IHoldEntity {
             Cm_Falling_Block_Entity fallingBlockEntity = new Cm_Falling_Block_Entity(this.level(), (double)hitX + 0.5, (double)hitY + 1.0, (double)hitZ + 0.5, block, 10);
             fallingBlockEntity.push(0.0, 0.2 + this.getRandom().nextGaussian() * 0.15, 0.0);
             this.level().addFreshEntity((Entity)fallingBlockEntity);
-            if (block.is(ModTag.IGNIS_CAN_DESTROY_CRACKED_BLOCK) && (CMCommonConfig.Ignis.ignoreMobGriefing || EventHooks.canEntityGrief((Level)this.level(), (Entity)this))) {
+            if (block.is(ModTag.IGNIS_CAN_DESTROY_CRACKED_BLOCK) && this.level() instanceof ServerLevel && (CMCommonConfig.Ignis.ignoreMobGriefing || EventHooks.canEntityGrief((ServerLevel)this.level(), (Entity)this))) {
                 this.level().destroyBlock(pos, false, (Entity)this);
             }
             double minY = this.getY() - 2.0;
             double maxY = this.getY() + (double)mxy;
             AABB selection = new AABB(px - 0.5, minY, pz - 0.5, px + 0.5, maxY, pz + 0.5);
-            List hit = this.level().getEntitiesOfClass(LivingEntity.class, selection);
+            List<LivingEntity> hit = this.level().getEntitiesOfClass(LivingEntity.class, selection);
             if (!hit.isEmpty()) {
                 DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
                 float baseDamage = (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) * damage;
@@ -2120,14 +2117,14 @@ implements IHoldEntity {
                     if (this.isAlliedTo((Entity)entity) || entity instanceof Ignis_Entity || entity == this) continue;
                     float finalDamage = baseDamage + entity.getMaxHealth() * hpdamage;
                     boolean flag = entity.hurtOrSimulate(damagesource, finalDamage);
-                    if (entity.isDamageSourceBlocked(damagesource) && entity instanceof Player) {
+                    if (entity.isBlocking() && entity instanceof Player) {
                         Player player = (Player)entity;
                         if (shieldbreakticks > 0) {
                             EntityUtil.disableShield(player, shieldbreakticks);
                         }
                     }
                     if (!flag) continue;
-                    entity.setDeltaMovement(entity.getDeltaMovement().add(0.0, (double)airborne + thislevel().getRandom().nextDouble() * 0.15, 0.0));
+                    entity.setDeltaMovement(entity.getDeltaMovement().add(0.0, (double)airborne + this.level().getRandom().nextDouble() * 0.15, 0.0));
                 }
             }
         }
@@ -2189,7 +2186,9 @@ implements IHoldEntity {
             Level level = this.level();
             if (level instanceof ServerLevel) {
                 ServerLevel serverLevel = (ServerLevel)level;
-                serverLevel.getPlayers(EntitySelector.NO_SPECTATORS).forEach(serverPlayer -> serverPlayer.displayClientMessage((Component)Component.translatable((String)"entity.cataclysm.ignis.defeat_message").withStyle(ChatFormatting.GOLD), true));
+                for (ServerPlayer serverPlayer : serverLevel.getPlayers(p -> EntitySelector.NO_SPECTATORS.test(p))) {
+                    serverPlayer.sendSystemMessage((Component)Component.translatable((String)"entity.cataclysm.ignis.defeat_message").withStyle(ChatFormatting.GOLD), true);
+                }
             }
         }
     }

@@ -225,7 +225,7 @@ extends LLibrary_Monster {
             if (!this.followingTargetEvenIfNotSeen) {
                 return !this.watcher.getNavigation().isDone();
             }
-            if (!this.watcher.isWithinRestriction(target.blockPosition())) {
+            if (!this.watcher.isWithinHome(target.blockPosition())) {
                 return false;
             }
             return !(target instanceof Player) || !target.isSpectator() && !((Player)target).isCreative();
