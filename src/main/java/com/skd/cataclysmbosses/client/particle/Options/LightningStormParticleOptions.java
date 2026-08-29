@@ -30,7 +30,7 @@ import org.jetbrains.annotations.NotNull;
 public record LightningStormParticleOptions(float size) implements ParticleOptions
 {
     public static StreamCodec<? super ByteBuf, LightningStormParticleOptions> STREAM_CODEC = StreamCodec.of((buf, option) -> buf.writeFloat(option.size), buf -> new LightningStormParticleOptions(buf.readFloat()));
-    public static MapCodec<LightningStormParticleOptions> MAP_CODEC = RecordCodecBuilder.mapCodec(object -> object.group((App)Codec.FLOAT.fieldOf("size").forGetter(p -> Float.valueOf(p.size))).apply((Applicative)object, LightningStormParticleOptions::new));
+    public static MapCodec<LightningStormParticleOptions> MAP_CODEC = RecordCodecBuilder.mapCodec(object -> object.group(Codec.FLOAT.fieldOf("size").forGetter(p -> Float.valueOf(p.size))).apply(object, LightningStormParticleOptions::new));
 
     @NotNull
     public ParticleType<LightningStormParticleOptions> getType() {

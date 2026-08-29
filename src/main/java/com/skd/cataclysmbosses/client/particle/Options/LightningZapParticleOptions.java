@@ -35,7 +35,7 @@ public record LightningZapParticleOptions(int r, int g, int b, float gravity) im
         buf.writeInt(option.b);
         buf.writeFloat(option.gravity);
     }, buf -> new LightningZapParticleOptions(buf.readInt(), buf.readInt(), buf.readInt(), buf.readFloat()));
-    public static MapCodec<LightningZapParticleOptions> MAP_CODEC = RecordCodecBuilder.mapCodec(object -> object.group((App)Codec.INT.fieldOf("r").forGetter(p -> p.r), (App)Codec.INT.fieldOf("g").forGetter(p -> p.g), (App)Codec.INT.fieldOf("b").forGetter(p -> p.b), (App)Codec.FLOAT.fieldOf("gravity").forGetter(p -> Float.valueOf(p.gravity))).apply((Applicative)object, LightningZapParticleOptions::new));
+    public static MapCodec<LightningZapParticleOptions> MAP_CODEC = RecordCodecBuilder.mapCodec(object -> object.group(Codec.INT.fieldOf("r").forGetter(p -> p.r), Codec.INT.fieldOf("g").forGetter(p -> p.g), Codec.INT.fieldOf("b").forGetter(p -> p.b), Codec.FLOAT.fieldOf("gravity").forGetter(p -> Float.valueOf(p.gravity))).apply(object, LightningZapParticleOptions::new));
 
     @NotNull
     public ParticleType<LightningZapParticleOptions> getType() {

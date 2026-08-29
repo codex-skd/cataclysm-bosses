@@ -30,7 +30,7 @@ import org.jetbrains.annotations.NotNull;
 public record Cursed_MarkParticleOption(float size) implements ParticleOptions
 {
     public static StreamCodec<? super ByteBuf, Cursed_MarkParticleOption> STREAM_CODEC = StreamCodec.of((buf, option) -> buf.writeFloat(option.size), buf -> new Cursed_MarkParticleOption(buf.readFloat()));
-    public static MapCodec<Cursed_MarkParticleOption> MAP_CODEC = RecordCodecBuilder.mapCodec(object -> object.group((App)Codec.FLOAT.fieldOf("size").forGetter(p -> Float.valueOf(p.size))).apply((Applicative)object, Cursed_MarkParticleOption::new));
+    public static MapCodec<Cursed_MarkParticleOption> MAP_CODEC = RecordCodecBuilder.mapCodec(object -> object.group(Codec.FLOAT.fieldOf("size").forGetter(p -> Float.valueOf(p.size))).apply(object, Cursed_MarkParticleOption::new));
 
     @NotNull
     public ParticleType<Cursed_MarkParticleOption> getType() {

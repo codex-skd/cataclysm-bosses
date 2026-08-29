@@ -35,7 +35,7 @@ public record CustomPoofParticleOptions(int r, int g, int b, float gravity) impl
         buf.writeInt(option.b);
         buf.writeFloat(option.gravity);
     }, buf -> new CustomPoofParticleOptions(buf.readInt(), buf.readInt(), buf.readInt(), buf.readFloat()));
-    public static MapCodec<CustomPoofParticleOptions> MAP_CODEC = RecordCodecBuilder.mapCodec(object -> object.group((App)Codec.INT.fieldOf("r").forGetter(p -> p.r), (App)Codec.INT.fieldOf("g").forGetter(p -> p.g), (App)Codec.INT.fieldOf("b").forGetter(p -> p.b), (App)Codec.FLOAT.fieldOf("gravity").forGetter(p -> Float.valueOf(p.gravity))).apply((Applicative)object, CustomPoofParticleOptions::new));
+    public static MapCodec<CustomPoofParticleOptions> MAP_CODEC = RecordCodecBuilder.mapCodec(object -> object.group(Codec.INT.fieldOf("r").forGetter(p -> p.r), Codec.INT.fieldOf("g").forGetter(p -> p.g), Codec.INT.fieldOf("b").forGetter(p -> p.b), Codec.FLOAT.fieldOf("gravity").forGetter(p -> Float.valueOf(p.gravity))).apply(object, CustomPoofParticleOptions::new));
 
     @NotNull
     public ParticleType<CustomPoofParticleOptions> getType() {

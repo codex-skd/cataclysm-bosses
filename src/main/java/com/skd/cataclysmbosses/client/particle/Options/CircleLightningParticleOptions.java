@@ -35,7 +35,7 @@ public record CircleLightningParticleOptions(float size, int r, int g, int b) im
         buf.writeInt(option.g);
         buf.writeInt(option.b);
     }, buf -> new CircleLightningParticleOptions(buf.readFloat(), buf.readInt(), buf.readInt(), buf.readInt()));
-    public static MapCodec<CircleLightningParticleOptions> MAP_CODEC = RecordCodecBuilder.mapCodec(object -> object.group((App)Codec.FLOAT.fieldOf("size").forGetter(p -> Float.valueOf(p.size)), (App)Codec.INT.fieldOf("r").forGetter(p -> p.r), (App)Codec.INT.fieldOf("g").forGetter(p -> p.g), (App)Codec.INT.fieldOf("b").forGetter(p -> p.b)).apply((Applicative)object, CircleLightningParticleOptions::new));
+    public static MapCodec<CircleLightningParticleOptions> MAP_CODEC = RecordCodecBuilder.mapCodec(object -> object.group(Codec.FLOAT.fieldOf("size").forGetter(p -> Float.valueOf(p.size)), Codec.INT.fieldOf("r").forGetter(p -> p.r), Codec.INT.fieldOf("g").forGetter(p -> p.g), Codec.INT.fieldOf("b").forGetter(p -> p.b)).apply(object, CircleLightningParticleOptions::new));
 
     @NotNull
     public ParticleType<CircleLightningParticleOptions> getType() {

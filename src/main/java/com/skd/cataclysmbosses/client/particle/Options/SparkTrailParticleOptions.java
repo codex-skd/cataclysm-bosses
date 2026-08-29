@@ -34,7 +34,7 @@ public record SparkTrailParticleOptions(int r, int g, int b) implements Particle
         buf.writeInt(option.g);
         buf.writeInt(option.b);
     }, buf -> new SparkTrailParticleOptions(buf.readInt(), buf.readInt(), buf.readInt()));
-    public static MapCodec<SparkTrailParticleOptions> MAP_CODEC = RecordCodecBuilder.mapCodec(object -> object.group((App)Codec.INT.fieldOf("r").forGetter(p -> p.r), (App)Codec.INT.fieldOf("g").forGetter(p -> p.g), (App)Codec.INT.fieldOf("b").forGetter(p -> p.b)).apply((Applicative)object, SparkTrailParticleOptions::new));
+    public static MapCodec<SparkTrailParticleOptions> MAP_CODEC = RecordCodecBuilder.mapCodec(object -> object.group(Codec.INT.fieldOf("r").forGetter(p -> p.r), Codec.INT.fieldOf("g").forGetter(p -> p.g), Codec.INT.fieldOf("b").forGetter(p -> p.b)).apply(object, SparkTrailParticleOptions::new));
 
     @NotNull
     public ParticleType<SparkTrailParticleOptions> getType() {

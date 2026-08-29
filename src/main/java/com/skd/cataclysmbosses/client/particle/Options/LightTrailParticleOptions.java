@@ -37,7 +37,7 @@ public record LightTrailParticleOptions(float r, float g, float b, float width, 
         buf.writeFloat(option.height);
         buf.writeInt(option.entityid);
     }, buf -> new LightTrailParticleOptions(buf.readFloat(), buf.readFloat(), buf.readFloat(), buf.readFloat(), buf.readFloat(), buf.readInt()));
-    public static MapCodec<LightTrailParticleOptions> MAP_CODEC = RecordCodecBuilder.mapCodec(object -> object.group((App)Codec.FLOAT.fieldOf("r").forGetter(p -> Float.valueOf(p.r)), (App)Codec.FLOAT.fieldOf("g").forGetter(p -> Float.valueOf(p.g)), (App)Codec.FLOAT.fieldOf("b").forGetter(p -> Float.valueOf(p.b)), (App)Codec.FLOAT.fieldOf("width").forGetter(p -> Float.valueOf(p.width)), (App)Codec.FLOAT.fieldOf("height").forGetter(p -> Float.valueOf(p.height)), (App)Codec.INT.fieldOf("entityid").forGetter(p -> p.entityid)).apply((Applicative)object, LightTrailParticleOptions::new));
+    public static MapCodec<LightTrailParticleOptions> MAP_CODEC = RecordCodecBuilder.mapCodec(object -> object.group(Codec.FLOAT.fieldOf("r").forGetter(p -> Float.valueOf(p.r)), Codec.FLOAT.fieldOf("g").forGetter(p -> Float.valueOf(p.g)), Codec.FLOAT.fieldOf("b").forGetter(p -> Float.valueOf(p.b)), Codec.FLOAT.fieldOf("width").forGetter(p -> Float.valueOf(p.width)), Codec.FLOAT.fieldOf("height").forGetter(p -> Float.valueOf(p.height)), Codec.INT.fieldOf("entityid").forGetter(p -> p.entityid)).apply(object, LightTrailParticleOptions::new));
 
     @NotNull
     public ParticleType<LightTrailParticleOptions> getType() {

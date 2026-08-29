@@ -37,7 +37,7 @@ public record AfterImageParticleOptions(int entityid, int r, int g, int b, boole
         buf.writeBoolean(option.ghost);
         buf.writeInt(option.lifeticks);
     }, buf -> new AfterImageParticleOptions(buf.readInt(), buf.readInt(), buf.readInt(), buf.readInt(), buf.readBoolean(), buf.readInt()));
-    public static MapCodec<AfterImageParticleOptions> MAP_CODEC = RecordCodecBuilder.mapCodec(object -> object.group((App)Codec.INT.fieldOf("entityid").forGetter(p -> p.entityid), (App)Codec.INT.fieldOf("r").forGetter(p -> p.r), (App)Codec.INT.fieldOf("g").forGetter(p -> p.g), (App)Codec.INT.fieldOf("b").forGetter(p -> p.b), (App)Codec.BOOL.fieldOf("ghost").forGetter(p -> p.ghost), (App)Codec.INT.fieldOf("lifeticks").forGetter(p -> p.lifeticks)).apply((Applicative)object, AfterImageParticleOptions::new));
+    public static MapCodec<AfterImageParticleOptions> MAP_CODEC = RecordCodecBuilder.mapCodec(object -> object.group(Codec.INT.fieldOf("entityid").forGetter(p -> p.entityid), Codec.INT.fieldOf("r").forGetter(p -> p.r), Codec.INT.fieldOf("g").forGetter(p -> p.g), Codec.INT.fieldOf("b").forGetter(p -> p.b), Codec.BOOL.fieldOf("ghost").forGetter(p -> p.ghost), Codec.INT.fieldOf("lifeticks").forGetter(p -> p.lifeticks)).apply(object, AfterImageParticleOptions::new));
 
     @NotNull
     public ParticleType<AfterImageParticleOptions> getType() {

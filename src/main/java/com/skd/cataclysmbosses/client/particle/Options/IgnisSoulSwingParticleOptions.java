@@ -36,7 +36,7 @@ public record IgnisSoulSwingParticleOptions(int lifetime, float scale, float yaw
         buf.writeFloat(option.pitch);
         buf.writeFloat(option.roll);
     }, buf -> new IgnisSoulSwingParticleOptions(buf.readInt(), buf.readFloat(), buf.readFloat(), buf.readFloat(), buf.readFloat()));
-    public static MapCodec<IgnisSoulSwingParticleOptions> MAP_CODEC = RecordCodecBuilder.mapCodec(object -> object.group((App)Codec.INT.fieldOf("lifetime").forGetter(p -> p.lifetime), (App)Codec.FLOAT.fieldOf("scale").forGetter(p -> Float.valueOf(p.scale)), (App)Codec.FLOAT.fieldOf("yaw").forGetter(p -> Float.valueOf(p.yaw)), (App)Codec.FLOAT.fieldOf("pitch").forGetter(p -> Float.valueOf(p.pitch)), (App)Codec.FLOAT.fieldOf("roll").forGetter(p -> Float.valueOf(p.roll))).apply((Applicative)object, IgnisSoulSwingParticleOptions::new));
+    public static MapCodec<IgnisSoulSwingParticleOptions> MAP_CODEC = RecordCodecBuilder.mapCodec(object -> object.group(Codec.INT.fieldOf("lifetime").forGetter(p -> p.lifetime), Codec.FLOAT.fieldOf("scale").forGetter(p -> Float.valueOf(p.scale)), Codec.FLOAT.fieldOf("yaw").forGetter(p -> Float.valueOf(p.yaw)), Codec.FLOAT.fieldOf("pitch").forGetter(p -> Float.valueOf(p.pitch)), Codec.FLOAT.fieldOf("roll").forGetter(p -> Float.valueOf(p.roll))).apply(object, IgnisSoulSwingParticleOptions::new));
 
     @NotNull
     public ParticleType<IgnisSoulSwingParticleOptions> getType() {

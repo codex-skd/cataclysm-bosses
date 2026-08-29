@@ -30,7 +30,7 @@ import org.jetbrains.annotations.NotNull;
 public record RainFogParticleOptions(float size) implements ParticleOptions
 {
     public static StreamCodec<? super ByteBuf, RainFogParticleOptions> STREAM_CODEC = StreamCodec.of((buf, option) -> buf.writeFloat(option.size), buf -> new RainFogParticleOptions(buf.readFloat()));
-    public static MapCodec<RainFogParticleOptions> MAP_CODEC = RecordCodecBuilder.mapCodec(object -> object.group((App)Codec.FLOAT.fieldOf("size").forGetter(p -> Float.valueOf(p.size))).apply((Applicative)object, RainFogParticleOptions::new));
+    public static MapCodec<RainFogParticleOptions> MAP_CODEC = RecordCodecBuilder.mapCodec(object -> object.group(Codec.FLOAT.fieldOf("size").forGetter(p -> Float.valueOf(p.size))).apply(object, RainFogParticleOptions::new));
 
     @NotNull
     public ParticleType<RainFogParticleOptions> getType() {

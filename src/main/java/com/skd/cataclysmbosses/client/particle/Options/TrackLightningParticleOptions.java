@@ -34,7 +34,7 @@ public record TrackLightningParticleOptions(int r, int g, int b) implements Part
         buf.writeInt(option.g);
         buf.writeInt(option.b);
     }, buf -> new TrackLightningParticleOptions(buf.readInt(), buf.readInt(), buf.readInt()));
-    public static MapCodec<TrackLightningParticleOptions> MAP_CODEC = RecordCodecBuilder.mapCodec(object -> object.group((App)Codec.INT.fieldOf("r").forGetter(p -> p.r), (App)Codec.INT.fieldOf("g").forGetter(p -> p.g), (App)Codec.INT.fieldOf("b").forGetter(p -> p.b)).apply((Applicative)object, TrackLightningParticleOptions::new));
+    public static MapCodec<TrackLightningParticleOptions> MAP_CODEC = RecordCodecBuilder.mapCodec(object -> object.group(Codec.INT.fieldOf("r").forGetter(p -> p.r), Codec.INT.fieldOf("g").forGetter(p -> p.g), Codec.INT.fieldOf("b").forGetter(p -> p.b)).apply(object, TrackLightningParticleOptions::new));
 
     @NotNull
     public ParticleType<TrackLightningParticleOptions> getType() {
