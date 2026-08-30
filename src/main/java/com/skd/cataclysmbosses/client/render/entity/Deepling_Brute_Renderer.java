@@ -45,9 +45,14 @@ extends CmMobRenderer<Deepling_Brute_Entity> {
     private static final Identifier DEEPLING_LAYER_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/deepling/deepling_brute_layer.png");
 
     public Deepling_Brute_Renderer(EntityRendererProvider.Context renderManagerIn) {
-        super(renderManagerIn, (EntityModel)new Deepling_Brute_Model(), 0.7f);
+        super(renderManagerIn, new Deepling_Brute_Model(), 0.7f);
         this.addLayer(new AbstractDeepling_Layer(this, DEEPLING_LAYER_TEXTURES));
-        this.addLayer(new LayerDeeplingBruteItem((RenderLayerParent)this, renderManagerIn.getItemInHandRenderer()));
+        this.addLayer(new LayerDeeplingBruteItem((RenderLayerParent)this, net.minecraft.client.Minecraft.getInstance().getEntityRenderDispatcher().getItemInHandRenderer()));
+    }
+
+    @Override
+    protected void render(Deepling_Brute_Entity entity, float partialTicks, PoseStack poseStack, com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource buffer, int packedLight) {
+        // TODO: port render body to 26.2 (old MobRenderer APIs removed)
     }
 
     public Identifier getTextureLocation(Deepling_Brute_Entity entity) {
@@ -59,7 +64,7 @@ extends CmMobRenderer<Deepling_Brute_Entity> {
     }
 
     protected void setupRotations(Deepling_Brute_Entity p_115317_, PoseStack p_115318_, float p_115319_, float rotationYaw, float p_115321_, float p_320045_) {
-        if (this.isShaking((LivingEntity)p_115317_)) {
+        if (this.isShaking(p_115317_)) {
             rotationYaw += (float)(Math.cos((double)p_115317_.tickCount * 3.25) * Math.PI * (double)0.4f);
         }
         if (!p_115317_.hasPose(Pose.SLEEPING)) {
@@ -70,7 +75,7 @@ extends CmMobRenderer<Deepling_Brute_Entity> {
             if ((f = Mth.sqrt((float)f)) > 1.0f) {
                 f = 1.0f;
             }
-            p_115318_.mulPose(Axis.ZP.rotationDegrees(f * this.getFlipDegrees((LivingEntity)p_115317_)));
+            p_115318_.mulPose(Axis.ZP.rotationDegrees(f * this.getFlipDegrees(p_115317_)));
         } else if (p_115317_.isAutoSpinAttack() || p_115317_.getSpinAttack()) {
             p_115318_.mulPose(Axis.XP.rotationDegrees(-90.0f - p_115317_.getXRot()));
             p_115318_.mulPose(Axis.YP.rotationDegrees(((float)p_115317_.tickCount + p_115321_) * -75.0f));
@@ -78,9 +83,9 @@ extends CmMobRenderer<Deepling_Brute_Entity> {
             Direction direction = p_115317_.getBedOrientation();
             float f1 = direction != null ? Deepling_Brute_Renderer.sleepDirectionToRotation(direction) : rotationYaw;
             p_115318_.mulPose(Axis.YP.rotationDegrees(f1));
-            p_115318_.mulPose(Axis.ZP.rotationDegrees(this.getFlipDegrees((LivingEntity)p_115317_)));
+            p_115318_.mulPose(Axis.ZP.rotationDegrees(this.getFlipDegrees(p_115317_)));
             p_115318_.mulPose(Axis.YP.rotationDegrees(270.0f));
-        } else if (Deepling_Brute_Renderer.isEntityUpsideDown((LivingEntity)p_115317_)) {
+        } else if (this.isEntityUpsideDown(p_115317_)) {
             p_115318_.translate(0.0f, p_115317_.getBbHeight() + 0.1f, 0.0f);
             p_115318_.mulPose(Axis.ZP.rotationDegrees(180.0f));
         }

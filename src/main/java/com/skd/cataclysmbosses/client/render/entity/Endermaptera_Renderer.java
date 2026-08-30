@@ -44,8 +44,13 @@ extends CmMobRenderer<Endermaptera_Entity> {
     private static final Identifier SSAPBUG_LAYER_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/ender_ssap_bug_layer.png");
 
     public Endermaptera_Renderer(EntityRendererProvider.Context renderManagerIn) {
-        super(renderManagerIn, (EntityModel)new Endermaptera_Model(), 0.7f);
+        super(renderManagerIn, new Endermaptera_Model(), 0.7f);
         this.addLayer(new LayerGenericGlowing(this, SSAPBUG_LAYER_TEXTURES));
+    }
+
+    @Override
+    protected void render(Endermaptera_Entity entity, float partialTicks, PoseStack poseStack, com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource buffer, int packedLight) {
+        // TODO: port render body to 26.2 (old MobRenderer APIs removed)
     }
 
     public Identifier getTextureLocation(Endermaptera_Entity entity) {
@@ -58,7 +63,7 @@ extends CmMobRenderer<Endermaptera_Entity> {
 
     protected void setupRotations(Endermaptera_Entity entityLiving, PoseStack matrixStackIn, float p_115319_, float rotationYaw, float p_115321_, float p_320045_) {
         String s;
-        if (this.isShaking((LivingEntity)entityLiving)) {
+        if (this.isShaking(entityLiving)) {
             rotationYaw += (float)(Math.cos((double)entityLiving.tickCount * 3.25) * Math.PI * (double)0.4f);
         }
         float trans = 0.5f;
@@ -115,7 +120,7 @@ extends CmMobRenderer<Endermaptera_Entity> {
             if ((f = Mth.sqrt((float)f)) > 1.0f) {
                 f = 1.0f;
             }
-            matrixStackIn.mulPose(Axis.ZP.rotationDegrees(f * this.getFlipDegrees((LivingEntity)entityLiving)));
+            matrixStackIn.mulPose(Axis.ZP.rotationDegrees(f * this.getFlipDegrees(entityLiving)));
         } else if (entityLiving.isAutoSpinAttack()) {
             matrixStackIn.mulPose(Axis.XP.rotationDegrees(-90.0f - entityLiving.getXRot()));
             matrixStackIn.mulPose(Axis.YP.rotationDegrees(((float)entityLiving.tickCount + p_115321_) * -75.0f));
