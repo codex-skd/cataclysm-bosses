@@ -1,6 +1,66 @@
 SESSION STATUS — NeoForge 26.2.0.45-beta -> 26.2.0.57 compile port
 ================================================================
 
+== 2026-08-30 (sesión 3, FINAL) — 1.015 -> 560 errores ==
+
+Objetivo: primera versión limpia (compila) para subir a CurseForge.
+
+Commits nuevos en `minecraft/26.2/neoforge-26.2.0.57/production` (SIN pushear):
+  00fdf42  entity/AnimationMonster/ compila (1015 -> 896)   [longcat-2.0 + 8 fixes a mano]
+  dae8f97  entity/InternalAnimationMonster/ + Deepling/ compila (896 -> 690)  [longcat-2.0 + 10 fixes]
+  44ca83f  entity/ TODO el árbol compila (690 -> 665)  [Ministrosity + CMBossInfoServer + Spike a mano]
+  7ec446f  items/ compila (662 -> 560)  [longcat-2.0 + ~30 stragglers a mano]
+
+**entity/ ENTERO e items/ ENTERO compilan (0 errores).**
+
+PAQUETES A 0 ERRORES: blocks/, client/particle/ (+Options/), CMRenderTypes.java,
+  structures/ (incl. jisaw/), world/, util/, **TODO entity/**, **TODO items/**.
+
+REPARTO DE LOS 560 RESTANTES:
+  client/  486   -- EL ÚNICO BLOQUE GRANDE. renderers de entidad/boss, modelos
+                    (client/model/entity/*: ImmutableList.of((Object)root) genéricos ~mecánico),
+                    client/render/entity/* (renderers: puentes Cm* ya existen), ClientEvent.java ~61.
+  init/    32    (11 ficheros: ModDataComponents/ModRecipeSerializers register() con MapCodec,
+                    KeyMapping ctor nuevo (KeyMapping(String,Type,int,String) -> otra firma),
+                    Codec<UUID>->Codec<Object> raw, ArmorMaterial->Holder<ArmorMaterial> en ModItems)
+  mixin/   18    (LivingEntityMixin 4x "Object->Boolean" en @Redirect/@ModifyVariable,
+                    Client/HumanoidModelMixin 3x Model<S> ctor, 8x mixins de estructura "Object->Boolean")
+  misc ~24: inventory 8 (WeaponfusionMenu/ItemCombinerMenu ctor), effects 5 (EffectAbyssal_Burn
+            cannot find symbol), message 5 (MessageParticle RegistryFriendlyByteBuf/addParticle),
+            crafting 2, jei 2 (CMRecipes recipe-manager API), event 1
+
+ORDEN SUGERIDO PARA CONTINUAR:
+  1. init/ (32) + mixin/ (18) + misc (~24) — ~74 errores, mecánico variado. Una delegación
+     a longcat-2.0 con el prompt tight + patrones acumulados; luego stragglers a mano.
+     (init/ toca ModItems otra vez para ArmorMaterial->Holder si el commit de items/ lo dejó a medias.)
+  2. client/ (486) — el bloque final. Trocear:
+     a) client/model/entity/ (~ImmutableList.of genéricos + Model<S> ctor) — muy mecánico, delegar entero.
+     b) client/render/entity/ (renderers) — CmEntityRenderer/CmMobRenderer/CmHierarchicalModel ya
+        existen de sesiones previas; migrar los que aún usan MultiBufferSource/RenderType viejo.
+     c) client/render/ (BER, item renderers, etc) + client/gui/.
+     d) ClientEvent.java (61) — al final, probablemente varios sub-problemas (RenderGuiLayerEvent,
+        RenderLivingEvent, key handling, etc — ver memoria [[mc262_client_api_migration]]).
+  3. Cuando compile: `./gradlew build`, revisar los TODOs 26.2 (abajo), runClient, y recién entonces
+     pensar en CurseForge (el proyecto está CERRADO por L_Ender — ver docs/curseforge/, NO subir
+     hasta tener algo genuinamente jugable).
+
+TODOs 26.2 acumulados (stubs que compilan pero necesitan repaso antes de jugar de verdad):
+  - Koboleton_Entity.java:207 — Curios getCuriosHelper() eliminado, stub Optional.empty()
+  - Netherite_Ministrosity_Entity — GUI de inventario del pet stubbeada (MinistrostiyMenu sin
+    MenuType registrado; el path manual de ServerPlayer es privado ahora). El pet funciona,
+    su inventario persiste, pero no se abre la pantalla. Reimplementar con player.openMenu(MenuProvider).
+  - Endermaptera getDefaultLootTable() override quitado -> getLootTable().orElse(null) (verificar drops)
+  - Draugar: canDropMobsSkull()/increaseDroppedSkulls() quitados (verificar que dropean cráneos)
+  - varios "isDamageSourceBlocked -> isBlocking" pierden el check de ángulo de escudo (aceptable)
+
+ORDEN SUGERIDO PARA CONTINUAR:
+  1. Terminar items/ (delegación lanzada; revisar, compilar, commitear).
+  2. init/ (32) — registros; mecánico, mirar patrones de vault-drawers/otros mods ya portados.
+  3. mixin/ (18) + misc pequeño (inventory/effects/message/crafting/jei/event ~20).
+  4. client/ (486) — el más grande. Empezar por client/model/entity/ (ImmutableList.of genéricos,
+     ~mecánico) y client/render/entity/ (renderers: los puentes Cm* ya existen de sesiones previas).
+     Dejar ClientEvent.java para el final (61 err, probablemente varios sub-problemas).
+
 == 2026-08-30 — HANDOFF (sesión 2, FINAL): 1.397 -> ~1.015 errores ==
 
 Commits nuevos en `minecraft/26.2/neoforge-26.2.0.57/production` (SIN pushear):
