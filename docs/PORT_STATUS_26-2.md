@@ -1,7 +1,7 @@
 SESSION STATUS — NeoForge 26.2.0.45-beta -> 26.2.0.57 compile port
 ================================================================
 
-== 2026-08-30 (sesión 5) — 423 -> 288 errores | client/ (model DONE, render en curso) ==
+== 2026-08-30 (sesión 5) — 423 -> 148 errores | client/{model,render/entity} DONE ==
 
 Modelo de delegación: opencode-go/longcat-2.0 (elección del usuario, misma que sesiones 2-4).
 Nota: longcat esta sesión tiende a tardar MUCHO (~25-35 min/lote) y a veces necesita el fichero
@@ -10,22 +10,31 @@ reparó). Prompts tight en scratchpad: deleg_client_model{,_1b}.md, deleg_render
 Refs de NautilusAPI copiadas a tmp_scratch/nautilus_ref/ (OpenCode auto-rechaza external_directory).
 
 Commits nuevos (rama production, SIN pushear):
-  d410b94  client/model/ compila (423 -> 351)   [longcat parcial + Claude a mano: clusters
-           buildPartCache->createPartLookup, riding field, translateToHand, skull models, elytra]
-  4ad909f  client/render/entity LIGHT batch + root proxy (351 -> 288)  [longcat: 27 renderers
-           simples CmEntityRenderer; + Claude: FMLLoader.getDist->FMLEnvironment.getDist,
-           ClientProxy cameraEntity/Int2ObjectMap]
+  d410b94  client/model/ compila (423 -> 351)   [longcat parcial + Claude: buildPartCache->
+           createPartLookup, riding field, translateToHand, skull models, elytra]
+  4ad909f  render/entity LIGHT + root proxy (351 -> 288)  [longcat 27 renderers; Claude:
+           FMLLoader.getDist->FMLEnvironment.getDist, ClientProxy]
+  6ea6ba2  docs PORT_STATUS  |  d2f0210  render/entity HEAVY pt.1 (288 -> 195, longcat 36 renderers)
+  8405fc0  redo 3 renderers a mano (195 -> 164)
+  eb30496  render/entity COMPLETO 0 err (164 -> 148, Claude 17 residuales)
 
-ESTADO: 288 errores, todos en client/:
-  render/entity            140   (SOLO el cluster CmMobRenderer de jefes: Scylla 20, Leviathan 10,
-                                  Deepling*/Draugr*/Ignited*... + Scylla_Ceraunus, Void_Scatter_Arrow.
-                                  Los 27 renderers simples ya compilan. -> lote HEAVY delegado a longcat.)
-  event/                    62   (ClientEvent.java ~58 + ClientSetup ~4; RenderGuiLayerEvent,
-                                  RenderLivingEvent, key handling, ViewArea privado... A MANO al final.)
-  render/item/CuriosRenderer 44  (Curios render API; prepareModel name-clash x9. Varios quedarán stub.)
+ESTADO: 148 errores, todos en client/. **model/ y render/entity ENTEROS compilan.**
+  event/                    61   (ClientEvent.java; InputConstants.isKeyDown(Window)/keybind,
+                                  RenderGuiLayerEvent, RenderLivingEvent, ViewArea privado,
+                                  Camera.getNearPlane... A MANO, con tabla mc262_client_api_migration.)
+  render/item/CuriosRenderer 44  (Curios render API; prepareModel name-clash x9. Varios quedaran stub.)
   gui                       17   (CustomBossBar blit(Identifier,...) x11; MinistrosityInventoryScreen 4)
-  render/etc                16   (CurioHeadRenderer 8, LightningBoltData 7 - ViewArea.sections privado)
-  CustomRarity 3 / render(root) 3 / render/item 3
+  render/etc                16   (CurioHeadRenderer 8 - ICurioRenderer.ModelRender<S,M> bounds;
+                                  LightningBoltData 7 - ViewArea.sections privado)
+  CustomRarity 4 (EnumProxy Object[] no functional interface) / render(root) 3 (CMItemstackRenderer -
+  Cataclysm_Skull_Block_Renderer.createSkullRenderers/renderItemSkull ya no existen; BER stub) /
+  render/item 3 (CustomArmorRenderProperties - withAnimations/entityLiving, VertexConsumer.create/
+  entityGlintDirect eliminados)
+
+TODOs 26.2 sesión 5 EXTRA: casi todos los renderers de jefe tienen render() = stub vacío (compilan
+pero no se dibujan hasta cablear el pipeline submit); layers (glow/hold/ItemInHand/snake/eye-spark)
+comentadas con PORT TODO; getLightColor de Leviathan/Tidal_Tentacle -> full-bright fijo;
+Scylla_Ceraunus pierde el offset de mano anclada; Scylla_Renderer render body entero stubbeado.
 
 TODOs 26.2 NUEVOS de esta sesión (stubs que compilan, revisar antes de jugar):
   - client/render/blockentity/Cataclysm_Skull_Block_Renderer: submit() entero stub (ya lo estaba).
@@ -39,12 +48,11 @@ TODOs 26.2 NUEVOS de esta sesión (stubs que compilan, revisar antes de jugar):
     ElytraModel vanilla); se perdió la matemática vieja de fall-fly/crouch (ahora es upstream).
 
 PLAN restante (orden):
-  1. render/entity HEAVY (140) - longcat en curso (deleg_render_entity_heavy.md). Scylla/Leviathan
-     quizá necesiten repaso a mano. El cuerpo de render() de muchos jefes YA era un stub // TODO.
-  2. render/item/CuriosRenderer (44) + render/etc (16) - Curios; varios quedarán stub.
-  3. gui (17) - CustomBossBar blit/GuiGraphics.
-  4. event/ClientEvent.java (62) - AL FINAL, A MANO, con la tabla de mc262_client_api_migration.
-  5. `./gradlew build`, repasar TODOs, runClient.
+  1. render/item/CuriosRenderer (44) + render/etc (16) - Curios render API; varios quedarán stub.
+  2. gui (17) - CustomBossBar blit/GuiGraphics; MinistrosityInventoryScreen.
+  3. CustomRarity 4 + render(root) 3 + render/item 3 - EnumProxy, skull BER stub, elytra armor.
+  4. event/ClientEvent.java (61) - AL FINAL, A MANO, con la tabla de mc262_client_api_migration.
+  5. `./gradlew build`, repasar los MUCHOS TODOs de render (bosses no se dibujan), runClient.
 
 --- histórico sesión 4 ---
 
