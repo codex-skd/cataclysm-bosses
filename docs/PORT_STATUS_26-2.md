@@ -1,5 +1,43 @@
-SESSION STATUS — NeoForge 26.2.0.45-beta -> 26.2.0.57 compile port
+SESSION STATUS — NeoForge 26.2 port  (compileJava + build: GREEN as of 2026-08-30)
 ================================================================
+
+== 2026-08-30 (sesión 5) — 423 -> 0 errores | `./gradlew build` PASA ==
+
+**PRIMER build limpio del port** (baseline histórico: 5548 errores). El jar sale:
+`build/libs/cataclysm_bosses-26.2-neoforge-26.2.0.57-0.0.0-beta.3.jar` (~3,3 MB, mods.toml real).
+NUNCA se ha ejecutado — `runClient`/`runServer` pendientes. NO subir a CurseForge (proyecto cerrado
+por L_Ender; y ver los MUCHOS PORT TODO de render abajo — casi nada visual funciona todavía).
+
+Commits sesión 5 (rama production, SIN pushear): d410b94 4ad909f 6ea6ba2 d2f0210 8405fc0 eb30496
+b556c4c d9a91ec 196e9f8 6687913 7ffe40f 889d7d5 c43cf4f 64a605b b12be17.
+
+Cambio de dependencia: **Curios -> regalia_slots_api** (7ffe40f). regalia_slots_api trae un shim
+`top.theillusivec4.curios.api.*` completo, así que fue drop-in (libs/ + neoforge.mods.toml).
+
+PORT TODO de render/HUD acumulados (compilan, funcionalidad DESACTIVADA hasta cablear el pipeline
+submit / la GUI nueva):
+  - Casi todos los renderers de jefe: `render()` = stub vacío (los mobs no se dibujan).
+  - Layers de entidad (glow / hold / ItemInHand / snake / eye-spark / Clawdian hold) comentadas.
+  - Scylla_Renderer body entero stub; Scylla_Ceraunus pierde el offset de mano anclada.
+  - Cataclysm_Skull_Block_Renderer.submit() stub + los 3 *HeadModel sin su translate/scale;
+    CurioHeadRenderer.prepareModel stub; CMItemstackRenderer skull helpers = no-op.
+  - ClientEvent: onPreRenderEntity (flame sigil incinerator/immolator), onRenderArm (guantes 1ª
+    persona), CustomHealth (heart-bar), MovementInput (curse of desert invierte controles),
+    setOverlayMessage x2, setupOverlayRenderState -> todo stub.
+  - gui/CustomBossBar.renderBossBar stub -> los jefes con barra custom no muestran barra.
+  - CustomRarity: rarezas custom pierden el color pulsante (Rarity ctor ahora (int,String,
+    ChatFormatting)); usan un ChatFormatting fijo.
+  - Ignitium_Elytra sin la matemática vieja de fall-fly/crouch (ahora upstream).
+  - Leviathan/Tidal_Tentacle getLightColor -> full-bright fijo.
+  - jei recetas vacías, WeaponfusionMenu sin resultado, 3 comidas sin efecto, Lionfish sin
+    createAttributes, pet Ministrosity sin pantalla de inventario (TODOs de sesiones previas).
+
+PRÓXIMO: `./gradlew runClient` (arrancar por primera vez, cazar crashes de registro/mixin/refmap),
+luego ir reactivando los PORT TODO de render por prioridad, y verificar el rename the_sundering->
+cataclysm_bosses en runtime (carga de mixins + regen de refmap).
+
+--- histórico ---
+
 
 == 2026-08-30 (sesión 5) — 423 -> 87 errores | client/{model,render/entity,CuriosRenderer} DONE ==
 
