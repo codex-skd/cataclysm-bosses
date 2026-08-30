@@ -15,6 +15,7 @@ package com.skd.cataclysmbosses.entity.etc;
 import com.skd.cataclysmbosses.message.MessageBossBar;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import java.util.UUID;
 import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.BossEvent;
@@ -26,13 +27,13 @@ extends ServerBossEvent {
     private int remainlife;
 
     public CMBossInfoServer(Component component, BossEvent.BossBarColor bossBarColor, boolean dark, int renderType) {
-        super(component, bossBarColor, BossEvent.BossBarOverlay.PROGRESS);
+        super(UUID.randomUUID(), component, bossBarColor, BossEvent.BossBarOverlay.PROGRESS);
         this.setDarkenScreen(dark);
         this.renderType = renderType;
     }
 
     public CMBossInfoServer(Component component, BossEvent.BossBarColor bossBarColor, boolean dark, boolean fog, int renderType) {
-        super(component, bossBarColor, BossEvent.BossBarOverlay.PROGRESS);
+        super(UUID.randomUUID(), component, bossBarColor, BossEvent.BossBarOverlay.PROGRESS);
         this.setDarkenScreen(dark);
         this.setCreateWorldFog(fog);
         this.renderType = renderType;

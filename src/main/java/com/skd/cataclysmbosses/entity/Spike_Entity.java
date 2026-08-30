@@ -105,7 +105,7 @@ implements IAnimatedEntity {
     }
 
     protected SoundEvent getAmbientSound() {
-        return SoundEvents.PUFFER_FISH_AMBIENT;
+        return SoundEvents.PUFFER_FISH_FLOP;
     }
 
     protected SoundEvent getDeathSound() {
@@ -184,7 +184,7 @@ implements IAnimatedEntity {
     }
 
     protected void handleAirSupply(int p_30344_) {
-        if (this.isAlive() && !this.isInWaterOrBubble()) {
+        if (this.isAlive() && !this.isInWater()) {
             this.setAirSupply(p_30344_ - 1);
             if (this.getAirSupply() == -20) {
                 this.setAirSupply(0);

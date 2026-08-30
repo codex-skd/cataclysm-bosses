@@ -102,7 +102,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.Container;
-import net.minecraft.world.inventory.ContainerListener;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleContainer;
@@ -149,7 +148,6 @@ import net.minecraft.world.level.storage.ValueOutput;
 public class Netherite_Ministrosity_Entity
 extends InternalAnimationPet
 implements Bucketable,
-ContainerListener,
 HasCustomInventoryScreen {
     private static final EntityDataAccessor<Boolean> FROM_BUCKET = SynchedEntityData.defineId(Netherite_Ministrosity_Entity.class, (EntityDataSerializer)EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> IS_AWAKEN = SynchedEntityData.defineId(Netherite_Ministrosity_Entity.class, (EntityDataSerializer)EntityDataSerializers.BOOLEAN);
@@ -218,7 +216,6 @@ HasCustomInventoryScreen {
         SimpleContainer simplecontainer = this.miniInventory;
         this.miniInventory = new SimpleContainer(this.getInventorySize());
         if (simplecontainer != null) {
-            simplecontainer.removeListener((ContainerListener)this);
             int i = Math.min(simplecontainer.getContainerSize(), this.miniInventory.getContainerSize());
             for (int j = 0; j < i; ++j) {
                 ItemStack itemstack = simplecontainer.getItem(j);
@@ -226,23 +223,15 @@ HasCustomInventoryScreen {
                 this.miniInventory.setItem(j, itemstack.copy());
             }
         }
-        this.miniInventory.addListener((ContainerListener)this);
     }
 
     public void openCustomInventoryScreen(Player playerEntity) {
-        if (playerEntity instanceof ServerPlayer) {
-            ServerPlayer serverplayer = (ServerPlayer)playerEntity;
-            if (this.isAlive()) {
-                if (serverplayer.containerMenu != serverplayer.inventoryMenu) {
-                    serverplayer.closeContainer();
-                }
-                this.setAttackState(3);
-                serverplayer.nextContainerCounter();
-                serverplayer.connection.send((CustomPacketPayload)new MessageOpenInventory(serverplayer.containerCounter, this.miniInventory.getContainerSize(), this.getId()));
-                serverplayer.containerMenu = new MinistrostiyMenu(serverplayer.containerCounter, serverplayer.getInventory(), (Container)this.miniInventory, this);
-                serverplayer.initMenu(serverplayer.containerMenu);
-                NeoForge.EVENT_BUS.post((Event)new PlayerContainerEvent.Open((Player)serverplayer, serverplayer.containerMenu));
-            }
+        // TODO 26.2: the manual ServerPlayer container-counter path
+        // (nextContainerCounter / containerCounter / initMenu) is now private, and
+        // MinistrostiyMenu has no registered MenuType. Re-implement via a real
+        // MenuType + player.openMenu(MenuProvider, buf-writer) before shipping the pet GUI.
+        if (playerEntity instanceof ServerPlayer && this.isAlive()) {
+            this.setAttackState(3);
         }
     }
 
@@ -299,17 +288,17 @@ HasCustomInventoryScreen {
         super.travel(vec3d);
     }
 
-    public boolean isInvulnerableTo(DamageSource source) {
-        return source.is(DamageTypes.IN_WALL) || source.is(DamageTypes.FALLING_BLOCK) || super.isInvulnerableTo(source);
+    public boolean isInvulnerableTo(ServerLevel level, DamageSource source) {
+        return source.is(DamageTypes.IN_WALL) || source.is(DamageTypes.FALLING_BLOCK) || super.isInvulnerableTo(level, source);
     }
 
-    protected void dropEquipment() {
-        super.dropEquipment();
+    protected void dropEquipment(ServerLevel level) {
+        super.dropEquipment(level);
         if (this.miniInventory != null) {
             for (int i = 0; i < this.miniInventory.getContainerSize(); ++i) {
                 ItemStack itemstack = this.miniInventory.getItem(i);
                 if (itemstack.isEmpty()) continue;
-                this.spawnAtLocation((ServerLevel)this.level(), itemstack, 0.0f);
+                this.spawnAtLocation(level, itemstack, 0.0f);
             }
         }
     }
@@ -326,15 +315,11 @@ HasCustomInventoryScreen {
         super.addAdditionalSaveData(compound);
         compound.putBoolean("FromBucket", this.fromBucket());
         compound.putBoolean("is_Awaken", this.getIsAwaken());
-        ListTag listtag = new ListTag();
-        for (int i = 1; i < this.miniInventory.getContainerSize(); ++i) {
-            ItemStack itemstack = this.miniInventory.getItem(i);
-            if (itemstack.isEmpty()) continue;
-            CompoundTag compoundtag = new CompoundTag();
-            compoundtag.putByte("Slot", (byte)(i - 1));
-            listtag.add((Object)itemstack.save((HolderLookup.Provider)this.registryAccess(), (Tag)compoundtag));
+        net.minecraft.core.NonNullList<ItemStack> saveList = net.minecraft.core.NonNullList.withSize(this.miniInventory.getContainerSize(), ItemStack.EMPTY);
+        for (int i = 0; i < this.miniInventory.getContainerSize(); ++i) {
+            saveList.set(i, this.miniInventory.getItem(i));
         }
-        compound.put("Items", (Tag)listtag);
+        net.minecraft.world.ContainerHelper.saveAllItems(compound, saveList);
     }
 
     @Override
@@ -343,12 +328,10 @@ HasCustomInventoryScreen {
         this.setFromBucket(compound.getBooleanOr("FromBucket", false));
         this.setIsAwaken(compound.getBooleanOr("is_Awaken", false));
         this.createInventory();
-        ListTag listtag = compound.getList("Items", 10);
-        for (int i = 0; i < listtag.size(); ++i) {
-            CompoundTag compoundtag = listtag.getCompound(i);
-            int j = compoundtag.getByte("Slot") & 0xFF;
-            if (j >= this.miniInventory.getContainerSize() - 1) continue;
-            this.miniInventory.setItem(j + 1, ItemStack.parse((HolderLookup.Provider)this.registryAccess(), (Tag)compoundtag).orElse(ItemStack.EMPTY));
+        net.minecraft.core.NonNullList<ItemStack> loadList = net.minecraft.core.NonNullList.withSize(this.miniInventory.getContainerSize(), ItemStack.EMPTY);
+        net.minecraft.world.ContainerHelper.loadAllItems(compound, loadList);
+        for (int i = 0; i < loadList.size() && i < this.miniInventory.getContainerSize(); ++i) {
+            this.miniInventory.setItem(i, loadList.get(i));
         }
     }
 
@@ -427,13 +410,19 @@ HasCustomInventoryScreen {
     }
 
     public void saveToBucketTag(@Nonnull ItemStack bucket) {
-        CustomData.update((DataComponentType)DataComponents.BUCKET_ENTITY_DATA, (ItemStack)bucket, this::addAdditionalSaveData);
         Bucketable.saveDefaultDataToBucketTag((Mob)this, (ItemStack)bucket);
+        CustomData.update((DataComponentType)DataComponents.BUCKET_ENTITY_DATA, (ItemStack)bucket, tag -> {
+            tag.putBoolean("FromBucket", this.fromBucket());
+            tag.putBoolean("is_Awaken", this.getIsAwaken());
+        });
+        // TODO 26.2: pet inventory is not persisted through the bucket item (was via
+        // addAdditionalSaveData, now ValueOutput-only). Re-add if bucketed pets must keep items.
     }
 
     public void loadFromBucketTag(CompoundTag p_148832_) {
-        this.readAdditionalSaveData(p_148832_);
         Bucketable.loadDefaultDataFromBucketTag((Mob)this, (CompoundTag)p_148832_);
+        this.setFromBucket(p_148832_.getBooleanOr("FromBucket", false));
+        this.setIsAwaken(p_148832_.getBooleanOr("is_Awaken", false));
     }
 
     @Nonnull
@@ -459,7 +448,7 @@ HasCustomInventoryScreen {
                 this.openCustomInventoryScreen(player);
                 this.setCommand(2);
                 this.setOrderedToSit(true);
-                return InteractionResult.sidedSuccess((boolean)this.level().isClientSide());
+                return InteractionResult.SUCCESS;
             }
         }
         if (!this.isTame() && stack.is((Item)ModItems.LAVA_POWER_CELL.get())) {
@@ -490,7 +479,7 @@ HasCustomInventoryScreen {
             if (this.getCommand() == 3) {
                 this.setCommand(0);
             }
-            player.displayClientMessage((Component)Component.translatable((String)("entity.cataclysm.all.command_" + this.getCommand()), (Object[])new Object[]{this.getName()}), true);
+            player.sendSystemMessage((Component)Component.translatable((String)("entity.cataclysm.all.command_" + this.getCommand()), (Object[])new Object[]{this.getName()}));
             boolean bl = sit = this.getCommand() == 2;
             if (sit) {
                 this.setOrderedToSit(true);
@@ -515,7 +504,7 @@ HasCustomInventoryScreen {
                 CriteriaTriggers.FILLED_BUCKET.trigger((ServerPlayer)p_148829_, itemstack1);
             }
             p_148831_.discard();
-            return Optional.of(InteractionResult.sidedSuccess((boolean)level.isClientSide()));
+            return Optional.of(InteractionResult.SUCCESS);
         }
         return Optional.empty();
     }
