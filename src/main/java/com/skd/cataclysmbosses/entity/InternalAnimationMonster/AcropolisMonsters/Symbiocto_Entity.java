@@ -202,17 +202,17 @@ implements RangedAttackMob {
         this.level().broadcastEntityEvent((Entity)this, (byte)(-input));
     }
 
-    public boolean isInvulnerableTo(DamageSource source) {
-        return source.is(DamageTypes.IN_WALL) || super.isInvulnerableTo(source);
+    public boolean isInvulnerableTo(net.minecraft.server.level.ServerLevel level, DamageSource source) {
+        return source.is(DamageTypes.IN_WALL) || super.isInvulnerableTo(level, source);
     }
 
     public void stopAllAnimationStates() {
         this.spitAnimationState.stop();
     }
 
-    public boolean doHurtTarget(Entity p_219472_) {
+    public boolean doHurtTarget(net.minecraft.server.level.ServerLevel level, Entity p_219472_) {
         this.level().broadcastEntityEvent((Entity)this, (byte)4);
-        return super.doHurtTarget(p_219472_);
+        return super.doHurtTarget(level, p_219472_);
     }
 
     public void addAdditionalSaveData(ValueOutput compound) {

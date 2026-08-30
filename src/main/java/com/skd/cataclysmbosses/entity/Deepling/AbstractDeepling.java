@@ -88,6 +88,14 @@ Enemy {
         super(entity, world);
     }
 
+    protected AABB getSwimmingBox() {
+        return this.getBoundingBox();
+    }
+
+    protected AABB getNormalBox() {
+        return this.getBoundingBox();
+    }
+
     protected void registerGoals() {
         super.registerGoals();
         this.goalSelector.addGoal(4, new MobAIFindWater(this, 1.0));

@@ -182,7 +182,7 @@ implements RangedAttackMob {
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor accessor, DifficultyInstance difficulty, EntitySpawnReason spawnType, @Nullable SpawnGroupData spawnGroupData) {
         spawnGroupData = super.finalizeSpawn(accessor, difficulty, spawnType, spawnGroupData);
         Symbiocto_Entity upper = new Symbiocto_Entity((EntityType)ModEntities.SYMBIOCTO.get(), this.level());
-        upper.setPos(this.getX(), this.getY() + 1.3125, this.getZ()); upper.setYRot(this.getZ()); upper.setXRot(this.getYRot());
+        upper.setPos(this.getX(), this.getY() + 1.3125, this.getZ()); upper.setYRot((float)this.getZ()); upper.setXRot(this.getYRot());
         EventHooks.finalizeMobSpawn((Mob)upper, (ServerLevelAccessor)accessor, (DifficultyInstance)difficulty, (EntitySpawnReason)spawnType, (SpawnGroupData)spawnGroupData);
         upper.setYBodyRot(this.yBodyRot);
         upper.setYHeadRot(this.getYHeadRot());
@@ -274,14 +274,14 @@ implements RangedAttackMob {
         }
     }
 
-    protected boolean canReplaceCurrentItem(ItemStack candidate, ItemStack existing) {
+    protected boolean canReplaceCurrentItem(ItemStack candidate, ItemStack existing, net.minecraft.world.entity.EquipmentSlot slot) {
         if (existing.is(Items.NAUTILUS_SHELL)) {
             return false;
         }
         if (existing.is(Items.TRIDENT)) {
             return candidate.is(Items.TRIDENT) ? candidate.getDamageValue() < existing.getDamageValue() : false;
         }
-        return candidate.is(Items.TRIDENT) ? true : super.canReplaceCurrentItem(candidate, existing);
+        return candidate.is(Items.TRIDENT) ? true : super.canReplaceCurrentItem(candidate, existing, slot);
     }
 
     protected boolean convertsInWater() {
@@ -413,7 +413,7 @@ implements RangedAttackMob {
         }
 
         public boolean canUse() {
-            if (!this.level().getOverworldClockTime() % 24000 < 12000 % 24000 < 12000) {
+            if (!(this.level.getOverworldClockTime() % 24000 < 12000)) {
                 return false;
             }
             if (this.mob.isInWater()) {
@@ -486,7 +486,7 @@ implements RangedAttackMob {
         }
 
         public boolean canUse() {
-            return super.canUse() && !this.drowned.level().getOverworldClockTime() % 24000 < 12000 % 24000 < 12000 && this.drowned.isInWater() && this.drowned.getY() >= (double)(this.drowned.level().getSeaLevel() - 3);
+            return super.canUse() && this.drowned.level().getOverworldClockTime() % 24000 >= 12000 && this.drowned.isInWater() && this.drowned.getY() >= (double)(this.drowned.level().getSeaLevel() - 3);
         }
 
         public boolean canContinueToUse() {
@@ -523,7 +523,7 @@ implements RangedAttackMob {
         }
 
         public boolean canUse() {
-            return !this.drowned.level().getOverworldClockTime() % 24000 < 12000 % 24000 < 12000 && this.drowned.isInWater() && this.drowned.getY() < (double)(this.seaLevel - 2);
+            return this.drowned.level().getOverworldClockTime() % 24000 >= 12000 && this.drowned.isInWater() && this.drowned.getY() < (double)(this.seaLevel - 2);
         }
 
         public boolean canContinueToUse() {

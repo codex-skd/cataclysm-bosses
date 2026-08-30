@@ -117,7 +117,10 @@ IHomeEntity {
 
     @Override
     public void addAdditionalHomePoint(ValueOutput compound) {
-        this.getHomePos().ifPresent(homePos -> GlobalPos.CODEC.encodeStart(compound.child("HomePos"), homePos).resultOrPartial(arg_0 -> ((Logger)Cataclysm.LOGGER).error(arg_0)));
+        GlobalPos homePos = this.getHomePos();
+        if (homePos != null) {
+            compound.store("HomePos", GlobalPos.CODEC, homePos);
+        }
     }
 
     @Override
@@ -291,7 +294,7 @@ IHomeEntity {
             
             // Check if home position is in the same dimension
             if (this.getHomePos().dimension().equals(this.level().dimension())) {
-                if (homeBlockPos.getCenter().distanceTo(this.position()) > 16.0) {
+                if (homeBlockPos.distToCenterSqr(this.position()) > 256.0) {
                     this.setPos(homeVec.x, homeVec.y, homeVec.z);
                     this.setYRot(this.getYRot());
                     this.setXRot(this.getXRot());

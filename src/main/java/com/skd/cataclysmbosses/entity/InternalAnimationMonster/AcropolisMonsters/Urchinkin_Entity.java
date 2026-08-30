@@ -212,9 +212,9 @@ extends Monster {
         this.rollAnimationState.stop();
     }
 
-    public boolean doHurtTarget(Entity p_219472_) {
+    public boolean doHurtTarget(net.minecraft.server.level.ServerLevel level, Entity p_219472_) {
         this.level().broadcastEntityEvent((Entity)this, (byte)4);
-        return super.doHurtTarget(p_219472_);
+        return super.doHurtTarget(level, p_219472_);
     }
 
     public void addAdditionalSaveData(ValueOutput compound) {

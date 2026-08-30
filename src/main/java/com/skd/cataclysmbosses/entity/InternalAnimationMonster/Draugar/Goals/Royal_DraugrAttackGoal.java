@@ -90,7 +90,7 @@ extends Goal {
         if (!this.followingTargetEvenIfNotSeen) {
             return !this.mob.getNavigation().isDone();
         }
-        if (!this.mob.isWithinRestriction(livingentity.blockPosition())) {
+        if (!this.mob.isWithinHome(livingentity.blockPosition())) {
             return false;
         }
         return !(livingentity instanceof Player) || !livingentity.isSpectator() && !((Player)livingentity).isCreative();
@@ -126,7 +126,7 @@ extends Goal {
             this.mob.getLookControl().setLookAt((Entity)livingentity, 30.0f, 30.0f);
             double d0 = this.mob.distanceToSqr((Entity)livingentity);
             this.ticksUntilNextPathRecalculation = Math.max(this.ticksUntilNextPathRecalculation - 1, 0);
-            if (!this.isShieldDisabled(this.mob) && this.mob.getOffhandItem().canPerformAction(ItemAbilities.SHIELD_BLOCK) && this.mob.getRandom().nextInt(6) == 0) {
+            if (!this.isShieldDisabled(this.mob) && this.mob.getOffhandItem().getUseAnimation() == net.minecraft.world.item.ItemUseAnimation.BLOCK && this.mob.getRandom().nextInt(6) == 0) {
                 this.mob.startUsingItem(InteractionHand.OFF_HAND);
             }
             if ((this.followingTargetEvenIfNotSeen || this.mob.getSensing().hasLineOfSight((Entity)livingentity)) && this.ticksUntilNextPathRecalculation <= 0 && (this.pathedTargetX == 0.0 && this.pathedTargetY == 0.0 && this.pathedTargetZ == 0.0 || livingentity.distanceToSqr(this.pathedTargetX, this.pathedTargetY, this.pathedTargetZ) >= 1.0 || this.mob.getRandom().nextFloat() < 0.05f)) {
@@ -167,7 +167,7 @@ extends Goal {
                 this.mob.setShieldCooldownTime(30);
             }
             this.mob.swing(InteractionHand.MAIN_HAND);
-            this.mob.doHurtTarget((Entity)p_25557_);
+            if (this.mob.level() instanceof net.minecraft.server.level.ServerLevel _sl) this.mob.doHurtTarget(_sl, (Entity)p_25557_);
         }
     }
 

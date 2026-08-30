@@ -202,7 +202,6 @@ extends AbstractDeepling {
         }
     }
 
-    @Override
     public EntityDimensions getSwimmingSize() {
         return SWIMMING_SIZE;
     }

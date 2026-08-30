@@ -80,7 +80,7 @@ import net.minecraft.world.level.storage.ValueOutput;
 public class Scylla_Ceraunus_Entity
 extends AbstractArrow
 implements IHoldEntity {
-    private static final EntityDataAccessor<Optional<UUID>> CONTROLLER_UUID = SynchedEntityData.defineId(Scylla_Ceraunus_Entity.class, (EntityDataSerializer)EntityDataSerializers.OPTIONAL_UUID);
+    private static final EntityDataAccessor<String> CONTROLLER_UUID = SynchedEntityData.defineId(Scylla_Ceraunus_Entity.class, (EntityDataSerializer)EntityDataSerializers.STRING);
     private static final EntityDataAccessor<Integer> CONTROLLER_ID = SynchedEntityData.defineId(Scylla_Ceraunus_Entity.class, (EntityDataSerializer)EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> GRAB = SynchedEntityData.defineId(Scylla_Ceraunus_Entity.class, (EntityDataSerializer)EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Float> Y_ROT_OLD = SynchedEntityData.defineId(Scylla_Ceraunus_Entity.class, (EntityDataSerializer)EntityDataSerializers.FLOAT);
@@ -107,7 +107,7 @@ implements IHoldEntity {
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(CONTROLLER_UUID, Optional.empty());
+        p_326229_.define(CONTROLLER_UUID, "");
         p_326229_.define(CONTROLLER_ID, -1);
         p_326229_.define(GRAB, false);
         p_326229_.define(HOOK_MODE, false);
@@ -118,11 +118,12 @@ implements IHoldEntity {
 
     @Nullable
     public UUID getControllerUUID() {
-        return ((Optional)this.entityData.get(CONTROLLER_UUID)).orElse(null);
+        String s = (String)this.entityData.get(CONTROLLER_UUID);
+        return s.isEmpty() ? null : UUID.fromString(s);
     }
 
     public void setControllerUUID(@Nullable UUID uniqueId) {
-        this.entityData.set(CONTROLLER_UUID, Optional.ofNullable(uniqueId));
+        this.entityData.set(CONTROLLER_UUID, uniqueId == null ? "" : uniqueId.toString());
     }
 
     public Entity getController() {
@@ -249,8 +250,10 @@ implements IHoldEntity {
         Entity entity1;
         DamageSource damagesource;
         Entity entity = p_37573_.getEntity();
-        if (entity.hurtOrSimulate(damagesource = CMDamageTypes.causeStormBringerDamage((Entity)this, (Entity)((entity1 = this.getController()) == null ? this : entity1)), (float)this.getBaseDamage())) {
-            if (entity.getType() == EntityType.ENDERMAN) {
+        Entity controller = (entity1 = this.getController()) == null ? this : entity1;
+        float dmg = controller instanceof LivingEntity ? (float)((LivingEntity)controller).getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE) : 6.0f;
+        if (entity.hurtOrSimulate(damagesource = CMDamageTypes.causeStormBringerDamage((Entity)this, controller), dmg)) {
+            if (entity.getType() == net.minecraft.world.entity.EntityTypes.ENDERMAN) {
                 return;
             }
             if (entity instanceof LivingEntity) {

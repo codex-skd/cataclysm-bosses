@@ -231,7 +231,7 @@ extends IABoss_monster {
         this.goalSelector.addGoal(8, (Goal)new RandomLookAroundGoal((Mob)this));
         this.targetSelector.addGoal(1, (Goal)new HurtByNearestTargetGoal((PathfinderMob)this, new Class[0]));
         this.targetSelector.addGoal(2, (Goal)new NearestAttackableTargetGoal((Mob)this, Player.class, true));
-        this.targetSelector.addGoal(3, (Goal)new NearestAttackableTargetGoal((Mob)this, LivingEntity.class, 120, true, true, ModEntities.buildPredicateFromTag(ModTag.ANCIENT_REMNANT_TARGET)));
+        this.targetSelector.addGoal(3, (Goal)new NearestAttackableTargetGoal((Mob)this, LivingEntity.class, 120, true, true, (net.minecraft.world.entity.ai.targeting.TargetingConditions.Selector) ((le, srv) -> ModEntities.buildPredicateFromTag(ModTag.ANCIENT_REMNANT_TARGET).test(le))));
         this.targetSelector.addGoal(2, (Goal)new HurtByTargetGoal((PathfinderMob)this, new Class[0]));
         this.goalSelector.addGoal(5, (Goal)new RemnantAttackModeGoal(this));
         this.goalSelector.addGoal(3, (Goal)new RemnantAttackGoal(this, 0, 4, 0, 70, 29, 6.0f, 10.0f));
@@ -239,7 +239,7 @@ extends IABoss_monster {
         this.goalSelector.addGoal(0, (Goal)new RemnantAwakenGoal(this, 2, 2, 0, 80, 0));
         this.goalSelector.addGoal(0, (Goal)new RemnantPhaseChangeGoal(this, 0, 7, 0, 60, 13));
         this.goalSelector.addGoal(3, (Goal)new RemnantStompGoal(this, 0, 8, 9, 13, 14, 0, 50, 66, 26, 20.0, 36.0f));
-        this.goalSelector.addGoal(3, (Goal)new RemnantAttackGoal(this, this, 0, 6, 0, 60, 11, 32.0f, 18.0f){
+        this.goalSelector.addGoal(3, (Goal)new RemnantAttackGoal(this, 0, 6, 0, 60, 11, 32.0f, 18.0f){
 
             @Override
             public boolean canUse() {
@@ -278,7 +278,7 @@ extends IABoss_monster {
             }
         });
         this.goalSelector.addGoal(1, (Goal)new InternalStateGoal(this, 12, 12, 0, 120, 0));
-        this.goalSelector.addGoal(3, (Goal)new RemnantAttackGoal(this, this, 0, 15, 0, 110, 85, 12.0f, 10.0f){
+        this.goalSelector.addGoal(3, (Goal)new RemnantAttackGoal(this, 0, 15, 0, 110, 85, 12.0f, 10.0f){
 
             @Override
             public boolean canUse() {
@@ -292,7 +292,7 @@ extends IABoss_monster {
                 this.entity.earthquake_cooldown = 160;
             }
         });
-        this.goalSelector.addGoal(3, (Goal)new RemnantAttackGoal(this, this, 0, 16, 0, 58, 13, 7.5f, 10.0f){
+        this.goalSelector.addGoal(3, (Goal)new RemnantAttackGoal(this, 0, 16, 0, 58, 13, 7.5f, 10.0f){
 
             @Override
             public boolean canUse() {
@@ -449,7 +449,7 @@ extends IABoss_monster {
     private void floatRemnant() {
         if (this.isInWater()) {
             CollisionContext collisioncontext = CollisionContext.of((Entity)this);
-            if (collisioncontext.isAbove(LiquidBlock.STABLE_SHAPE, this.blockPosition(), true) && !this.level().getFluidState(this.blockPosition().above()).is(FluidTags.WATER)) {
+            if (collisioncontext.isAbove(this.getLiquidCollisionShape(), this.blockPosition(), true) && !this.level().getFluidState(this.blockPosition().above()).is(FluidTags.WATER)) {
                 this.setOnGround(true);
             } else {
                 this.setDeltaMovement(this.getDeltaMovement().scale(0.5).add(0.0, 0.05, 0.0));
@@ -675,7 +675,7 @@ extends IABoss_monster {
         if (!this.level().isClientSide() && this.getAttackState() == 0) {
             if (CMCommonConfig.AncientRemnant.ignoreMobGriefing) {
                 this.ChargeBlockBreaking(0.5);
-            } else if (EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+            } else if (this.level() instanceof net.minecraft.server.level.ServerLevel sl && EventHooks.canEntityGrief(sl, (Entity)this)) {
                 this.ChargeBlockBreaking(0.5);
             }
         }
@@ -701,7 +701,7 @@ extends IABoss_monster {
         if (!this.level().isClientSide()) {
             if (CMCommonConfig.AncientRemnant.ignoreMobGriefing) {
                 this.ChargeBlockBreaking(1.5);
-            } else if (EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+            } else if (this.level() instanceof net.minecraft.server.level.ServerLevel sl && EventHooks.canEntityGrief(sl, (Entity)this)) {
                 this.ChargeBlockBreaking(1.5);
             }
             if (this.tickCount % 4 == 0) {
@@ -1279,7 +1279,7 @@ extends IABoss_monster {
                 float entityHitDistance = (float)Math.sqrt((entityHit.getZ() - this.getZ()) * (entityHit.getZ() - this.getZ()) + (entityHit.getX() - this.getX()) * (entityHit.getX() - this.getX()));
                 if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || this.isAlliedTo((Entity)entityHit) || entityHit instanceof Ancient_Remnant_Entity || entityHit == this) continue;
                 boolean flag = entityHit.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage, (double)(entityHit.getMaxHealth() * hpdamage))));
-                if (entityHit.isDamageSourceBlocked(damagesource) && entityHit instanceof Player) {
+                if (entityHit.isBlocking() && entityHit instanceof Player) {
                     Player player = (Player)entityHit;
                     if (shieldbreakticks > 0) {
                         EntityUtil.disableShield(player, shieldbreakticks);
@@ -1310,7 +1310,7 @@ extends IABoss_monster {
                 float entityHitDistance = (float)Math.sqrt((entityHit.getZ() - this.getZ()) * (entityHit.getZ() - this.getZ()) + (entityHit.getX() - this.getX()) * (entityHit.getX() - this.getX()));
                 if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || this.isAlliedTo((Entity)entityHit) || entityHit instanceof Ancient_Remnant_Entity || entityHit == this) continue;
                 boolean flag = entityHit.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage, (double)(entityHit.getMaxHealth() * hpdamage))));
-                if (entityHit.isDamageSourceBlocked(damagesource) && entityHit instanceof Player) {
+                if (entityHit.isBlocking() && entityHit instanceof Player) {
                     Player player = (Player)entityHit;
                     if (shieldbreakticks > 0) {
                         EntityUtil.disableShield(player, shieldbreakticks);
@@ -1384,7 +1384,7 @@ extends IABoss_monster {
         fallingBlockEntity.push(0.0, 0.2 + this.getRandom().nextGaussian() * 0.04, 0.0);
         this.level().addFreshEntity((Entity)fallingBlockEntity);
         AABB selection = new AABB(px - 0.5, (double)blockpos.getY() + d0 - 1.0, pz - 0.5, px + 0.5, (double)blockpos.getY() + d0 + (double)mxy, pz + 0.5);
-        List hitbox = this.level().getEntitiesOfClass(LivingEntity.class, selection);
+        List<LivingEntity> hitbox = this.level().getEntitiesOfClass(LivingEntity.class, selection);
         if (!hitbox.isEmpty()) {
             DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
             float baseDamage = (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage);
@@ -1392,7 +1392,7 @@ extends IABoss_monster {
                 if (this.isAlliedTo((Entity)entity) || entity instanceof Ancient_Remnant_Entity || entity == this) continue;
                 float finalDamage = baseDamage + entity.getMaxHealth() * hpdamage;
                 boolean flag = entity.hurtOrSimulate(damagesource, finalDamage);
-                if (entity.isDamageSourceBlocked(damagesource) && entity instanceof Player) {
+                if (entity.isBlocking() && entity instanceof Player) {
                     Player player = (Player)entity;
                     if (shieldbreakticks > 0) {
                         EntityUtil.disableShield(player, shieldbreakticks);
@@ -1533,8 +1533,8 @@ extends IABoss_monster {
             BlockEntity blockEntity = targetLevel.getBlockEntity(targetPos);
             if (blockEntity instanceof Boss_Respawn_Spawner_Block_Entity) {
                 Boss_Respawn_Spawner_Block_Entity spawnerBlockEntity = (Boss_Respawn_Spawner_Block_Entity)blockEntity;
-                spawnerBlockEntity.setEntityId((EntityType)ModEntities.ANCIENT_REMNANT.get());
-                spawnerBlockEntity.setTheItem(((Item)ModItems.DESERT_EYE.get()).getDefaultInstance());
+                spawnerBlockEntity.spawnType = (EntityType)ModEntities.ANCIENT_REMNANT.get();
+                spawnerBlockEntity.item = ((Item)ModItems.DESERT_EYE.get()).getDefaultInstance();
             }
         }
     }
@@ -1598,7 +1598,7 @@ extends IABoss_monster {
             if (!target.isAlive()) {
                 return false;
             }
-            if (!this.mob.isWithinRestriction(target.blockPosition())) {
+            if (!this.mob.isWithinHome(target.blockPosition())) {
                 return false;
             }
             return !(target instanceof Player) || !target.isSpectator() && !((Player)target).isCreative();

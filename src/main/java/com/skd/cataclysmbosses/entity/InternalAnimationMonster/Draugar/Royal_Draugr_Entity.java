@@ -132,8 +132,8 @@ implements IShieldEntity {
         return Monster.createMonsterAttributes().add(Attributes.FOLLOW_RANGE, 30.0).add(Attributes.MOVEMENT_SPEED, (double)0.27f).add(Attributes.ATTACK_DAMAGE, 5.0).add(Attributes.MAX_HEALTH, 30.0).add(Attributes.ARMOR, 5.0).add(Attributes.KNOCKBACK_RESISTANCE, 0.1);
     }
 
-    protected AABB getAttackBoundingBox() {
-        AABB aabb = super.getAttackBoundingBox();
+    protected AABB getAttackBoundingBox(double range) {
+        AABB aabb = super.getAttackBoundingBox(range);
         return aabb.deflate(0.05, 0.0, 0.05);
     }
 
@@ -153,11 +153,7 @@ implements IShieldEntity {
     public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         Entity entity = source.getDirectEntity();
         if (damage > 0.0f && this.canBlockDamageSource(source)) {
-            this.hurtCurrentlyUsedShield(damage);
-            if (!source.is(DamageTypeTags.IS_PROJECTILE) && entity instanceof LivingEntity) {
-                this.blockUsingShield((LivingEntity)entity);
-            }
-            this.playSound(SoundEvents.SHIELD_BLOCK, 1.0f, 0.8f + thislevel().getRandom().nextFloat() * 0.4f);
+            this.playSound(SoundEvents.SHIELD_BLOCK.value(), 1.0f, 0.8f + this.level().getRandom().nextFloat() * 0.4f);
             return false;
         }
         return super.hurtOrSimulate(source, damage);
@@ -187,51 +183,17 @@ implements IShieldEntity {
         this.shieldCooldownTime = 100;
         this.stopUsingItem();
         this.level().broadcastEntityEvent((Entity)this, (byte)30);
-        this.playSound(SoundEvents.SHIELD_BREAK, 0.8f, 0.8f + thislevel().getRandom().nextFloat() * 0.4f);
-    }
-
-    protected void hurtCurrentlyUsedShield(float p_36383_) {
-        if (this.useItem.canPerformAction(ItemAbilities.SHIELD_BLOCK) && p_36383_ >= 3.0f) {
-            int i = 1 + Mth.floor((float)p_36383_);
-            InteractionHand interactionhand = this.getUsedItemHand();
-            Level level = this.level();
-            if (level instanceof ServerLevel) {
-                ServerLevel serverlevel = (ServerLevel)level;
-                if (!this.hasInfiniteMaterials()) {
-                    this.useItem.hurtAndBreak(i, serverlevel, (LivingEntity)this, item -> {
-                        this.onEquippedItemBroken((Item)item, Royal_Draugr_Entity.getSlotForHand((InteractionHand)interactionhand));
-                        this.stopUsingItem();
-                    });
-                }
-            }
-            if (this.useItem.isEmpty()) {
-                this.stopUsingItem();
-                if (interactionhand == InteractionHand.MAIN_HAND) {
-                    this.setItemSlot(EquipmentSlot.MAINHAND, ItemStack.EMPTY);
-                } else {
-                    this.setItemSlot(EquipmentSlot.OFFHAND, ItemStack.EMPTY);
-                }
-                this.useItem = ItemStack.EMPTY;
-                this.playSound(SoundEvents.SHIELD_BREAK, 0.8f, 0.8f + thislevel().getRandom().nextFloat() * 0.4f);
-            }
-        }
+        this.playSound(SoundEvents.SHIELD_BREAK.value(), 0.8f, 0.8f + this.level().getRandom().nextFloat() * 0.4f);
     }
 
     public boolean isBlocking() {
         return false;
     }
 
-    protected void blockUsingShield(LivingEntity p_36295_) {
-        super.blockUsingShield(p_36295_);
-        if (p_36295_.getMainHandItem().canDisableShield(this.useItem, (LivingEntity)this, p_36295_)) {
-            this.disableShield(true);
-        }
-    }
-
     public boolean isDraugrBlocking() {
         if (this.isUsingItem() && !this.useItem.isEmpty()) {
             Item item = this.useItem.getItem();
-            return !this.useItem.canPerformAction(ItemAbilities.SHIELD_BLOCK) ? false : item.getUseDuration(this.useItem, (LivingEntity)this) - this.useItemRemaining >= 5;
+            return this.useItem.getUseAnimation() == net.minecraft.world.item.ItemUseAnimation.BLOCK ? item.getUseDuration(this.useItem, (LivingEntity)this) - this.useItemRemaining >= 5 : false;
         }
         return false;
     }
@@ -274,23 +236,21 @@ implements IShieldEntity {
         }
     }
 
-    public boolean doHurtTarget(Entity p_219472_) {
+    public boolean doHurtTarget(net.minecraft.server.level.ServerLevel level, Entity p_219472_) {
         this.level().broadcastEntityEvent((Entity)this, (byte)4);
         if (this.isDraugrBlocking()) {
             this.stopUsingItem();
             this.setShieldCooldownTime(30);
         }
-        return super.doHurtTarget(p_219472_);
+        return super.doHurtTarget(level, p_219472_);
     }
 
     protected void dropCustomDeathLoot(ServerLevel p_348503_, DamageSource p_34697_, boolean p_34699_) {
-        Creeper creeper;
         super.dropCustomDeathLoot(p_348503_, p_34697_, p_34699_);
         Entity entity = p_34697_.getEntity();
-        if (entity instanceof Creeper && (creeper = (Creeper)entity).canDropMobsSkull()) {
+        if (entity instanceof Creeper creeper && this.level() instanceof ServerLevel sl) {
             ItemStack itemstack = new ItemStack((ItemLike)ModItems.DRAUGR_HEAD.get());
-            creeper.increaseDroppedSkulls();
-            this.spawnAtLocation((ServerLevel)this.level(), itemstack, 0.0f);
+            this.spawnAtLocation(sl, itemstack, 0.0f);
         }
     }
 

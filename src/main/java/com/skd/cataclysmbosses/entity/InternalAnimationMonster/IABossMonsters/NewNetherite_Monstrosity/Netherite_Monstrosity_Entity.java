@@ -239,7 +239,7 @@ extends IABoss_monster {
         this.targetSelector.addGoal(2, (Goal)new NearestAttackableTargetGoal((Mob)this, Player.class, true));
         this.targetSelector.addGoal(3, (Goal)new NearestAttackableTargetGoal((Mob)this, IronGolem.class, true));
         this.targetSelector.addGoal(3, (Goal)new NearestAttackableTargetGoal((Mob)this, AbstractVillager.class, true));
-        this.goalSelector.addGoal(5, (Goal)new InternalMoveGoal(this, this, false, 1.0){
+        this.goalSelector.addGoal(5, (Goal)new InternalMoveGoal(this, false, 1.0){
 
             @Override
             public boolean canUse() {
@@ -551,8 +551,8 @@ extends IABoss_monster {
             BlockEntity blockEntity = targetLevel.getBlockEntity(targetPos);
             if (blockEntity instanceof Boss_Respawn_Spawner_Block_Entity) {
                 Boss_Respawn_Spawner_Block_Entity spawnerBlockEntity = (Boss_Respawn_Spawner_Block_Entity)blockEntity;
-                spawnerBlockEntity.setEntityId((EntityType)ModEntities.NETHERITE_MONSTROSITY.get());
-                spawnerBlockEntity.setTheItem(((Item)ModItems.MONSTROUS_EYE.get()).getDefaultInstance());
+                spawnerBlockEntity.spawnType = (EntityType)ModEntities.NETHERITE_MONSTROSITY.get();
+                spawnerBlockEntity.item = ((Item)ModItems.MONSTROUS_EYE.get()).getDefaultInstance();
             }
         }
     }
@@ -578,7 +578,7 @@ extends IABoss_monster {
 
     private void floatStrider() {
         CollisionContext lvt_1_1_;
-        if (this.isInLava() && (lvt_1_1_ = CollisionContext.of((Entity)this)).isAbove(LiquidBlock.STABLE_SHAPE, this.blockPosition().below(), true) && !this.level().getFluidState(this.blockPosition().above()).is(FluidTags.LAVA)) {
+        if (this.isInLava() && (lvt_1_1_ = CollisionContext.of((Entity)this)).isAbove(this.getLiquidCollisionShape(), this.blockPosition().below(), true) && !this.level().getFluidState(this.blockPosition().above()).is(FluidTags.LAVA)) {
             this.setOnGround(true);
         }
     }
@@ -751,7 +751,7 @@ extends IABoss_monster {
             if (this.attackTicks > 19 && this.attackTicks < 49 && !this.level().isClientSide()) {
                 if (CMCommonConfig.NetheriteMonstrosity.ignoreMobGriefing) {
                     this.ChargeBlockBreaking();
-                } else if (EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+                } else if (this.level() instanceof net.minecraft.server.level.ServerLevel sl && EventHooks.canEntityGrief(sl, (Entity)this)) {
                     this.ChargeBlockBreaking();
                 }
                 double yaw = Math.toRadians(this.getYRot() + 90.0f);
@@ -948,12 +948,12 @@ extends IABoss_monster {
         fallingBlockEntity.push(0.0, 0.2 + this.getRandom().nextGaussian() * 0.04, 0.0);
         this.level().addFreshEntity((Entity)fallingBlockEntity);
         AABB selection = new AABB(px - 0.5, (double)blockpos.getY() + d0 - 1.0, pz - 0.5, px + 0.5, (double)blockpos.getY() + d0 + (double)mxy, pz + 0.5);
-        List hit = this.level().getEntitiesOfClass(LivingEntity.class, selection);
+        List<LivingEntity> hit = this.level().getEntitiesOfClass(LivingEntity.class, selection);
         if (!hit.isEmpty()) {
             for (LivingEntity entity : hit) {
                 if (this.isAlliedTo((Entity)entity) || entity instanceof Kobolediator_Entity || entity == this) continue;
                 boolean flag = entity.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
-                if (entity.isDamageSourceBlocked(damagesource) && entity instanceof Player) {
+                if (entity.isBlocking() && entity instanceof Player) {
                     Player player = (Player)entity;
                     if (shieldbreakticks > 0) {
                         EntityUtil.disableShield(player, shieldbreakticks);
@@ -1003,7 +1003,7 @@ extends IABoss_monster {
             for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(area))) {
                 if (this.isAlliedTo((Entity)entity) || entity instanceof Netherite_Monstrosity_Entity || entity == this) continue;
                 boolean flag = entity.hurtOrSimulate(damagesource, (float)((double)((float)this.getAttributeValue(Attributes.ATTACK_DAMAGE)) + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE), (double)(entity.getMaxHealth() * (float)CMCommonConfig.NetheriteMonstrosity.SmashHpdamage))));
-                if (entity.isDamageSourceBlocked(damagesource) && entity instanceof Player) {
+                if (entity.isBlocking() && entity instanceof Player) {
                     Player player = (Player)entity;
                     EntityUtil.disableShield(player, 120);
                 }
@@ -1094,7 +1094,7 @@ extends IABoss_monster {
         int MthX = Mth.floor((double)this.getX());
         int MthY = Mth.floor((double)this.getY());
         int MthZ = Mth.floor((double)this.getZ());
-        if (!this.level().isClientSide() && EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+        if (this.level() instanceof net.minecraft.server.level.ServerLevel sl && EventHooks.canEntityGrief(sl, (Entity)this)) {
             for (int k2 = -x; k2 <= x; ++k2) {
                 for (int l2 = -z; l2 <= z; ++l2) {
                     for (int j = 0; j <= y; ++j) {
@@ -1121,7 +1121,7 @@ extends IABoss_monster {
     }
 
     private void BlockBreaking() {
-        if (!this.isNoAi() && !this.level().isClientSide() && this.blockBreakCounter == 0 && EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+        if (!this.isNoAi() && this.level() instanceof net.minecraft.server.level.ServerLevel sl && this.blockBreakCounter == 0 && EventHooks.canEntityGrief(sl, (Entity)this)) {
             AABB box = this.getBoundingBox();
             BlockPos min = new BlockPos(Mth.floor((double)box.minX), Mth.floor((double)box.minY), Mth.floor((double)box.minZ));
             BlockPos max = new BlockPos(Mth.floor((double)box.maxX), Mth.floor((double)box.maxY), Mth.floor((double)box.maxZ));

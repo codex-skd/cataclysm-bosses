@@ -458,7 +458,7 @@ implements ISemiAquatic {
         }
         if (this.isNoAi()) {
             this.setAirSupply(this.getMaxAirSupply());
-        } else if (this.isInWaterRainOrBubble()) {
+        } else if (this.isInWaterOrRain()) {
             this.setMoistness(6000);
         } else {
             int dry = (this.level().getOverworldClockTime() % 24000 < 12000) ? 2 : 1;
@@ -468,7 +468,7 @@ implements ISemiAquatic {
                 this.moistureAttackTime = 20;
             }
         }
-        boolean flag1 = this.canInFluidType(this.getEyeInFluidType());
+        boolean flag1 = this.canBreatheUnderwater();
         if (flag1) {
             if (this.level().noCollision((Entity)this, this.getBoundingBox()) && !this.getSwim()) {
                 this.setSwim(true);
@@ -536,7 +536,7 @@ implements ISemiAquatic {
                 if (this.isAlliedTo((Entity)entity) || entity instanceof Coralssus_Entity || entity == this) continue;
                 this.launch(entity, true);
                 entity.hurtOrSimulate(damagesource, (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) + (float)this.random.nextInt(damage));
-                if (!entity.isDamageSourceBlocked(damagesource) || !(entity instanceof Player)) continue;
+                if (!entity.isBlocking() || !(entity instanceof Player)) continue;
                 Player player = (Player)entity;
                 if (shieldbreakticks <= 0) continue;
                 EntityUtil.disableShield(player, shieldbreakticks);
@@ -546,7 +546,7 @@ implements ISemiAquatic {
 
     private void BlockBreaking() {
         boolean flag = false;
-        if (!this.level().isClientSide() && EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+        if (this.level() instanceof net.minecraft.server.level.ServerLevel sl && EventHooks.canEntityGrief(sl, (Entity)this)) {
             AABB aabb = this.getBoundingBox().inflate(1.5, 1.5, 1.5);
             for (BlockPos blockpos : BlockPos.betweenClosed((int)Mth.floor((double)aabb.minX), (int)Mth.floor((double)this.getY()), (int)Mth.floor((double)aabb.minZ), (int)Mth.floor((double)aabb.maxX), (int)Mth.floor((double)aabb.maxY), (int)Mth.floor((double)aabb.maxZ))) {
                 BlockState blockstate = this.level().getBlockState(blockpos);
@@ -828,7 +828,7 @@ implements ISemiAquatic {
         }
 
         static {
-            BY_ID = ByIdMap.sparse(Variant::id, (Object[])Variant.values(), (Object)((Object)FIRE));
+            BY_ID = ByIdMap.sparse(Variant::id, Variant.values(), FIRE);
             CODEC = StringRepresentable.fromEnum(Variant::values);
         }
     }

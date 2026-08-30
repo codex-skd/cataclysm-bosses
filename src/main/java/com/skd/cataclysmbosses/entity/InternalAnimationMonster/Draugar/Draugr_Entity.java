@@ -148,9 +148,9 @@ extends Monster {
         }
     }
 
-    public boolean doHurtTarget(Entity p_219472_) {
+    public boolean doHurtTarget(net.minecraft.server.level.ServerLevel level, Entity p_219472_) {
         this.level().broadcastEntityEvent((Entity)this, (byte)4);
-        return super.doHurtTarget(p_219472_);
+        return super.doHurtTarget(level, p_219472_);
     }
 
     @Nullable
@@ -184,13 +184,11 @@ extends Monster {
     }
 
     protected void dropCustomDeathLoot(ServerLevel p_348503_, DamageSource p_34697_, boolean p_34699_) {
-        Creeper creeper;
         super.dropCustomDeathLoot(p_348503_, p_34697_, p_34699_);
         Entity entity = p_34697_.getEntity();
-        if (entity instanceof Creeper && (creeper = (Creeper)entity).canDropMobsSkull()) {
+        if (entity instanceof Creeper creeper && this.level() instanceof ServerLevel sl) {
             ItemStack itemstack = new ItemStack((ItemLike)ModItems.DRAUGR_HEAD.get());
-            creeper.increaseDroppedSkulls();
-            this.spawnAtLocation((ServerLevel)this.level(), itemstack, 0.0f);
+            this.spawnAtLocation(sl, itemstack, 0.0f);
         }
     }
 
@@ -219,8 +217,8 @@ extends Monster {
         return (SoundEvent)ModSounds.DRAUGR_IDLE.get();
     }
 
-    protected AABB getAttackBoundingBox() {
-        AABB aabb = super.getAttackBoundingBox();
+    protected AABB getAttackBoundingBox(double range) {
+        AABB aabb = super.getAttackBoundingBox(range);
         return aabb.deflate(0.05, 0.0, 0.05);
     }
 }

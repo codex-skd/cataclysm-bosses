@@ -262,7 +262,7 @@ extends Internal_Animation_Monster {
                     if (entity instanceof LivingEntity) {
                         LivingEntity living = (LivingEntity)entity;
                         this.block_stage = 2;
-                        living.knockback(0.5, this.getX() - living.getX(), this.getZ() - living.getZ());
+                        living.knockback(0.5, this.getX() - living.getX(), this.getZ() - living.getZ(), this.damageSources().mobAttack(this), 0.5f);
                     }
                     return false;
                 }
@@ -469,7 +469,7 @@ extends Internal_Animation_Monster {
                 float entityHitDistance = (float)Math.sqrt((entityHit.getZ() - this.getZ()) * (entityHit.getZ() - this.getZ()) + (entityHit.getX() - this.getX()) * (entityHit.getX() - this.getX()));
                 if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || this.isAlliedTo((Entity)entityHit) || entityHit instanceof Hippocamtus_Entity || entityHit == this) continue;
                 boolean hurt = entityHit.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
-                if (entityHit.isDamageSourceBlocked(damagesource) && entityHit instanceof Player) {
+                if (entityHit.isBlocking() && entityHit instanceof Player) {
                     Player player = (Player)entityHit;
                     if (shieldbreakticks > 0) {
                         EntityUtil.disableShield(player, shieldbreakticks);

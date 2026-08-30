@@ -59,7 +59,7 @@ extends Cm_Part_Entity<Netherite_Monstrosity_Entity> {
     }
 
     public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
-        return this.isInvulnerableTo(source) ? false : this.parentMob.hurtParts(this, source, amount);
+        return this.isInvulnerableToBase(source) ? false : this.parentMob.hurtParts(this, source, amount);
     }
 
     protected void readAdditionalSaveData(ValueInput compound) {

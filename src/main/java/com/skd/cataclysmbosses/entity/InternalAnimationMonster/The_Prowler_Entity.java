@@ -136,14 +136,14 @@ extends Internal_Animation_Monster {
                 The_Prowler_Entity.this.spin_cooldown = 80;
             }
         });
-        this.goalSelector.addGoal(1, (Goal)new InternalAttackGoal(this, this, 0, 5, 0, 50, 38, 5.0f){
+        this.goalSelector.addGoal(1, (Goal)new InternalAttackGoal(this, 0, 5, 0, 50, 38, 5.0f){
 
             @Override
             public boolean canUse() {
                 return super.canUse() && this.entity.getRandom().nextFloat() * 100.0f < 20.0f;
             }
         });
-        this.goalSelector.addGoal(1, (Goal)new InternalAttackGoal(this, this, 0, 6, 0, 55, 45, 6.0f){
+        this.goalSelector.addGoal(1, (Goal)new InternalAttackGoal(this, 0, 6, 0, 55, 45, 6.0f){
 
             @Override
             public boolean canUse() {
@@ -151,7 +151,7 @@ extends Internal_Animation_Monster {
                 return super.canUse() && this.entity.getRandom().nextFloat() * 100.0f < 20.0f && target != null && (double)this.entity.distanceTo((Entity)target) >= 2.75;
             }
         });
-        this.goalSelector.addGoal(1, (Goal)new InternalAttackGoal(this, this, 0, 7, 0, 80, 38, 4.25f){
+        this.goalSelector.addGoal(1, (Goal)new InternalAttackGoal(this, 0, 7, 0, 80, 38, 4.25f){
 
             @Override
             public boolean canUse() {

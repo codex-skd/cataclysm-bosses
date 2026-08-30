@@ -245,7 +245,6 @@ extends AbstractDeepling {
         return livingentity != null && livingentity.isInWater();
     }
 
-    @Override
     public EntityDimensions getSwimmingSize() {
         return SWIMMING_SIZE;
     }
@@ -271,8 +270,8 @@ extends AbstractDeepling {
     }
 
     @Override
-    protected AABB getAttackBoundingBox() {
-        AABB aabb = super.getAttackBoundingBox();
+    protected AABB getAttackBoundingBox(double range) {
+        AABB aabb = super.getAttackBoundingBox(range);
         return aabb.deflate(0.05, 0.0, 0.05);
     }
 

@@ -6,6 +6,7 @@ import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.ServerLevelAccessor;
 import org.jspecify.annotations.Nullable;
 
@@ -26,7 +27,7 @@ public class Lionfish_Entity extends AbstractDeepling {
     }
 
     @Override
-    public boolean checkSpawnObstruction(Level level) {
+    public boolean checkSpawnObstruction(LevelReader level) {
         return super.checkSpawnObstruction(level);
     }
 

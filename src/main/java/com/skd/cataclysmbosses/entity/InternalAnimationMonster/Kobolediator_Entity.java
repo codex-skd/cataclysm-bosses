@@ -182,7 +182,7 @@ extends Internal_Animation_Monster {
                 return super.canUse() && Kobolediator_Entity.this.getRandom().nextFloat() * 100.0f < 9.0f && Kobolediator_Entity.this.charge_cooldown <= 0;
             }
         });
-        this.goalSelector.addGoal(1, (Goal)new InternalStateGoal(this, this, 6, 6, 7, 30, 0){
+        this.goalSelector.addGoal(1, (Goal)new InternalStateGoal(this, 6, 6, 7, 30, 0){
 
             @Override
             public void tick() {
@@ -488,7 +488,7 @@ extends Internal_Animation_Monster {
         if (this.getAttackState() == 6 && !this.level().isClientSide()) {
             if (CMCommonConfig.Kobolediator.ignoreMobGriefing) {
                 this.ChargeBlockBreaking();
-            } else if (EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+            } else if (this.level() instanceof net.minecraft.server.level.ServerLevel sl && EventHooks.canEntityGrief(sl, (Entity)this)) {
                 this.ChargeBlockBreaking();
             }
             if (this.tickCount % 4 == 0) {
@@ -581,7 +581,7 @@ extends Internal_Animation_Monster {
                 float entityHitDistance = (float)Math.sqrt((entityHit.getZ() - this.getZ()) * (entityHit.getZ() - this.getZ()) + (entityHit.getX() - this.getX()) * (entityHit.getX() - this.getX()));
                 if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || this.isAlliedTo((Entity)entityHit) || entityHit instanceof Kobolediator_Entity || entityHit == this) continue;
                 entityHit.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
-                if (!entityHit.isDamageSourceBlocked(damagesource) || !(entityHit instanceof Player)) continue;
+                if (!entityHit.isBlocking() || !(entityHit instanceof Player)) continue;
                 Player player = (Player)entityHit;
                 if (shieldbreakticks <= 0) continue;
                 EntityUtil.disableShield(player, shieldbreakticks);
@@ -644,12 +644,12 @@ extends Internal_Animation_Monster {
         fallingBlockEntity.push(0.0, 0.2 + this.getRandom().nextGaussian() * 0.04, 0.0);
         this.level().addFreshEntity((Entity)fallingBlockEntity);
         AABB selection = new AABB(px - 0.5, (double)blockpos.getY() + d0 - 1.0, pz - 0.5, px + 0.5, (double)blockpos.getY() + d0 + (double)mxy, pz + 0.5);
-        List hit = this.level().getEntitiesOfClass(LivingEntity.class, selection);
+        List<LivingEntity> hit = this.level().getEntitiesOfClass(LivingEntity.class, selection);
         if (!hit.isEmpty()) {
             for (LivingEntity entity : hit) {
                 if (this.isAlliedTo((Entity)entity) || entity instanceof Kobolediator_Entity || entity == this) continue;
                 boolean flag = entity.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
-                if (entity.isDamageSourceBlocked(damagesource) && entity instanceof Player) {
+                if (entity.isBlocking() && entity instanceof Player) {
                     Player player = (Player)entity;
                     if (shieldbreakticks > 0) {
                         EntityUtil.disableShield(player, shieldbreakticks);

@@ -190,7 +190,7 @@ extends Internal_Animation_Monster {
                 Wadjet_Entity.this.setStab(Wadjet_Entity.this.getRandom().nextBoolean());
             }
         });
-        this.goalSelector.addGoal(1, (Goal)new InternalStateGoal(this, this, 1, 1, 0, 0, 0){
+        this.goalSelector.addGoal(1, (Goal)new InternalStateGoal(this, 1, 1, 0, 0, 0){
 
             @Override
             public void tick() {
@@ -237,8 +237,6 @@ extends Internal_Animation_Monster {
             this.playSound(soundevent, this.getSoundVolume(), (this.random.nextFloat() - this.random.nextFloat()) * 0.2f + 1.0f);
         }
         this.hurtOrSimulate(this.damageSources().generic(), 0.0f);
-        this.lastDamageSource = damageSource;
-        this.lastDamageStamp = this.level().getGameTime();
     }
 
     private boolean canBlockDamageSource(DamageSource damageSourceIn) {
@@ -486,7 +484,7 @@ extends Internal_Animation_Monster {
                 if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || this.isAlliedTo((Entity)entityHit) || entityHit instanceof Wadjet_Entity || entityHit == this) continue;
                 DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
                 boolean hurt = entityHit.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
-                if (entityHit.isDamageSourceBlocked(damagesource) && entityHit instanceof Player) {
+                if (entityHit.isBlocking() && entityHit instanceof Player) {
                     Player player = (Player)entityHit;
                     if (shieldbreakticks > 0) {
                         EntityUtil.disableShield(player, shieldbreakticks);

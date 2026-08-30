@@ -306,7 +306,6 @@ extends AbstractDeepling {
         return new AABB(this.getX() - (double)0.7f, this.getY(), this.getZ() - (double)0.7f, this.getX() + (double)0.7f, this.getY() + (double)2.6f, this.getZ() + (double)0.7f);
     }
 
-    @Override
     public EntityDimensions getSwimmingSize() {
         return SWIMMING_SIZE;
     }
@@ -322,8 +321,8 @@ extends AbstractDeepling {
     }
 
     @Override
-    protected AABB getAttackBoundingBox() {
-        AABB aabb = super.getAttackBoundingBox();
+    protected AABB getAttackBoundingBox(double range) {
+        AABB aabb = super.getAttackBoundingBox(range);
         return aabb.deflate(0.05, 0.0, 0.05);
     }
 

@@ -393,13 +393,11 @@ implements IHoldEntity {
     }
 
     protected void dropCustomDeathLoot(ServerLevel p_348503_, DamageSource p_34697_, boolean p_34699_) {
-        Creeper creeper;
         super.dropCustomDeathLoot(p_348503_, p_34697_, p_34699_);
         Entity entity = p_34697_.getEntity();
-        if (entity instanceof Creeper && (creeper = (Creeper)entity).canDropMobsSkull()) {
+        if (entity instanceof Creeper creeper && this.level() instanceof ServerLevel sl) {
             ItemStack itemstack = new ItemStack((ItemLike)ModItems.APTRGANGR_HEAD.get());
-            creeper.increaseDroppedSkulls();
-            this.spawnAtLocation((ServerLevel)this.level(), itemstack, 0.0f);
+            this.spawnAtLocation(sl, itemstack, 0.0f);
         }
     }
 
@@ -554,7 +552,7 @@ implements IHoldEntity {
                 float entityHitDistance = (float)Math.sqrt((entityHit.getZ() - this.getZ()) * (entityHit.getZ() - this.getZ()) + (entityHit.getX() - this.getX()) * (entityHit.getX() - this.getX()));
                 if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || this.isAlliedTo((Entity)entityHit) || entityHit instanceof Aptrgangr_Entity || entityHit == this) continue;
                 boolean hurt = entityHit.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
-                if (entityHit.isDamageSourceBlocked(damagesource) && entityHit instanceof Player) {
+                if (entityHit.isBlocking() && entityHit instanceof Player) {
                     Player player = (Player)entityHit;
                     if (shieldbreakticks > 0) {
                         EntityUtil.disableShield(player, shieldbreakticks);
@@ -586,7 +584,7 @@ implements IHoldEntity {
                 if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || this.isAlliedTo((Entity)entityHit) || entityHit instanceof Aptrgangr_Entity || entityHit == this) continue;
                 DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
                 boolean hurt = entityHit.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
-                if (entityHit.isDamageSourceBlocked(damagesource) && entityHit instanceof Player) {
+                if (entityHit.isBlocking() && entityHit instanceof Player) {
                     Player player = (Player)entityHit;
                     if (shieldbreakticks > 0) {
                         EntityUtil.disableShield(player, shieldbreakticks);
@@ -610,7 +608,7 @@ implements IHoldEntity {
             if (this.isAlliedTo((Entity)entity) || entity == this || !this.getPassengers().isEmpty()) continue;
             DamageSource damagesource = maledictio ? CMDamageTypes.causeMaledictioDamage((LivingEntity)this) : this.damageSources().mobAttack((LivingEntity)this);
             boolean flag = entity.hurtOrSimulate(damagesource, damage);
-            if (entity.isDamageSourceBlocked(damagesource) && entity instanceof Player) {
+            if (entity.isBlocking() && entity instanceof Player) {
                 Player player = (Player)entity;
                 if (shieldbreakticks > 0) {
                     EntityUtil.disableShield(player, shieldbreakticks);
@@ -627,7 +625,7 @@ implements IHoldEntity {
     }
 
     private void Icicle_Crash() {
-        if (this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
+        if (this.level() instanceof net.minecraft.server.level.ServerLevel _sl && _sl.getGameRules().get(GameRules.MOB_GRIEFING)) {
             BlockPos ceil = this.blockPosition().offset(0, 5, 0);
             while (!(this.level().getBlockState(ceil).isSolid() && this.level().getBlockState(ceil).getBlock() != ModBlocks.POINTED_ICICLE.get() || ceil.getY() >= this.level().getMaxY() + 1)) {
                 ceil = ceil.above();

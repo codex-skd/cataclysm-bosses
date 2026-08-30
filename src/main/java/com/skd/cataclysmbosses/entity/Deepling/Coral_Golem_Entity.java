@@ -249,7 +249,7 @@ implements ISemiAquatic {
         if (!this.isInWater() && !this.isLandNavigator) {
             this.switchNavigator(true);
         }
-        if (flag1 = this.canInFluidType(this.getEyeInFluidType())) {
+        if (flag1 = this.canBreatheUnderwater()) {
             if (this.level().noCollision(this, this.getBoundingBox()) && !this.getSwim()) {
                 this.setSwim(true);
             }
@@ -336,7 +336,7 @@ implements ISemiAquatic {
         ScreenShake_Entity.ScreenShake(this.level(), this.position(), 10.0f, 0.15f, 0, 20);
         this.playSound((SoundEvent)ModSounds.EXPLOSION.get(), 0.5f, 1.0f + this.getRandom().nextFloat() * 0.1f);
         for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate((double)grow))) {
-            if (this.isAlliedTo(entity) || entity instanceof Coral_Golem_Entity || entity == this) continue;
+            if (this.considersCoralAlly(entity) || entity instanceof Coral_Golem_Entity || entity == this) continue;
             entity.hurtOrSimulate(this.damageSources().mobAttack((LivingEntity)this), (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) + (float)this.random.nextInt(damage));
             this.launch(entity, true);
         }
@@ -362,7 +362,7 @@ implements ISemiAquatic {
         e.push(d0 / d2 * (double)f, huge ? 0.5 : (double)0.2f, d1 / d2 * (double)f);
     }
 
-    public boolean isAlliedTo(@Nullable Entity entityIn) {
+    public boolean considersCoralAlly(@Nullable Entity entityIn) {
         if (entityIn == this) {
             return true;
         }

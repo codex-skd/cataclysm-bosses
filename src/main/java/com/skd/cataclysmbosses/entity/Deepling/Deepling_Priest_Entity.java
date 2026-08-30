@@ -243,7 +243,6 @@ extends AbstractDeepling {
         return livingentity != null && livingentity.isInWater();
     }
 
-    @Override
     public EntityDimensions getSwimmingSize() {
         return SWIMMING_SIZE;
     }
