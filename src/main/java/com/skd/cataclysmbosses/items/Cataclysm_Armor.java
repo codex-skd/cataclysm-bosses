@@ -18,7 +18,13 @@ public class Cataclysm_Armor
 extends Item {
     protected final Holder<ArmorMaterial> material;
     protected final ArmorType type;
-    private final Supplier<ItemAttributeModifiers> catdefaultModifiers = Suppliers.memoize(() -> {
+    private final AttributeContainer[] attributes;
+    // PORT(26.2): assigned in the constructor (after the final fields it reads) so javac's
+    // definite-assignment check on the captured blank finals is satisfied.
+    private final Supplier<ItemAttributeModifiers> catdefaultModifiers;
+
+    private Supplier<ItemAttributeModifiers> buildDefaultModifiers() {
+        return Suppliers.memoize(() -> {
         int i = this.material.value().defense().getOrDefault(this.type, 0);
         float f = this.material.value().toughness();
         ItemAttributeModifiers.Builder itemattributemodifiers$builder = ItemAttributeModifiers.builder();
@@ -34,14 +40,15 @@ extends Item {
             itemattributemodifiers$builder.add(holder.attribute(), holder.createModifier(this.type.getSlot().getName()), equipmentslotgroup);
         }
         return itemattributemodifiers$builder.build();
-    });
-    private final AttributeContainer[] attributes;
+        });
+    }
 
     public Cataclysm_Armor(Holder<ArmorMaterial> pMaterial, ArmorType pType, Item.Properties pProperties, AttributeContainer ... pAttributes) {
         super(pProperties);
         this.material = pMaterial;
         this.type = pType;
         this.attributes = pAttributes;
+        this.catdefaultModifiers = this.buildDefaultModifiers();
     }
 
     public Holder<ArmorMaterial> getMaterial() {

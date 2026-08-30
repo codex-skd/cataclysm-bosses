@@ -123,40 +123,10 @@ public class CustomBossBar {
     }
 
     public void renderBossBar(CustomizeGuiOverlayEvent.BossEventProgress event, int remainLife) {
-        GuiGraphics guiGraphics = event.getGuiGraphics();
-        int y = event.getY();
-        int i = Minecraft.getInstance().getWindow().getGuiScaledWidth();
-        int j = y - 9;
-        Minecraft.getInstance().getProfiler().push("CataclysmCustomBossBarBase");
-        RenderSystem.setShaderColor((float)1.0f, (float)1.0f, (float)1.0f, (float)1.0f);
-        RenderSystem.setShaderTexture((int)0, (Identifier)this.getBaseTexture());
-        int barX = event.getX() + this.getBaseOffsetX();
-        int barY = y + this.getBaseOffsetY();
-        this.drawBar(guiGraphics, barX, barY, (BossEvent)event.getBossEvent());
-        MutableComponent component = event.getBossEvent().getName().copy().withStyle(this.getTextColor());
-        Minecraft.getInstance().getProfiler().pop();
-        int l = Minecraft.getInstance().font.width((FormattedText)component);
-        int i1 = i / 2 - l / 2;
-        int j1 = j;
-        guiGraphics.drawString(Minecraft.getInstance().font, (Component)component, i1, j1, 0xFFFFFF);
-        if (this.hasOverlay()) {
-            Minecraft.getInstance().getProfiler().push("CataclysmCustomBossBarOverlay");
-            RenderSystem.setShaderTexture((int)0, (Identifier)this.getOverlayTexture());
-            event.getGuiGraphics().blit(this.getOverlayTexture(), event.getX() + this.getBaseOffsetX() + this.getOverlayOffsetX(), y + this.getOverlayOffsetY() + this.getBaseOffsetY(), 0.0f, 0.0f, this.getOverlayWidth(), this.getOverlayHeight(), this.getOverlayWidth(), this.getOverlayHeight());
-            Minecraft.getInstance().getProfiler().pop();
-        }
-        if (remainLife > 0) {
-            int iconSize = 16;
-            int iconX = barX + this.getProgress() - 32;
-            int iconY = barY + this.getBaseHeight() + 2;
-            Calendar calendar = Calendar.getInstance();
-            Identifier sans = calendar.get(2) == 3 && calendar.get(5) == 1 ? LIFE_REMAIN_SANS_ICON : LIFE_REMAIN_SKULL_ICON;
-            RenderSystem.setShaderTexture((int)0, (Identifier)sans);
-            RenderSystem.setShaderColor((float)1.0f, (float)1.0f, (float)1.0f, (float)1.0f);
-            guiGraphics.blit(sans, iconX, iconY, 0.0f, 0.0f, iconSize, iconSize, iconSize, iconSize);
-            MutableComponent lifeText = Component.literal((String)("x " + remainLife)).withStyle(ChatFormatting.WHITE);
-            guiGraphics.drawString(Minecraft.getInstance().font, (Component)lifeText, iconX + iconSize + 2, iconY + 3, 0xFFFFFF, true);
-        }
+        // PORT TODO(26.2): custom boss-bar skin rendering. Needs a full rewrite against
+        // GuiGraphicsExtractor + RenderPipelines.GUI_TEXTURED blits; RenderSystem.setShaderColor/
+        // setShaderTexture and Minecraft.getProfiler() are gone, and drawBar() was already
+        // dropped in a prior session. Until then, keep the HUD layout spacing consistent.
         event.setIncrement(this.getVerticalIncrement());
     }
 //     

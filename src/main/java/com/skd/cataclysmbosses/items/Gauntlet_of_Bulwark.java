@@ -147,7 +147,6 @@ extends Cataclysm_Weapon {
             }
         }
         return true;
-        return false;
     }
 
     public boolean canDisableShield(ItemStack stack, ItemStack shield, LivingEntity entity, LivingEntity attacker) {

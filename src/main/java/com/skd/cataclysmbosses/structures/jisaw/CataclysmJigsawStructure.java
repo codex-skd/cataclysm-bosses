@@ -113,14 +113,14 @@ extends Structure {
                 throw new MatchException(null, null);
             }
             case NONE: {
-                int n = 0;
+                vanillaEdgeBuffer = 0;
                 break;
             }
-            case BURY: 
-            case BEARD_THIN: 
-            case BEARD_BOX: 
+            case BURY:
+            case BEARD_THIN:
+            case BEARD_BOX:
             case ENCAPSULATE: {
-                int n = vanillaEdgeBuffer = 12;
+                vanillaEdgeBuffer = 12;
             }
         }
         if (structure.maxDistanceFromCenter + vanillaEdgeBuffer > 192) {

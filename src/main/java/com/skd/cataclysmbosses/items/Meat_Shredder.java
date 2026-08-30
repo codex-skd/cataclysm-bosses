@@ -129,7 +129,6 @@ extends Cataclysm_Weapon {
         world.playSound(null, living.getX(), living.getY(), living.getZ(), (SoundEvent)ModSounds.SHREDDER_END.get(), SoundSource.PLAYERS, 1.5f, 1.0f / (living.getRandom().nextFloat() * 0.4f + 0.8f));
         Cataclysm.PROXY.clearSoundCacheFor((Entity)living);
         return true;
-        return false;
     }
 
     public float getDestroySpeed(ItemStack p_41004_, BlockState p_41005_) {

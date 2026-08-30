@@ -101,7 +101,6 @@ extends Cataclysm_Weapon {
             }
         }
         return true;
-        return false;
     }
 
     public void onUseTick(Level worldIn, LivingEntity livingEntityIn, ItemStack stack, int count) {

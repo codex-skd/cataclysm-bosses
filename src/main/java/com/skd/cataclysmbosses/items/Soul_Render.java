@@ -98,7 +98,6 @@ extends Cataclysm_Weapon {
             }
         }
         return true;
-        return false;
     }
 
     private void StrikeWindmillHalberd(Level level, LivingEntity player, int numberOfBranches, int particlesPerBranch, double initialRadius, double radiusIncrement, double curveFactor, int delay) {
