@@ -48,7 +48,7 @@ extends HumanoidModel<HumanoidRenderState> {
     }
 
     protected Iterable<ModelPart> bodyParts() {
-        return ImmutableList.of((Object)this.leftLeg, (Object)this.rightLeg);
+        return ImmutableList.of(this.leftLeg, this.rightLeg);
     }
 }
 

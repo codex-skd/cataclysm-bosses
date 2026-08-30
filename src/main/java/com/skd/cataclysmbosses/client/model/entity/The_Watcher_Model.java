@@ -285,7 +285,7 @@ extends AdvancedEntityModel<The_Watcher_Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.root, (Object)this.pivot, (Object)this.head, (Object)this.jaw, (Object)this.cannon, (Object)this.bone, (Object)this.headgear, (Object)this.right_wing, (Object)this.sail, (Object)this.head, (Object)this.left_wing, (Object)this.sail2, (Object[])new AdvancedModelBox[]{this.booster, this.upper_sub_booster, this.lower_sub_booster});
+        return ImmutableList.of(this.root, this.pivot, this.head, this.jaw, this.cannon, this.bone, this.headgear, this.right_wing, this.sail, this.head, this.left_wing, this.sail2, (Object[])new AdvancedModelBox[]{this.booster, this.upper_sub_booster, this.lower_sub_booster});
     }
 
     public BasicModelPart root() {

@@ -222,7 +222,7 @@ extends AdvancedEntityModel<Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.root, (Object)this.bow, (Object)this.bow_r1, (Object)this.arm1, (Object)this.cube_r8_r1, (Object)this.arm2, (Object)this.bow_string, (Object)this.string, (Object)this.string2, (Object)this.arrow3, (Object)this.arrow_pivot3, (Object)this.third_sand3, (Object[])new AdvancedModelBox[]{this.third_sand2, this.third_sand1, this.arrow2, this.arrow_pivot2, this.second_sand3, this.second_sand2, this.second_sand1, this.arrow1, this.arrow_pivot1, this.first_sand3, this.first_sand2, this.first_sand1});
+        return ImmutableList.of(this.root, this.bow, this.bow_r1, this.arm1, this.cube_r8_r1, this.arm2, this.bow_string, this.string, this.string2, this.arrow3, this.arrow_pivot3, this.third_sand3, (Object[])new AdvancedModelBox[]{this.third_sand2, this.third_sand1, this.arrow2, this.arrow_pivot2, this.second_sand3, this.second_sand2, this.second_sand1, this.arrow1, this.arrow_pivot1, this.first_sand3, this.first_sand2, this.first_sand1});
     }
 
     public BasicModelPart root() {

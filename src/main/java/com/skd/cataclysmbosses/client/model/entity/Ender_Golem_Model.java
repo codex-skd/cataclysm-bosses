@@ -332,7 +332,7 @@ extends AdvancedEntityModel<Ender_Golem_Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.root, (Object)this.left_arm, (Object)this.right_arm, (Object)this.left_arm2, (Object)this.right_arm2, (Object)this.left_finger, (Object)this.right_finger, (Object)this.left_leg, (Object)this.right_leg, (Object)this.head, (Object)this.lowerbody, (Object)this.upperbody, (Object[])new AdvancedModelBox[]{this.voidstone});
+        return ImmutableList.of(this.root, this.left_arm, this.right_arm, this.left_arm2, this.right_arm2, this.left_finger, this.right_finger, this.left_leg, this.right_leg, this.head, this.lowerbody, this.upperbody, (Object[])new AdvancedModelBox[]{this.voidstone});
     }
 
     public BasicModelPart root() {

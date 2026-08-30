@@ -125,7 +125,7 @@ extends AdvancedEntityModel<Deepling_Priest_Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.root, (Object)this.left_leg, (Object)this.right_leg, (Object)this.body, (Object)this.headwear, (Object)this.head, (Object)this.head2, (Object)this.r_fin, (Object)this.l_fin, (Object)this.right_arm, (Object)this.left_arm, (Object)this.fin, (Object[])new AdvancedModelBox[]{this.light});
+        return ImmutableList.of(this.root, this.left_leg, this.right_leg, this.body, this.headwear, this.head, this.head2, this.r_fin, this.l_fin, this.right_arm, this.left_arm, this.fin, (Object[])new AdvancedModelBox[]{this.light});
     }
 
     public void animate(Deepling_Priest_Entity entity, float f, float f1, float f2, float f3, float f4) {

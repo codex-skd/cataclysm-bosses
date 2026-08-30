@@ -3153,7 +3153,7 @@ extends AdvancedEntityModel<Ignis_Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.root, (Object)this.upperbody, (Object)this.head, (Object)this.right_chestplate, (Object)this.lowerbody, (Object)this.lowerbody2, (Object)this.left_arm_joint, (Object)this.left_arm, (Object)this.left_guantlet, (Object)this.left_big_guantlet, (Object)this.left_hand, (Object)this.left_fist, (Object[])new AdvancedModelBox[]{this.right_arm_joint, this.right_arm, this.right_guantlet, this.right_big_guantlet, this.right_hand, this.right_fist, this.sword, this.handle_core, this.core, this.shield_root, this.shield});
+        return ImmutableList.of(this.root, this.upperbody, this.head, this.right_chestplate, this.lowerbody, this.lowerbody2, this.left_arm_joint, this.left_arm, this.left_guantlet, this.left_big_guantlet, this.left_hand, this.left_fist, (Object[])new AdvancedModelBox[]{this.right_arm_joint, this.right_arm, this.right_guantlet, this.right_big_guantlet, this.right_hand, this.right_fist, this.sword, this.handle_core, this.core, this.shield_root, this.shield});
     }
 
     public BasicModelPart root() {

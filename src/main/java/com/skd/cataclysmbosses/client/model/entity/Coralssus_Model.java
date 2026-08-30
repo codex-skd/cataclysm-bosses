@@ -221,7 +221,7 @@ extends AdvancedEntityModel<Coralssus_Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.root, (Object)this.body, (Object)this.chest, (Object)this.cube_r1, (Object)this.neck, (Object)this.head, (Object)this.cube_r2, (Object)this.cube_r3, (Object)this.cube_r4, (Object)this.eye, (Object)this.right_arm_joint, (Object)this.right_arm, (Object[])new AdvancedModelBox[]{this.cube_r5, this.cube_r6, this.right_arm2, this.left_arm_joint, this.left_arm, this.cube_r7, this.left_arm_coral, this.left_arm2, this.coral, this.cube_r8, this.coral2, this.right_leg, this.left_leg});
+        return ImmutableList.of(this.root, this.body, this.chest, this.cube_r1, this.neck, this.head, this.cube_r2, this.cube_r3, this.cube_r4, this.eye, this.right_arm_joint, this.right_arm, (Object[])new AdvancedModelBox[]{this.cube_r5, this.cube_r6, this.right_arm2, this.left_arm_joint, this.left_arm, this.cube_r7, this.left_arm_coral, this.left_arm2, this.coral, this.cube_r8, this.coral2, this.right_leg, this.left_leg});
     }
 }
 

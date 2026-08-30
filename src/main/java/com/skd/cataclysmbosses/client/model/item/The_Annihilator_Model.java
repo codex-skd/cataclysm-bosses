@@ -43,7 +43,7 @@ extends AdvancedEntityModel<Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.root);
+        return ImmutableList.of(this.root);
     }
 
     public BasicModelPart root() {

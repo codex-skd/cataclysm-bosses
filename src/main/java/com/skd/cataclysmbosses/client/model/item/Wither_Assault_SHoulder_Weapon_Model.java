@@ -99,7 +99,7 @@ extends AdvancedEntityModel<Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.root, (Object)this.handle, (Object)this.handle2, (Object)this.trigger, (Object)this.cube1, (Object)this.cube2, (Object)this.cube3, (Object)this.cube4, (Object)this.cap, (Object)this.cap2, (Object)this.cap3);
+        return ImmutableList.of(this.root, this.handle, this.handle2, this.trigger, this.cube1, this.cube2, this.cube3, this.cube4, this.cap, this.cap2, this.cap3);
     }
 
     public BasicModelPart root() {

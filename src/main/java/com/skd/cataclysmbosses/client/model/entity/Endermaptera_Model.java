@@ -182,7 +182,7 @@ extends AdvancedEntityModel<Endermaptera_Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.root, (Object)this.head, (Object)this.body, (Object)this.abdomen, (Object)this.left_antenna, (Object)this.right_antenna, (Object)this.left_jaw, (Object)this.right_jaw, (Object)this.left_leg_front, (Object)this.right_leg_front, (Object)this.left_leg_mid, (Object)this.right_leg_mid, (Object[])new AdvancedModelBox[]{this.left_leg_back, this.right_leg_back});
+        return ImmutableList.of(this.root, this.head, this.body, this.abdomen, this.left_antenna, this.right_antenna, this.left_jaw, this.right_jaw, this.left_leg_front, this.right_leg_front, this.left_leg_mid, this.right_leg_mid, (Object[])new AdvancedModelBox[]{this.left_leg_back, this.right_leg_back});
     }
 
     public void setRotationAngle(AdvancedModelBox AdvancedModelBox2, float x, float y, float z) {

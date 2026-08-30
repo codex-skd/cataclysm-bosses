@@ -149,7 +149,7 @@ extends AdvancedEntityModel<Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.root, (Object)this.gauntlet_fist, (Object)this.fist_guard, (Object)this.void_stone_knuckle, (Object)this.spike, (Object)this.void_spike, (Object)this.void_spike4, (Object)this.void_spike2, (Object)this.void_spike3, (Object)this.thumb, (Object)this.gauntlet_arm, (Object)this.gauntlet_arm2, (Object[])new AdvancedModelBox[]{this.gauntlet_shoulder, this.big_void_stone, this.flame_spike, this.cube_r1, this.flame_spike2, this.cube_r2, this.arm_pad});
+        return ImmutableList.of(this.root, this.gauntlet_fist, this.fist_guard, this.void_stone_knuckle, this.spike, this.void_spike, this.void_spike4, this.void_spike2, this.void_spike3, this.thumb, this.gauntlet_arm, this.gauntlet_arm2, (Object[])new AdvancedModelBox[]{this.gauntlet_shoulder, this.big_void_stone, this.flame_spike, this.cube_r1, this.flame_spike2, this.cube_r2, this.arm_pad});
     }
 
     public BasicModelPart root() {

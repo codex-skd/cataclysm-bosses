@@ -68,7 +68,7 @@ extends AdvancedEntityModel<Amethyst_Cluster_Projectile_Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.roots, (Object)this.bone, (Object)this.bone2, (Object)this.bone3, (Object)this.bone4);
+        return ImmutableList.of(this.roots, this.bone, this.bone2, this.bone3, this.bone4);
     }
 
     public BasicModelPart root() {

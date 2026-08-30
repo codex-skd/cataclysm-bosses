@@ -280,7 +280,7 @@ extends AdvancedEntityModel<Coral_Golem_Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.root, (Object)this.lower_body, (Object)this.upper_body, (Object)this.helmet, (Object)this.chest, (Object)this.table_coral, (Object)this.blue_table_coral, (Object)this.red_table_coral, (Object)this.right_arm, (Object)this.right_fist, (Object)this.right_coral, (Object)this.left_arm, (Object[])new AdvancedModelBox[]{this.left_fist, this.left_coral, this.coral_shoulder, this.head, this.right_leg, this.left_leg});
+        return ImmutableList.of(this.root, this.lower_body, this.upper_body, this.helmet, this.chest, this.table_coral, this.blue_table_coral, this.red_table_coral, this.right_arm, this.right_fist, this.right_coral, this.left_arm, (Object[])new AdvancedModelBox[]{this.left_fist, this.left_coral, this.coral_shoulder, this.head, this.right_leg, this.left_leg});
     }
 
     public BasicModelPart root() {

@@ -52,7 +52,7 @@ extends HumanoidModel<HumanoidRenderState> {
     }
 
     protected Iterable<ModelPart> bodyParts() {
-        return ImmutableList.of((Object)this.body);
+        return ImmutableList.of(this.body);
     }
 }
 

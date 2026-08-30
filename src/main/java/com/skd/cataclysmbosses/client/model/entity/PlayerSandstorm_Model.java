@@ -53,7 +53,7 @@ extends AdvancedEntityModel<LivingEntity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.root, (Object)this.storm, (Object)this.storm2, (Object)this.storm3, (Object)this.storm4);
+        return ImmutableList.of(this.root, this.storm, this.storm2, this.storm3, this.storm4);
     }
 
     public void setupAnim(LivingEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {

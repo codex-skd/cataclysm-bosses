@@ -75,7 +75,7 @@ extends AdvancedEntityModel<Brontes_Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.root, (Object)this.hammer_head, (Object)this.back, (Object)this.handle, (Object)this.handle2);
+        return ImmutableList.of(this.root, this.hammer_head, this.back, this.handle, this.handle2);
     }
 
     public BasicModelPart root() {

@@ -147,7 +147,7 @@ extends AdvancedEntityModel<Spike_Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.root, (Object)this.body, (Object)this.tail, (Object)this.tail2, (Object)this.l_fin, (Object)this.left_long_fin, (Object)this.right_long_fin, (Object)this.upper_jaw, (Object)this.jaw, (Object)this.head, (Object)this.r_fin);
+        return ImmutableList.of(this.root, this.body, this.tail, this.tail2, this.l_fin, this.left_long_fin, this.right_long_fin, this.upper_jaw, this.jaw, this.head, this.r_fin);
     }
 
     public BasicModelPart root() {

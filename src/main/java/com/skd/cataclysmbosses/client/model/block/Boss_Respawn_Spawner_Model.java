@@ -71,7 +71,7 @@ extends AdvancedEntityModel<Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.root, (Object)this.bone, (Object)this.one, (Object)this.two, (Object)this.three, (Object)this.four, (Object)this.bone2, (Object)this.bone3);
+        return ImmutableList.of(this.root, this.bone, this.one, this.two, this.three, this.four, this.bone2, this.bone3);
     }
 
     public void setupAnim(Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
