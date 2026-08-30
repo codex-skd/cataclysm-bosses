@@ -41,7 +41,7 @@ extends Block {
         BlockEntity blockentity = level.getBlockEntity(pos.above());
         if (blockentity instanceof Cataclysm_Skull_BlockEntity) {
             Cataclysm_Skull_BlockEntity cataclysmSkullBlock = (Cataclysm_Skull_BlockEntity)blockentity;
-            cir.setReturnValue((Object)cataclysmSkullBlock.getNoteBlockSound());
+            cir.setReturnValue(cataclysmSkullBlock.getNoteBlockSound());
         }
     }
 }

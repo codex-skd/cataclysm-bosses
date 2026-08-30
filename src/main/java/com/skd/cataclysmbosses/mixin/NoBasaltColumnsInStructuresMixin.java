@@ -34,7 +34,7 @@ public class NoBasaltColumnsInStructuresMixin {
         }
         WorldGenRegion worldGenRegion = (WorldGenRegion)levelAccessor;
         if (MixinUtils.isPositionInTaggedStructure(worldGenRegion, (BlockPos)mutableBlockPos, ModTag.BLOCKED_BASALT)) {
-            cir.setReturnValue((Object)false);
+            cir.setReturnValue(false);
         }
     }
 }

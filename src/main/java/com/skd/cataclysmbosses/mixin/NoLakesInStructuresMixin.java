@@ -36,7 +36,7 @@ public class NoLakesInStructuresMixin {
         }
         WorldGenRegion worldGenRegion = (WorldGenRegion)worldGenLevel;
         if (MixinUtils.isPositionInTaggedStructure(worldGenRegion, context.origin(), ModTag.BLOCKED_LAKE)) {
-            cir.setReturnValue((Object)false);
+            cir.setReturnValue(false);
         }
     }
 }

@@ -36,7 +36,7 @@ public class NoMultifaceGrowthFeatureInStructuresMixin {
         }
         WorldGenRegion worldGenRegion = (WorldGenRegion)worldGenLevel;
         if (MixinUtils.isPositionInTaggedStructure(worldGenRegion, context.origin(), ModTag.BLOCKED_MULTIFACE)) {
-            cir.setReturnValue((Object)false);
+            cir.setReturnValue(false);
         }
     }
 }

@@ -36,7 +36,7 @@ public class NoMagmaBlockInStructuresMixin {
         }
         WorldGenRegion worldGenRegion = (WorldGenRegion)worldGenLevel;
         if (MixinUtils.isPositionInTaggedStructure(worldGenRegion, context.origin(), ModTag.BLOCKED_MAGMA_BLOCK)) {
-            cir.setReturnValue((Object)false);
+            cir.setReturnValue(false);
         }
     }
 }
