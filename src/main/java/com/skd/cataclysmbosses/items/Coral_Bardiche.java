@@ -49,7 +49,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Position;
-import net.minecraft.core.component.DataComponentType;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -94,7 +93,7 @@ RangeTool {
     }
 
     public static Tool createToolProperties() {
-        return new Tool(List.of(), 1.0f, 2);
+        return new Tool(List.of(), 1.0f, 2, true);
     }
 
     public boolean canAttackBlock(BlockState p_43409_, Level p_43410_, BlockPos p_43411_, Player p_43412_) {
@@ -115,9 +114,9 @@ RangeTool {
             Player player = (Player)p_43396_;
             int i = this.getUseDuration(p_43394_, p_43396_) - p_43397_;
             if (!(i < 10 || (f = EnchantmentHelper.getTridentSpinAttackStrength((ItemStack)p_43394_, (LivingEntity)player)) > 0.0f && !player.isInWaterOrRain() || Coral_Bardiche.isTooDamagedToUse(p_43394_))) {
-                Holder holder = EnchantmentHelper.pickHighestLevel((ItemStack)p_43394_, (DataComponentType)EnchantmentEffectComponents.TRIDENT_SOUND).orElse(SoundEvents.TRIDENT_THROW);
+                Holder<SoundEvent> holder = EnchantmentHelper.pickHighestLevel((ItemStack)p_43394_, EnchantmentEffectComponents.TRIDENT_SOUND).orElse(SoundEvents.TRIDENT_THROW);
                 if (!p_43395_.isClientSide()) {
-                    p_43394_.hurtAndBreak(1, (LivingEntity)player, LivingEntity.getSlotForHand((InteractionHand)p_43396_.getUsedItemHand()));
+                    p_43394_.hurtAndBreak(1, (LivingEntity)player, EquipmentSlot.MAINHAND);
                     if (f == 0.0f) {
                         ThrownCoral_Bardiche_Entity throwntrident = new ThrownCoral_Bardiche_Entity(p_43395_, (LivingEntity)player, p_43394_);
                         throwntrident.shootFromRotation((Entity)player, player.getXRot(), player.getYRot(), 0.0f, 2.5f, 1.0f);
@@ -131,7 +130,7 @@ RangeTool {
                         }
                     }
                 }
-                player.awardStat(Stats.ITEM_USED.get((Object)this));
+                player.awardStat(Stats.ITEM_USED.get(this));
                 if (f > 0.0f) {
                     float f7 = player.getYRot();
                     float f1 = player.getXRot();
@@ -156,7 +155,7 @@ RangeTool {
         ItemStack itemstack = p_43406_.getItemInHand(p_43407_);
         InteractionHand otherhand = p_43407_ == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
         ItemStack otheritem = p_43406_.getItemInHand(otherhand);
-        if (otheritem.canPerformAction(ItemAbilities.SHIELD_BLOCK) && !p_43406_.getCooldowns().isOnCooldown(otheritem.getItem())) {
+        if (otheritem.has(net.minecraft.core.component.DataComponents.BLOCKS_ATTACKS) && !p_43406_.getCooldowns().isOnCooldown(otheritem)) {
             return InteractionResult.FAIL;
         }
         if (Coral_Bardiche.isTooDamagedToUse(itemstack)) {

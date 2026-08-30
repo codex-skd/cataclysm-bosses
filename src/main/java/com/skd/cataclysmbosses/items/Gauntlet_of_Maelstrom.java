@@ -50,12 +50,14 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.ItemUseAnimation;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.neoforged.neoforge.common.ItemAbility;
 import net.neoforged.neoforge.common.ItemAbilities;
 
 public class Gauntlet_of_Maelstrom
@@ -76,7 +78,7 @@ extends Cataclysm_Weapon {
         ItemStack item = p_77659_2_.getItemInHand(p_77659_3_);
         InteractionHand otherhand = p_77659_3_ == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
         ItemStack otheritem = p_77659_2_.getItemInHand(otherhand);
-        if (otheritem.canPerformAction(ItemAbilities.SHIELD_BLOCK) && !p_77659_2_.getCooldowns().isOnCooldown(otheritem.getItem())) {
+        if (otheritem.has(net.minecraft.core.component.DataComponents.BLOCKS_ATTACKS) && !p_77659_2_.getCooldowns().isOnCooldown(otheritem)) {
             return InteractionResult.FAIL;
         }
         p_77659_2_.startUsingItem(p_77659_3_);
@@ -97,7 +99,7 @@ extends Cataclysm_Weapon {
                 }
                 if (hasSucceeded) {
                     player.getCooldowns().addCooldown(this.getDefaultInstance(), CMCommonConfig.GauntletOfMaelstrom.cooldown);
-                    player.awardStat(Stats.ITEM_USED.get((Object)this));
+                    player.awardStat(Stats.ITEM_USED.get(this));
                 }
             }
         }
@@ -144,8 +146,8 @@ extends Cataclysm_Weapon {
         return !player.isCreative();
     }
 
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flags) {
-        tooltip.add((Component)Component.translatable((String)"item.cataclysm.gauntlet_of_maelstrom.desc").withStyle(ChatFormatting.DARK_GREEN));
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, java.util.function.Consumer<Component> builder, TooltipFlag flags) {
+        builder.accept((Component)Component.translatable((String)"item.cataclysm.gauntlet_of_maelstrom.desc").withStyle(ChatFormatting.DARK_GREEN));
     }
 }
 

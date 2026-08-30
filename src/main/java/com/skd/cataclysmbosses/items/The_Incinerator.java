@@ -53,13 +53,14 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.ItemUseAnimation;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.ItemAbility;
+import net.neoforged.neoforge.common.ItemAbilities;
 
 public class The_Incinerator
 extends Cataclysm_Weapon {
@@ -114,7 +115,7 @@ extends Cataclysm_Weapon {
         ItemStack item = p_77659_2_.getItemInHand(p_77659_3_);
         InteractionHand otherhand = p_77659_3_ == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
         ItemStack otheritem = p_77659_2_.getItemInHand(otherhand);
-        if (otheritem.canPerformAction(ItemAbilities.SHIELD_BLOCK) && !p_77659_2_.getCooldowns().isOnCooldown(otheritem.getItem())) {
+        if (otheritem.has(net.minecraft.core.component.DataComponents.BLOCKS_ATTACKS) && !p_77659_2_.getCooldowns().isOnCooldown(otheritem)) {
             return InteractionResult.FAIL;
         }
         p_77659_2_.startUsingItem(p_77659_3_);
@@ -172,13 +173,13 @@ extends Cataclysm_Weapon {
     }
 
     public boolean canPerformAction(ItemStack stack, ItemAbility itemAbility) {
-        return ItemAbilities.DEFAULT_SWORD_ACTIONS.contains(itemAbility);
+        return false; // TODO 26.2: shield blocking is the DataComponents.BLOCKS_ATTACKS component on Item.Properties now, not this override
     }
 
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flags) {
-        tooltip.add((Component)Component.translatable((String)"item.cataclysm.incinerator.desc").withStyle(ChatFormatting.DARK_GREEN));
-        tooltip.add((Component)Component.translatable((String)"item.cataclysm.incinerator2.desc").withStyle(ChatFormatting.DARK_GREEN));
-        tooltip.add((Component)Component.translatable((String)"item.cataclysm.incinerator3.desc").withStyle(ChatFormatting.DARK_GREEN));
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, java.util.function.Consumer<Component> builder, TooltipFlag flags) {
+        builder.accept((Component)Component.translatable((String)"item.cataclysm.incinerator.desc").withStyle(ChatFormatting.DARK_GREEN));
+        builder.accept((Component)Component.translatable((String)"item.cataclysm.incinerator2.desc").withStyle(ChatFormatting.DARK_GREEN));
+        builder.accept((Component)Component.translatable((String)"item.cataclysm.incinerator3.desc").withStyle(ChatFormatting.DARK_GREEN));
     }
 }
 

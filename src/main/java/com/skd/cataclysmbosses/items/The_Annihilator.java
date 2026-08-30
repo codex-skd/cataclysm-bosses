@@ -50,6 +50,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.ItemUseAnimation;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -101,7 +102,7 @@ extends Cataclysm_Weapon {
         double radius = 6.0;
         ScreenShake_Entity.ScreenShake(world, caster.position(), 30.0f, 0.1f, 0, 30);
         world.playSound(null, caster.getX(), caster.getY(), caster.getZ(), (SoundEvent)ModSounds.EXPLOSION.get(), SoundSource.PLAYERS, 1.5f, 1.0f / (caster.getRandom().nextFloat() * 0.4f + 0.8f));
-        List list = world.getEntities((Entity)caster, caster.getBoundingBox().inflate(radius, radius, radius));
+        List<Entity> list = world.getEntities((Entity)caster, caster.getBoundingBox().inflate(radius, radius, radius));
         for (Entity entity : list) {
             if (!(entity instanceof LivingEntity)) continue;
             entity.hurt(world.damageSources().mobAttack(caster), (float)caster.getAttributeValue(Attributes.ATTACK_DAMAGE) * 2.0f);
@@ -151,9 +152,9 @@ extends Cataclysm_Weapon {
         return !player.isCreative();
     }
 
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltips, TooltipFlag flags) {
-        tooltips.add((Component)Component.translatable((String)"item.cataclysm.annihilator.desc").withStyle(ChatFormatting.DARK_GREEN));
-        tooltips.add((Component)Component.translatable((String)"item.cataclysm.annihilator2.desc").withStyle(ChatFormatting.DARK_GREEN));
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, java.util.function.Consumer<Component> builder, TooltipFlag flags) {
+        builder.accept((Component)Component.translatable((String)"item.cataclysm.annihilator.desc").withStyle(ChatFormatting.DARK_GREEN));
+        builder.accept((Component)Component.translatable((String)"item.cataclysm.annihilator2.desc").withStyle(ChatFormatting.DARK_GREEN));
     }
 }
 

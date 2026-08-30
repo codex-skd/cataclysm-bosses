@@ -50,7 +50,7 @@ import net.minecraft.world.phys.HitResult;
 
 public class ModernRemantBucket
 extends MobBucketItem {
-    public ModernRemantBucket(EntityType<?> fishTypeIn, Fluid fluid, Item.Properties builder) {
+    public ModernRemantBucket(EntityType<? extends net.minecraft.world.entity.Mob> fishTypeIn, Fluid fluid, Item.Properties builder) {
         super(fishTypeIn, fluid, SoundEvents.BUCKET_EMPTY_FISH, builder.stacksTo(1));
     }
 
@@ -69,7 +69,7 @@ extends MobBucketItem {
             if (player instanceof ServerPlayer) {
                 CriteriaTriggers.PLACED_BLOCK.trigger((ServerPlayer)player, blockPos, itemStack);
             }
-            player.awardStat(Stats.ITEM_USED.get((Object)this));
+            player.awardStat(Stats.ITEM_USED.get(this));
             ItemStack emptyResult = ModernRemantBucket.getEmptySuccessItem(itemStack, player);
             if (emptyResult != itemStack) {
                 player.setItemInHand(interactionHand, emptyResult);

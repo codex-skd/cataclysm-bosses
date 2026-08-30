@@ -60,6 +60,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.BlockGetter;
@@ -76,7 +77,7 @@ extends Item {
     public void hurtEnemy(ItemStack heldItemStack, LivingEntity target, LivingEntity attacker) {
         if (!target.level().isClientSide()) {
             target.playSound((SoundEvent)ModSounds.HAMMERTIME.get(), 0.5f, 0.5f);
-            target.knockback(1.0, attacker.getX() - target.getX(), attacker.getZ() - target.getZ());
+            target.push(attacker.getX() - target.getX(), 0.0, attacker.getZ() - target.getZ());
         }
         return;
     }
@@ -124,11 +125,13 @@ extends Item {
             ScreenShake_Entity.ScreenShake((Level)serverLevel, player.position(), 30.0f, 0.1f, 0, 30);
             DamageSource shredderDamage = serverLevel.damageSources().playerAttack(player);
             float basedmg = AttributeUtils.OriginDamage((LivingEntity)player, context.getItemInHand());
-            List list = serverLevel.getEntities((Entity)player, player.getBoundingBox().inflate(radius));
+            List<Entity> list = serverLevel.getEntities((Entity)player, player.getBoundingBox().inflate(radius));
             for (Entity entity : list) {
-                float enchanteddmg;
                 LivingEntity living;
-                if (!(entity instanceof LivingEntity) || !(living = (LivingEntity)entity).hurt(shredderDamage, enchanteddmg = EnchantmentHelper.modifyDamage((ServerLevel)serverLevel, (ItemStack)context.getItemInHand(), (Entity)living, (DamageSource)shredderDamage, (float)basedmg))) continue;
+                if (!(entity instanceof LivingEntity)) continue;
+                living = (LivingEntity)entity;
+                float enchanteddmg = EnchantmentHelper.modifyDamage((ServerLevel)serverLevel, (ItemStack)context.getItemInHand(), (Entity)living, (DamageSource)shredderDamage, (float)basedmg);
+                living.hurt(shredderDamage, enchanteddmg);
                 living.setDeltaMovement(living.getDeltaMovement().multiply(0.5, 1.0, 0.5).add(0.0, 0.6, 0.0));
                 if (!berserk) continue;
                 living.igniteForSeconds(5.0f);
@@ -173,10 +176,9 @@ extends Item {
         return 16;
     }
 
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flags) {
-        super.appendHoverText(stack, context, tooltip, flags);
-        tooltip.add((Component)Component.translatable((String)"item.cataclysm.infernal_forge.desc").withStyle(ChatFormatting.DARK_GREEN));
-        tooltip.add((Component)Component.translatable((String)"item.cataclysm.infernal_forge.desc2").withStyle(ChatFormatting.DARK_GREEN));
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, java.util.function.Consumer<Component> builder, TooltipFlag flags) {
+        builder.accept((Component)Component.translatable((String)"item.cataclysm.infernal_forge.desc").withStyle(ChatFormatting.DARK_GREEN));
+        builder.accept((Component)Component.translatable((String)"item.cataclysm.infernal_forge.desc2").withStyle(ChatFormatting.DARK_GREEN));
     }
 }
 

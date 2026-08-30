@@ -45,6 +45,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
@@ -70,7 +71,7 @@ extends Item {
         Vec3 vec3 = p_40623_.getViewVector(1.0f);
         Vec3 vec31 = hitresult.getLocation();
         double d0 = 5.0;
-        List list = p_40622_.getEntities((Entity)p_40623_, p_40623_.getBoundingBox().expandTowards(vec3.scale(5.0)).inflate(1.0), ENTITY_PREDICATE);
+        List<Entity> list = p_40622_.getEntities((Entity)p_40623_, p_40623_.getBoundingBox().expandTowards(vec3.scale(5.0)).inflate(1.0), ENTITY_PREDICATE);
         if (!list.isEmpty()) {
             for (Entity entity : list) {
                 AABB aabb = entity.getBoundingBox().inflate((double)entity.getPickRadius());
@@ -92,14 +93,14 @@ extends Item {
                     itemstack.shrink(1);
                 }
             }
-            p_40623_.awardStat(Stats.ITEM_USED.get((Object)this));
+            p_40623_.awardStat(Stats.ITEM_USED.get(this));
             return p_40622_.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.SUCCESS_SERVER;
         }
         return InteractionResult.PASS;
     }
 
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltips, TooltipFlag flags) {
-        tooltips.add((Component)Component.translatable((String)"item.cataclysm.netherite_effigy.desc").withStyle(ChatFormatting.DARK_GREEN));
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, java.util.function.Consumer<Component> builder, TooltipFlag flags) {
+        builder.accept((Component)Component.translatable((String)"item.cataclysm.netherite_effigy.desc").withStyle(ChatFormatting.DARK_GREEN));
     }
 }
 

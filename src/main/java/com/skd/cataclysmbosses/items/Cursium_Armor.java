@@ -50,8 +50,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.Item;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -67,42 +69,37 @@ implements KeybindUsingArmor {
         return p_41135_.is((Item)ModItems.CURSIUM_INGOT.get());
     }
 
-    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
+    public void inventoryTick(ItemStack stack, ServerLevel level, Entity entity, @javax.annotation.Nullable EquipmentSlot slotId) {
         Player player;
-        block9: {
-            block8: {
-                super.inventoryTick(stack, level, entity, slotId, isSelected);
-                if (!(entity instanceof Player)) break block8;
-                player = (Player)entity;
-                if (level.isClientSide()) break block9;
-            }
+        if (!(entity instanceof Player)) {
             return;
         }
+        player = (Player)entity;
         if (this.type == ArmorType.HELMET && player.getItemBySlot(EquipmentSlot.HEAD) == stack) {
             if (ModKeybind.HELMET_KEY_ABILITY.consumeClick()) {
-                PacketDistributor.sendToServer((CustomPacketPayload)new MessageArmorKey(EquipmentSlot.HEAD.ordinal(), player.getId(), 5), (CustomPacketPayload[])new CustomPacketPayload[0]);
+                PacketDistributor.sendToPlayer((net.minecraft.server.level.ServerPlayer)player, (CustomPacketPayload)new MessageArmorKey(EquipmentSlot.HEAD.ordinal(), player.getId(), 5));
                 this.onKeyPacket(player, stack, 5);
             }
         } else if (this.type == ArmorType.BOOTS && player.getItemBySlot(EquipmentSlot.FEET) == stack && ModKeybind.BOOTS_KEY_ABILITY.consumeClick()) {
-            PacketDistributor.sendToServer((CustomPacketPayload)new MessageArmorKey(EquipmentSlot.FEET.ordinal(), player.getId(), 7), (CustomPacketPayload[])new CustomPacketPayload[0]);
+            PacketDistributor.sendToPlayer((net.minecraft.server.level.ServerPlayer)player, (CustomPacketPayload)new MessageArmorKey(EquipmentSlot.FEET.ordinal(), player.getId(), 7));
             this.onKeyPacket(player, stack, 7);
         }
     }
 
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flags) {
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, java.util.function.Consumer<Component> builder, TooltipFlag flags) {
         if (this.type == ArmorType.HELMET) {
-            tooltip.add((Component)Component.translatable((String)"item.cataclysm.cursium_helmet.desc").withStyle(ChatFormatting.DARK_GREEN));
-            tooltip.add((Component)Component.translatable((String)"item.cataclysm.cursium_helmet.desc2", (Object[])new Object[]{ModKeybind.HELMET_KEY_ABILITY.getTranslatedKeyMessage()}).withStyle(ChatFormatting.DARK_GREEN));
+            builder.accept((Component)Component.translatable((String)"item.cataclysm.cursium_helmet.desc").withStyle(ChatFormatting.DARK_GREEN));
+            builder.accept((Component)Component.translatable((String)"item.cataclysm.cursium_helmet.desc2", (Object[])new Object[]{ModKeybind.HELMET_KEY_ABILITY.getTranslatedKeyMessage()}).withStyle(ChatFormatting.DARK_GREEN));
         } else if (this.type == ArmorType.CHESTPLATE) {
-            tooltip.add((Component)Component.translatable((String)"item.cataclysm.cursium_chestplate.desc").withStyle(ChatFormatting.DARK_GREEN));
-            tooltip.add((Component)Component.translatable((String)"item.cataclysm.cursium_chestplate.desc2").withStyle(ChatFormatting.DARK_GREEN));
-            tooltip.add((Component)Component.translatable((String)"item.cataclysm.cursium_chestplate.desc3").withStyle(ChatFormatting.DARK_GREEN));
+            builder.accept((Component)Component.translatable((String)"item.cataclysm.cursium_chestplate.desc").withStyle(ChatFormatting.DARK_GREEN));
+            builder.accept((Component)Component.translatable((String)"item.cataclysm.cursium_chestplate.desc2").withStyle(ChatFormatting.DARK_GREEN));
+            builder.accept((Component)Component.translatable((String)"item.cataclysm.cursium_chestplate.desc3").withStyle(ChatFormatting.DARK_GREEN));
         } else if (this.type == ArmorType.LEGGINGS) {
-            tooltip.add((Component)Component.translatable((String)"item.cataclysm.cursium_leggings.desc").withStyle(ChatFormatting.DARK_GREEN));
-            tooltip.add((Component)Component.translatable((String)"item.cataclysm.cursium_leggings.desc2").withStyle(ChatFormatting.DARK_GREEN));
+            builder.accept((Component)Component.translatable((String)"item.cataclysm.cursium_leggings.desc").withStyle(ChatFormatting.DARK_GREEN));
+            builder.accept((Component)Component.translatable((String)"item.cataclysm.cursium_leggings.desc2").withStyle(ChatFormatting.DARK_GREEN));
         } else if (this.type == ArmorType.BOOTS) {
-            tooltip.add((Component)Component.translatable((String)"item.cataclysm.cursium_boots.desc").withStyle(ChatFormatting.DARK_GREEN));
-            tooltip.add((Component)Component.translatable((String)"item.cataclysm.cursium_boots.desc2", (Object[])new Object[]{ModKeybind.BOOTS_KEY_ABILITY.getTranslatedKeyMessage()}).withStyle(ChatFormatting.DARK_GREEN));
+            builder.accept((Component)Component.translatable((String)"item.cataclysm.cursium_boots.desc").withStyle(ChatFormatting.DARK_GREEN));
+            builder.accept((Component)Component.translatable((String)"item.cataclysm.cursium_boots.desc2", (Object[])new Object[]{ModKeybind.BOOTS_KEY_ABILITY.getTranslatedKeyMessage()}).withStyle(ChatFormatting.DARK_GREEN));
         }
     }
 
@@ -111,9 +108,9 @@ implements KeybindUsingArmor {
         if (player == null) {
             return;
         }
-        if (type == 5 && !player.getCooldowns().isOnCooldown((Item)ModItems.CURSIUM_HELMET.get())) {
+        if (type == 5 && !player.getCooldowns().isOnCooldown(new ItemStack(ModItems.CURSIUM_HELMET.get()))) {
             boolean targetFound = false;
-            List list = player.level().getEntities((Entity)player, player.getBoundingBox().inflate(24.0));
+            List<Entity> list = player.level().getEntities((Entity)player, player.getBoundingBox().inflate(24.0));
             for (Entity entity : list) {
                 if (!(entity instanceof LivingEntity)) continue;
                 LivingEntity living = (LivingEntity)entity;
@@ -125,7 +122,7 @@ implements KeybindUsingArmor {
                 player.getCooldowns().addCooldown(ModItems.CURSIUM_HELMET.get().getDefaultInstance(), 200);
             }
         }
-        if (type == 7 && player.onGround() && !player.getCooldowns().isOnCooldown((Item)ModItems.CURSIUM_BOOTS.get())) {
+        if (type == 7 && player.onGround() && !player.getCooldowns().isOnCooldown(new ItemStack(ModItems.CURSIUM_BOOTS.get()))) {
             float speed = -1.8f;
             float dodgeYaw = (float)Math.toRadians(player.getYRot() + 90.0f);
             double velX = (double)speed * Math.cos(dodgeYaw);

@@ -51,7 +51,7 @@ public interface ModJukeboxSongs {
     }
 
     private static void register(BootstrapContext<JukeboxSong> context, ResourceKey<JukeboxSong> key, Holder<SoundEvent> sound, float length, int output) {
-        context.register(key, (Object)new JukeboxSong(sound, (Component)Component.translatable((String)Util.makeDescriptionId((String)"jukebox_song", (Identifier)key.location())), length, output));
+        context.register(key, new JukeboxSong(sound, (Component)Component.translatable((String)Util.makeDescriptionId((String)"jukebox_song", key.identifier())), length, output));
     }
 }
 

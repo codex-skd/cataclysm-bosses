@@ -17,8 +17,8 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShieldItem;
-import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.ItemAbility;
+import net.neoforged.neoforge.common.ItemAbilities;
 
 public class Black_Steel_Targe
 extends ShieldItem {
@@ -26,12 +26,12 @@ extends ShieldItem {
         super(properties);
     }
 
-    public boolean isValidRepairItem(ItemStack toRepair, ItemStack repair) {
-        return repair.is((Item)ModItems.BLACK_STEEL_INGOT.get()) || !repair.is(ItemTags.PLANKS) && super.isValidRepairItem(toRepair, repair);
+    public boolean isValidRepairItem(ItemStack repairItem) {
+        return repairItem.is((Item)ModItems.BLACK_STEEL_INGOT.get());
     }
 
     public boolean canPerformAction(ItemStack stack, ItemAbility itemAbility) {
-        return ItemAbilities.DEFAULT_SHIELD_ACTIONS.contains(itemAbility);
+        return false; // TODO 26.2: shield blocking is the DataComponents.BLOCKS_ATTACKS component on Item.Properties now, not this override
     }
 }
 

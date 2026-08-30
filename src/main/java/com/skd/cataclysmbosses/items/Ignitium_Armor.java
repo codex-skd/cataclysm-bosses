@@ -49,9 +49,11 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.item.equipment.ArmorMaterial;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
 
@@ -66,36 +68,31 @@ implements KeybindUsingArmor {
         return p_41135_.is((Item)ModItems.IGNITIUM_INGOT.get());
     }
 
-    public void inventoryTick(ItemStack stack, Level level, Entity entity, int i, boolean held) {
+    public void inventoryTick(ItemStack stack, ServerLevel level, Entity entity, @javax.annotation.Nullable EquipmentSlot slot) {
         Player player;
-        block5: {
-            block4: {
-                super.inventoryTick(stack, level, entity, i, held);
-                if (!(entity instanceof Player)) break block4;
-                player = (Player)entity;
-                if (level.isClientSide()) break block5;
-            }
+        if (!(entity instanceof Player)) {
             return;
         }
+        player = (Player)entity;
         if (this.type == ArmorType.HELMET && player.getItemBySlot(EquipmentSlot.HEAD) == stack && ModKeybind.HELMET_KEY_ABILITY.consumeClick()) {
-            PacketDistributor.sendToServer((CustomPacketPayload)new MessageArmorKey(EquipmentSlot.HEAD.ordinal(), player.getId(), 5), (CustomPacketPayload[])new CustomPacketPayload[0]);
+            PacketDistributor.sendToPlayer((net.minecraft.server.level.ServerPlayer)player, (CustomPacketPayload)new MessageArmorKey(EquipmentSlot.HEAD.ordinal(), player.getId(), 5));
             this.onKeyPacket(player, stack, 5);
         }
     }
 
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltips, TooltipFlag flags) {
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, java.util.function.Consumer<Component> builder, TooltipFlag flags) {
         if (this.type == ArmorType.HELMET) {
-            tooltips.add((Component)Component.translatable((String)"item.cataclysm.ignitium_helmet.desc").withStyle(ChatFormatting.DARK_GREEN));
-            tooltips.add((Component)Component.translatable((String)"item.cataclysm.ignitium_helmet.desc2", (Object[])new Object[]{ModKeybind.HELMET_KEY_ABILITY.getTranslatedKeyMessage()}).withStyle(ChatFormatting.DARK_GREEN));
+            builder.accept((Component)Component.translatable((String)"item.cataclysm.ignitium_helmet.desc").withStyle(ChatFormatting.DARK_GREEN));
+            builder.accept((Component)Component.translatable((String)"item.cataclysm.ignitium_helmet.desc2", (Object[])new Object[]{ModKeybind.HELMET_KEY_ABILITY.getTranslatedKeyMessage()}).withStyle(ChatFormatting.DARK_GREEN));
         }
         if (this.type == ArmorType.CHESTPLATE) {
-            tooltips.add((Component)Component.translatable((String)"item.cataclysm.ignitium_chestplate.desc").withStyle(ChatFormatting.DARK_GREEN));
+            builder.accept((Component)Component.translatable((String)"item.cataclysm.ignitium_chestplate.desc").withStyle(ChatFormatting.DARK_GREEN));
         }
         if (this.type == ArmorType.LEGGINGS) {
-            tooltips.add((Component)Component.translatable((String)"item.cataclysm.ignitium_leggings.desc").withStyle(ChatFormatting.DARK_GREEN));
+            builder.accept((Component)Component.translatable((String)"item.cataclysm.ignitium_leggings.desc").withStyle(ChatFormatting.DARK_GREEN));
         }
         if (this.type == ArmorType.BOOTS) {
-            tooltips.add((Component)Component.translatable((String)"item.cataclysm.ignitium_boots.desc").withStyle(ChatFormatting.DARK_GREEN));
+            builder.accept((Component)Component.translatable((String)"item.cataclysm.ignitium_boots.desc").withStyle(ChatFormatting.DARK_GREEN));
         }
     }
 
@@ -104,9 +101,9 @@ implements KeybindUsingArmor {
         if (player == null) {
             return;
         }
-        if (Type2 == 5 && !player.getCooldowns().isOnCooldown((Item)ModItems.IGNITIUM_HELMET.get())) {
+        if (Type2 == 5 && !player.getCooldowns().isOnCooldown(new ItemStack(ModItems.IGNITIUM_HELMET.get()))) {
             boolean flag = false;
-            List list = player.level().getEntities((Entity)player, player.getBoundingBox().inflate(16.0));
+            List<Entity> list = player.level().getEntities((Entity)player, player.getBoundingBox().inflate(16.0));
             for (Entity entity : list) {
                 if (entity instanceof LivingEntity) {
                     LivingEntity living = (LivingEntity)entity;

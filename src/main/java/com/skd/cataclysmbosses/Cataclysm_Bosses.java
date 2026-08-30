@@ -99,7 +99,6 @@ public class Cataclysm_Bosses {
         ModDataComponents.COMPONENTS.register(bus);
         ModEntityDataSerializers.DEF_REG.register(bus);
         ModItems.ITEMS.register(bus);
-        Armortier.ARMOR_MATERIALS.register(bus);
         ModEffect.EFFECTS.register(bus);
         ModBlocks.BLOCKS.register(bus);
         ModParticle.PARTICLE.register(bus);

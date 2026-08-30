@@ -80,7 +80,7 @@ extends Item {
             p_41184_.playSound((Player)null, p_41185_.getX(), p_41185_.getY(), p_41185_.getZ(), SoundEvents.ENDER_EYE_LAUNCH, SoundSource.NEUTRAL, 0.5f, 0.4f / (p_41184_.getRandom().nextFloat() * 0.4f + 0.8f));
             p_41184_.levelEvent((Player)null, 1003, p_41185_.blockPosition(), 0);
             p_41185_.getCooldowns().addCooldown(this.getDefaultInstance(), 60);
-            p_41185_.awardStat(Stats.ITEM_USED.get((Object)this));
+            p_41185_.awardStat(Stats.ITEM_USED.get(this));
             p_41185_.swing(p_41186_, true);
             return InteractionResult.SUCCESS;
         }

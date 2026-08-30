@@ -33,15 +33,20 @@ public class CataclysmSkullItem
 extends StandingAndWallBlockItem
 { // implements Equipable - removed in 26.2
     public CataclysmSkullItem(Block floorBlock, Block wallBlock, Item.Properties properties) {
-        super(floorBlock, wallBlock, properties, Direction.DOWN);
+        super(floorBlock, wallBlock, Direction.DOWN, properties);
     }
 
     public InteractionResult use(Level level, Player player, InteractionHand hand) {
-        return this.swapWithEquipmentSlot((Item)this, level, player, hand);
+        ItemStack stack = player.getItemInHand(hand);
+        net.minecraft.world.item.equipment.Equippable equippable = stack.get(net.minecraft.core.component.DataComponents.EQUIPPABLE);
+        if (equippable != null && equippable.swappable()) {
+            return equippable.swapWithEquipmentSlot(stack, player);
+        }
+        return InteractionResult.PASS;
     }
 
-    public EquipmentSlot getEquipmentSlot() {
-        return EquipmentSlot.HEAD;
+    public net.minecraft.world.entity.EquipmentSlot getEquipmentSlot(ItemStack stack) {
+        return net.minecraft.world.entity.EquipmentSlot.HEAD;
     }
 }
 

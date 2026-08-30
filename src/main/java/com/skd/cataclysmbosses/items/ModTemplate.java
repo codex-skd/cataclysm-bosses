@@ -24,6 +24,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 
 public class ModTemplate
 extends Item {
@@ -80,14 +81,13 @@ extends Item {
         return List.of(EMPTY_SLOT_INGOT);
     }
 
-    public void appendHoverText(ItemStack p_267313_, Item.TooltipContext p_339591_, List<Component> p_266820_, TooltipFlag p_266857_) {
-        super.appendHoverText(p_267313_, p_339591_, p_266820_, p_266857_);
-        p_266820_.add(this.upgradeDescription);
-        p_266820_.add(CommonComponents.EMPTY);
-        p_266820_.add(APPLIES_TO_TITLE);
-        p_266820_.add((Component)CommonComponents.space().append(this.appliesTo));
-        p_266820_.add(INGREDIENTS_TITLE);
-        p_266820_.add((Component)CommonComponents.space().append(this.ingredients));
+    public void appendHoverText(ItemStack p_267313_, Item.TooltipContext p_339591_, TooltipDisplay display, java.util.function.Consumer<Component> builder, TooltipFlag p_266857_) {
+        builder.accept(this.upgradeDescription);
+        builder.accept(CommonComponents.EMPTY);
+        builder.accept(APPLIES_TO_TITLE);
+        builder.accept((Component)CommonComponents.space().append(this.appliesTo));
+        builder.accept(INGREDIENTS_TITLE);
+        builder.accept((Component)CommonComponents.space().append(this.ingredients));
     }
 
     public Component getBaseSlotDescription() {
@@ -106,7 +106,7 @@ extends Item {
         return this.additionalSlotEmptyIcons;
     }
 
-    public String getDescriptionId() {
+    public String getDescriptionId(ItemStack stack) {
         return DESCRIPTION_ID;
     }
 }

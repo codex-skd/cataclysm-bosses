@@ -49,6 +49,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -65,7 +66,7 @@ extends Item {
     public void hurtEnemy(ItemStack heldItemStack, LivingEntity target, LivingEntity attacker) {
         if (!target.level().isClientSide()) {
             target.playSound((SoundEvent)ModSounds.HAMMERTIME.get(), 0.5f, 0.5f);
-            target.knockback(1.0, attacker.getX() - target.getX(), attacker.getZ() - target.getZ());
+            target.push(attacker.getX() - target.getX(), 0.0, attacker.getZ() - target.getZ());
         }
         return;
     }
@@ -134,9 +135,9 @@ extends Item {
         return false;
     }
 
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flags) {
-        tooltip.add((Component)Component.translatable((String)"item.cataclysm.void_forge.desc").withStyle(ChatFormatting.DARK_GREEN));
-        tooltip.add((Component)Component.translatable((String)"item.cataclysm.void_forge.desc2").withStyle(ChatFormatting.DARK_GREEN));
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, java.util.function.Consumer<Component> builder, TooltipFlag flags) {
+        builder.accept((Component)Component.translatable((String)"item.cataclysm.void_forge.desc").withStyle(ChatFormatting.DARK_GREEN));
+        builder.accept((Component)Component.translatable((String)"item.cataclysm.void_forge.desc2").withStyle(ChatFormatting.DARK_GREEN));
     }
 }
 

@@ -46,7 +46,7 @@ public class ModFishBucket
 extends MobBucketItem {
     private final EntityType<?> type;
 
-    public ModFishBucket(EntityType<?> fishTypeIn, Fluid fluid, Item.Properties builder) {
+    public ModFishBucket(EntityType<? extends net.minecraft.world.entity.Mob> fishTypeIn, Fluid fluid, Item.Properties builder) {
         super(fishTypeIn, fluid, SoundEvents.BUCKET_EMPTY_FISH, builder.stacksTo(1));
         this.type = fishTypeIn;
     }
@@ -62,7 +62,7 @@ extends MobBucketItem {
         Entity entity = this.type.spawn(p_151142_, p_151143_, null, p_151144_, EntitySpawnReason.BUCKET, true, false);
         if (entity instanceof Bucketable) {
             Bucketable bucketable = (Bucketable)entity;
-            CustomData customdata = (CustomData)p_151143_.getOrDefault(DataComponents.BUCKET_ENTITY_DATA, (Object)CustomData.EMPTY);
+            CustomData customdata = (CustomData)p_151143_.getOrDefault(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY);
             bucketable.loadFromBucketTag(customdata.copyTag());
             bucketable.setFromBucket(true);
         }

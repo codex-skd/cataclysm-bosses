@@ -39,10 +39,11 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.ItemUseAnimation;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.ItemAbility;
+import net.neoforged.neoforge.common.ItemAbilities;
 
 public class Bulwark_of_the_flame
 extends Item {
@@ -51,7 +52,7 @@ extends Item {
     }
 
     public boolean canPerformAction(ItemStack stack, ItemAbility itemAbility) {
-        return ItemAbilities.DEFAULT_SHIELD_ACTIONS.contains(itemAbility);
+        return false; // TODO 26.2: shield blocking is the DataComponents.BLOCKS_ATTACKS component on Item.Properties now, not this override
     }
 
     public ItemUseAnimation getUseAnimation(ItemStack p_77661_1_) {
@@ -99,9 +100,9 @@ extends Item {
         return InteractionResult.CONSUME;
     }
 
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltips, TooltipFlag flags) {
-        tooltips.add((Component)Component.translatable((String)"item.cataclysm.bulwark_of_the_flame.desc").withStyle(ChatFormatting.DARK_GREEN));
-        tooltips.add((Component)Component.translatable((String)"item.cataclysm.bulwark_of_the_flame2.desc").withStyle(ChatFormatting.DARK_GREEN));
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, java.util.function.Consumer<Component> builder, TooltipFlag flags) {
+        builder.accept((Component)Component.translatable((String)"item.cataclysm.bulwark_of_the_flame.desc").withStyle(ChatFormatting.DARK_GREEN));
+        builder.accept((Component)Component.translatable((String)"item.cataclysm.bulwark_of_the_flame2.desc").withStyle(ChatFormatting.DARK_GREEN));
     }
 }
 

@@ -91,7 +91,7 @@ implements ILeftClick {
             Level worldIn = playerIn.level();
             Entity closestValid = null;
             Vec3 playerEyes = playerIn.getEyePosition(1.0f);
-            BlockHitResult hitresult = worldIn.clip(new ClipContext(playerEyes, playerEyes.add(playerIn.getLookAngle().scale(16.0)), ClipContext.Block.VISUAL, ClipContext.Fluid.NONE, (Entity)playerIn));
+            net.minecraft.world.phys.HitResult hitresult = worldIn.clip(new ClipContext(playerEyes, playerEyes.add(playerIn.getLookAngle().scale(16.0)), ClipContext.Block.VISUAL, ClipContext.Fluid.NONE, (Entity)playerIn));
             if (hitresult instanceof EntityHitResult) {
                 Entity entity = ((EntityHitResult)hitresult).getEntity();
                 if (!entity.equals((Object)playerIn) && !playerIn.isAlliedTo(entity) && !entity.isAlliedTo((Entity)playerIn) && entity instanceof Mob && playerIn.hasLineOfSight(entity)) {
@@ -140,22 +140,22 @@ implements ILeftClick {
             level.addFreshEntity((Entity)hookshot);
         }
         user.startUsingItem(hand);
-        user.setData(ModDataAttachments.HOOK_FALLING, (Object)true);
+        user.setData(ModDataAttachments.HOOK_FALLING.get(), true);
         return super.use(level, user, hand);
     }
 
     public ItemStack finishUsingItem(ItemStack p_40712_, Level p_40713_, LivingEntity p_40714_) {
-        boolean flag = (Boolean)p_40714_.getData(ModDataAttachments.HOOK_FALLING);
+        boolean flag = (Boolean)p_40714_.getData(ModDataAttachments.HOOK_FALLING.get());
         if (flag) {
-            p_40714_.setData(ModDataAttachments.HOOK_FALLING, (Object)false);
+            p_40714_.setData(ModDataAttachments.HOOK_FALLING.get(), false);
         }
         return super.finishUsingItem(p_40712_, p_40713_, p_40714_);
     }
 
     public boolean releaseUsing(ItemStack stack, Level world, LivingEntity user, int remainingUseTicks) {
-        boolean flag = (Boolean)user.getData(ModDataAttachments.HOOK_FALLING);
+        boolean flag = (Boolean)user.getData(ModDataAttachments.HOOK_FALLING.get());
         if (flag) {
-            user.setData(ModDataAttachments.HOOK_FALLING, (Object)false);
+            user.setData(ModDataAttachments.HOOK_FALLING.get(), false);
         }
         return false;
     }

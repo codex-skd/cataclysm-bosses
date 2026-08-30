@@ -30,7 +30,7 @@ extends Item {
         if (f1 > 0.0f) {
             itemattributemodifiers$builder.add(Attributes.KNOCKBACK_RESISTANCE, new AttributeModifier(resourcelocation, f1, AttributeModifier.Operation.ADD_VALUE), equipmentslotgroup);
         }
-        for (AttributeContainer holder : attributes) {
+        for (AttributeContainer holder : this.attributes) {
             itemattributemodifiers$builder.add(holder.attribute(), holder.createModifier(this.type.getSlot().getName()), equipmentslotgroup);
         }
         return itemattributemodifiers$builder.build();
