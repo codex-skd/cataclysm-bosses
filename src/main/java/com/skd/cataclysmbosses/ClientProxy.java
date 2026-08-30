@@ -46,7 +46,7 @@ extends ServerProxy {
 
     @Override
     public boolean isFirstPersonPlayer(Entity entity) {
-        return entity.equals((Object)Minecraft.getInstance().cameraEntity) && Minecraft.getInstance().options.getCameraType().isFirstPerson();
+        return entity.equals((Object)Minecraft.getInstance().getCameraEntity()) && Minecraft.getInstance().options.getCameraType().isFirstPerson();
     }
 
     @Override
@@ -86,7 +86,7 @@ extends ServerProxy {
                 AbstractTickableSoundInstance old = (AbstractTickableSoundInstance)ENTITY_SOUND_INSTANCE_MAP.get(livingEntity.getId());
                 if (old == null || !(old instanceof MeatShredderSound) || !(shredderSound = (MeatShredderSound)old).isSameEntity(livingEntity)) {
                     sound = new MeatShredderSound(livingEntity);
-                    ENTITY_SOUND_INSTANCE_MAP.put(livingEntity.getId(), (Object)sound);
+                    ENTITY_SOUND_INSTANCE_MAP.put(livingEntity.getId(), sound);
                 } else {
                     sound = (MeatShredderSound)old;
                 }
@@ -102,7 +102,7 @@ extends ServerProxy {
                 AbstractTickableSoundInstance old = (AbstractTickableSoundInstance)ENTITY_SOUND_INSTANCE_MAP.get(sandstom.getId());
                 if (old == null || !(old instanceof SandstormSound) || !(sandstomSound = (SandstormSound)old).isSameEntity(sandstom)) {
                     sound = new SandstormSound(sandstom);
-                    ENTITY_SOUND_INSTANCE_MAP.put(sandstom.getId(), (Object)sound);
+                    ENTITY_SOUND_INSTANCE_MAP.put(sandstom.getId(), sound);
                 } else {
                     sound = (SandstormSound)old;
                 }

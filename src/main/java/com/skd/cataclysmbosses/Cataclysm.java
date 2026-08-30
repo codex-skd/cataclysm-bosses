@@ -1,7 +1,7 @@
 package com.skd.cataclysmbosses;
 
 import net.neoforged.api.distmarker.Dist;
-import net.neoforged.fml.loading.FMLLoader;
+import net.neoforged.fml.loading.FMLEnvironment;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -17,7 +17,7 @@ public class Cataclysm {
     
     static {
         // Initialize proxy based on dist
-        PROXY = FMLLoader.getDist().isClient() ? new ClientProxy() : new ServerProxy();
+        PROXY = FMLEnvironment.getDist().isClient() ? new ClientProxy() : new ServerProxy();
     }
     
     // Prevent instantiation

@@ -19,6 +19,8 @@ import com.skd.cataclysmbosses.client.render.layer.Maledictus_Cicle_Layer;
 import com.skd.cataclysmbosses.client.render.layer.Maledictus_Layer;
 import com.skd.cataclysmbosses.entity.InternalAnimationMonster.IABossMonsters.Maledictus.Maledictus_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
@@ -40,7 +42,6 @@ public class Maledictus_Renderer extends CmEntityRenderer<Maledictus_Entity> {
         // TODO: port render body to 26.2 (old MobRenderer APIs removed)
     }
 
-    @Override
     public Identifier getTextureLocation(Maledictus_Entity entity) {
         return MALEDICTUS_TEXTURES;
     }

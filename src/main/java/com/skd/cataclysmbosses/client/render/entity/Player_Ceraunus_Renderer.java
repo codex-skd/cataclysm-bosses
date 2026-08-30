@@ -78,7 +78,6 @@ public class Player_Ceraunus_Renderer extends CmEntityRenderer<Player_Ceraunus_E
         matrices.popPose();
     }
 
-    @Override
     public Identifier getTextureLocation(Player_Ceraunus_Entity entity) {
         return TEXTURE;
     }

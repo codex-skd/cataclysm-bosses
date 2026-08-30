@@ -26,6 +26,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import java.util.Random;
 import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderState;
 import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
@@ -61,9 +62,10 @@ extends CmEntityRenderer<Void_Rune_Entity> {
         matrixStackIn.popPose();
     }
 
-    public Vec3 getRenderOffset(Void_Rune_Entity entityIn, float partialTicks) {
+    public Vec3 getRenderOffset(CmEntityRenderState state) {
+        Void_Rune_Entity entityIn = (Void_Rune_Entity) state.entity;
         if (entityIn.activateProgress == 10.0f) {
-            return super.getRenderOffset((Entity)entityIn, partialTicks);
+            return super.getRenderOffset(state);
         }
         double d0 = 0.02;
         return new Vec3(this.rnd.nextGaussian() * d0, 0.0, this.rnd.nextGaussian() * d0);

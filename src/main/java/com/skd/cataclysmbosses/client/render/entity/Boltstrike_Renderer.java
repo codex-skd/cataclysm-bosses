@@ -69,7 +69,7 @@ extends CmEntityRenderer<Bolt_strike_Entity> {
             if (!Minecraft.getInstance().isPaused()) {
                 lightningRender.update((Object)entity, bolt1, partialTicks);
             }
-            lightningRender.render(partialTicks, poseStack, p_115270_);
+            lightningRender.render(partialTicks, poseStack, (net.minecraft.client.renderer.SubmitNodeCollector) null);
             poseStack.popPose();
         }
         if (entity.isRemoved() && this.lightningRenderMap.containsKey(entity.getUUID())) {

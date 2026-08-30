@@ -27,7 +27,7 @@ extends ArrowRenderer<Void_Scatter_Arrow_Entity, ArrowRenderState> {
         super(renderManagerIn);
     }
 
-    public Identifier getTextureLocation(Void_Scatter_Arrow_Entity entity) {
+    public Identifier getTextureLocation(ArrowRenderState state) {
         return TEXTURE;
     }
 }

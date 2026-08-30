@@ -64,7 +64,7 @@ extends CmEntityRenderer<Scylla_Ceraunus_Entity> {
     }
 
     public boolean shouldRender(Scylla_Ceraunus_Entity entity, Frustum camera, double camX, double camY, double camZ) {
-        if (super.shouldRender((Entity)entity, camera, camX, camY, camZ)) {
+        if (super.shouldRender(entity, camera, camX, camY, camZ)) {
             return true;
         }
         Entity weapon = entity.getController();

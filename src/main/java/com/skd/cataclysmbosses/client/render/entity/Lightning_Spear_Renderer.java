@@ -23,6 +23,7 @@ import com.skd.cataclysmbosses.entity.projectile.Lightning_Spear_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderState;
 import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
@@ -52,9 +53,10 @@ extends CmEntityRenderer<Lightning_Spear_Entity> {
     protected void render(Lightning_Spear_Entity entity, float partialTicks, PoseStack poseStack, CmMultiBufferSource buffer, int packedLight) {
         poseStack.pushPose();
         poseStack.scale(-1.0f, -1.0f, 1.0f);
-        float f = Mth.rotLerp((float)partialTicks, (float)entity.yRotO, (float)entity.getYRot());
-        float f1 = Mth.lerp((float)partialTicks, (float)entity.xRotO, (float)entity.getXRot());
-        this.model.setupAnim(entity, 0.0f, 0.0f, (float)entity.tickCount + partialTicks, f, f1);
+        CmEntityRenderState state = new CmEntityRenderState();
+        state.entity = entity;
+        state.partialTick = partialTicks;
+        this.model.setupAnim(state);
         VertexConsumer vertexconsumer = buffer.getBuffer(CMRenderTypes.CMEyes(this.getTextureLocation(entity)));
         this.model.renderToBuffer(poseStack, vertexconsumer, packedLight, OverlayTexture.NO_OVERLAY, -1);
         poseStack.popPose();

@@ -28,6 +28,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -43,12 +44,14 @@ extends CmEntityRenderer<Blazing_Bone_Entity> {
     protected void render(Blazing_Bone_Entity entity, float partialTicks, PoseStack stack, CmMultiBufferSource buffer, int light) {
         stack.pushPose();
         float spin = ((float)entity.tickCount + partialTicks) * 30.0f;
+        float yaw = Mth.rotLerp(partialTicks, entity.yRotO, entity.getYRot());
         stack.scale(1.25f, 1.25f, 1.25f);
         stack.pushPose();
         stack.mulPose(Axis.YP.rotationDegrees(yaw + 90.0f));
         stack.mulPose(Axis.ZP.rotationDegrees(spin));
         stack.translate(0.0f, 0.0f, 0.0f);
-        Minecraft.getInstance().getItemRenderer().renderStatic(entity.getItem(), ItemDisplayContext.GROUND, light, OverlayTexture.NO_OVERLAY, stack, buffer, entity.level(), entity.getId());
+        // PORT TODO(26.2): re-wire item render
+        // Minecraft.getInstance().getItemRenderer().renderStatic(entity.getItem(), ItemDisplayContext.GROUND, light, OverlayTexture.NO_OVERLAY, stack, buffer, entity.level(), entity.getId());
         stack.popPose();
         stack.popPose();
     }

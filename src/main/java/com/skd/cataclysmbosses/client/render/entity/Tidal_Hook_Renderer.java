@@ -56,7 +56,7 @@ extends CmEntityRenderer<Tidal_Hook_Entity> {
     private final Tidal_Hook_Model model = new Tidal_Hook_Model();
     private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/tidal_hook.png");
     private static final Identifier CHAIN_TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/tidal_hook_chain.png");
-    private static final RenderType CHAIN_LAYER = RenderType.entitySmoothCutout((Identifier)CHAIN_TEXTURE);
+    private static final RenderType CHAIN_LAYER = RenderTypes.entityCutout((Identifier)CHAIN_TEXTURE);
 
     public Tidal_Hook_Renderer(EntityRendererProvider.Context renderManagerIn) {
         super(renderManagerIn);
@@ -67,7 +67,7 @@ extends CmEntityRenderer<Tidal_Hook_Entity> {
     }
 
     public boolean shouldRender(Tidal_Hook_Entity entity, Frustum camera, double camX, double camY, double camZ) {
-        if (super.shouldRender((Entity)entity, camera, camX, camY, camZ)) {
+        if (super.shouldRender(entity, camera, camX, camY, camZ)) {
             return true;
         }
         Entity weapon = entity.getOwner();
@@ -99,7 +99,7 @@ extends CmEntityRenderer<Tidal_Hook_Entity> {
             double d2 = (double)i * 0.35;
             if ((this.entityRenderDispatcher.options == null || this.entityRenderDispatcher.options.getCameraType().isFirstPerson()) && player == Minecraft.getInstance().player) {
                 double d7 = 960.0 / (double)((Integer)this.entityRenderDispatcher.options.fov().get()).intValue();
-                Vec3 vec3 = this.entityRenderDispatcher.camera.getNearPlane().getPointOnPlane((float)i * 0.6f, -1.0f);
+                Vec3 vec3 = this.entityRenderDispatcher.camera.getNearPlane(this.entityRenderDispatcher.camera.getFov()).getPointOnPlane((float)i * 0.6f, -1.0f);
                 vec3 = vec3.scale(d7);
                 vec3 = vec3.yRot(f1 * 0.25f);
                 vec3 = vec3.xRot(-f1 * 0.35f);

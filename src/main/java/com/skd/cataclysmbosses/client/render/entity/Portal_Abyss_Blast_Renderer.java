@@ -106,7 +106,7 @@ extends CmEntityRenderer<Portal_Abyss_Blast_Entity> {
 
     private void renderEnd(int frame, Direction side, PoseStack matrixStackIn, VertexConsumer builder, int packedLightIn) {
         matrixStackIn.pushPose();
-        Quaternionf quat = this.entityRenderDispatcher.cameraOrientation();
+        Quaternionf quat = this.entityRenderDispatcher.camera.rotation();
         matrixStackIn.mulPose(quat);
         this.renderFlatQuad(frame, matrixStackIn, builder, packedLightIn);
         matrixStackIn.popPose();
@@ -142,13 +142,13 @@ extends CmEntityRenderer<Portal_Abyss_Blast_Entity> {
         matrixStackIn.mulPose(new Quaternionf().rotationX(-pitch * ((float)Math.PI / 180)));
         matrixStackIn.pushPose();
         if (!this.clearerView) {
-            matrixStackIn.mulPose(new Quaternionf().rotationY(Minecraft.getInstance().gameRenderer.getMainCamera().getXRot() + 90.0f));
+            matrixStackIn.mulPose(new Quaternionf().rotationY(Minecraft.getInstance().getEntityRenderDispatcher().camera.xRot() + 90.0f));
         }
         this.drawBeam(length, frame, matrixStackIn, builder, packedLightIn);
         matrixStackIn.popPose();
         if (!this.clearerView) {
             matrixStackIn.pushPose();
-            matrixStackIn.mulPose(new Quaternionf().rotationY((-Minecraft.getInstance().gameRenderer.getMainCamera().getXRot() - 90.0f) * ((float)Math.PI / 180)));
+            matrixStackIn.mulPose(new Quaternionf().rotationY((-Minecraft.getInstance().getEntityRenderDispatcher().camera.xRot() - 90.0f) * ((float)Math.PI / 180)));
             this.drawBeam(length, frame, matrixStackIn, builder, packedLightIn);
             matrixStackIn.popPose();
         }

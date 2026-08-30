@@ -68,7 +68,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.IConfigSpec;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.fml.loading.FMLLoader;
+import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
@@ -84,7 +84,7 @@ public class Cataclysm_Bosses {
     public Cataclysm_Bosses(IEventBus bus, Dist dist, ModContainer modContainer) {
         bus.addListener(this::setup);
         bus.addListener(this::setupPackets);
-        PROXY = FMLLoader.getDist().isClient() ? new ClientProxy() : new ServerProxy();
+        PROXY = FMLEnvironment.getDist().isClient() ? new ClientProxy() : new ServerProxy();
         ModGroup.DEF_REG.register(bus);
         bus.addListener(this::setupEntityModelLayers);
         bus.addListener(ConfigHolder::onModConfigLoadingEvent);

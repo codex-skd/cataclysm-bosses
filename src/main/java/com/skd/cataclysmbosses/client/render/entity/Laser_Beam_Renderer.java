@@ -22,6 +22,7 @@ import com.skd.cataclysmbosses.entity.projectile.Laser_Beam_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderState;
 import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -47,9 +48,10 @@ extends CmEntityRenderer<Laser_Beam_Entity> {
     protected void render(Laser_Beam_Entity entity, float partialTicks, PoseStack poseStack, CmMultiBufferSource buffer, int packedLight) {
         poseStack.pushPose();
         poseStack.scale(-1.0f, -1.0f, 1.0f);
-        float f = Mth.rotLerp((float)partialTicks, (float)entity.yRotO, (float)entity.getYRot());
-        float f1 = Mth.lerp((float)partialTicks, (float)entity.xRotO, (float)entity.getXRot());
-        this.model.setupAnim(f, f1);
+        CmEntityRenderState state = new CmEntityRenderState();
+        state.entity = entity;
+        state.partialTick = partialTicks;
+        this.model.setupAnim(state);
         VertexConsumer vertexconsumer = buffer.getBuffer(RENDER_TYPE_RED);
         this.model.renderToBuffer(poseStack, vertexconsumer, packedLight, OverlayTexture.NO_OVERLAY, -1);
         poseStack.popPose();

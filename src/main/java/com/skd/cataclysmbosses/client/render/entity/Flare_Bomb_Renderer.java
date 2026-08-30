@@ -27,6 +27,7 @@ import com.skd.cataclysmbosses.entity.projectile.Flare_Bomb_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderState;
 import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
@@ -57,9 +58,13 @@ extends CmEntityRenderer<Flare_Bomb_Entity> {
 
     protected void render(Flare_Bomb_Entity entityIn, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
         matrixStackIn.pushPose();
+        float entityYaw = Mth.rotLerp(partialTicks, entityIn.yRotO, entityIn.getYRot());
         matrixStackIn.mulPose(new Quaternionf().setAngleAxis(entityYaw * ((float)Math.PI / 180), 0.0f, -1.0f, 0.0f));
         VertexConsumer VertexConsumer2 = bufferIn.getBuffer(CMRenderTypes.CMEyes(this.getTextureLocation(entityIn)));
-        this.model.setupAnim(entityIn, 0.0f, 0.0f, (float)entityIn.tickCount + partialTicks, 0.0f, 0.0f);
+        CmEntityRenderState state = new CmEntityRenderState();
+        state.entity = entityIn;
+        state.partialTick = partialTicks;
+        this.model.setupAnim(state);
         this.model.renderToBuffer(matrixStackIn, VertexConsumer2, packedLightIn, OverlayTexture.NO_OVERLAY, -1);
         VertexConsumer VertexConsumer22 = bufferIn.getBuffer(CMRenderTypes.CMEyes(OUTER_TEXTURES));
         int i = ARGB.color((int)102, (int)255, (int)255, (int)255);

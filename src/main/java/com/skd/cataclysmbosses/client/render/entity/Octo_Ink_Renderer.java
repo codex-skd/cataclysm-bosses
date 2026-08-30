@@ -34,7 +34,6 @@ extends CmEntityRenderer<Octo_Ink_Entity> {
         // TODO: Implement octo ink rendering
     }
 
-    @Override
     public Identifier getTextureLocation(Octo_Ink_Entity entity) {
         return Identifier.fromNamespaceAndPath("cataclysm", "textures/entity/octo_ink.png");
     }

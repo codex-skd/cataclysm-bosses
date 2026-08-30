@@ -58,10 +58,11 @@ extends CmEntityRenderer<Eye_Of_Dungeon_Entity> {
     }
 
     protected void render(Eye_Of_Dungeon_Entity entityIn, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
-        if (entityIn.tickCount >= 2 || !(this.entityRenderDispatcher.camera.getEntity().distanceToSqr((Entity)entityIn) < 12.25)) {
+        if (entityIn.tickCount >= 2 || !(this.entityRenderDispatcher.camera.entity().distanceToSqr((Entity)entityIn) < 12.25)) {
             matrixStackIn.pushPose();
-            matrixStackIn.mulPose(this.entityRenderDispatcher.cameraOrientation());
-            this.itemModelResolver.renderItem(entityIn.getItem(), ItemDisplayContext.GROUND, packedLightIn, OverlayTexture.NO_OVERLAY, matrixStackIn, bufferIn, entityIn.level(), entityIn.getId());
+            matrixStackIn.mulPose(this.entityRenderDispatcher.camera.rotation());
+            // PORT TODO(26.2): re-wire item render
+            // this.itemModelResolver.renderItem(entityIn.getItem(), ItemDisplayContext.GROUND, packedLightIn, OverlayTexture.NO_OVERLAY, matrixStackIn, bufferIn, entityIn.level(), entityIn.getId());
             matrixStackIn.popPose();
             if (entityIn.hasTrail()) {
                 double x = Mth.lerp((double)partialTicks, (double)entityIn.xOld, (double)entityIn.getX());

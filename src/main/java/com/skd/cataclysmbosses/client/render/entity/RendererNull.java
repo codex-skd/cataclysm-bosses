@@ -25,6 +25,11 @@ extends EntityRenderer<Entity, EntityRenderState> {
         super(renderManagerIn);
     }
 
+    @Override
+    public EntityRenderState createRenderState() {
+        return new EntityRenderState();
+    }
+
     public Identifier getTextureLocation(Entity entity) {
         return null;
     }

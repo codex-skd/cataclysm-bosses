@@ -17,6 +17,8 @@ import com.skd.cataclysmbosses.client.model.entity.Netherite_Ministrosity_Model;
 import com.skd.cataclysmbosses.client.render.layer.Netherite_Ministrosity_Layer;
 import com.skd.cataclysmbosses.entity.Pet.Netherite_Ministrosity_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
@@ -38,7 +40,6 @@ public class Netherite_Ministrosity_Renderer extends CmEntityRenderer<Netherite_
         // TODO: port render body to 26.2 (old MobRenderer APIs removed)
     }
 
-    @Override
     public Identifier getTextureLocation(Netherite_Ministrosity_Entity entity) {
         return NETHER_MINISTROSITY_TEXTURES;
     }

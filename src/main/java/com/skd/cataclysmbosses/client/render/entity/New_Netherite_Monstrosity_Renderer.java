@@ -22,6 +22,8 @@ import com.skd.cataclysmbosses.client.render.layer.Netherite_Monstrosity_Layer2;
 import com.skd.cataclysmbosses.entity.InternalAnimationMonster.IABossMonsters.NewNetherite_Monstrosity.Netherite_Monstrosity_Entity;
 import com.skd.cataclysmbosses.entity.InternalAnimationMonster.IABossMonsters.NewNetherite_Monstrosity.Netherite_Monstrosity_Part;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -45,7 +47,6 @@ public class New_Netherite_Monstrosity_Renderer extends CmEntityRenderer<Netheri
         // TODO: port render body to 26.2 (old MobRenderer APIs removed)
     }
 
-    @Override
     public Identifier getTextureLocation(Netherite_Monstrosity_Entity entity) {
         return NETHER_MONSTROSITY_TEXTURES;
     }

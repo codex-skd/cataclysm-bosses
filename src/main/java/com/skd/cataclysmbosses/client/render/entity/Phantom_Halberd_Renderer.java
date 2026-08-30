@@ -48,8 +48,8 @@ extends CmEntityRenderer<Phantom_Halberd_Entity> {
     private static final Identifier PHANTOM_HALBERD = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/maledictus/phantom_halberd.png");
     private static final Identifier PHANTOM_HALBERD_DISCARD = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/maledictus/phantom_halberd_discard.png");
     private final Phantom_Halberd_Model model = new Phantom_Halberd_Model();
-    private static final RenderType DECAL = RenderType.entityDecal((Identifier)PHANTOM_HALBERD);
-    private static final RenderType RENDER_TYPE = RenderTypes.entityCutoutNoCull((Identifier)PHANTOM_HALBERD);
+    private static final RenderType DECAL = CMRenderTypes.entityCutoutNoCull((Identifier)PHANTOM_HALBERD);
+    private static final RenderType RENDER_TYPE = CMRenderTypes.entityCutoutNoCull((Identifier)PHANTOM_HALBERD);
 
     public Phantom_Halberd_Renderer(EntityRendererProvider.Context renderManagerIn) {
         super(renderManagerIn);
@@ -65,7 +65,7 @@ extends CmEntityRenderer<Phantom_Halberd_Entity> {
         if (entityIn.lifeTicks > 0) {
             float f2 = (float)entityIn.lifeTicks / 70.0f;
             int i = ARGB.color((int)Mth.floor((float)(f2 * 255.0f)), (int)-1);
-            VertexConsumer vertexconsumer = bufferIn.getBuffer(RenderType.dragonExplosionAlpha((Identifier)PHANTOM_HALBERD_DISCARD));
+            VertexConsumer vertexconsumer = bufferIn.getBuffer(RenderTypes.entityTranslucent((Identifier)PHANTOM_HALBERD_DISCARD));
             this.model.renderToBuffer(matrixStackIn, vertexconsumer, packedLightIn, OverlayTexture.NO_OVERLAY, i);
             VertexConsumer vertexconsumer1 = bufferIn.getBuffer(DECAL);
             this.model.renderToBuffer(matrixStackIn, vertexconsumer1, packedLightIn, OverlayTexture.NO_OVERLAY, -1);

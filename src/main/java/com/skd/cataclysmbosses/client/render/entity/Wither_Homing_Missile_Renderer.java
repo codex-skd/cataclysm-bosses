@@ -91,7 +91,7 @@ extends CmEntityRenderer<Wither_Homing_Missile_Entity> {
         Matrix4f matrix = lastPose.pose();
         VertexConsumer vertexconsumer = bufferIn.getBuffer(CMRenderTypes.getLightTrailEffect(TRAIL_TEXTURE));
         Vec3 drawFrom = entityIn.getTrailPosition(0, partialTicks);
-        Vec3 cameraPos = this.entityRenderDispatcher.camera.getPosition();
+        Vec3 cameraPos = this.entityRenderDispatcher.camera.position();
         for (int i = 0; i < sampleSize; ++i) {
             Vec3 sample = entityIn.getTrailPosition(i + 1, partialTicks);
             float u1 = (float)i / (float)sampleSize;

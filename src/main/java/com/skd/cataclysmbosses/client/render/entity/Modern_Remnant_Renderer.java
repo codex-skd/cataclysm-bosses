@@ -15,6 +15,8 @@ package com.skd.cataclysmbosses.client.render.entity;
 import com.skd.cataclysmbosses.client.model.entity.Modern_Remnant_Model;
 import com.skd.cataclysmbosses.entity.Pet.Modern_Remnant_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
@@ -36,7 +38,6 @@ public class Modern_Remnant_Renderer extends CmEntityRenderer<Modern_Remnant_Ent
         // TODO: port render body to 26.2 (old MobRenderer APIs removed)
     }
 
-    @Override
     public Identifier getTextureLocation(Modern_Remnant_Entity entity) {
         return MODERN_REMNANT_TEXTURES;
     }

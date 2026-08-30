@@ -23,6 +23,7 @@ import com.skd.cataclysmbosses.entity.AnimationMonster.BossMonsters.The_Leviatha
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import com.skd.cataclysmbosses.client.render.CMRenderTypes;
 import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
 import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -41,7 +42,7 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 public class Abyss_Orb_Renderer
 extends CmEntityRenderer<Abyss_Orb_Entity> {
     private static final Identifier TEXTURE_LOCATION = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/leviathan/abyss_orb.png");
-    private static final RenderType RENDER_TYPE = RenderTypes.entityCutoutNoCull((Identifier)TEXTURE_LOCATION);
+    private static final RenderType RENDER_TYPE = CMRenderTypes.entityCutoutNoCull((Identifier)TEXTURE_LOCATION);
 
     public Abyss_Orb_Renderer(EntityRendererProvider.Context p_173962_) {
         super(p_173962_);

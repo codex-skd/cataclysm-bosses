@@ -49,7 +49,8 @@ extends CmEntityRenderer<Urchin_Spike_Entity> {
         stack.mulPose(Axis.ZP.rotationDegrees(-45.0f));
         stack.mulPose(Axis.ZP.rotationDegrees(Mth.lerp((float)partialTicks, (float)entity.xRotO, (float)entity.getXRot())));
         stack.translate(0.0f, 0.0f, 0.0f);
-        Minecraft.getInstance().getItemRenderer().renderStatic(entity.getItem(), ItemDisplayContext.GROUND, light, OverlayTexture.NO_OVERLAY, stack, buffer, entity.level(), entity.getId());
+        // PORT TODO(26.2): re-wire item render
+        // Minecraft.getInstance().getItemRenderer().renderStatic(entity.getItem(), ItemDisplayContext.GROUND, light, OverlayTexture.NO_OVERLAY, stack, buffer, entity.level(), entity.getId());
         stack.popPose();
         stack.popPose();
     }
