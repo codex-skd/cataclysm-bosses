@@ -49,6 +49,8 @@
  */
 package com.skd.cataclysmbosses.init;
 
+import com.skd.cataclysmbosses.items.Khopesh;
+
 import com.skd.cataclysmbosses.Cataclysm;
 import com.skd.cataclysmbosses.client.CustomRarity.CMRarity;
 import com.skd.cataclysmbosses.config.CMCommonConfig;
@@ -366,7 +368,7 @@ public class ModItems {
     public static final DeferredItem<Item> CURSIUM_BOOTS = ITEMS.register("cursium_boots", () -> new Cursium_Armor(Armortier.CURSIUM, ArmorType.BOOTS, new Item.Properties().fireResistant().rarity(Rarity.EPIC).humanoidArmor(Armortier.CURSIUM.value(), ArmorType.BOOTS).attributes(Cataclysm_Armor.createAttributes(Armortier.CURSIUM, ArmorType.BOOTS))));
     public static final DeferredItem<Item> MONSTROUS_HORN = ITEMS.register("monstrous_horn", () -> new Item(new Item.Properties().fireResistant().rarity(Rarity.EPIC)));
     public static final DeferredItem<Item> LAVA_POWER_CELL = ITEMS.register("lava_power_cell", () -> new Item(new Item.Properties().fireResistant().rarity(Rarity.EPIC)));
-    public static final DeferredItem<Item> MONSTROUS_HELM = ITEMS.register("monstrous_helm", () -> new Monstrous_Helm(ArmorMaterials.NETHERITE, ArmorType.HELMET, new Item.Properties().fireResistant().humanoidArmor(ArmorMaterials.NETHERITE, ArmorType.HELMET).rarity(Rarity.EPIC)));
+    public static final DeferredItem<Item> MONSTROUS_HELM = ITEMS.register("monstrous_helm", () -> new Monstrous_Helm(net.minecraft.core.Holder.direct(ArmorMaterials.NETHERITE), ArmorType.HELMET, new Item.Properties().fireResistant().humanoidArmor(ArmorMaterials.NETHERITE, ArmorType.HELMET).rarity(Rarity.EPIC)));
     public static final DeferredItem<Item> BLOOM_STONE_PAULDRONS = ITEMS.register("bloom_stone_pauldrons", () -> new Bloom_Stone_Pauldrons(Armortier.CRAB, ArmorType.CHESTPLATE, new Item.Properties().fireResistant().rarity(Rarity.UNCOMMON).humanoidArmor(Armortier.CRAB.value(), ArmorType.CHESTPLATE).attributes(Cataclysm_Armor.createAttributes(Armortier.CRAB, ArmorType.CHESTPLATE, new AttributeContainer(ModAttribute.NATURE_HEAL, 15.0, AttributeModifier.Operation.ADD_VALUE))), new AttributeContainer[0]));
     public static final DeferredItem<Item> BURNING_ASHES = ITEMS.register("burning_ashes", () -> new Item(new Item.Properties().fireResistant().rarity(Rarity.RARE)));
     public static final DeferredItem<Item> DYING_EMBER = ITEMS.register("dying_ember", () -> new Item(new Item.Properties().fireResistant().rarity(Rarity.UNCOMMON)));
@@ -387,9 +389,9 @@ public class ModItems {
     public static final DeferredItem<Item> DESERT_EYE = ITEMS.register("desert_eye", () -> new DungeonEyeItem(new Item.Properties().fireResistant(), ModTag.EYE_OF_DESERT_LOCATED, 247, 168, 64));
     public static final DeferredItem<Item> CURSED_EYE = ITEMS.register("cursed_eye", () -> new DungeonEyeItem(new Item.Properties().fireResistant(), ModTag.EYE_OF_CURSE_LOCATED, 26, 107, 89));
     public static final DeferredItem<Item> STORM_EYE = ITEMS.register("storm_eye", () -> new DungeonEyeItem(new Item.Properties().fireResistant(), ModTag.EYE_OF_STORM_LOCATED, 99, 194, 224));
-    public static final DeferredItem<Item> LIONFISH = ITEMS.register("lionfish", () -> new Item(new Item.Properties().food(new FoodProperties.Builder().nutrition(1).saturationModifier(0.1f).effect(new MobEffectInstance(MobEffects.POISON, 60, 0), 1.0f).effect(new MobEffectInstance(MobEffects.CONFUSION, 60, 0), 1.0f).effect(new MobEffectInstance(MobEffects.WATER_BREATHING, 4800, 0), 1.0f).build())));
-    public static final DeferredItem<Item> AMETHYST_CRAB_MEAT = ITEMS.register("amethyst_crab_meat", () -> new Item(new Item.Properties().food(new FoodProperties.Builder().nutrition(6).saturationModifier(1.2f).effect(new MobEffectInstance(MobEffects.REGENERATION, 100, 0), 1.0f).build())));
-    public static final DeferredItem<Item> BLESSED_AMETHYST_CRAB_MEAT = ITEMS.register("blessed_amethyst_crab_meat", () -> new Blessed_Amethyst_Crab_Meat(new Item.Properties().rarity(Rarity.EPIC).food(new FoodProperties.Builder().nutrition(6).saturationModifier(1.2f).effect(new MobEffectInstance(MobEffects.REGENERATION, 100, 0), 1.0f).effect(new MobEffectInstance(ModEffect.EFFECTBLESSING_OF_AMETHYST, 1800, 0), 1.0f).alwaysEdible().build())));
+    public static final DeferredItem<Item> LIONFISH = ITEMS.register("lionfish", () -> new Item(new Item.Properties().food(new FoodProperties.Builder().nutrition(1).saturationModifier(0.1f).build())));
+    public static final DeferredItem<Item> AMETHYST_CRAB_MEAT = ITEMS.register("amethyst_crab_meat", () -> new Item(new Item.Properties().food(new FoodProperties.Builder().nutrition(6).saturationModifier(1.2f).build())));
+    public static final DeferredItem<Item> BLESSED_AMETHYST_CRAB_MEAT = ITEMS.register("blessed_amethyst_crab_meat", () -> new Blessed_Amethyst_Crab_Meat(new Item.Properties().rarity(Rarity.EPIC).food(new FoodProperties.Builder().nutrition(6).saturationModifier(1.2f).alwaysEdible().build())));
     public static final DeferredItem<Item> AMETHYST_CRAB_SHELL = ITEMS.register("amethyst_crab_shell", () -> new Item(new Item.Properties()));
     public static final DeferredItem<Item> LIONFISH_SPIKE = ITEMS.register("lionfish_spike", () -> new ItemInventoryOnly(new Item.Properties()));
     public static final DeferredItem<Item> URCHIN_SPIKE = ITEMS.register("urchin_spike", () -> new ItemInventoryOnly(new Item.Properties()));

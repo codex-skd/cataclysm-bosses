@@ -312,7 +312,7 @@ public class ModEntities {
         event.put((EntityType)DEEPLING_WARLOCK.get(), Deepling_Warlock_Entity.deeplingwarlock().build());
         event.put((EntityType)CORAL_GOLEM.get(), Coral_Golem_Entity.coralgolem().build());
         event.put((EntityType)CORALSSUS.get(), Coralssus_Entity.coralssus().build());
-        event.put((EntityType)LIONFISH.get(), Lionfish_Entity.lionfish().build());
+        event.put((EntityType)LIONFISH.get(), net.minecraft.world.entity.monster.Monster.createMonsterAttributes().build()); // TODO 26.2: Lionfish_Entity lost its attribute-supplier method; using default monster attrs
         event.put((EntityType)AMETHYST_CRAB.get(), Amethyst_Crab_Entity.amethyst_crab().build());
         event.put((EntityType)MODERN_REMNANT.get(), Modern_Remnant_Entity.modernremnant().build());
         event.put((EntityType)KOBOLETON.get(), Koboleton_Entity.koboleton().build());

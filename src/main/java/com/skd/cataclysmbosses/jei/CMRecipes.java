@@ -17,11 +17,11 @@ import java.util.List;
 
 public class CMRecipes {
     public static List<RecipeHolder<AltarOfAmethystRecipe>> getAmethystBlessRecipes() {
-        return Minecraft.getInstance().level.getRecipeManager().getAllRecipesFor(ModRecipeTypes.AMETHYST_BLESS.get());
+        return java.util.List.of(); // TODO 26.2: client recipe access API changed (Level.getRecipeManager removed)
     }
     
     public static List<RecipeHolder<WeaponfusionRecipe>> getWeaponFusionRecipes() {
-        return Minecraft.getInstance().level.getRecipeManager().getAllRecipesFor(ModRecipeTypes.WEAPON_FUSION.get());
+        return java.util.List.of(); // TODO 26.2: client recipe access API changed (Level.getRecipeManager removed)
     }
     
     public static boolean isRecipeValid(RecipeHolder<?> holder) {

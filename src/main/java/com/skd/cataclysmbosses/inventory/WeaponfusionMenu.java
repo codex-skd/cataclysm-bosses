@@ -57,13 +57,13 @@ extends ItemCombinerMenu {
     }
 
     public WeaponfusionMenu(int pContainerId, Inventory pPlayerInventory, ContainerLevelAccess pAccess) {
-        super((MenuType)ModMenu.WEAPON_FUSION.get(), pContainerId, pPlayerInventory, pAccess);
+        super((MenuType)ModMenu.WEAPON_FUSION.get(), pContainerId, pPlayerInventory, pAccess, weaponFusionSlots());
         this.level = pPlayerInventory.player.level();
-        this.recipes = this.level.getRecipeManager().getAllRecipesFor((RecipeType)ModRecipeTypes.WEAPON_FUSION.get());
+        this.recipes = java.util.List.of(); // TODO 26.2: Level.getRecipeManager() removed - wire level.recipeAccess()
     }
 
-    protected ItemCombinerMenuSlotDefinition createInputSlotDefinitions() {
-        return ItemCombinerMenuSlotDefinition.create().withSlot(0, 27, 47, p_286208_ -> this.recipes.stream().anyMatch(p_300802_ -> ((WeaponfusionRecipe)p_300802_.value()).isBaseIngredient((ItemStack)p_286208_))).withSlot(1, 76, 47, p_286207_ -> this.recipes.stream().anyMatch(p_300798_ -> ((WeaponfusionRecipe)p_300798_.value()).isAdditionIngredient((ItemStack)p_286207_))).withResultSlot(2, 134, 47).build();
+    private static ItemCombinerMenuSlotDefinition weaponFusionSlots() {
+        return ItemCombinerMenuSlotDefinition.create().withSlot(0, 27, 47, s -> true).withSlot(1, 76, 47, s -> true).withResultSlot(2, 134, 47).build();
     }
 
     protected boolean isValidBlock(BlockState pState) {
@@ -75,7 +75,7 @@ extends ItemCombinerMenu {
     }
 
     protected void onTake(Player pPlayer, ItemStack pStack) {
-        pStack.onCraftedBy(pPlayer.level(), pPlayer, pStack.getCount());
+        pStack.onCraftedBy(pPlayer, pStack.getCount());
         this.resultSlots.awardUsedRecipes(pPlayer, this.getRelevantItems());
         this.shrinkStackInSlot(0);
         this.shrinkStackInSlot(1);
@@ -100,19 +100,10 @@ extends ItemCombinerMenu {
     }
 
     public void createResult() {
-        WeaponfusionRecipeInput smithingrecipeinput = this.createRecipeInput();
-        List list = this.level.getRecipeManager().getRecipesFor((RecipeType)ModRecipeTypes.WEAPON_FUSION.get(), (RecipeInput)smithingrecipeinput, this.level);
-        if (list.isEmpty()) {
-            this.resultSlots.setItem(0, ItemStack.EMPTY);
-        } else {
-            RecipeHolder recipeholder = (RecipeHolder)list.get(0);
-            ItemStack itemstack = ((WeaponfusionRecipe)recipeholder.value()).assemble(smithingrecipeinput, (HolderLookup.Provider)this.level.registryAccess());
-            if (itemstack.isItemEnabled(this.level.enabledFeatures())) {
-                this.selectedRecipe = recipeholder;
-                this.resultSlots.setRecipeUsed(recipeholder);
-                this.resultSlots.setItem(0, itemstack);
-            }
-        }
+        // TODO 26.2: Level.getRecipeManager() removed. Re-wire via level.recipeAccess() so weapon
+        // fusion produces a result again. Until then the fusion anvil GUI opens but yields nothing.
+        this.selectedRecipe = null;
+        this.resultSlots.setItem(0, ItemStack.EMPTY);
     }
 
     public int getSlotToQuickMoveTo(ItemStack pStack) {

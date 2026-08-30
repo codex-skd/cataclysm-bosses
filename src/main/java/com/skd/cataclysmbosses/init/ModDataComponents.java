@@ -34,10 +34,10 @@ import org.jetbrains.annotations.Nullable;
 
 public class ModDataComponents {
     public static final DeferredRegister<DataComponentType<?>> COMPONENTS = DeferredRegister.create((ResourceKey)Registries.DATA_COMPONENT_TYPE, (String)"cataclysm");
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> LASER_GATLING = COMPONENTS.register("laser_gatling", () -> DataComponentType.builder().persistent((Codec)Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL).build());
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<ChargeAnimationComponent>> CHARGE_ANIMATION = COMPONENTS.register("charge_animation", () -> DataComponentType.builder().persistent(ChargeAnimationComponent.CODEC).networkSynchronized(ChargeAnimationComponent.STREAM_CODEC).build());
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<UUID>> THROWN_ANCHOR = COMPONENTS.register("thrown_anchor", () -> DataComponentType.builder().persistent(UUIDUtil.CODEC).networkSynchronized(UUIDUtil.STREAM_CODEC).build());
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<UUID>> THROWN_HAMMER = COMPONENTS.register("thrown_hammer", () -> DataComponentType.builder().persistent(UUIDUtil.CODEC).networkSynchronized(UUIDUtil.STREAM_CODEC).build());
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> LASER_GATLING = COMPONENTS.register("laser_gatling", () -> DataComponentType.<Boolean>builder().persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL).build());
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<ChargeAnimationComponent>> CHARGE_ANIMATION = COMPONENTS.register("charge_animation", () -> DataComponentType.<ChargeAnimationComponent>builder().persistent(ChargeAnimationComponent.CODEC).networkSynchronized(ChargeAnimationComponent.STREAM_CODEC).build());
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<UUID>> THROWN_ANCHOR = COMPONENTS.register("thrown_anchor", () -> DataComponentType.<UUID>builder().persistent(UUIDUtil.CODEC).networkSynchronized(UUIDUtil.STREAM_CODEC).build());
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<UUID>> THROWN_HAMMER = COMPONENTS.register("thrown_hammer", () -> DataComponentType.<UUID>builder().persistent(UUIDUtil.CODEC).networkSynchronized(UUIDUtil.STREAM_CODEC).build());
 
     @NotNull
     private static <T> DeferredHolder<DataComponentType<?>, DataComponentType<T>> register(String name, Codec<T> codec) {
@@ -47,9 +47,9 @@ public class ModDataComponents {
     @NotNull
     private static <T> DeferredHolder<DataComponentType<?>, DataComponentType<T>> register2(String name, Codec<T> codec, @Nullable StreamCodec<? super RegistryFriendlyByteBuf, T> streamCodec) {
         if (streamCodec == null) {
-            return COMPONENTS.register(name, () -> DataComponentType.builder().persistent(codec).build());
+            return COMPONENTS.register(name, () -> DataComponentType.<T>builder().persistent(codec).build());
         }
-        return COMPONENTS.register(name, () -> DataComponentType.builder().persistent(codec).networkSynchronized(streamCodec).build());
+        return COMPONENTS.register(name, () -> DataComponentType.<T>builder().persistent(codec).networkSynchronized(streamCodec).build());
     }
 }
 

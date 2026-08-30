@@ -33,7 +33,7 @@ public class WeaponfusionRecipe implements WeaponfusionRecipeInterface {
     public static final MapCodec<WeaponfusionRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
         Ingredient.CODEC.fieldOf("base").forGetter(recipe -> recipe.base),
         Ingredient.CODEC.fieldOf("addition").forGetter(recipe -> recipe.addition),
-        ItemStack.STRICT_CODEC.fieldOf("result").forGetter(recipe -> recipe.result)
+        ItemStack.CODEC.fieldOf("result").forGetter(recipe -> recipe.result)
     ).apply(i, WeaponfusionRecipe::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, WeaponfusionRecipe> STREAM_CODEC = StreamCodec.of(
@@ -115,7 +115,7 @@ public class WeaponfusionRecipe implements WeaponfusionRecipeInterface {
     }
 
     public boolean isIncomplete() {
-        return Stream.of(this.base, this.addition).anyMatch(Ingredient::hasNoItems);
+        return Stream.of(this.base, this.addition).anyMatch(Ingredient::isEmpty);
     }
 
     // Legacy inner class removed - serializer is now a static record instance

@@ -126,9 +126,10 @@ public class ModTag {
         return TagKey.create((ResourceKey)Registries.DAMAGE_TYPE, (Identifier)Identifier.fromNamespaceAndPath((String)"cataclysm", (String)name));
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> boolean isInTag(T value, TagKey<T> tagKey) {
-        Registry registry = (Registry)BuiltInRegistries.REGISTRY.get(tagKey.registry().location());
-        return registry.getOrCreateTag(tagKey).contains((Holder)registry.getHolderOrThrow((ResourceKey)registry.getResourceKey(value).orElseThrow()));
+        Registry<T> registry = (Registry<T>)(Registry<?>)BuiltInRegistries.REGISTRY.getValue(tagKey.registry().identifier());
+        return registry.wrapAsHolder(value).is(tagKey);
     }
 }
 

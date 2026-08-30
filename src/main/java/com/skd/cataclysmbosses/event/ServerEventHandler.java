@@ -309,7 +309,7 @@ public class ServerEventHandler {
         // Do not attempt to fix this block until then.
         if ((entity = event.getSource().getDirectEntity()) instanceof LivingEntity) {
             LivingEntity living = (LivingEntity)entity;
-            List slot = CuriosApi.getCuriosHelper().findCurios(living, stack -> stack.is((Item)ModItems.BLAZING_GRIPS.get()));
+            java.util.List slot = new java.util.ArrayList(); // TODO 26.2: CuriosApi.getCuriosHelper() removed - re-wire Curios lookup
             if (!slot.isEmpty() && event.getEntity().getRandom().nextFloat() < 0.15f * (float)slot.size()) {
                 MobEffectInstance effectinstance = new MobEffectInstance(ModEffect.EFFECTBLAZING_BRAND, 60, 0);
                 entity2.addEffect(effectinstance);

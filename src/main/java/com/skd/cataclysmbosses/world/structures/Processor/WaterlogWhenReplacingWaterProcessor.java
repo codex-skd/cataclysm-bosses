@@ -80,7 +80,4 @@ implements StructureProcessor {
         return CODEC;
     }
 
-    protected StructureProcessorType getType() {
-        return ModStructureProcessor.WATERLOGGING_WHEN_REPLACING_WATER_PROCESSOR.get();
-    }
 }
