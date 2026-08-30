@@ -1,6 +1,56 @@
 SESSION STATUS — NeoForge 26.2.0.45-beta -> 26.2.0.57 compile port
 ================================================================
 
+== 2026-08-30 (sesión 4) — 560 -> 423 errores | SOLO QUEDA client/ ==
+
+Commits nuevos (rama production, SIN pushear):
+  4e07d5a  mixin/ compila (560 -> 542)          [a mano: cir.setReturnValue, (X)(Object)this, Model ctor]
+  f8ad070  init/ + inventory/ effects/ message/ crafting/ jei/ event/ compilan (560 -> 490)
+           [parcial longcat-2.0 + a mano; ver TODOs stub abajo]
+  d040f82  client/model/ ImmutableList genéricos (490 -> 423)   [regex a mano en 90 ficheros]
+
+**TODO PAQUETE COMPILA MENOS client/.** 423 errores, todos en client/:
+  render/entity            194   (renderers de mob/boss; Scylla_Renderer 20, The_Leviathan 10,
+                                  Deepling_Brute 7... ~40 ficheros. Puentes Cm* ya existen.)
+  event/ClientEvent.java    61   (varios sub-problemas: RenderGuiLayerEvent, RenderLivingEvent,
+                                  key handling, LevelRenderer.viewArea privado, Camera.getNearPlane...
+                                  ver memoria mc262_client_api_migration)
+  model/entity              51   (residual tras el fix de ImmutableList; setupAnim nueva firma,
+                                  HeadedModel/LivingEntityRenderState genéricos)
+  render/item/CuriosRenderer 44  (Curios API de render cambió: prepareModel name-clash x9,
+                                  ICurioRenderer. Curios sigue medio-stubbeado en varios sitios)
+  gui                       17   (CustomBossBar 11 - blit(Identifier,...) firma, GuiGraphics;
+                                  MinistrosityInventoryScreen 4)
+  render/etc                16   (CurioHeadRenderer 8, LightningBoltData 7 - ViewArea.sections privado)
+  model/armor               10   (Ignitium_Elytra_chestplate_Model: HumanoidModel<T> genéricos +
+                                  AbstractClientPlayer.elytraRotX/Y/Z eliminados - reescritura de elytra)
+  render(root)/render/item/CustomRarity  ~9
+
+ENTORNO: la herramienta Bash de la sesión 4 se rompió (sin PATH: git/grep/coreutils no
+resuelven). Se trabajó todo por PowerShell + python3 + scratchpad/extract.py + client_scope.py.
+Compilar así:  & .\gradlew.bat compileJava "-Dorg.gradle.jvmargs=-Xmx10G" --console=plain 2>&1 |
+               Out-File compile.txt -Encoding utf8 -Width 1000    (el -Width 1000 es CLAVE: sin él
+               PowerShell trunca las rutas de los errores y extract.py no las parsea).
+
+TODOs 26.2 nuevos (stubs que compilan, revisar antes de publicar):
+  - jei/CMRecipes: devuelve listas vacías (Level.getRecipeManager() eliminado; API de recetas
+    cliente cambió). La integración JEI no funcionará hasta re-cablear level.recipeAccess().
+  - inventory/WeaponfusionMenu.createResult: stubbeado -> el yunque de fusión abre GUI pero no
+    produce resultado. Re-cablear recipeAccess().
+  - event/ServerEventHandler: lookup de Curios stubbeado (efecto Blazing Grips no se aplicará).
+  - init/ModItems: 3 comidas (lionfish, amethyst_crab_meat, blessed_amethyst_crab_meat) perdieron
+    sus efectos al comer (FoodProperties.Builder.effect eliminado -> mover a DataComponents.CONSUMABLE).
+  - init/ModEntities: Lionfish usa atributos de monstruo por defecto (perdió su createAttributes).
+
+PLAN client/ (sugerido):
+  1. render/entity (194) - delegar por lotes (~15 ficheros/lote) con prompt tight + patrones de
+     render acumulados. Los peores (Scylla 20, The_Leviathan 10) quizá a mano.
+  2. model/entity (51) + model/armor (10) - setupAnim/genéricos; el elytra a mano o stub.
+  3. render/item/CuriosRenderer (44) + render/etc (16) - Curios render; puede que varios queden stub.
+  4. gui (17) - CustomBossBar blit/GuiGraphics.
+  5. ClientEvent.java (61) - AL FINAL, a mano, con la tabla de mc262_client_api_migration delante.
+  6. `./gradlew build`, repasar TODOs, runClient.
+
 == 2026-08-30 (sesión 3, FINAL) — 1.015 -> 560 errores ==
 
 Objetivo: primera versión limpia (compila) para subir a CurseForge.
