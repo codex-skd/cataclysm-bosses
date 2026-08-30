@@ -1,7 +1,7 @@
 SESSION STATUS — NeoForge 26.2.0.45-beta -> 26.2.0.57 compile port
 ================================================================
 
-== 2026-08-30 (sesión 5) — 423 -> 148 errores | client/{model,render/entity} DONE ==
+== 2026-08-30 (sesión 5) — 423 -> 87 errores | client/{model,render/entity,CuriosRenderer} DONE ==
 
 Modelo de delegación: opencode-go/longcat-2.0 (elección del usuario, misma que sesiones 2-4).
 Nota: longcat esta sesión tiende a tardar MUCHO (~25-35 min/lote) y a veces necesita el fichero
@@ -15,21 +15,23 @@ Commits nuevos (rama production, SIN pushear):
   4ad909f  render/entity LIGHT + root proxy (351 -> 288)  [longcat 27 renderers; Claude:
            FMLLoader.getDist->FMLEnvironment.getDist, ClientProxy]
   6ea6ba2  docs PORT_STATUS  |  d2f0210  render/entity HEAVY pt.1 (288 -> 195, longcat 36 renderers)
-  8405fc0  redo 3 renderers a mano (195 -> 164)
-  eb30496  render/entity COMPLETO 0 err (164 -> 148, Claude 17 residuales)
+  8405fc0  redo 3 renderers a mano (195 -> 164)  |  eb30496  render/entity COMPLETO (164 -> 148)
+  b556c4c  docs
+  d9a91ec  render/item/CuriosRenderer entero + CustomRarity + skull item stubs (148 -> 93)
+  196e9f8  gui GUIWeponfusion + MinistrosityInventoryScreen (93 -> 87)
 
-ESTADO: 148 errores, todos en client/. **model/ y render/entity ENTEROS compilan.**
-  event/                    61   (ClientEvent.java; InputConstants.isKeyDown(Window)/keybind,
-                                  RenderGuiLayerEvent, RenderLivingEvent, ViewArea privado,
-                                  Camera.getNearPlane... A MANO, con tabla mc262_client_api_migration.)
-  render/item/CuriosRenderer 44  (Curios render API; prepareModel name-clash x9. Varios quedaran stub.)
-  gui                       17   (CustomBossBar blit(Identifier,...) x11; MinistrosityInventoryScreen 4)
-  render/etc                16   (CurioHeadRenderer 8 - ICurioRenderer.ModelRender<S,M> bounds;
-                                  LightningBoltData 7 - ViewArea.sections privado)
-  CustomRarity 4 (EnumProxy Object[] no functional interface) / render(root) 3 (CMItemstackRenderer -
-  Cataclysm_Skull_Block_Renderer.createSkullRenderers/renderItemSkull ya no existen; BER stub) /
-  render/item 3 (CustomArmorRenderProperties - withAnimations/entityLiving, VertexConsumer.create/
-  entityGlintDirect eliminados)
+ESTADO: 87 errores, todos en client/. **model/, render/entity y render/item/CuriosRenderer ENTEROS compilan.**
+  event/ClientEvent.java    61   (InputConstants.isKeyDown(Window)/keybind, RenderGuiLayerEvent,
+                                  RenderLivingEvent, CustomizeGuiOverlayEvent ELIMINADO, ViewArea
+                                  privado, Camera.getNearPlane... A MANO, tabla mc262_client_api_migration.)
+  render/etc                15   (CurioHeadRenderer 7 - ICurioRenderer.ModelRender<S,M> bounds;
+                                  LightningBoltData 7 - ViewArea.sections privado + lambda inference;
+                                  LightningRender 1)
+  gui/CustomBossBar         11   (HUD overlay: CustomizeGuiOverlayEvent.BossEventProgress ELIMINADO
+                                  -> re-arquitectura sobre RenderGuiLayerEvent + VanillaGuiLayers.
+                                  BOSS_OVERLAY; RenderSystem.setShader* y Minecraft.getProfiler()
+                                  eliminados; blit necesita RenderPipelines.GUI_TEXTURED.
+                                  ACOPLADO con ClientEvent.renderBossOverlay.)
 
 TODOs 26.2 sesión 5 EXTRA: casi todos los renderers de jefe tienen render() = stub vacío (compilan
 pero no se dibujan hasta cablear el pipeline submit); layers (glow/hold/ItemInHand/snake/eye-spark)
@@ -48,11 +50,15 @@ TODOs 26.2 NUEVOS de esta sesión (stubs que compilan, revisar antes de jugar):
     ElytraModel vanilla); se perdió la matemática vieja de fall-fly/crouch (ahora es upstream).
 
 PLAN restante (orden):
-  1. render/item/CuriosRenderer (44) + render/etc (16) - Curios render API; varios quedarán stub.
-  2. gui (17) - CustomBossBar blit/GuiGraphics; MinistrosityInventoryScreen.
-  3. CustomRarity 4 + render(root) 3 + render/item 3 - EnumProxy, skull BER stub, elytra armor.
-  4. event/ClientEvent.java (61) - AL FINAL, A MANO, con la tabla de mc262_client_api_migration.
-  5. `./gradlew build`, repasar los MUCHOS TODOs de render (bosses no se dibujan), runClient.
+  1. render/etc (15): CurioHeadRenderer (bounds de ICurioRenderer.ModelRender<S,M>), LightningBoltData
+     (ViewArea.sections privado -> LevelRenderer o full-bright + lambdas), LightningRender (1).
+  2. gui/CustomBossBar (11) + event/ClientEvent.renderBossOverlay: CustomizeGuiOverlayEvent fue
+     ELIMINADO en 26.2 -> reescribir el HUD del boss bar sobre RenderGuiLayerEvent.Pre/Post
+     apuntando a VanillaGuiLayers.BOSS_OVERLAY. Están acoplados, hacerlos juntos.
+  3. event/ClientEvent.java (resto ~55) - A MANO, con la tabla de mc262_client_api_migration:
+     InputConstants.isKeyDown ahora toma Window (no long handle), key handling, RenderLivingEvent,
+     RenderGuiLayerEvent, etc.
+  4. `./gradlew build`, repasar los MUCHOS TODOs de render (casi ningún boss se dibuja), runClient.
 
 --- histórico sesión 4 ---
 
