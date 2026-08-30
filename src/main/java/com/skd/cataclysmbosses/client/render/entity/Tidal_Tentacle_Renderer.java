@@ -34,6 +34,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
+import com.skd.cataclysmbosses.client.render.CMRenderTypes;
 import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
 import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -51,7 +52,7 @@ import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-// import net.minecraft.world.level.BlockAndTintGetter; // Removed in 26.2
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
@@ -69,7 +70,7 @@ extends CmEntityRenderer<Tidal_Tentacle_Entity> {
 
     public boolean shouldRender(Tidal_Tentacle_Entity entity, Frustum frustum, double x, double y, double z) {
         Entity next = entity.getFromEntity();
-        return next != null && frustum.isVisible(entity.getBoundingBox().minmax(next.getBoundingBox())) || super.shouldRender((Entity)entity, frustum, x, y, z);
+        return next != null && frustum.isVisible(entity.getBoundingBox().minmax(next.getBoundingBox())) || super.shouldRender(entity, frustum, x, y, z);
     }
 
     protected void render(Tidal_Tentacle_Entity entity, float partialTicks, PoseStack poseStack, CmMultiBufferSource buffer, int light) {
@@ -84,7 +85,7 @@ extends CmEntityRenderer<Tidal_Tentacle_Entity> {
             Vec3 to = distVec.scale((double)(1.0f - progress));
             Vec3 from = distVec;
             Vec3 currentNeckButt = from;
-            VertexConsumer neckConsumer = buffer.getBuffer(RenderTypes.entityCutoutNoCull((Identifier)TENTACLE_TEXTURE));
+            VertexConsumer neckConsumer = buffer.getBuffer(CMRenderTypes.entityCutoutNoCull((Identifier)TENTACLE_TEXTURE));
             double remainingDistance = to.distanceTo(from);
             for (int segmentCount = 0; segmentCount < 128 && remainingDistance > 0.0; ++segmentCount) {
                 Vec3 powVec;
@@ -96,7 +97,7 @@ extends CmEntityRenderer<Tidal_Tentacle_Entity> {
                 Tidal_Tentacle_Renderer.renderNeckCube(currentNeckButt, next, poseStack, neckConsumer, neckLight, OverlayTexture.NO_OVERLAY, 0.0f);
                 currentNeckButt = next;
             }
-            VertexConsumer clawConsumer = buffer.getBuffer(RenderTypes.entityCutoutNoCull((Identifier)CLAW_TEXTURE));
+            VertexConsumer clawConsumer = buffer.getBuffer(CMRenderTypes.entityCutoutNoCull((Identifier)CLAW_TEXTURE));
             if (entity.hasClaw() || entity.isRetracting()) {
                 poseStack.pushPose();
                 poseStack.translate(to.x, to.y, to.z);
@@ -142,7 +143,7 @@ extends CmEntityRenderer<Tidal_Tentacle_Entity> {
             double d2 = (double)i * 0.35;
             if ((this.entityRenderDispatcher.options == null || this.entityRenderDispatcher.options.getCameraType().isFirstPerson()) && player == Minecraft.getInstance().player) {
                 double d7 = 960.0 / (double)((Integer)this.entityRenderDispatcher.options.fov().get()).intValue();
-                Vec3 vec3 = this.entityRenderDispatcher.camera.getNearPlane().getPointOnPlane((float)i * 0.6f, -1.0f);
+                Vec3 vec3 = this.entityRenderDispatcher.camera.getNearPlane(this.entityRenderDispatcher.camera.getFov()).getPointOnPlane((float)i * 0.6f, -1.0f);
                 vec3 = vec3.scale(d7);
                 vec3 = vec3.yRot(f1 * 0.25f);
                 vec3 = vec3.xRot(-f1 * 0.35f);

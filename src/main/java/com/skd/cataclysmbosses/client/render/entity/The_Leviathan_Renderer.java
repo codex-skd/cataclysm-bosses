@@ -30,14 +30,15 @@ package com.skd.cataclysmbosses.client.render.entity;
 import com.skd.cataclysmbosses.client.model.entity.The_Leviathan_Model;
 import com.skd.cataclysmbosses.client.model.entity.The_Leviathan_Tongue_End_Model;
 import com.skd.cataclysmbosses.client.model.entity.The_Leviathan_Tongue_Model;
+import com.skd.cataclysmbosses.client.render.CMRenderTypes;
 import com.skd.cataclysmbosses.client.render.RenderUtils;
 import com.skd.cataclysmbosses.client.render.layer.LayerBasicGlow;
 import com.skd.cataclysmbosses.client.render.layer.The_Leviathan_Layer;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderState;
 import com.skd.cataclysmbosses.entity.AnimationMonster.BossMonsters.The_Leviathan.The_Leviathan_Entity;
 import com.skd.cataclysmbosses.entity.AnimationMonster.BossMonsters.The_Leviathan.The_Leviathan_Part;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.LevelRenderer;
 import com.skd.cataclysmbosses.client.render.compat.CmMobRenderer;
 import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
@@ -54,7 +55,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-// import net.minecraft.world.level.BlockAndTintGetter; // Removed in 26.2
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
@@ -71,10 +72,13 @@ extends CmMobRenderer<The_Leviathan_Entity> {
     private static final The_Leviathan_Tongue_End_Model TONGUE_END_MODEL = new The_Leviathan_Tongue_End_Model();
 
     public The_Leviathan_Renderer(EntityRendererProvider.Context renderManagerIn) {
-        super(renderManagerIn, (EntityModel)new The_Leviathan_Model(), 1.5f);
+        super(renderManagerIn, new The_Leviathan_Model(), 1.5f);
+        this.model = new The_Leviathan_Model();
         this.addLayer(new The_Leviathan_Layer(this));
         this.addLayer(new LayerBasicGlow(this, LEVIATHAN_TEXTURE_EYES));
     }
+
+    private final The_Leviathan_Model model;
 
     public Identifier getTextureLocation(The_Leviathan_Entity entity) {
         return entity.getMeltDown() ? BURNING_LEVIATHAN_TEXTURES : LEVIATHAN_TEXTURES;
@@ -97,17 +101,19 @@ extends CmMobRenderer<The_Leviathan_Entity> {
         return false;
     }
 
-    public Vec3 getRenderOffset(The_Leviathan_Entity entity, float partialTicks) {
+    public Vec3 getRenderOffset(CmEntityRenderState state) {
+        The_Leviathan_Entity entity = (The_Leviathan_Entity) state.entity;
         if (entity.getAnimation() == The_Leviathan_Entity.LEVIATHAN_ABYSS_BLAST && entity.getAnimationTick() <= 66) {
             double d0 = 0.01;
             return new Vec3(this.rnd.nextGaussian() * d0, 0.0, this.rnd.nextGaussian() * d0);
         }
-        return super.getRenderOffset((Entity)entity, partialTicks);
+        return super.getRenderOffset(state);
     }
 
     protected void render(The_Leviathan_Entity entity, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
+        float entityYaw = Mth.rotLerp(partialTicks, entity.yBodyRotO, entity.yBodyRot);
         if (entity.getAnimation() == The_Leviathan_Entity.LEVIATHAN_TAIL_WHIPS) {
-            Vec3 bladePos = RenderUtils.matrixStackFromCitadelModel((Entity)entity, entityYaw, ((The_Leviathan_Model)this.model).Tail_Particle);
+            Vec3 bladePos = RenderUtils.matrixStackFromCitadelModel((Entity)entity, entityYaw, this.model.Tail_Particle);
             entity.setSocketPosArray(0, bladePos);
         }
         double x = Mth.lerp((double)partialTicks, (double)entity.xOld, (double)entity.getX());
@@ -118,11 +124,11 @@ extends CmMobRenderer<The_Leviathan_Entity> {
         if (weapon != null && entity.isAlive() && weapon.isAlive()) {
             matrixStackIn.pushPose();
             matrixStackIn.translate(-x, -y, -z);
-            Vec3 headModelPos = ((The_Leviathan_Model)this.getModel()).translateToTongue(new Vec3(0.0, 0.0, 0.0), yaw).scale(0.2);
+            Vec3 headModelPos = this.model.translateToTongue(new Vec3(0.0, 0.0, 0.0), yaw).scale(0.2);
             Vec3 fromVec = entity.getTonguePosition().add(headModelPos);
             Vec3 toVec = weapon.getPosition(partialTicks);
             Vec3 currentNeckButt = fromVec;
-            VertexConsumer neckConsumer = bufferIn.getBuffer(RenderTypes.entityCutoutNoCull((Identifier)LEVIATHAN_TEXTURES));
+            VertexConsumer neckConsumer = bufferIn.getBuffer(CMRenderTypes.entityCutoutNoCull((Identifier)LEVIATHAN_TEXTURES));
             double remainingDistance = toVec.distanceTo(fromVec);
             for (int segmentCount = 0; segmentCount < 128 && remainingDistance > 0.0; ++segmentCount) {
                 Vec3 powVec;
@@ -134,7 +140,7 @@ extends CmMobRenderer<The_Leviathan_Entity> {
                 The_Leviathan_Renderer.renderNeckCube(currentNeckButt, next, matrixStackIn, neckConsumer, neckLight, OverlayTexture.NO_OVERLAY, 0.0f);
                 currentNeckButt = next;
             }
-            VertexConsumer clawConsumer = bufferIn.getBuffer(RenderTypes.entityCutoutNoCull((Identifier)LEVIATHAN_TEXTURES));
+            VertexConsumer clawConsumer = bufferIn.getBuffer(CMRenderTypes.entityCutoutNoCull((Identifier)LEVIATHAN_TEXTURES));
             matrixStackIn.pushPose();
             matrixStackIn.translate(toVec.x, toVec.y, toVec.z);
             matrixStackIn.translate(0.0f, -0.5f, 0.0f);

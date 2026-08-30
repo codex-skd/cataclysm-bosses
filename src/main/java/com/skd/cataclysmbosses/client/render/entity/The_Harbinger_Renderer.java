@@ -25,15 +25,16 @@
 package com.skd.cataclysmbosses.client.render.entity;
 
 import com.skd.cataclysmbosses.client.model.entity.The_Harbinger_Model;
+import com.skd.cataclysmbosses.client.render.CMRenderTypes;
 import com.skd.cataclysmbosses.client.render.layer.The_Harbinger_Item_Layer;
 import com.skd.cataclysmbosses.client.render.layer.The_Harbinger_Jet_Layer;
 import com.skd.cataclysmbosses.client.render.layer.The_Harbinger_Layer;
 import com.skd.cataclysmbosses.client.render.layer.The_Harbinger_Shield_Layer;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderState;
 import com.skd.cataclysmbosses.entity.AnimationMonster.BossMonsters.The_Harbinger_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.model.EntityModel;
 import com.skd.cataclysmbosses.client.render.compat.CmMobRenderer;
 import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
@@ -42,7 +43,6 @@ import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.Items;
@@ -59,23 +59,27 @@ extends CmMobRenderer<The_Harbinger_Entity> {
     private static final float HALF_SQRT_3 = (float)(Math.sqrt(3.0) / 2.0);
 
     public The_Harbinger_Renderer(EntityRendererProvider.Context renderManagerIn) {
-        super(renderManagerIn, (EntityModel)new The_Harbinger_Model(), 1.0f);
+        super(renderManagerIn, new The_Harbinger_Model(), 1.0f);
+        this.model = new The_Harbinger_Model();
         this.addLayer(new The_Harbinger_Layer(this));
         this.addLayer(new The_Harbinger_Jet_Layer(this, renderManagerIn));
         this.addLayer(new The_Harbinger_Shield_Layer(this));
-        this.addLayer(new The_Harbinger_Item_Layer(this, ((The_Harbinger_Model)this.getModel()).nether_star, Items.NETHER_STAR.getDefaultInstance(), ItemDisplayContext.GROUND));
+        this.addLayer(new The_Harbinger_Item_Layer(this, this.model.nether_star, Items.NETHER_STAR.getDefaultInstance(), ItemDisplayContext.GROUND));
     }
+
+    private final The_Harbinger_Model model;
 
     public Identifier getTextureLocation(The_Harbinger_Entity entity) {
         return HARBINGER_TEXTURES;
     }
 
-    public Vec3 getRenderOffset(The_Harbinger_Entity entityIn, float partialTicks) {
+    public Vec3 getRenderOffset(CmEntityRenderState state) {
+        The_Harbinger_Entity entityIn = (The_Harbinger_Entity) state.entity;
         if (entityIn.getAnimation() == The_Harbinger_Entity.DEATHLASER_ANIMATION && entityIn.getAnimationTick() >= 27 && entityIn.getAnimationTick() <= 48 || entityIn.getAnimation() == The_Harbinger_Entity.DEATH_ANIMATION || entityIn.getAnimation() == The_Harbinger_Entity.STUN_ANIAMATION && entityIn.getAnimationTick() <= 90) {
             double d0 = 0.05;
             return new Vec3(this.rnd.nextGaussian() * d0, 0.0, this.rnd.nextGaussian() * d0);
         }
-        return super.getRenderOffset((Entity)entityIn, partialTicks);
+        return super.getRenderOffset(state);
     }
 
     protected void render(The_Harbinger_Entity entity, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
@@ -84,7 +88,7 @@ extends CmMobRenderer<The_Harbinger_Entity> {
             float f5 = ((float)entity.deathTime + partialTicks) / 144.0f;
             float f7 = Math.min(f5 > 0.8f ? (f5 - 0.8f) / 0.2f : 0.0f, 1.0f);
             RandomSource randomsource = RandomSource.create((long)432L);
-            VertexConsumer vertexconsumer2 = bufferIn.getBuffer(RenderType.lightning());
+            VertexConsumer vertexconsumer2 = bufferIn.getBuffer(CMRenderTypes.CMLightning());
             matrixStackIn.pushPose();
             matrixStackIn.translate(0.0, 1.8, 0.0);
             int i = 0;

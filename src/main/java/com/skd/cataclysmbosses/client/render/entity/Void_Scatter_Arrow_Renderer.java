@@ -30,5 +30,10 @@ extends ArrowRenderer<Void_Scatter_Arrow_Entity, ArrowRenderState> {
     public Identifier getTextureLocation(ArrowRenderState state) {
         return TEXTURE;
     }
+
+    @Override
+    public ArrowRenderState createRenderState() {
+        return new ArrowRenderState();
+    }
 }
 

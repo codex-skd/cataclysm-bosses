@@ -13,13 +13,13 @@
 package com.skd.cataclysmbosses.client.render.entity;
 import com.skd.cataclysmbosses.client.render.compat.CmMobRenderer;
 import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 
 import com.skd.cataclysmbosses.client.model.CMModelLayers;
 import com.skd.cataclysmbosses.client.model.entity.Hippocamtus_Model;
 import com.skd.cataclysmbosses.client.render.layer.Hippocamtus_Layer;
 import com.skd.cataclysmbosses.entity.InternalAnimationMonster.AcropolisMonsters.Hippocamtus_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.Identifier;
@@ -32,8 +32,13 @@ extends CmMobRenderer<Hippocamtus_Entity> {
     private static final Identifier KOBOLEDIATOR_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/sea/hippocamtus.png");
 
     public Hippocamtus_Renderer(EntityRendererProvider.Context renderManagerIn) {
-        super(renderManagerIn, (EntityModel)new Hippocamtus_Model(renderManagerIn.bakeLayer(CMModelLayers.HIPPOCAMTUS_MODEL)), 0.75f);
+        super(renderManagerIn, new Hippocamtus_Model(renderManagerIn.bakeLayer(CMModelLayers.HIPPOCAMTUS_MODEL)), 0.75f);
         this.addLayer(new Hippocamtus_Layer(this));
+    }
+
+    @Override
+    protected void render(Hippocamtus_Entity entity, float partialTicks, PoseStack poseStack, CmMultiBufferSource buffer, int packedLight) {
+        // TODO: port render body to 26.2 (old MobRenderer APIs removed)
     }
 
     public Identifier getTextureLocation(Hippocamtus_Entity entity) {

@@ -12,12 +12,12 @@
 package com.skd.cataclysmbosses.client.render.entity;
 import com.skd.cataclysmbosses.client.render.compat.CmMobRenderer;
 import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 
 import com.skd.cataclysmbosses.client.model.CMModelLayers;
 import com.skd.cataclysmbosses.client.model.entity.Urchinkin_Model;
 import com.skd.cataclysmbosses.client.render.layer.Urchinkin_Layer;
 import com.skd.cataclysmbosses.entity.InternalAnimationMonster.AcropolisMonsters.Urchinkin_Entity;
-import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.Identifier;
@@ -31,8 +31,13 @@ extends CmMobRenderer<Urchinkin_Entity> {
     private static final Identifier MEAT_BOY = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/sea/meat_boy.png");
 
     public Urchinkin_Renderer(EntityRendererProvider.Context renderManagerIn) {
-        super(renderManagerIn, (EntityModel)new Urchinkin_Model(renderManagerIn.bakeLayer(CMModelLayers.URCHINKIN_MODEL)), 0.25f);
+        super(renderManagerIn, new Urchinkin_Model(renderManagerIn.bakeLayer(CMModelLayers.URCHINKIN_MODEL)), 0.25f);
         this.addLayer(new Urchinkin_Layer(this));
+    }
+
+    @Override
+    protected void render(Urchinkin_Entity entity, float partialTicks, PoseStack poseStack, CmMultiBufferSource buffer, int packedLight) {
+        // TODO: port render body to 26.2 (old MobRenderer APIs removed)
     }
 
     public Identifier getTextureLocation(Urchinkin_Entity entity) {

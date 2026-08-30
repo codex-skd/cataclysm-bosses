@@ -13,12 +13,12 @@
 package com.skd.cataclysmbosses.client.render.entity;
 import com.skd.cataclysmbosses.client.render.compat.CmMobRenderer;
 import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 
 import com.skd.cataclysmbosses.client.model.entity.Ender_Guardian_Model;
 import com.skd.cataclysmbosses.client.render.layer.Ender_Guardian_Layer;
 import com.skd.cataclysmbosses.entity.AnimationMonster.BossMonsters.Ender_Guardian_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.Identifier;
@@ -31,8 +31,13 @@ extends CmMobRenderer<Ender_Guardian_Entity> {
     private static final Identifier ENDER_GUARDIAN_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/ender_guardian.png");
 
     public Ender_Guardian_Renderer(EntityRendererProvider.Context renderManagerIn) {
-        super(renderManagerIn, (EntityModel)new Ender_Guardian_Model(), 1.5f);
+        super(renderManagerIn, new Ender_Guardian_Model(), 1.5f);
         this.addLayer(new Ender_Guardian_Layer(this));
+    }
+
+    @Override
+    protected void render(Ender_Guardian_Entity entity, float partialTicks, PoseStack poseStack, CmMultiBufferSource buffer, int packedLight) {
+        // TODO: port render body to 26.2 (old MobRenderer APIs removed)
     }
 
     public Identifier getTextureLocation(Ender_Guardian_Entity entity) {

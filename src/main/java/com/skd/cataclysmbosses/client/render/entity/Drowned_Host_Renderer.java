@@ -33,7 +33,7 @@ extends CmMobRenderer<Drowned_Host_Entity> {
     private static final Identifier DROWNED_LOCATION = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/sea/drowned_host.png");
 
     public Drowned_Host_Renderer(EntityRendererProvider.Context p_173964_) {
-        super(p_173964_, new Drowned_Host_Model(p_173964_.bakeLayer(CMModelLayers.DROWNED_HOST)), new Drowned_Host_Model(p_173964_.bakeLayer(CMModelLayers.DROWNED_HOST_INNER_ARMOR)), new Drowned_Host_Model(p_173964_.bakeLayer(CMModelLayers.DROWNED_HOST_OUTER_ARMOR)));
+        super(p_173964_, new Drowned_Host_Model(p_173964_.bakeLayer(CMModelLayers.DROWNED_HOST)), 0.5f);
         this.addLayer(new Drowned_Host_Outer_Layer(this, p_173964_.getModelSet()));
     }
 

@@ -13,11 +13,11 @@
 package com.skd.cataclysmbosses.client.render.entity;
 import com.skd.cataclysmbosses.client.render.compat.CmMobRenderer;
 import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 
 import com.skd.cataclysmbosses.client.model.entity.Coralssus_Model;
 import com.skd.cataclysmbosses.entity.InternalAnimationMonster.Coralssus_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.Identifier;
@@ -33,7 +33,12 @@ extends CmMobRenderer<Coralssus_Entity> {
     private static final Identifier SPONGE_TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/deepling/coralssus_sponge_horn.png");
 
     public Coralssus_Renderer(EntityRendererProvider.Context renderManagerIn) {
-        super(renderManagerIn, (EntityModel)new Coralssus_Model(), 1.7f);
+        super(renderManagerIn, new Coralssus_Model(), 1.7f);
+    }
+
+    @Override
+    protected void render(Coralssus_Entity entity, float partialTicks, PoseStack poseStack, CmMultiBufferSource buffer, int packedLight) {
+        // TODO: port render body to 26.2 (old MobRenderer APIs removed)
     }
 
     public Identifier getTextureLocation(Coralssus_Entity entity) {

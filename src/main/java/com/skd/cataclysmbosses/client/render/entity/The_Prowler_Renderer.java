@@ -18,6 +18,7 @@
 package com.skd.cataclysmbosses.client.render.entity;
 import com.skd.cataclysmbosses.client.render.compat.CmMobRenderer;
 import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderState;
 
 import com.skd.cataclysmbosses.client.model.CMModelLayers;
 import com.skd.cataclysmbosses.client.model.entity.The_Prowler_Model;
@@ -30,7 +31,6 @@ import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.WalkAnimationState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
@@ -65,12 +65,13 @@ extends CmMobRenderer<The_Prowler_Entity> {
         return TEXTURE_PROGRESS[Mth.clamp((int)age, (int)0, (int)4)];
     }
 
-    public Vec3 getRenderOffset(The_Prowler_Entity entityIn, float partialTicks) {
+    public Vec3 getRenderOffset(CmEntityRenderState state) {
+        The_Prowler_Entity entityIn = (The_Prowler_Entity) state.entity;
         if (entityIn.getAttackState() == 1) {
             double d0 = 0.05;
             return new Vec3(this.rnd.nextGaussian() * d0, 0.0, this.rnd.nextGaussian() * d0);
         }
-        return super.getRenderOffset((Entity)entityIn, partialTicks);
+        return super.getRenderOffset(state);
     }
 
     protected void scale(The_Prowler_Entity entitylivingbaseIn, PoseStack matrixStackIn, float partialTickTime) {

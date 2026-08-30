@@ -13,14 +13,14 @@ package com.skd.cataclysmbosses.client.render.entity;
 
 import com.skd.cataclysmbosses.client.model.CMModelLayers;
 import com.skd.cataclysmbosses.client.model.entity.Symbiocto_Model;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import com.skd.cataclysmbosses.entity.InternalAnimationMonster.AcropolisMonsters.Symbiocto_Entity;
-import net.minecraft.client.model.EntityModel;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Symbiocto_Renderer extends CmEntityRenderer<Symbiocto_Entity> {
@@ -36,7 +36,6 @@ public class Symbiocto_Renderer extends CmEntityRenderer<Symbiocto_Entity> {
         // TODO: port render body to 26.2 (old MobRenderer APIs removed)
     }
 
-    @Override
     public Identifier getTextureLocation(Symbiocto_Entity entity) {
         return entity.isCloseEye() ? SYMbiocto_CLOSE : SYMbiocto_OPEN;
     }

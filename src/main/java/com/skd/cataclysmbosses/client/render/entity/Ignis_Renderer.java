@@ -52,7 +52,7 @@ extends CmMobRenderer<Ignis_Entity> {
     private static final Identifier[] TEXTURE_SOUL_PROGRESS = new Identifier[8];
 
     public Ignis_Renderer(EntityRendererProvider.Context renderManagerIn) {
-        super(renderManagerIn, (EntityModel)new Ignis_Model(), 1.0f);
+        super(renderManagerIn, new Ignis_Model(), 1.0f);
         this.addLayer(new Ignis_Armor_Crack_Layer(this));
         this.addLayer(new Ignis_Shield_Layer(this));
         for (int i = 0; i < 8; ++i) {
@@ -80,7 +80,7 @@ extends CmMobRenderer<Ignis_Entity> {
         return new Vec3(d0, d1, d2);
     }
 
-    private void renderBeams(Ignis_Entity entity, float x, float y, float z, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+    private void renderBeams(Ignis_Entity entity, float x, float y, float z, float partialTick, PoseStack poseStack, CmMultiBufferSource bufferSource, int packedLight) {
         float f = Mth.sqrt((float)(x * x + z * z));
         float f1 = Mth.sqrt((float)(x * x + y * y + z * z));
         if (f1 < 0.01f) {

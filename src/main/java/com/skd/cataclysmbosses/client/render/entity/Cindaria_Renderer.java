@@ -13,13 +13,13 @@
 package com.skd.cataclysmbosses.client.render.entity;
 import com.skd.cataclysmbosses.client.render.compat.CmMobRenderer;
 import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 
 import com.skd.cataclysmbosses.client.model.CMModelLayers;
 import com.skd.cataclysmbosses.client.model.entity.Cindaria_Model;
 import com.skd.cataclysmbosses.client.render.layer.Cindaria_Layer;
 import com.skd.cataclysmbosses.entity.InternalAnimationMonster.AcropolisMonsters.Cindaria_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.Identifier;
@@ -32,8 +32,13 @@ extends CmMobRenderer<Cindaria_Entity> {
     private static final Identifier CINDARIA_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/sea/cindaria_armor.png");
 
     public Cindaria_Renderer(EntityRendererProvider.Context renderManagerIn) {
-        super(renderManagerIn, (EntityModel)new Cindaria_Model(renderManagerIn.bakeLayer(CMModelLayers.CINDARIA_MODEL)), 0.5f);
+        super(renderManagerIn, new Cindaria_Model(renderManagerIn.bakeLayer(CMModelLayers.CINDARIA_MODEL)), 0.5f);
         this.addLayer(new Cindaria_Layer(this));
+    }
+
+    @Override
+    protected void render(Cindaria_Entity entity, float partialTicks, PoseStack poseStack, CmMultiBufferSource buffer, int packedLight) {
+        // TODO: port render body to 26.2 (old MobRenderer APIs removed)
     }
 
     public Identifier getTextureLocation(Cindaria_Entity entity) {

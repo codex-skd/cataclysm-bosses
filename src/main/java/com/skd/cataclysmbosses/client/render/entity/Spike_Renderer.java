@@ -13,12 +13,12 @@
 package com.skd.cataclysmbosses.client.render.entity;
 import com.skd.cataclysmbosses.client.render.compat.CmMobRenderer;
 import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 
 import com.skd.cataclysmbosses.client.model.entity.Spike_Model;
 import com.skd.cataclysmbosses.client.render.layer.LionFish_Layer;
 import com.skd.cataclysmbosses.entity.Deepling.Spike_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.Identifier;
@@ -31,8 +31,13 @@ extends CmMobRenderer<Spike_Entity> {
     private static final Identifier LIONFISH_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/deepling/lionfish.png");
 
     public Spike_Renderer(EntityRendererProvider.Context renderManagerIn) {
-        super(renderManagerIn, (EntityModel)new Spike_Model(), 0.4f);
+        super(renderManagerIn, new Spike_Model(), 0.4f);
         this.addLayer(new LionFish_Layer(this));
+    }
+
+    @Override
+    protected void render(Spike_Entity entity, float partialTicks, PoseStack poseStack, CmMultiBufferSource buffer, int packedLight) {
+        // TODO: port render body to 26.2 (old MobRenderer APIs removed)
     }
 
     public Identifier getTextureLocation(Spike_Entity entity) {

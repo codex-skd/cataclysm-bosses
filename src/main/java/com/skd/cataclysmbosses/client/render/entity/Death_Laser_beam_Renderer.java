@@ -129,7 +129,9 @@ extends CmEntityRenderer<Death_Laser_Beam_Entity> {
                 lightningRender.update((Object)entity, bolt1, frame);
                 lightningRender.update((Object)entity, bolt2, frame);
             }
-            lightningRender.render(frame, poseStack, buffer);
+            // PORT TODO(26.2): LightningRender.render now needs SubmitNodeCollector, but the
+            // bridge render() only provides CmMultiBufferSource. Needs bridge plumbing change.
+            // lightningRender.render(frame, poseStack, buffer);
             poseStack.popPose();
         }
         if (entity.isRemoved() && this.lightningRenderMap.containsKey(entity.getUUID())) {
@@ -149,7 +151,7 @@ extends CmEntityRenderer<Death_Laser_Beam_Entity> {
             return;
         }
         matrixStackIn.pushPose();
-        Quaternionf quat = this.entityRenderDispatcher.cameraOrientation();
+        Quaternionf quat = this.entityRenderDispatcher.camera.rotation();
         matrixStackIn.mulPose(quat);
         this.renderFlatQuad(frame, matrixStackIn, builder, packedLightIn);
         matrixStackIn.popPose();
@@ -157,7 +159,7 @@ extends CmEntityRenderer<Death_Laser_Beam_Entity> {
 
     private void renderEnd(int frame, Direction side, PoseStack matrixStackIn, VertexConsumer builder, int packedLightIn) {
         matrixStackIn.pushPose();
-        Quaternionf quat = this.entityRenderDispatcher.cameraOrientation();
+        Quaternionf quat = this.entityRenderDispatcher.camera.rotation();
         matrixStackIn.mulPose(quat);
         this.renderFlatQuad(frame, matrixStackIn, builder, packedLightIn);
         matrixStackIn.popPose();
@@ -193,13 +195,13 @@ extends CmEntityRenderer<Death_Laser_Beam_Entity> {
         matrixStackIn.mulPose(CMMathUtil.quatFromRotationXYZ(-pitch, 0.0f, 0.0f, true));
         matrixStackIn.pushPose();
         if (!this.clearerView) {
-            matrixStackIn.mulPose(new Quaternionf().rotationY(Minecraft.getInstance().gameRenderer.getMainCamera().getXRot() + 90.0f));
+            matrixStackIn.mulPose(new Quaternionf().rotationY(Minecraft.getInstance().getEntityRenderDispatcher().camera.xRot() + 90.0f));
         }
         this.drawBeam(length, frame, matrixStackIn, builder, packedLightIn);
         matrixStackIn.popPose();
         if (!this.clearerView) {
             matrixStackIn.pushPose();
-            matrixStackIn.mulPose(new Quaternionf().rotationY((-Minecraft.getInstance().gameRenderer.getMainCamera().getXRot() - 90.0f) * ((float)Math.PI / 180)));
+            matrixStackIn.mulPose(new Quaternionf().rotationY((-Minecraft.getInstance().getEntityRenderDispatcher().camera.xRot() - 90.0f) * ((float)Math.PI / 180)));
             this.drawBeam(length, frame, matrixStackIn, builder, packedLightIn);
             matrixStackIn.popPose();
         }
