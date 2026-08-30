@@ -496,7 +496,7 @@ extends AdvancedEntityModel<The_Harbinger_Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of(this.root, this.main_head, this.mid, this.head, this.headgear, this.eyebrows, this.jaw, this.righthead, this.rightlaser, this.rightlaser2, this.right_guard, this.right_upper_guard, (Object[])new AdvancedModelBox[]{this.right_lower_guard, this.lefthead, this.left_side_guard, this.left_upper_guard, this.left_lower_guard, this.leftlaser, this.leftlaser2, this.body, this.tail, this.nether_star, this.tailbone, this.jetpack, this.rightside, this.rightedge1, this.rightedge2, this.rightedge3, this.leftside, this.leftedge1, this.leftedge2, this.leftedge3, this.left_jet, this.right_jet});
+        return ImmutableList.of(this.root, this.main_head, this.mid, this.head, this.headgear, this.eyebrows, this.jaw, this.righthead, this.rightlaser, this.rightlaser2, this.right_guard, this.right_upper_guard, this.right_lower_guard, this.lefthead, this.left_side_guard, this.left_upper_guard, this.left_lower_guard, this.leftlaser, this.leftlaser2, this.body, this.tail, this.nether_star, this.tailbone, this.jetpack, this.rightside, this.rightedge1, this.rightedge2, this.rightedge3, this.leftside, this.leftedge1, this.leftedge2, this.leftedge3, this.left_jet, this.right_jet);
     }
 
     public void translateToHand(PoseStack matrixStack, boolean right) {

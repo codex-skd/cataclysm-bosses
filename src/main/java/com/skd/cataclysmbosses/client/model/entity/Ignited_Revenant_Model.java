@@ -385,7 +385,7 @@ extends AdvancedEntityModel<Ignited_Revenant_Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of(this.root, this.head, this.jaw, this.helmet, this.skull, this.body, this.guardingring, this.guardingring2, this.shield, this.shieldjoint, this.shield2, this.shieldjoint2, (Object[])new AdvancedModelBox[]{this.shield3, this.shieldjoint3, this.shield4, this.shieldjoint4, this.center});
+        return ImmutableList.of(this.root, this.head, this.jaw, this.helmet, this.skull, this.body, this.guardingring, this.guardingring2, this.shield, this.shieldjoint, this.shield2, this.shieldjoint2, this.shield3, this.shieldjoint3, this.shield4, this.shieldjoint4, this.center);
     }
 
     public BasicModelPart root() {

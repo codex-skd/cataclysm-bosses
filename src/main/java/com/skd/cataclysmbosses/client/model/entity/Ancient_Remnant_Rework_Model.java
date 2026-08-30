@@ -122,7 +122,6 @@ extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRen
     public Ancient_Remnant_Rework_Model(ModelPart root) {
         super(root);
         this.root = root;
-        this.buildPartCache(root);
         this.roots = this.root.getChild("roots");
         this.mid_pivot = this.roots.getChild("mid_pivot");
         this.pelvis = this.mid_pivot.getChild("pelvis");

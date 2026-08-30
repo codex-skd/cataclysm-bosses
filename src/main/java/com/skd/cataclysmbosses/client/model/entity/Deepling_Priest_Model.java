@@ -40,6 +40,7 @@ extends AdvancedEntityModel<Deepling_Priest_Entity> {
     public final AdvancedModelBox right_arm;
     public final AdvancedModelBox left_arm;
     private ModelAnimator animator;
+    public boolean riding;
 
     public Deepling_Priest_Model() {
         this.texWidth = 128;
@@ -125,7 +126,7 @@ extends AdvancedEntityModel<Deepling_Priest_Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of(this.root, this.left_leg, this.right_leg, this.body, this.headwear, this.head, this.head2, this.r_fin, this.l_fin, this.right_arm, this.left_arm, this.fin, (Object[])new AdvancedModelBox[]{this.light});
+        return ImmutableList.of(this.root, this.left_leg, this.right_leg, this.body, this.headwear, this.head, this.head2, this.r_fin, this.l_fin, this.right_arm, this.left_arm, this.fin, this.light);
     }
 
     public void animate(Deepling_Priest_Entity entity, float f, float f1, float f2, float f3, float f4) {

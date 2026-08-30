@@ -58,7 +58,6 @@ extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRen
     public Symbiocto_Model(ModelPart root) {
         super(root);
         this.root = root;
-        this.buildPartCache(root);
         this.everything = this.root.getChild("everything");
         this.octo_head = this.everything.getChild("octo_head");
         this.back_tentacle1 = this.octo_head.getChild("back_tentacle1");

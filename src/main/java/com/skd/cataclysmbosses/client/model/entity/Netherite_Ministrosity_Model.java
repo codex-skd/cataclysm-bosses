@@ -49,7 +49,6 @@ extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRen
     public Netherite_Ministrosity_Model(ModelPart root) {
         super(root);
         this.root = root;
-        this.buildPartCache(root);
         this.roots = this.root.getChild("roots");
         this.mid_root = this.roots.getChild("mid_root");
         this.legs = this.mid_root.getChild("legs");

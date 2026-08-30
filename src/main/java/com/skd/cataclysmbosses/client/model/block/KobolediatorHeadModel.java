@@ -37,6 +37,7 @@ extends SkullModelBase {
     private final ModelPart jaw;
 
     public KobolediatorHeadModel(ModelPart p_171097_) {
+        super(p_171097_);
         this.head = p_171097_.getChild("head");
         this.jaw = this.head.getChild("jaw");
     }
@@ -55,18 +56,16 @@ extends SkullModelBase {
         return LayerDefinition.create((MeshDefinition)meshdefinition, (int)256, (int)256);
     }
 
-    public void setupAnim(float p_104188_, float p_104189_, float p_104190_) {
-        this.jaw.xRot = (float)(Math.sin(p_104188_ * (float)Math.PI * 0.2f) + 1.0) * 0.2f;
-        this.head.yRot = p_104189_ * ((float)Math.PI / 180);
-        this.head.xRot = p_104190_ * ((float)Math.PI / 180);
+    @Override
+    public void setupAnim(SkullModelBase.State state) {
+        super.setupAnim(state);
+        this.jaw.xRot = (float)(Math.sin(state.animationPos * (float)Math.PI * 0.2f) + 1.0) * 0.2f;
+        this.head.yRot = state.yRot * ((float)Math.PI / 180);
+        this.head.xRot = state.xRot * ((float)Math.PI / 180);
     }
 
-    public void renderToBuffer(PoseStack p_104192_, VertexConsumer p_104193_, int p_104194_, int p_104195_, int p_350947_) {
-        p_104192_.pushPose();
-        p_104192_.translate(0.0f, -0.374375f, 0.0f);
-        p_104192_.scale(0.75f, 0.75f, 0.75f);
-        this.head.render(p_104192_, p_104193_, p_104194_, p_104195_, p_350947_);
-        p_104192_.popPose();
-    }
+// PORT TODO(26.2): Model#renderToBuffer is final now. Original custom transform was
+    // translate(0, -0.374375, 0) + scale(0.75, 0.75, 0.75) on the 'head' part. Re-apply in
+    // Cataclysm_Skull_Block_Renderer#submit when that renderer is implemented.
 }
 

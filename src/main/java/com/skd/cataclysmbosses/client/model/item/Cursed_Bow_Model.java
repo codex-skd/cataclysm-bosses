@@ -121,7 +121,7 @@ extends AdvancedEntityModel<Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of(this.root, this.bow_string, this.bow, this.arm1, this.arm2, this.string, this.string2, this.arrow, this.arrow2, this.arrow3, this.arrow_pivot1, this.arrow_pivot2, (Object[])new AdvancedModelBox[]{this.arrow_pivot3});
+        return ImmutableList.of(this.root, this.bow_string, this.bow, this.arm1, this.arm2, this.string, this.string2, this.arrow, this.arrow2, this.arrow3, this.arrow_pivot1, this.arrow_pivot2, this.arrow_pivot3);
     }
 
     public BasicModelPart root() {

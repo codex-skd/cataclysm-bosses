@@ -58,7 +58,7 @@ extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRen
     public Ignited_Berserker_Model(ModelPart root) {
         super(root);
         this.root = root;
-        this.buildPartCache(root);
+
         this.everything = root.getChild("everything");
         this.mid_root = this.everything.getChild("mid_root");
         this.rod = this.mid_root.getChild("rod");

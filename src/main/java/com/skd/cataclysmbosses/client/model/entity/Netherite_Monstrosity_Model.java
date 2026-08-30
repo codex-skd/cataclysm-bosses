@@ -78,7 +78,6 @@ extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRen
     public Netherite_Monstrosity_Model(ModelPart root) {
         super(root);
         this.root = root;
-        this.buildPartCache(root);
         this.roots = this.root.getChild("roots");
         this.lowerbody = this.roots.getChild("lowerbody");
         this.upperbody = this.lowerbody.getChild("upperbody");

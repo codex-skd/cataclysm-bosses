@@ -49,6 +49,7 @@ extends AdvancedEntityModel<Deepling_Warlock_Entity> {
     private final AdvancedModelBox l_fin;
     private final AdvancedModelBox headwear;
     private ModelAnimator animator;
+    public boolean riding;
 
     public Deepling_Warlock_Model() {
         this.texWidth = 128;

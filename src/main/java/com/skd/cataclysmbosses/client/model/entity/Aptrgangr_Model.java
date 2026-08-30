@@ -114,7 +114,6 @@ extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRen
     public Aptrgangr_Model(ModelPart root) {
         super(root);
         this.root = root;
-        this.buildPartCache(root);
         this.roots = this.root.getChild("roots");
         this.l_leg = this.roots.getChild("l_leg");
         this.l_leg_armor = this.l_leg.getChild("l_leg_armor");

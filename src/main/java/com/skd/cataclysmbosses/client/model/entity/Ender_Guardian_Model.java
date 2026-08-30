@@ -957,7 +957,7 @@ extends AdvancedEntityModel<Ender_Guardian_Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of(this.root, this.left_arm, this.right_arm, this.left_arm2, this.right_arm2, this.left_fist, this.right_fist, this.left_leg, this.right_leg, this.head, this.armor, this.helmet, (Object[])new AdvancedModelBox[]{this.upperhelmet, this.lowerbody, this.upperbody, this.rightarmor, this.leftarmor});
+        return ImmutableList.of(this.root, this.left_arm, this.right_arm, this.left_arm2, this.right_arm2, this.left_fist, this.right_fist, this.left_leg, this.right_leg, this.head, this.armor, this.helmet, this.upperhelmet, this.lowerbody, this.upperbody, this.rightarmor, this.leftarmor);
     }
 
     public BasicModelPart root() {

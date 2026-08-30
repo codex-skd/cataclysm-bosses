@@ -60,7 +60,6 @@ implements ArmedModel {
     public Draugr_Model(ModelPart root) {
         super(root);
         this.everything = root;
-        this.buildPartCache(root);
         this.root = this.everything.getChild("root");
         this.right_leg = this.root.getChild("right_leg");
         this.left_leg = this.root.getChild("left_leg");
@@ -98,5 +97,11 @@ implements ArmedModel {
         @Override
     public void setupAnim(EntityRenderState state) {
         super.setupAnim(state);
+    }
+
+    @Override
+    public void translateToHand(EntityRenderState state, HumanoidArm arm, PoseStack poseStack) {
+        this.body.translateAndRotate(poseStack);
+        this.right_arm.translateAndRotate(poseStack);
     }
 }

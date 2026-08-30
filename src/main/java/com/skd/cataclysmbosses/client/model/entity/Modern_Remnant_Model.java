@@ -283,7 +283,7 @@ extends AdvancedEntityModel<Modern_Remnant_Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of(this.root, this.body, this.upper_body, this.right_arm, this.right_hand, this.left_arm, this.left_hand, this.neck, this.bandage, this.headjoint, this.head, this.helmet, (Object[])new AdvancedModelBox[]{this.helmet2, this.jaw, this.tail, this.tail2, this.tail3, this.right_leg, this.right_leg2, this.left_leg, this.left_leg2});
+        return ImmutableList.of(this.root, this.body, this.upper_body, this.right_arm, this.right_hand, this.left_arm, this.left_hand, this.neck, this.bandage, this.headjoint, this.head, this.helmet, this.helmet2, this.jaw, this.tail, this.tail2, this.tail3, this.right_leg, this.right_leg2, this.left_leg, this.left_leg2);
     }
 
     public BasicModelPart root() {

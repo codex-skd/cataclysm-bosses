@@ -38,6 +38,7 @@ extends AdvancedEntityModel<Deepling_Angler_Entity> {
     public final AdvancedModelBox headwear;
     public final AdvancedModelBox right_arm;
     public final AdvancedModelBox left_arm;
+    public boolean riding;
     public ModelAnimator animator;
 
     public Deepling_Angler_Model() {
@@ -140,7 +141,7 @@ extends AdvancedEntityModel<Deepling_Angler_Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of(this.root, this.left_leg, this.right_leg, this.body, this.headwear, this.head, this.head2, this.r_fin, this.l_fin, this.right_arm, this.left_arm, this.thorns, (Object[])new AdvancedModelBox[]{this.thorns2, this.thorns3, this.thorns4});
+        return ImmutableList.of(this.root, this.left_leg, this.right_leg, this.body, this.headwear, this.head, this.head2, this.r_fin, this.l_fin, this.right_arm, this.left_arm, this.thorns, this.thorns2, this.thorns3, this.thorns4);
     }
 
     public void animate(Deepling_Angler_Entity entity, float f, float f1, float f2, float f3, float f4) {

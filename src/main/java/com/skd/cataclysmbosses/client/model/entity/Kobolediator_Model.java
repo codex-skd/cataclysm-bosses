@@ -67,7 +67,7 @@ extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRen
     public Kobolediator_Model(ModelPart root) {
         super(root);
         this.root = root;
-        this.buildPartCache(root);
+
         this.everything = this.root.getChild("everything");
         this.mid_root = this.everything.getChild("mid_root");
         this.pelvis = this.mid_root.getChild("pelvis");

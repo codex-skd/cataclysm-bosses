@@ -57,13 +57,12 @@ extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRen
     private final ModelPart rightLeg2;
     private final ModelPart leftLeg;
     private final ModelPart leftLeg2;
-    private final Map<String, ModelPart> partCache = new Object2ObjectOpenHashMap();
-    private final Map<String, Optional<ModelPart>> optionalPartCache = new Object2ObjectOpenHashMap();
+    private final java.util.function.Function<String, ModelPart> partLookup;
 
     public Cindaria_Model(ModelPart root) {
         super(root);
         this.root = root;
-        this.buildPartCache(root);
+        this.partLookup = root.createPartLookup();
         this.everything = this.root.getChild("everything");
         this.lowerBody = this.everything.getChild("lowerBody");
         this.upperBody = this.lowerBody.getChild("upperBody");
@@ -124,23 +123,12 @@ extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRen
         return LayerDefinition.create((MeshDefinition)meshdefinition, (int)256, (int)256);
     }
 
-    private void buildPartCache(ModelPart part) {
-        for (Map.Entry entry : part.getAllParts().entrySet()) {
-            String partName = (String)entry.getKey();
-            ModelPart childPart = (ModelPart)entry.getValue();
-            this.partCache.putIfAbsent(partName, childPart);
-            this.optionalPartCache.putIfAbsent(partName, Optional.of(childPart));
-            if (getChildrenMap(childPart).isEmpty()) continue;
-            this.buildPartCache(childPart);
-        }
-    }
-
     @NotNull
     public Optional<ModelPart> getAnyDescendantWithName(String name) {
         if ("root".equals(name)) {
             return Optional.of(this.root);
         }
-        return this.optionalPartCache.getOrDefault(name, Optional.empty());
+        return Optional.ofNullable(this.partLookup.apply(name));
     }
 
         @Override

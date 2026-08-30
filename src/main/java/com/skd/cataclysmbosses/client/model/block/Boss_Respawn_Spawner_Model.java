@@ -81,7 +81,7 @@ extends AdvancedEntityModel<Entity> {
     public void animate(Boss_Respawn_Spawner_Block_Entity entity, float partialTick) {
         this.resetToDefaultPose();
         float ageInTicks = (float)entity.tickCount + partialTick;
-        this.animate(entity.getAnimationState("opening"), Boss_Respawn_Spawner_Animation.SPAWNING, ageInTicks, 1.0f);
+        this.animate(entity.openingAnimationState, Boss_Respawn_Spawner_Animation.SPAWNING, ageInTicks, 1.0f);
     }
 
     public void setRotationAngle(AdvancedModelBox AdvancedModelBox2, float x, float y, float z) {

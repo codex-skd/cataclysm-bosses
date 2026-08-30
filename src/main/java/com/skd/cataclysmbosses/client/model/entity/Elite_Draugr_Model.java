@@ -66,7 +66,6 @@ implements ArmedModel {
     public Elite_Draugr_Model(ModelPart root) {
         super(root);
         this.everything = root;
-        this.buildPartCache(root);
         this.root = this.everything.getChild("root");
         this.body = this.root.getChild("body");
         this.front_cloth1 = this.body.getChild("front_cloth1");
@@ -116,5 +115,14 @@ implements ArmedModel {
         @Override
     public void setupAnim(EntityRenderState state) {
         super.setupAnim(state);
+    }
+
+    @Override
+    public void translateToHand(EntityRenderState state, HumanoidArm arm, PoseStack poseStack) {
+        this.root.translateAndRotate(poseStack);
+        this.body.translateAndRotate(poseStack);
+        this.waist.translateAndRotate(poseStack);
+        this.chest.translateAndRotate(poseStack);
+        this.r_arm.translateAndRotate(poseStack);
     }
 }

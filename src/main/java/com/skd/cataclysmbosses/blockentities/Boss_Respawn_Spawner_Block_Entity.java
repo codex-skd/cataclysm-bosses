@@ -44,6 +44,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.datafix.DataFixTypes;
 import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.EntitySpawnReason;
@@ -68,6 +69,8 @@ extends BlockEntity {
     public EntityType<?> spawnType;
     public ItemStack item;
     public boolean hasBeenRespawned;
+    // PORT(26.2): client-side opening animation clock the spawner model drives (was lost in decompile).
+    public final AnimationState openingAnimationState = new AnimationState();
     private Entity displayEntity;
     private boolean hasBeenRespawnedOnce;
 

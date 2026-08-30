@@ -35,6 +35,7 @@ extends AdvancedEntityModel<Deepling_Entity> {
     public final AdvancedModelBox right_arm;
     public final AdvancedModelBox left_arm;
     private ModelAnimator animator;
+    public boolean riding;
 
     public Deepling_Model() {
         this.texWidth = 64;

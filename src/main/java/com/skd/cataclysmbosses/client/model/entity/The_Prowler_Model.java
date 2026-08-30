@@ -70,7 +70,6 @@ extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRen
     public The_Prowler_Model(ModelPart root) {
         super(root);
         this.root = root;
-        this.buildPartCache(root);
         this.roots = this.root.getChild("roots");
         this.upperbody = this.roots.getChild("upperbody");
         this.chestplate = this.upperbody.getChild("chestplate");

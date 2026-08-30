@@ -383,7 +383,7 @@ extends AdvancedEntityModel<The_Baby_Leviathan_Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of(this.root, this.body, this.main_belly, this.r_tentacle, this.r_tentacle2, this.r_hook1, this.r_hook2, this.r_hook3, this.r_hook4, this.l_tentacle, this.l_tentacle2, this.l_hook1, (Object[])new AdvancedModelBox[]{this.l_hook2, this.l_hook3, this.l_hook4, this.belly, this.r_down_fin, this.l_down_fin, this.tail, this.tail_back, this.r_spike1, this.r_spike2, this.head, this.maw, this.skul, this.main_mouth, this.mouth1, this.mouth1_e, this.mouth2, this.mouth2_e, this.mouth3, this.mouth3_e, this.mouth4, this.mouth4_e, this.r_fin, this.l_fin, this.l_spike1, this.l_spike2});
+        return ImmutableList.of(this.root, this.body, this.main_belly, this.r_tentacle, this.r_tentacle2, this.r_hook1, this.r_hook2, this.r_hook3, this.r_hook4, this.l_tentacle, this.l_tentacle2, this.l_hook1, this.l_hook2, this.l_hook3, this.l_hook4, this.belly, this.r_down_fin, this.l_down_fin, this.tail, this.tail_back, this.r_spike1, this.r_spike2, this.head, this.maw, this.skul, this.main_mouth, this.mouth1, this.mouth1_e, this.mouth2, this.mouth2_e, this.mouth3, this.mouth3_e, this.mouth4, this.mouth4_e, this.r_fin, this.l_fin, this.l_spike1, this.l_spike2);
     }
 
     public BasicModelPart root() {

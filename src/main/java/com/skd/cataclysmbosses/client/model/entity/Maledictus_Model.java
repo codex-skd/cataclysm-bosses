@@ -102,7 +102,6 @@ extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRen
     public Maledictus_Model(ModelPart root) {
         super(root);
         this.root = root;
-        this.buildPartCache(root);
         this.roots = this.root.getChild("roots");
         this.berserker = this.roots.getChild("berserker");
         this.legs = this.berserker.getChild("legs");
