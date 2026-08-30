@@ -120,8 +120,8 @@ dependencies {
     // NautilusAPI (port of LionfishAPI, this mod's own animation-library dependency).
     implementation files("libs/nautilus_api-26.2-neoforge-26.2.0.45-beta-0.0.0-beta.2.jar")
 
-    // Curios API -- official NeoForge 26.2 build
-    implementation files("libs/curios-neoforge-15.0.0-beta.2+26.2.jar")
+    // Accessory-slots API -- regalia_slots_api (our own port; ships a top.theillusivec4.curios.api shim).
+    implementation files("libs/regalia_slots_api-26.2-neoforge-26.2.0.57-1.1.3.jar")
 
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html

@@ -91,10 +91,10 @@ config="${mod_id}.mixins.json"
     ordering="NONE"
     side="BOTH"
 
-# Curios API -- official NeoForge 26.2 build
+# Accessory-slots API -- regalia_slots_api (our own port)
 [[dependencies.${mod_id}]]
-    modId="curios"
+    modId="regalia_slots_api"
     type="required"
-    versionRange="[15.0.0-beta.2+26.2,)"
+    versionRange="[1.1.3,)"
     ordering="NONE"
     side="BOTH"

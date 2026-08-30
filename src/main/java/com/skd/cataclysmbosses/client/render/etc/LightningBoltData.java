@@ -139,7 +139,7 @@ public class LightningBoltData {
         quads.addQuad(startRight, endRight, end, start);
         quads.addQuad(startRight, endRight, endBack, startBack);
         quads.addQuad(startBack, endBack, endRight, startRight);
-        return Pair.of((Object)quads, (Object)new QuadCache(end, endRight, endBack));
+        return Pair.of(quads, new QuadCache(end, endRight, endBack));
     }
 
     public static class BoltRenderInfo {
@@ -172,12 +172,12 @@ public class LightningBoltData {
     }
 
     public static interface SpawnFunction {
-        public static final SpawnFunction NO_DELAY = rand -> Pair.of((Object)Float.valueOf(0.0f), (Object)Float.valueOf(0.0f));
+        public static final SpawnFunction NO_DELAY = rand -> Pair.of(Float.valueOf(0.0f), Float.valueOf(0.0f));
         public static final SpawnFunction CONSECUTIVE = new SpawnFunction(){
 
             @Override
             public Pair<Float, Float> getSpawnDelayBounds(Random rand) {
-                return Pair.of((Object)Float.valueOf(0.0f), (Object)Float.valueOf(0.0f));
+                return Pair.of(Float.valueOf(0.0f), Float.valueOf(0.0f));
             }
 
             @Override
@@ -187,11 +187,11 @@ public class LightningBoltData {
         };
 
         public static SpawnFunction delay(float delay) {
-            return rand -> Pair.of((Object)Float.valueOf(delay), (Object)Float.valueOf(delay));
+            return rand -> Pair.of(Float.valueOf(delay), Float.valueOf(delay));
         }
 
         public static SpawnFunction noise(float delay, float noise) {
-            return rand -> Pair.of((Object)Float.valueOf(delay - noise), (Object)Float.valueOf(delay + noise));
+            return rand -> Pair.of(Float.valueOf(delay - noise), Float.valueOf(delay + noise));
         }
 
         public Pair<Float, Float> getSpawnDelayBounds(Random var1);
@@ -207,13 +207,13 @@ public class LightningBoltData {
     }
 
     public static interface FadeFunction {
-        public static final FadeFunction NONE = (totalBolts, lifeScale) -> Pair.of((Object)0, (Object)totalBolts);
+        public static final FadeFunction NONE = (totalBolts, lifeScale) -> Pair.of(0, totalBolts);
 
         public static FadeFunction fade(float fade) {
             return (totalBolts, lifeScale) -> {
                 int start = lifeScale > 1.0f - fade ? (int)((float)totalBolts * (lifeScale - (1.0f - fade)) / fade) : 0;
                 int end = lifeScale < fade ? (int)((float)totalBolts * (lifeScale / fade)) : totalBolts;
-                return Pair.of((Object)start, (Object)end);
+                return Pair.of(start, end);
             };
         }
 
