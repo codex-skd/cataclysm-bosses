@@ -85,11 +85,13 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import java.util.Random;
+import java.lang.reflect.Method;
+import net.minecraft.Util;
 // import net.minecraft.util.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-// import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.GameRenderer;
@@ -254,7 +256,7 @@ public class ClientEvent {
             return false;
         }
         return switch (keybind.getKey().getType()) {
-            case InputConstants.Type.KEYSYM -> InputConstants.isKeyDown((long)Minecraft.getInstance().getWindow().handle(), (int)keybind.getKey().getValue());
+            case InputConstants.Type.KEYSYM -> InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), keybind.getKey().getValue());
             case InputConstants.Type.MOUSE -> {
                 if (GLFW.glfwGetMouseButton((long)Minecraft.getInstance().getWindow().handle(), (int)keybind.getKey().getValue()) == 1) {
                     yield true;
@@ -268,17 +270,13 @@ public class ClientEvent {
     public static void MovementInput(MovementInputUpdateEvent event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player != null && player.hasEffect(ModEffect.EFFECTCURSE_OF_DESERT)) {
-            if (Minecraft.getInstance().options.keyDown.isDown()) {
-                event.getInput().forwardImpulse *= -1.0f;
+            // PORT(26.2): Input.forwardImpulse/leftImpulse -> Input.moveVector (org.joml.Vector2f).
+            org.joml.Vector2f mv = event.getInput().moveVector;
+            if (Minecraft.getInstance().options.keyDown.isDown() || Minecraft.getInstance().options.keyUp.isDown()) {
+                mv.y *= -1.0f;
             }
-            if (Minecraft.getInstance().options.keyLeft.isDown()) {
-                event.getInput().leftImpulse *= -1.0f;
-            }
-            if (Minecraft.getInstance().options.keyRight.isDown()) {
-                event.getInput().leftImpulse *= -1.0f;
-            }
-            if (Minecraft.getInstance().options.keyUp.isDown()) {
-                event.getInput().forwardImpulse *= -1.0f;
+            if (Minecraft.getInstance().options.keyLeft.isDown() || Minecraft.getInstance().options.keyRight.isDown()) {
+                mv.x *= -1.0f;
             }
         }
     }
@@ -289,24 +287,17 @@ public class ClientEvent {
             Minecraft mc = Minecraft.getInstance();
             if (player.isPassenger()) {
                 if ((player.getVehicle() instanceof The_Leviathan_Tongue_Entity || player.getVehicle() instanceof IHoldEntity) && VanillaGuiLayers.VEHICLE_HEALTH == event.getName()) {
-                    Minecraft.getInstance().gui.setOverlayMessage((Component)Component.translatable((String)"entity.cataclysm.you_cant_escape"), false);
+                    // PORT TODO(26.2): Gui.setOverlayMessage removed; re-route "you_cant_escape" action-bar message.
                 }
                 if (player.getVehicle() instanceof Accretion_Entity && VanillaGuiLayers.VEHICLE_HEALTH == event.getName()) {
-                    Minecraft.getInstance().gui.setOverlayMessage((Component)Component.translatable((String)"entity.cataclysm.accretion_ride"), false);
+                    // PORT TODO(26.2): Gui.setOverlayMessage removed; re-route "accretion_ride" action-bar message.
                 }
             }
         }
     }
 
     public static void onPostRenderHUD(RenderGuiLayerEvent.Post event) {
-        LocalPlayer player = Minecraft.getInstance().player;
-        float delta = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true);
-        float screenEffectIntensity = ((Double)Minecraft.getInstance().options.screenEffectScale().get()).floatValue();
-        float ticksExistedDelta = (float)player.tickCount + delta;
-        Minecraft mc = Minecraft.getInstance();
-        if (player == null || VanillaGuiLayers.AIR_LEVEL != event.getName() || mc.options.hideGui || ClientEvent.shouldDrawSurvivalElements()) {
-            // empty if block
-        }
+        // PORT TODO(26.2): body was already empty; mc.options.hideGui field removed.
     }
 
     private static boolean shouldDrawSurvivalElements() {
@@ -376,7 +367,7 @@ public class ClientEvent {
     }
 
     public static void clientTick(ClientTickEvent.Post event) {
-        if (Minecraft.getInstance().isSingleplayer() && Minecraft.getInstance().isPaused()) {
+        if (Minecraft.getInstance().hasSingleplayerServer() && Minecraft.getInstance().isPaused()) {
             return;
         }
         CMItemstackRenderer.incrementTick();
@@ -384,12 +375,8 @@ public class ClientEvent {
     }
 
     private static void updateAllChunks() {
-        if (Minecraft.getInstance().levelRenderer.viewArea != null) {
-            int length = Minecraft.getInstance().levelRenderer.viewArea.sections.length;
-            for (int i = 0; i < length; ++i) {
-                Minecraft.getInstance().levelRenderer.viewArea.sections[i].setDirty(true);
-            }
-        }
+        // PORT(26.2): viewArea/ViewArea.sections are private; use the public rebuild-everything hook.
+        Minecraft.getInstance().levelExtractor.allChanged();
     }
 
     public static void onPoseHand(EventPosePlayerHand event) {
@@ -535,19 +522,8 @@ public class ClientEvent {
     }
 
     public static void setupOverlayRenderState(boolean blend, boolean depthTest) {
-        if (blend) {
-            RenderSystem.enableBlend();
-            RenderSystem.defaultBlendFunc();
-        } else {
-            RenderSystem.disableBlend();
-        }
-        if (depthTest) {
-            RenderSystem.enableDepthTest();
-        } else {
-            RenderSystem.disableDepthTest();
-        }
-        RenderSystem.setShaderColor((float)1.0f, (float)1.0f, (float)1.0f, (float)1.0f);
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        // PORT(26.2): RenderSystem enable/disableBlend/DepthTest, setShaderColor, setShader and
+        // GameRenderer::getPositionTexShader are gone; GUI blit state is pipeline-managed now.
     }
 
     private static void renderBossOverlay(CustomizeGuiOverlayEvent.BossEventProgress event) {
