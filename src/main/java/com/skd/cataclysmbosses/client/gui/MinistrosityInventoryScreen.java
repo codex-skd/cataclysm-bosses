@@ -23,6 +23,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
@@ -36,17 +37,17 @@ extends AbstractContainerScreen<MinistrostiyMenu> {
     private float yMouse;
 
     public MinistrosityInventoryScreen(MinistrostiyMenu p_98817_, Inventory p_98818_, Netherite_Ministrosity_Entity p_98819_, int p_352203_) {
-        super((AbstractContainerMenu)p_98817_, p_98818_, p_98819_.getDisplayName());
+        super(p_98817_, p_98818_, p_98819_.getDisplayName());
         this.mini = p_98819_;
         this.inventoryColumns = p_352203_;
     }
 
     @Override
-    public void extractBackground(GuiGraphicsExtractor p_282553_, float p_282998_, int p_282929_, int p_283133_) {
+    public void extractBackground(GuiGraphicsExtractor p_282553_, int p_282929_, int p_283133_, float p_282998_) {
         int i = (this.width - this.imageWidth) / 2;
         int j = (this.height - this.imageHeight) / 2;
-        p_282553_.blit(HORSE_INVENTORY_LOCATION, i, j, 0, 0, this.imageWidth, this.imageHeight);
-        p_282553_.blit(HORSE_INVENTORY_LOCATION, i + 70, j + 17, 0, this.imageHeight, this.inventoryColumns * 18, 54);
+        p_282553_.blit(RenderPipelines.GUI_TEXTURED, HORSE_INVENTORY_LOCATION, i, j, 0.0f, 0.0f, this.imageWidth, this.imageHeight, 256, 256);
+        p_282553_.blit(RenderPipelines.GUI_TEXTURED, HORSE_INVENTORY_LOCATION, i + 70, j + 17, 0.0f, (float)this.imageHeight, this.inventoryColumns * 18, 54, 256, 256);
         InventoryScreen.extractEntityInInventoryFollowsMouse(p_282553_, i - 10, j + 18, i + 78, j + 70, 34, 0.0f, this.xMouse, this.yMouse, (LivingEntity)this.mini);
     }
     
