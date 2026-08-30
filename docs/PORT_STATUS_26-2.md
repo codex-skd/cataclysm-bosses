@@ -1,6 +1,53 @@
 SESSION STATUS — NeoForge 26.2.0.45-beta -> 26.2.0.57 compile port
 ================================================================
 
+== 2026-08-30 (sesión 5) — 423 -> 288 errores | client/ (model DONE, render en curso) ==
+
+Modelo de delegación: opencode-go/longcat-2.0 (elección del usuario, misma que sesiones 2-4).
+Nota: longcat esta sesión tiende a tardar MUCHO (~25-35 min/lote) y a veces necesita el fichero
+de errores regenerado; también corrompió 6 líneas con un char  al quitar @Override (Claude lo
+reparó). Prompts tight en scratchpad: deleg_client_model{,_1b}.md, deleg_render_entity_{light,heavy}.md.
+Refs de NautilusAPI copiadas a tmp_scratch/nautilus_ref/ (OpenCode auto-rechaza external_directory).
+
+Commits nuevos (rama production, SIN pushear):
+  d410b94  client/model/ compila (423 -> 351)   [longcat parcial + Claude a mano: clusters
+           buildPartCache->createPartLookup, riding field, translateToHand, skull models, elytra]
+  4ad909f  client/render/entity LIGHT batch + root proxy (351 -> 288)  [longcat: 27 renderers
+           simples CmEntityRenderer; + Claude: FMLLoader.getDist->FMLEnvironment.getDist,
+           ClientProxy cameraEntity/Int2ObjectMap]
+
+ESTADO: 288 errores, todos en client/:
+  render/entity            140   (SOLO el cluster CmMobRenderer de jefes: Scylla 20, Leviathan 10,
+                                  Deepling*/Draugr*/Ignited*... + Scylla_Ceraunus, Void_Scatter_Arrow.
+                                  Los 27 renderers simples ya compilan. -> lote HEAVY delegado a longcat.)
+  event/                    62   (ClientEvent.java ~58 + ClientSetup ~4; RenderGuiLayerEvent,
+                                  RenderLivingEvent, key handling, ViewArea privado... A MANO al final.)
+  render/item/CuriosRenderer 44  (Curios render API; prepareModel name-clash x9. Varios quedarán stub.)
+  gui                       17   (CustomBossBar blit(Identifier,...) x11; MinistrosityInventoryScreen 4)
+  render/etc                16   (CurioHeadRenderer 8, LightningBoltData 7 - ViewArea.sections privado)
+  CustomRarity 3 / render(root) 3 / render/item 3
+
+TODOs 26.2 NUEVOS de esta sesión (stubs que compilan, revisar antes de jugar):
+  - client/render/blockentity/Cataclysm_Skull_Block_Renderer: submit() entero stub (ya lo estaba).
+    Los 3 *HeadModel perdieron su translate/scale custom (Model#renderToBuffer es final ahora);
+    valores originales anotados como PORT TODO en cada HeadModel para re-aplicar aquí.
+  - client/render/entity LIGHT: Eye_Of_Dungeon / Blazing_Bone / Urchin_Spike -> render de item
+    (ItemModelResolver/ItemRenderer) dejado como PORT TODO de 1 línea.
+  - Boss_Respawn_Spawner_Block_Entity: re-añadido `public final AnimationState openingAnimationState`
+    (se perdió en la descompilación); verificar que la animación de apertura del spawner va.
+  - Ignitium_Elytra_chestplate_Model: reescrito contra HumanoidRenderState.elytraRot* (como el
+    ElytraModel vanilla); se perdió la matemática vieja de fall-fly/crouch (ahora es upstream).
+
+PLAN restante (orden):
+  1. render/entity HEAVY (140) - longcat en curso (deleg_render_entity_heavy.md). Scylla/Leviathan
+     quizá necesiten repaso a mano. El cuerpo de render() de muchos jefes YA era un stub // TODO.
+  2. render/item/CuriosRenderer (44) + render/etc (16) - Curios; varios quedarán stub.
+  3. gui (17) - CustomBossBar blit/GuiGraphics.
+  4. event/ClientEvent.java (62) - AL FINAL, A MANO, con la tabla de mc262_client_api_migration.
+  5. `./gradlew build`, repasar TODOs, runClient.
+
+--- histórico sesión 4 ---
+
 == 2026-08-30 (sesión 4) — 560 -> 423 errores | SOLO QUEDA client/ ==
 
 Commits nuevos (rama production, SIN pushear):
