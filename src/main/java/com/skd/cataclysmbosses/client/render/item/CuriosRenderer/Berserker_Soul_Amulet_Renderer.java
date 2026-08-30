@@ -25,11 +25,13 @@ import com.skd.cataclysmbosses.client.render.CMRenderTypes;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
@@ -54,18 +56,18 @@ implements ICurioRenderer.HumanoidRender {
     }
 
     @Override
-    public void prepareModel(ItemStack stack, SlotContext slotContext, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight, HumanoidRenderState renderState, RenderLayerParent<HumanoidRenderState, HumanoidModel<HumanoidRenderState>> renderLayerParent, EntityRendererProvider.Context context, float limbSwing, float ageInTicks) {
+    public void prepareModel(ItemStack stack, SlotContext slotContext, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight, HumanoidRenderState renderState, RenderLayerParent<HumanoidRenderState, EntityModel<HumanoidRenderState>> renderLayerParent, EntityRendererProvider.Context context, float limbSwing, float ageInTicks) {
         ICurioRenderer.setupHumanoidAnimations(this.model, renderState);
         
         // Render main texture
         RenderType renderType = RenderTypes.armorCutoutNoCull(TEXTURE);
-        submitNodeCollector.order(1).submitModel(this.model, renderState, poseStack, renderType, packedLight, OverlayTexture.NO_OVERLAY, null, -1, null);
+        submitNodeCollector.order(1).submitModel(this.model, renderState, poseStack, renderType, packedLight, OverlayTexture.NO_OVERLAY, -1, null);
     }
 
     @Override
-    public void renderModel(ItemStack stack, SlotContext slotContext, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight, HumanoidRenderState renderState, RenderLayerParent<HumanoidRenderState, HumanoidModel<HumanoidRenderState>> renderLayerParent, EntityRendererProvider.Context context, float limbSwing, float ageInTicks) {
+    public void renderModel(ItemStack stack, SlotContext slotContext, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight, HumanoidRenderState renderState, RenderLayerParent<HumanoidRenderState, EntityModel<HumanoidRenderState>> renderLayerParent, EntityRendererProvider.Context context, float limbSwing, float ageInTicks) {
         // Render layer texture (eyes)
         RenderType renderType = RenderTypes.armorCutoutNoCull(TEXTURE_LAYER);
-        submitNodeCollector.order(1).submitModel(this.model, renderState, poseStack, renderType, 0xF000F0, OverlayTexture.NO_OVERLAY, null, -1, null);
+        submitNodeCollector.order(1).submitModel(this.model, renderState, poseStack, renderType, 0xF000F0, OverlayTexture.NO_OVERLAY, -1, null);
     }
 }

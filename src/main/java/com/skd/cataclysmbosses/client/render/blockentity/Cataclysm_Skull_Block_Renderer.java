@@ -65,4 +65,17 @@ implements BlockEntityRenderer<Cataclysm_Skull_BlockEntity, BlockEntityRenderSta
     public void submit(BlockEntityRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
         // TODO: Implement rendering with new API
     }
+
+    // PORT TODO(26.2): custom-skull rendering (block-entity AND item) is not wired to the
+    // SubmitNodeCollector pipeline yet. These two helpers keep CMItemstackRenderer compiling;
+    // createSkullRenderers returns an empty map so skullModels.get(type) is null and
+    // renderItemSkull is a no-op. Re-implement with SkullBlockRenderer.submitSkull once the
+    // block-entity submit() above is done.
+    public static java.util.Map<net.minecraft.world.level.block.SkullBlock.Type, net.minecraft.client.model.object.skull.SkullModelBase> createSkullRenderers(net.minecraft.client.model.geom.EntityModelSet models) {
+        return new java.util.HashMap<>();
+    }
+
+    public static void renderItemSkull(PoseStack poseStack, SubmitNodeCollector collector, int[] order, int packedLight, net.minecraft.client.model.object.skull.SkullModelBase model, net.minecraft.client.renderer.rendertype.RenderType renderType) {
+        // no-op until the skull submit pipeline is ported
+    }
 }

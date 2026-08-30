@@ -35,6 +35,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import javax.annotation.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
@@ -43,6 +44,7 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
@@ -76,6 +78,10 @@ implements ICurioRenderer.HumanoidRender {
         return hasSlimArms ? this.slimModel : this.model;
     }
 
+    private Blazing_Grips_Model getModel(boolean slim) {
+        return slim ? this.slimModel : this.model;
+    }
+
     @Override
     public Identifier getModelTexture(ItemStack stack, SlotContext slotContext) {
         return TEXTURE;
@@ -83,13 +89,13 @@ implements ICurioRenderer.HumanoidRender {
 
     protected static boolean hasSlimArms(Entity entity) {
         if (entity instanceof AbstractClientPlayer player) {
-            return player.getModelName().equals("slim");
+            return player.getSkin().model() == net.minecraft.world.entity.player.PlayerModelType.SLIM;
         }
         return false;
     }
 
     @Override
-    public void prepareModel(ItemStack stack, SlotContext slotContext, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight, HumanoidRenderState renderState, RenderLayerParent<HumanoidRenderState, HumanoidModel<HumanoidRenderState>> renderLayerParent, EntityRendererProvider.Context context, float limbSwing, float ageInTicks) {
+    public void prepareModel(ItemStack stack, SlotContext slotContext, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight, HumanoidRenderState renderState, RenderLayerParent<HumanoidRenderState, EntityModel<HumanoidRenderState>> renderLayerParent, EntityRendererProvider.Context context, float limbSwing, float ageInTicks) {
         Blazing_Grips_Model model = getModel(stack, slotContext);
         ICurioRenderer.setupHumanoidAnimations(model, renderState);
         
@@ -98,16 +104,16 @@ implements ICurioRenderer.HumanoidRender {
         
         // Render main texture
         RenderType renderType = RenderTypes.armorCutoutNoCull(TEXTURE);
-        submitNodeCollector.order(1).submitModel(model, renderState, poseStack, renderType, packedLight, OverlayTexture.NO_OVERLAY, null, -1, null);
+        submitNodeCollector.order(1).submitModel(model, renderState, poseStack, renderType, packedLight, OverlayTexture.NO_OVERLAY, -1, null);
     }
 
     @Override
-    public void renderModel(ItemStack stack, SlotContext slotContext, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight, HumanoidRenderState renderState, RenderLayerParent<HumanoidRenderState, HumanoidModel<HumanoidRenderState>> renderLayerParent, EntityRendererProvider.Context context, float limbSwing, float ageInTicks) {
+    public void renderModel(ItemStack stack, SlotContext slotContext, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int packedLight, HumanoidRenderState renderState, RenderLayerParent<HumanoidRenderState, EntityModel<HumanoidRenderState>> renderLayerParent, EntityRendererProvider.Context context, float limbSwing, float ageInTicks) {
         Blazing_Grips_Model model = getModel(stack, slotContext);
         
         // Render layer texture (eyes)
         RenderType renderType = RenderTypes.armorCutoutNoCull(TEXTURE_LAYER);
-        submitNodeCollector.order(1).submitModel(model, renderState, poseStack, renderType, 0xF000F0, OverlayTexture.NO_OVERLAY, null, -1, null);
+        submitNodeCollector.order(1).submitModel(model, renderState, poseStack, renderType, 0xF000F0, OverlayTexture.NO_OVERLAY, -1, null);
     }
 
     @Override
@@ -123,15 +129,15 @@ implements ICurioRenderer.HumanoidRender {
             arm.xRot = 0.0f;
             
             RenderType renderType = RenderTypes.armorCutoutNoCull(TEXTURE);
-            submitNodeCollector.order(1).submitModel(model, avatarRenderState, matrixStack, renderType, light, OverlayTexture.NO_OVERLAY, null, avatarRenderState.outlineColor, null);
+            submitNodeCollector.order(1).submitModel(model, avatarRenderState, matrixStack, renderType, light, OverlayTexture.NO_OVERLAY, avatarRenderState.outlineColor, null);
             
             if (stack.hasFoil()) {
                 RenderType glintType = RenderTypes.armorEntityGlint();
-                submitNodeCollector.order(2).submitModel(model, avatarRenderState, matrixStack, glintType, light, OverlayTexture.NO_OVERLAY, null, avatarRenderState.outlineColor, null);
+                submitNodeCollector.order(2).submitModel(model, avatarRenderState, matrixStack, glintType, light, OverlayTexture.NO_OVERLAY, avatarRenderState.outlineColor, null);
             }
             
             RenderType layerType = RenderTypes.armorCutoutNoCull(TEXTURE_LAYER);
-            submitNodeCollector.order(1).submitModel(model, avatarRenderState, matrixStack, layerType, 0xF000F0, OverlayTexture.NO_OVERLAY, null, avatarRenderState.outlineColor, null);
+            submitNodeCollector.order(1).submitModel(model, avatarRenderState, matrixStack, layerType, 0xF000F0, OverlayTexture.NO_OVERLAY, avatarRenderState.outlineColor, null);
         }
     }
 }

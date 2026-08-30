@@ -118,14 +118,15 @@ implements IClientItemExtensions {
             return BONE_REPTILE_ARMOR_MODEL;
         }
         if (itemStack.getItem() == ModItems.IGNITIUM_ELYTRA_CHESTPLATE.get()) {
-            return ELYTRA_ARMOR.withAnimations(entityLiving);
+            // PORT(26.2): withAnimations(entity) removed; wing anim now runs in setupAnim(HumanoidRenderState) upstream.
+            return ELYTRA_ARMOR;
         }
         return _default;
     }
 
     public static void renderCustomArmor(PoseStack poseStack, CmMultiBufferSource multiBufferSource, int light, ItemStack itemStack, Item item, Model armorModel, boolean legs, Identifier texture) {
         if (item instanceof com.skd.cataclysmbosses.items.Cataclysm_Armor cataclysmArmor && cataclysmArmor.getMaterial() == Armortier.CURSIUM) {
-            VertexConsumer vertexconsumer1 = itemStack.hasFoil() ? com.mojang.blaze3d.vertex.VertexConsumer.create((VertexConsumer)multiBufferSource.getBuffer(RenderType.entityGlintDirect()), (VertexConsumer)multiBufferSource.getBuffer(RenderTypes.entityTranslucent((Identifier)texture))) : multiBufferSource.getBuffer(RenderTypes.entityTranslucent((Identifier)texture));
+            VertexConsumer vertexconsumer1 = multiBufferSource.getFoilBuffer(RenderTypes.entityTranslucent((Identifier)texture), itemStack.hasFoil());
             armorModel.renderToBuffer(poseStack, vertexconsumer1, light, OverlayTexture.NO_OVERLAY, -1);
             VertexConsumer vertexconsumer2 = multiBufferSource.getBuffer(CMRenderTypes.getGhost(CURSIUM_ARMOR_GHOST));
             int i = ARGB.color((int)125, (int)255, (int)255, (int)255);
