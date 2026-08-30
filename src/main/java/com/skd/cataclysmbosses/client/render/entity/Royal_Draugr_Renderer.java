@@ -38,7 +38,7 @@ extends CmMobRenderer<Royal_Draugr_Entity> {
     public Royal_Draugr_Renderer(EntityRendererProvider.Context renderManagerIn) {
         super(renderManagerIn, new Royal_Draugr_Model(renderManagerIn.bakeLayer(CMModelLayers.ROYAL_DRAUGR_MODEL)), 0.5f);
         this.addLayer(new LayerGenericGlowing(this, LAYER));
-        this.addLayer((RenderLayer)new ItemInHandLayer((RenderLayerParent)this, net.minecraft.client.Minecraft.getInstance().getEntityRenderDispatcher().getItemInHandRenderer()));
+        // PORT TODO(26.2): ItemInHandLayer<S,M> ctor changed (needs RenderLayerParent<S extends EntityRenderState, M>); re-add when the layer is ported.
     }
 
     @Override

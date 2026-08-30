@@ -44,11 +44,16 @@ extends CmMobRenderer<The_Prowler_Entity> {
     private static final Identifier[] TEXTURE_PROGRESS = new Identifier[4];
 
     public The_Prowler_Renderer(EntityRendererProvider.Context renderManagerIn) {
-        super(renderManagerIn, (EntityModel)new The_Prowler_Model(renderManagerIn.bakeLayer(CMModelLayers.PROWLER_MODEL)), 0.7f);
+        super(renderManagerIn, new The_Prowler_Model(renderManagerIn.bakeLayer(CMModelLayers.PROWLER_MODEL)), 0.7f);
         this.addLayer(new The_Prowler_Layer(this));
         for (int i = 0; i < 4; ++i) {
             The_Prowler_Renderer.TEXTURE_PROGRESS[i] = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)("textures/entity/factory/the_prowler_" + i + ".png"));
         }
+    }
+
+    @Override
+    protected void render(The_Prowler_Entity entity, float partialTicks, PoseStack poseStack, com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource buffer, int packedLight) {
+        // TODO: port render body to 26.2 (old MobRenderer APIs removed)
     }
 
     protected float getFlipDegrees(The_Prowler_Entity entity) {

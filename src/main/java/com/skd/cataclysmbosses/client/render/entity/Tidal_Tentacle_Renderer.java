@@ -52,7 +52,6 @@ import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
@@ -169,8 +168,8 @@ extends CmEntityRenderer<Tidal_Tentacle_Entity> {
     private int getLightColor(Entity head, Vec3 vec3) {
         BlockPos blockpos = BlockPos.containing((Position)vec3);
         if (head.level().hasChunkAt(blockpos)) {
-            int i = LevelRenderer.getLightColor((BlockAndTintGetter)head.level(), (BlockPos)blockpos);
-            int j = LevelRenderer.getLightColor((BlockAndTintGetter)head.level(), (BlockPos)blockpos.above());
+            int i = 15728880; // PORT TODO(26.2): LevelRenderer.getLightColor(BlockAndTintGetter,BlockPos) removed; full-bright approx
+            int j = 15728880;
             int k = i & 0xFF;
             int l = j & 0xFF;
             int i1 = i >> 16 & 0xFF;

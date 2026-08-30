@@ -12,6 +12,7 @@
 package com.skd.cataclysmbosses.client.render.entity;
 import com.skd.cataclysmbosses.client.render.compat.CmMobRenderer;
 import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 
 import com.skd.cataclysmbosses.client.model.CMModelLayers;

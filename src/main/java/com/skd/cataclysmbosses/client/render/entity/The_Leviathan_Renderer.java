@@ -55,7 +55,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
@@ -85,7 +84,7 @@ extends CmMobRenderer<The_Leviathan_Entity> {
     }
 
     public boolean shouldRender(The_Leviathan_Entity livingentity, Frustum camera, double camX, double camY, double camZ) {
-        if (super.shouldRender((Entity)livingentity, camera, camX, camY, camZ)) {
+        if (super.shouldRender(livingentity, camera, camX, camY, camZ)) {
             return true;
         }
         for (The_Leviathan_Part part : livingentity.leviathanParts) {
@@ -174,8 +173,8 @@ extends CmMobRenderer<The_Leviathan_Entity> {
     private int getLightColor(Entity head, Vec3 vec3) {
         BlockPos blockpos = BlockPos.containing((Position)vec3);
         if (head.level().hasChunkAt(blockpos)) {
-            int i = LevelRenderer.getLightColor((BlockAndTintGetter)head.level(), (BlockPos)blockpos);
-            int j = LevelRenderer.getLightColor((BlockAndTintGetter)head.level(), (BlockPos)blockpos.above());
+            int i = 15728880; // PORT TODO(26.2): LevelRenderer.getLightColor(BlockAndTintGetter,BlockPos) removed; full-bright approx
+            int j = 15728880;
             int k = i & 0xFF;
             int l = j & 0xFF;
             int i1 = i >> 16 & 0xFF;

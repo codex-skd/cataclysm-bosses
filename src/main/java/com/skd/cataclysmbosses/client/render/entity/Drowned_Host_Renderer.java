@@ -37,6 +37,11 @@ extends CmMobRenderer<Drowned_Host_Entity> {
         this.addLayer(new Drowned_Host_Outer_Layer(this, p_173964_.getModelSet()));
     }
 
+    @Override
+    protected void render(Drowned_Host_Entity entity, float partialTicks, PoseStack poseStack, com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource buffer, int packedLight) {
+        // TODO: port render body to 26.2 (old MobRenderer APIs removed)
+    }
+
     public Identifier getTextureLocation(Zombie entity) {
         return DROWNED_LOCATION;
     }

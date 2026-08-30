@@ -80,18 +80,9 @@ extends CmEntityRenderer<Scylla_Ceraunus_Entity> {
         double d4 = Mth.lerp((double)partialTicks, (double)mob.xo, (double)mob.getX());
         double d5 = Mth.lerp((double)partialTicks, (double)mob.yo, (double)mob.getY());
         double d6 = Mth.lerp((double)partialTicks, (double)mob.zo, (double)mob.getZ());
-        if (mob instanceof Scylla_Entity) {
-            Scylla_Renderer livingRenderer;
-            EntityModel anchorModel;
-            Scylla_Entity living = (Scylla_Entity)mob;
-            float bodyYaw = Mth.rotLerp((float)partialTicks, (float)living.yBodyRotO, (float)living.yBodyRot);
-            EntityRenderer anchorRenderer = Minecraft.getInstance().getEntityRenderDispatcher().getRenderer((Entity)living);
-            if (anchorRenderer instanceof Scylla_Renderer && (anchorModel = (livingRenderer = (Scylla_Renderer)anchorRenderer).getModel()) instanceof Scylla_Model) {
-                Scylla_Model targetModel = (Scylla_Model)anchorModel;
-                Vec3 toPos = targetModel.getHandPosition(new Vec3(0.0, 0.0, 0.0)).yRot((float)(Math.PI - (double)(bodyYaw * ((float)Math.PI / 180))));
-                return new Vec3(d4 + toPos.x, d5 + toPos.y, d6 + toPos.z);
-            }
-        }
+        // PORT TODO(26.2): anchored-hand offset relied on Scylla_Renderer.getModel() +
+        // Scylla_Model.getHandPosition(Vec3); both dropped while Scylla rendering is stubbed.
+        // Falls back to the mob's plain interpolated position.
         return new Vec3(d4, d5, d6);
     }
 
