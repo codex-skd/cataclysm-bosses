@@ -28,7 +28,10 @@ import net.minecraft.world.item.component.ItemAttributeModifiers;
 
 public class AttributeUtils {
     public static void mergeAttributes(DataComponentMap.Builder builder, Item item, ItemAttributeModifiers newModifiers) {
-        ItemAttributeModifiers existingModifiers = (ItemAttributeModifiers)item.components().getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, (Object)ItemAttributeModifiers.EMPTY);
+        // PORT(26.2): item.components() throws "Components not bound yet" during
+        // ModifyDefaultComponentsEvent; the builder (a DataComponentGetter) already holds the
+        // item's registration-time components, so read the existing modifiers from it.
+        ItemAttributeModifiers existingModifiers = builder.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, ItemAttributeModifiers.EMPTY);
         ItemAttributeModifiers.Builder combinedBuilder = ItemAttributeModifiers.builder();
         for (ItemAttributeModifiers.Entry existingEntry : existingModifiers.modifiers()) {
             boolean shouldReplace = false;
