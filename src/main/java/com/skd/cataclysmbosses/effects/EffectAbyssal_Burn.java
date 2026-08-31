@@ -38,7 +38,7 @@ import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.animal.Fox;
+import net.minecraft.world.entity.animal.fox.Fox;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -53,22 +53,21 @@ extends MobEffect {
     }
 
     public boolean applyEffectTick(LivingEntity LivingEntityIn, int amplifier) {
-        boolean flag = LivingEntityIn.hurt(LivingEntityIn.damageSources().source(CMDamageTypes.ABYSSAL_BURN), 1.0f);
+        boolean flag = LivingEntityIn.hurtOrSimulate(LivingEntityIn.damageSources().source(CMDamageTypes.ABYSSAL_BURN), 1.0f);
         if (flag && LivingEntityIn.getRandom().nextFloat() < 0.75f - LivingEntityIn.getHealth() / LivingEntityIn.getMaxHealth() && !LivingEntityIn.level().isClientSide()) {
             double d0 = LivingEntityIn.getX();
             double d1 = LivingEntityIn.getY();
             double d2 = LivingEntityIn.getZ();
             for (int i = 0; i < 8; ++i) {
                 double d3 = LivingEntityIn.getX() + (LivingEntityIn.getRandom().nextDouble() - 0.5) * 8.0;
-                double d4 = Mth.clamp((double)(LivingEntityIn.getY() + (double)(LivingEntityIn.getRandom().nextInt(8) - 4)), (double)LivingEntityIn.level().getMinBuildHeight(), (double)(LivingEntityIn.level().getMinBuildHeight() + ((ServerLevel)LivingEntityIn.level()).getLogicalHeight() - 1));
+                double d4 = Mth.clamp((double)(LivingEntityIn.getY() + (double)(LivingEntityIn.getRandom().nextInt(8) - 4)), (double)LivingEntityIn.level().getMinY(), (double)(LivingEntityIn.level().getMinY() + ((ServerLevel)LivingEntityIn.level()).getLogicalHeight() - 1));
                 double d5 = LivingEntityIn.getZ() + (LivingEntityIn.getRandom().nextDouble() - 0.5) * 8.0;
                 if (LivingEntityIn.isPassenger()) {
                     LivingEntityIn.stopRiding();
                 }
                 Vec3 vec3 = LivingEntityIn.position();
                 LivingEntityIn.level().gameEvent((Holder)GameEvent.TELEPORT, vec3, GameEvent.Context.of((Entity)LivingEntityIn));
-                EntityTeleportEvent.ChorusFruit event = new EntityTeleportEvent.ChorusFruit(LivingEntityIn, d3, d4, d5);
-                if (!this.randomTeleportInwater(LivingEntityIn, event.getTargetX(), event.getTargetY(), event.getTargetZ(), true)) continue;
+                if (!this.randomTeleportInwater(LivingEntityIn, d3, d4, d5, true)) continue;
                 SoundEvent soundevent = LivingEntityIn instanceof Fox ? SoundEvents.FOX_TELEPORT : SoundEvents.CHORUS_FRUIT_TELEPORT;
                 LivingEntityIn.level().playSound((Player)null, d0, d1, d2, soundevent, SoundSource.PLAYERS, 1.0f, 1.0f);
                 LivingEntityIn.playSound(soundevent, 1.0f, 1.0f);
@@ -88,7 +87,7 @@ extends MobEffect {
         Level level = LivingEntityIn.level();
         if (level.hasChunkAt(blockpos)) {
             boolean flag1 = false;
-            while (!flag1 && blockpos.getY() > level.getMinBuildHeight()) {
+            while (!flag1 && blockpos.getY() > level.getMinY()) {
                 BlockPos blockpos1 = blockpos.below();
                 BlockState blockstate = level.getBlockState(blockpos1);
                 if (blockstate.blocksMotion()) {

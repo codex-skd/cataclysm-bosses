@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParam;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.predicates.LootItemEntityPropertyCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import com.mojang.serialization.Codec;
@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 
 @Mixin(LootItemEntityPropertyCondition.class)
 public abstract class MixinLootItemEntityPropertyCondition implements LootItemCondition {
-    private static final Logger LOGGER = LoggerFactory.getMixinLogger("MixinLootItemEntityPropertyCondition");
+    private static final Logger LOGGER = LoggerFactory.getLogger("MixinLootItemEntityPropertyCondition");
     private static final AtomicBoolean isConfigLoaded = new AtomicBoolean(false);
     private static final AtomicBoolean isCuriosLootPredicateFixEnabled = new AtomicBoolean(false);
     private static final AtomicInteger firstOccurrenceLogged = new AtomicInteger(0);
@@ -40,7 +40,7 @@ public abstract class MixinLootItemEntityPropertyCondition implements LootItemCo
             // Original test logic would go here - we let it run normally
             // Return value will be set by the original method unless we cancel it
         } catch (IllegalStateException e) {
-            if (isCuriosLootPredicateFixEnabled()) {
+            if (isCuriosLootPredicateFixEnabled.get()) {
                 // Log first occurrence or throttled occurrences
                 if (firstOccurrenceLogged.getAndIncrement() == 0) {
                     LOGGER.warn("First occurrence of IllegalStateException in LootItemEntityPropertyCondition.test: {}", e.getMessage());

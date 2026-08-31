@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###",
+    "#E#",
+    "###"
+  ],
+  "key": {
+    "#": "minecraft:nether_brick",
+    "E": "cataclysm:ignitium_ingot"
+  },
+  "result": {
+    "id": "cataclysm:blazing_grips",
+    "count": 1
+  }
+}

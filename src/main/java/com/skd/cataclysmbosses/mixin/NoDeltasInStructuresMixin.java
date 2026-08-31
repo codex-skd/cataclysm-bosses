@@ -36,7 +36,7 @@ public class NoDeltasInStructuresMixin {
         }
         WorldGenRegion worldGenRegion = (WorldGenRegion)worldGenLevel;
         if (MixinUtils.isPositionInTaggedStructure(worldGenRegion, context.origin(), ModTag.BLOCKED_BASALT)) {
-            cir.setReturnValue((Object)false);
+            cir.setReturnValue(false);
         }
     }
 }

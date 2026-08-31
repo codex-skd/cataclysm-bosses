@@ -24,7 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.TextureAtlas;
@@ -33,10 +34,11 @@ import net.minecraft.util.Mth;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Vector4f;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Boltstrike_Renderer
-extends EntityRenderer<Bolt_strike_Entity> {
+extends CmEntityRenderer<Bolt_strike_Entity> {
     private Map<UUID, LightningRender> lightningRenderMap = new HashMap<UUID, LightningRender>();
     private static final int MAX_HEIGHT = 15;
     private static final double START_MIN_RADIUS = 0.7;
@@ -48,7 +50,7 @@ extends EntityRenderer<Bolt_strike_Entity> {
         super(p_174286_);
     }
 
-    public void render(Bolt_strike_Entity entity, float p_115267_, float partialTicks, PoseStack poseStack, MultiBufferSource p_115270_, int p_115271_) {
+    protected void render(Bolt_strike_Entity entity, float partialTicks, PoseStack poseStack, CmMultiBufferSource p_115270_, int p_115271_) {
         double x = Mth.lerp((double)partialTicks, (double)entity.xOld, (double)entity.getX());
         double y = Mth.lerp((double)partialTicks, (double)entity.yOld, (double)entity.getY());
         double z = Mth.lerp((double)partialTicks, (double)entity.zOld, (double)entity.getZ());
@@ -67,7 +69,7 @@ extends EntityRenderer<Bolt_strike_Entity> {
             if (!Minecraft.getInstance().isPaused()) {
                 lightningRender.update((Object)entity, bolt1, partialTicks);
             }
-            lightningRender.render(partialTicks, poseStack, p_115270_);
+            lightningRender.render(partialTicks, poseStack, (net.minecraft.client.renderer.SubmitNodeCollector) null);
             poseStack.popPose();
         }
         if (entity.isRemoved() && this.lightningRenderMap.containsKey(entity.getUUID())) {

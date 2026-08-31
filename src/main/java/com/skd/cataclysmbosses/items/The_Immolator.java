@@ -48,7 +48,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -57,6 +57,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.ItemUseAnimation;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -92,7 +93,7 @@ extends Cataclysm_Weapon {
                 }
                 if (hasSucceeded) {
                     if (!p_43395_.isClientSide()) {
-                        player.getCooldowns().addCooldown((Item)this, CMCommonConfig.Immolator.cooldown);
+                        player.getCooldowns().addCooldown(this.getDefaultInstance(), CMCommonConfig.Immolator.cooldown);
                     }
                     ScreenShake_Entity.ScreenShake(p_43395_, player.position(), 30.0f, 0.15f, 0, 30);
                     p_43395_.playSound(null, player.getX(), player.getY(), player.getZ(), (SoundEvent)ModSounds.EXPLOSION.get(), SoundSource.PLAYERS, 1.5f, 1.0f / (player.getRandom().nextFloat() * 0.4f + 0.8f));
@@ -122,7 +123,7 @@ extends Cataclysm_Weapon {
         double radius = 6.0;
         ScreenShake_Entity.ScreenShake(world, caster.position(), 30.0f, 0.1f, 0, 30);
         world.playSound(null, caster.getX(), caster.getY(), caster.getZ(), (SoundEvent)ModSounds.EXPLOSION.get(), SoundSource.PLAYERS, 1.5f, 1.0f / (caster.getRandom().nextFloat() * 0.4f + 0.8f));
-        List list = world.getEntities((Entity)caster, caster.getBoundingBox().inflate(radius, radius, radius));
+        List<Entity> list = world.getEntities((Entity)caster, caster.getBoundingBox().inflate(radius, radius, radius));
         for (Entity entity : list) {
             if (!(entity instanceof LivingEntity)) continue;
             entity.hurt(world.damageSources().mobAttack(caster), (float)caster.getAttributeValue(Attributes.ATTACK_DAMAGE) * 2.0f);
@@ -160,20 +161,20 @@ extends Cataclysm_Weapon {
                 double extraX = caster.getX() + distance * (double)Mth.cos((float)angle);
                 double extraY = caster.getY() + (double)0.3f;
                 double extraZ = caster.getZ() + distance * (double)Mth.sin((float)angle);
-                world.addParticle((ParticleOptions)ParticleTypes.FLAME, extraX, extraY, extraZ, 0.0, world.random.nextGaussian() * 0.04, 0.0);
+                world.addParticle((ParticleOptions)ParticleTypes.FLAME, extraX, extraY, extraZ, 0.0, world.getRandom().nextGaussian() * 0.04, 0.0);
             }
         }
     }
 
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack otherHand;
         ItemStack itemstack = player.getItemInHand(hand);
         ItemStack itemStack = otherHand = hand == InteractionHand.MAIN_HAND ? player.getItemInHand(InteractionHand.OFF_HAND) : player.getItemInHand(InteractionHand.MAIN_HAND);
         if (otherHand.is((Item)ModItems.THE_IMMOLATOR.get())) {
             player.startUsingItem(hand);
-            return InteractionResultHolder.consume((Object)itemstack);
+            return InteractionResult.CONSUME;
         }
-        return InteractionResultHolder.fail((Object)itemstack);
+        return InteractionResult.FAIL;
     }
 
     public boolean canDisableShield(ItemStack stack, ItemStack shield, LivingEntity entity, LivingEntity attacker) {
@@ -192,10 +193,10 @@ extends Cataclysm_Weapon {
         return !player.isCreative();
     }
 
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flags) {
-        tooltip.add((Component)Component.translatable((String)"item.cataclysm.annihilator.desc").withStyle(ChatFormatting.DARK_GREEN));
-        tooltip.add((Component)Component.translatable((String)"item.cataclysm.immolator.desc").withStyle(ChatFormatting.DARK_GREEN));
-        tooltip.add((Component)Component.translatable((String)"item.cataclysm.immolator2.desc").withStyle(ChatFormatting.DARK_GREEN));
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, java.util.function.Consumer<Component> builder, TooltipFlag flags) {
+        builder.accept((Component)Component.translatable((String)"item.cataclysm.annihilator.desc").withStyle(ChatFormatting.DARK_GREEN));
+        builder.accept((Component)Component.translatable((String)"item.cataclysm.immolator.desc").withStyle(ChatFormatting.DARK_GREEN));
+        builder.accept((Component)Component.translatable((String)"item.cataclysm.immolator2.desc").withStyle(ChatFormatting.DARK_GREEN));
     }
 }
 

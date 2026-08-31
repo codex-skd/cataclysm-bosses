@@ -125,7 +125,7 @@ extends Goal {
         if (!this.followingTargetEvenIfNotSeen) {
             return !this.mob.getNavigation().isDone();
         }
-        if (!this.mob.isWithinRestriction(livingentity.blockPosition())) {
+        if (!this.mob.isWithinHome(livingentity.blockPosition())) {
             return false;
         }
         return !(livingentity instanceof Player) || !livingentity.isSpectator() && !((Player)livingentity).isCreative();
@@ -146,7 +146,7 @@ extends Goal {
         if (this.isHoldingCrossbow() && this.mob.isUsingItem()) {
             this.mob.stopUsingItem();
             this.mob.setChargingCrossbow(false);
-            this.mob.getUseItem().set(DataComponents.CHARGED_PROJECTILES, (Object)ChargedProjectiles.EMPTY);
+            this.mob.getUseItem().set(DataComponents.CHARGED_PROJECTILES, ChargedProjectiles.EMPTY);
         }
     }
 
@@ -220,7 +220,7 @@ extends Goal {
         if (p_25558_ <= d0 && this.ticksUntilNextAttack <= 0) {
             this.resetAttackCooldown();
             this.mob.swing(InteractionHand.MAIN_HAND);
-            this.mob.doHurtTarget((Entity)p_25557_);
+            if (this.mob.level() instanceof net.minecraft.server.level.ServerLevel _sl) this.mob.doHurtTarget(_sl, (Entity)p_25557_);
         }
     }
 

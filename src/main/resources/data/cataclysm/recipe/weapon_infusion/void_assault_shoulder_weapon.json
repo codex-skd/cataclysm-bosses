@@ -1,0 +1,8 @@
+{
+  "type": "cataclysm:weapon_fusion",
+  "base": "cataclysm:wither_assault_shoulder_weapon",
+  "addition": "cataclysm:void_core",
+  "result": {
+    "id": "cataclysm:void_assault_shoulder_weapon"
+  }
+}

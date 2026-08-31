@@ -28,8 +28,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.Map;
 import java.util.Optional;
-import net.minecraft.client.model.HierarchicalModel;
+import com.skd.cataclysmbosses.client.model.compat.CmHierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
@@ -43,7 +44,7 @@ import org.joml.Matrix4fc;
 import org.joml.Vector4f;
 
 public class Scylla_Model
-extends HierarchicalModel<Scylla_Entity> {
+extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRenderState> {
     private final ModelPart root;
     private final ModelPart everything;
     private final ModelPart scylla;
@@ -95,12 +96,12 @@ extends HierarchicalModel<Scylla_Entity> {
     private final ModelPart l_leg_armor;
     private final ModelPart l_leg2;
     private final ModelPart anchor2;
-    private final Map<String, ModelPart> partCache = new Object2ObjectOpenHashMap();
-    private final Map<String, Optional<ModelPart>> optionalPartCache = new Object2ObjectOpenHashMap();
+    private final java.util.function.Function<String, ModelPart> partLookup;
 
     public Scylla_Model(ModelPart root) {
+        super(root);
         this.root = root;
-        this.buildPartCache(root);
+        this.partLookup = root.createPartLookup();
         this.everything = this.root.getChild("everything");
         this.anchor2 = this.root.getChild("anchor2");
         this.scylla = this.everything.getChild("scylla");
@@ -281,145 +282,16 @@ extends HierarchicalModel<Scylla_Entity> {
         return LayerDefinition.create((MeshDefinition)meshdefinition, (int)256, (int)256);
     }
 
-    private void buildPartCache(ModelPart part) {
-        for (Map.Entry entry : part.children.entrySet()) {
-            String partName = (String)entry.getKey();
-            ModelPart childPart = (ModelPart)entry.getValue();
-            this.partCache.putIfAbsent(partName, childPart);
-            this.optionalPartCache.putIfAbsent(partName, Optional.of(childPart));
-            if (childPart.children.isEmpty()) continue;
-            this.buildPartCache(childPart);
-        }
-    }
-
     @NotNull
     public Optional<ModelPart> getAnyDescendantWithName(String name) {
         if ("root".equals(name)) {
             return Optional.of(this.root);
         }
-        return this.optionalPartCache.getOrDefault(name, Optional.empty());
+        return Optional.ofNullable(this.partLookup.apply(name));
     }
 
-    public void setupAnim(Scylla_Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        this.root().getAllParts().forEach(ModelPart::resetPose);
-        this.animateHeadLookTarget(netHeadYaw, headPitch);
-        if (entity.getAttackState() != 7) {
-            this.animateWalk(Scylla_Normal_Animation.WALK, limbSwing, limbSwingAmount, 1.5f, 4.0f);
-        }
-        this.l_eye.visible = entity.getEye();
-        this.r_eye.visible = entity.getEye();
-        this.chain_main.visible = entity.getChainAnchor();
-        this.anchor2.visible = entity.isSleep();
-        this.animate(entity.getAnimationState("idle"), Scylla_Normal_Animation.IDLE, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("cross_swing"), Scylla_Normal_Animation.CROSS_SWING, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("cross_swing2"), Scylla_Normal_Animation.CROSS_SWING2, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("double_swing"), Scylla_Normal_Animation.DOUBLE_CROSS_SWING, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("swing_smash"), Scylla_Normal_Animation.SWING_SMASH, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("smash"), Scylla_Normal_Animation.SMASH, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("back_step"), Scylla_Normal_Animation.BACKSTEP, ageInTicks, 1.2f);
-        this.animate(entity.getAnimationState("spin"), Scylla_Normal_Animation.ANCHOR_SPIN_ATTACK, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("wave"), Scylla_Projectile_Animation.WAVE_SHOOT, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("lightning_explosion"), Scylla_Lightning_Animation.LIGHTNING_EXPLOSION, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("lightning_spear_throw"), Scylla_Lightning_Animation.LIGHTNING_SPEAR_THROW, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("water_spear_throw"), Scylla_Projectile_Animation.WATER_SPEAR_THROW, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("anchor_shot"), Scylla_Projectile_Animation.ANCHOR_THROW, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("anchor_shot_pull"), Scylla_Projectile_Animation.ANCHOR_THROW_PULL, ageInTicks, 1.1f);
-        this.animate(entity.getAnimationState("chain_jump_1"), Scylla_Projectile_Animation.CHAIN_JUMP, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("chain_jump_2"), Scylla_Projectile_Animation.LANDING, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("chain_jump_3"), Scylla_Projectile_Animation.SUPER_HERO_LANDING, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("anchor_explosion"), Scylla_Lightning_Animation.ANCHOR_EXPLOSION, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("parry"), Scylla_Projectile_Animation.PARRY, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("electric_whip"), Scylla_Lightning_Animation.ELECTRIC_WHIP, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("whip_and_spear"), Scylla_Projectile_Animation.WHIP_AND_SPEAR, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("death"), Scylla_Lightning_Animation.DEATH, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("enchant_1"), Scylla_Lightning_Animation.WEAPON_ENCHANT, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("enchant_2"), Scylla_Lightning_Animation.WEAPON_ENCHANT2, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("spawn"), Scylla_Lightning_Animation.SPAWN, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("spawn_idle"), Scylla_Lightning_Animation.SPAWN_IDLE, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("summon_snake"), Scylla_Lightning_Animation.SUMMON_SNAKE, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("grab_smash"), Scylla_Normal_Animation.GRAB_SMASH, ageInTicks, 1.0f);
-    }
-
-    public void translateToEye(PoseStack matrixStack, boolean right) {
-        this.root.translateAndRotate(matrixStack);
-        this.everything.translateAndRotate(matrixStack);
-        this.scylla.translateAndRotate(matrixStack);
-        this.body.translateAndRotate(matrixStack);
-        this.chest.translateAndRotate(matrixStack);
-        this.head.translateAndRotate(matrixStack);
-        if (right) {
-            this.r_eye.translateAndRotate(matrixStack);
-        } else {
-            this.l_eye.translateAndRotate(matrixStack);
-        }
-    }
-
-    public Vec3 getChainPosition(Vec3 offsetIn) {
-        PoseStack armStack = new PoseStack();
-        armStack.pushPose();
-        this.root.translateAndRotate(armStack);
-        this.everything.translateAndRotate(armStack);
-        this.scylla.translateAndRotate(armStack);
-        this.body.translateAndRotate(armStack);
-        this.chest.translateAndRotate(armStack);
-        this.l_arm.translateAndRotate(armStack);
-        this.l_arm2.translateAndRotate(armStack);
-        Vector4f armOffsetVec = new Vector4f((float)offsetIn.x, (float)offsetIn.y, (float)offsetIn.z, 1.0f);
-        armOffsetVec.mul((Matrix4fc)armStack.last().pose());
-        Vec3 vec3 = new Vec3((double)armOffsetVec.x(), (double)armOffsetVec.y(), (double)armOffsetVec.z());
-        armStack.popPose();
-        return vec3.add(0.0, 0.0, 0.0);
-    }
-
-    public void translateChainAnchor(PoseStack matrixStack) {
-        this.root.translateAndRotate(matrixStack);
-        this.everything.translateAndRotate(matrixStack);
-        this.scylla.translateAndRotate(matrixStack);
-        this.body.translateAndRotate(matrixStack);
-        this.chest.translateAndRotate(matrixStack);
-        this.l_arm.translateAndRotate(matrixStack);
-        this.l_arm2.translateAndRotate(matrixStack);
-        this.chain_main.translateAndRotate(matrixStack);
-        this.chain_4.translateAndRotate(matrixStack);
-        this.chain_3.translateAndRotate(matrixStack);
-        this.chain_2.translateAndRotate(matrixStack);
-        this.chain.translateAndRotate(matrixStack);
-        this.chain_anchor.translateAndRotate(matrixStack);
-        this.trail.translateAndRotate(matrixStack);
-    }
-
-    public void translateHand(PoseStack matrixStack) {
-        this.root.translateAndRotate(matrixStack);
-        this.everything.translateAndRotate(matrixStack);
-        this.scylla.translateAndRotate(matrixStack);
-        this.body.translateAndRotate(matrixStack);
-        this.chest.translateAndRotate(matrixStack);
-        this.l_arm.translateAndRotate(matrixStack);
-        this.l_arm2.translateAndRotate(matrixStack);
-        this.anchor.translateAndRotate(matrixStack);
-    }
-
-    public Vec3 getHandPosition(Vec3 offsetIn) {
-        PoseStack translationStack = new PoseStack();
-        translationStack.pushPose();
-        this.translateHand(translationStack);
-        Vector4f armOffsetVec = new Vector4f((float)offsetIn.x, (float)offsetIn.y, (float)offsetIn.z, 1.0f);
-        armOffsetVec.mul((Matrix4fc)translationStack.last().pose());
-        Vec3 vec3 = new Vec3((double)(-armOffsetVec.x()), (double)(-armOffsetVec.y()), (double)armOffsetVec.z());
-        translationStack.popPose();
-        return vec3.add(0.0, 1.5, 0.0);
-    }
-
-    private void animateHeadLookTarget(float yRot, float xRot) {
-        this.head.xRot = xRot * ((float)Math.PI / 180);
-        this.head.yRot = yRot * ((float)Math.PI / 180);
-        float f = xRot * ((float)Math.PI / 180);
-        float f1 = 0.5f;
-        this.hair.xRot = Mth.cos((float)f) * f1;
-    }
-
-    public ModelPart root() {
-        return this.root;
+        @Override
+    public void setupAnim(EntityRenderState state) {
+        super.setupAnim(state);
     }
 }
-

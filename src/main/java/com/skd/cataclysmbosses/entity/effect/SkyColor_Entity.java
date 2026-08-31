@@ -33,6 +33,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class SkyColor_Entity
 extends Entity {
@@ -80,12 +82,12 @@ extends Entity {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        builder.define(RADIUS, (Object)Float.valueOf(10.0f));
-        builder.define(R, (Object)0);
-        builder.define(G, (Object)0);
-        builder.define(B, (Object)0);
-        builder.define(DURATION, (Object)0);
-        builder.define(FADE_DURATION, (Object)5);
+        builder.define(RADIUS, Float.valueOf(10.0f));
+        builder.define(R, 0);
+        builder.define(G, 0);
+        builder.define(B, 0);
+        builder.define(DURATION, 0);
+        builder.define(FADE_DURATION, 5);
     }
 
     public float getRadius() {
@@ -93,7 +95,7 @@ extends Entity {
     }
 
     public void setRadius(float radius) {
-        this.entityData.set(RADIUS, (Object)Float.valueOf(radius));
+        this.entityData.set(RADIUS, Float.valueOf(radius));
     }
 
     public int getR() {
@@ -101,7 +103,7 @@ extends Entity {
     }
 
     public void setR(int r) {
-        this.entityData.set(R, (Object)r);
+        this.entityData.set(R, r);
     }
 
     public int getG() {
@@ -109,7 +111,7 @@ extends Entity {
     }
 
     public void setG(int g) {
-        this.entityData.set(G, (Object)g);
+        this.entityData.set(G, g);
     }
 
     public int getB() {
@@ -117,7 +119,7 @@ extends Entity {
     }
 
     public void setB(int b) {
-        this.entityData.set(B, (Object)b);
+        this.entityData.set(B, b);
     }
 
     public int getDuration() {
@@ -125,7 +127,7 @@ extends Entity {
     }
 
     public void setDuration(int duration) {
-        this.entityData.set(DURATION, (Object)duration);
+        this.entityData.set(DURATION, duration);
     }
 
     public int getFadeDuration() {
@@ -133,20 +135,20 @@ extends Entity {
     }
 
     public void setFadeDuration(int fadeDuration) {
-        this.entityData.set(FADE_DURATION, (Object)fadeDuration);
+        this.entityData.set(FADE_DURATION, fadeDuration);
     }
 
-    protected void readAdditionalSaveData(CompoundTag compound) {
-        this.setRadius(compound.getFloat("radius"));
-        this.setR(compound.getInt("R"));
-        this.setG(compound.getInt("G"));
-        this.setB(compound.getInt("B"));
-        this.setDuration(compound.getInt("duration"));
-        this.setFadeDuration(compound.getInt("fade_duration"));
-        this.tickCount = compound.getInt("ticks_existed");
+    protected void readAdditionalSaveData(ValueInput compound) {
+        this.setRadius(compound.getFloatOr("radius", 0.0f));
+        this.setR(compound.getIntOr("R", 0));
+        this.setG(compound.getIntOr("G", 0));
+        this.setB(compound.getIntOr("B", 0));
+        this.setDuration(compound.getIntOr("duration", 0));
+        this.setFadeDuration(compound.getIntOr("fade_duration", 0));
+        this.tickCount = compound.getIntOr("ticks_existed", 0);
     }
 
-    protected void addAdditionalSaveData(CompoundTag compound) {
+    protected void addAdditionalSaveData(ValueOutput compound) {
         compound.putFloat("radius", this.getRadius());
         compound.putInt("R", this.getR());
         compound.putInt("G", this.getG());
@@ -161,6 +163,11 @@ extends Entity {
             SkyColor_Entity skyColorEntity = new SkyColor_Entity(world, position, radius, r, g, b, duration, fadeDuration);
             world.addFreshEntity((Entity)skyColorEntity);
         }
+    }
+
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return false;
     }
 }
 

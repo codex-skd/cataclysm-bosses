@@ -61,33 +61,15 @@ implements ICurioItem {
     }
 
     public Multimap<Holder<Attribute>, AttributeModifier> getAttributeModifiers(SlotContext slotContext, Identifier id, ItemStack stack) {
-        CurioAttributeModifierEvent evt = new CurioAttributeModifierEvent(stack, slotContext, id);
-        
-        // Add attributes from withAttributes()
+        // TODO 26.2: CurioAttributeModifierEvent ctor changed in Curios API for NeoForge 26.2.
+        // Old ctor: new CurioAttributeModifierEvent(stack, slotContext, id)
+        // New ctor expects (ItemStack, CurioAttributeModifiers). Stubbed to return direct modifiers.
+        ImmutableMultimap.Builder<Holder<Attribute>, AttributeModifier> builder = ImmutableMultimap.builder();
         if (slotContext.identifier().equals(this.attributeSlot) && this.attributes != null) {
             Multimap<Holder<Attribute>, AttributeModifier> attrMap = this.attributes.apply(slotContext.index());
-            for (Map.Entry<Holder<Attribute>, AttributeModifier> entry : attrMap.entries()) {
-                evt.addModifier(entry.getKey(), entry.getValue(), slotContext.identifier());
-            }
+            builder.putAll(attrMap);
         }
-        
-        // Add slot modifiers from withSlotModifier()
-        if (!this.slotModifiers.isEmpty()) {
-            for (Map.Entry<String, Integer> entry : this.slotModifiers.entrySet()) {
-                String slotId = entry.getKey();
-                int amount = entry.getValue();
-                // Create a generic attribute modifier for slot modification
-                // Note: In Curios 15.x, slot modifiers may use a different API
-                // This adds a modifier with the item's ID as the modifier ID
-                AttributeModifier modifier = new AttributeModifier(id.withSuffix("slot_" + slotId), amount, AttributeModifier.Operation.ADD_VALUE);
-                // Use a placeholder attribute - in practice this should be a Curios-specific attribute
-                // For now, we skip if we can't determine the correct attribute
-                // evt.addModifier(attribute, modifier, slotId);
-            }
-        }
-        
-        NeoForge.EVENT_BUS.post((Event)evt);
-        return evt.getModifiers();
+        return builder.build();
     }
 
     public CuriosItem withAttributes(String slot, AttributeContainer ... attributes) {

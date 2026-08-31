@@ -51,6 +51,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Cm_Falling_Block_Entity
 extends Entity {
@@ -75,7 +77,7 @@ extends Entity {
     }
 
     public void setStartPos(BlockPos p_31960_) {
-        this.entityData.set(DATA_START_POS, (Object)p_31960_);
+        this.entityData.set(DATA_START_POS, p_31960_);
     }
 
     public BlockPos getStartPos() {
@@ -83,8 +85,8 @@ extends Entity {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(DATA_START_POS, (Object)BlockPos.ZERO);
-        p_326229_.define(BLOCK_STATE, (Object)Blocks.AIR.defaultBlockState());
+        p_326229_.define(DATA_START_POS, BlockPos.ZERO);
+        p_326229_.define(BLOCK_STATE, Blocks.AIR.defaultBlockState());
     }
 
     public BlockState getBlockState() {
@@ -92,7 +94,7 @@ extends Entity {
     }
 
     public void setBlockState(BlockState p_270267_) {
-        this.entityData.set(BLOCK_STATE, (Object)p_270267_);
+        this.entityData.set(BLOCK_STATE, p_270267_);
     }
 
     public void tick() {
@@ -109,15 +111,14 @@ extends Entity {
         }
     }
 
-    protected void addAdditionalSaveData(CompoundTag p_31973_) {
-        BlockState blockState = this.getBlockState();
-        p_31973_.put("block_state", (Tag)NbtUtils.writeBlockState((BlockState)blockState));
+    protected void addAdditionalSaveData(ValueOutput p_31973_) {
+        p_31973_.store("block_state", net.minecraft.world.level.block.state.BlockState.CODEC, this.getBlockState());
         p_31973_.putInt("Time", this.duration);
     }
 
-    protected void readAdditionalSaveData(CompoundTag p_31964_) {
-        this.setBlockState(NbtUtils.readBlockState((HolderGetter)this.level().holderLookup(Registries.BLOCK), (CompoundTag)p_31964_.getCompound("block_state")));
-        this.duration = p_31964_.getInt("Time");
+    protected void readAdditionalSaveData(ValueInput p_31964_) {
+        this.setBlockState(p_31964_.read("block_state", net.minecraft.world.level.block.state.BlockState.CODEC).orElse(Blocks.AIR.defaultBlockState()));
+        this.duration = p_31964_.getIntOr("Time", 0);
     }
 
     public Packet<ClientGamePacketListener> getAddEntityPacket(ServerEntity p_352287_) {
@@ -125,6 +126,11 @@ extends Entity {
     }
 
     public boolean displayFireAnimation() {
+        return false;
+    }
+
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
         return false;
     }
 }

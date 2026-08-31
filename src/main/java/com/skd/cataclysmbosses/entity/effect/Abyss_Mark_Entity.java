@@ -35,6 +35,7 @@ import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -54,6 +55,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Abyss_Mark_Entity
 extends Entity {
@@ -61,7 +64,7 @@ extends Entity {
     private Entity finalTarget;
     @Nullable
     private UUID targetId;
-    private static final EntityDataAccessor<Optional<UUID>> CREATOR_ID = SynchedEntityData.defineId(Abyss_Mark_Entity.class, (EntityDataSerializer)EntityDataSerializers.OPTIONAL_UUID);
+    private static final EntityDataAccessor<String> CREATOR_ID = SynchedEntityData.defineId(Abyss_Mark_Entity.class, (EntityDataSerializer)EntityDataSerializers.STRING);
     protected static final EntityDataAccessor<Integer> LIFESPAN = SynchedEntityData.defineId(Abyss_Mark_Entity.class, (EntityDataSerializer)EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(Abyss_Mark_Entity.class, (EntityDataSerializer)EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> HPDAMAGE = SynchedEntityData.defineId(Abyss_Mark_Entity.class, (EntityDataSerializer)EntityDataSerializers.FLOAT);
@@ -107,15 +110,16 @@ extends Entity {
     }
 
     public void setLifespan(int i) {
-        this.entityData.set(LIFESPAN, (Object)i);
+        this.entityData.set(LIFESPAN, i);
     }
 
     public UUID getCreatorEntityUUID() {
-        return ((Optional)this.entityData.get(CREATOR_ID)).orElse(null);
+        String s = this.entityData.get(CREATOR_ID);
+        return s.isEmpty() ? null : java.util.UUID.fromString(s);
     }
 
     public void setCreatorEntityUUID(UUID id) {
-        this.entityData.set(CREATOR_ID, Optional.ofNullable(id));
+        this.entityData.set(CREATOR_ID, id == null ? "" : id.toString());
     }
 
     public Entity getCreatorEntity() {
@@ -154,10 +158,10 @@ extends Entity {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(CREATOR_ID, Optional.empty());
-        p_326229_.define(LIFESPAN, (Object)300);
-        p_326229_.define(DAMAGE, (Object)Float.valueOf(0.0f));
-        p_326229_.define(HPDAMAGE, (Object)Float.valueOf(0.0f));
+        p_326229_.define(CREATOR_ID, "");
+        p_326229_.define(LIFESPAN, 300);
+        p_326229_.define(DAMAGE, Float.valueOf(0.0f));
+        p_326229_.define(HPDAMAGE, Float.valueOf(0.0f));
     }
 
     public float getDamage() {
@@ -165,7 +169,7 @@ extends Entity {
     }
 
     public void setDamage(float damage) {
-        this.entityData.set(DAMAGE, (Object)Float.valueOf(damage));
+        this.entityData.set(DAMAGE, Float.valueOf(damage));
     }
 
     public float getHpDamage() {
@@ -173,20 +177,20 @@ extends Entity {
     }
 
     public void setHpDamage(float damage) {
-        this.entityData.set(HPDAMAGE, (Object)Float.valueOf(damage));
+        this.entityData.set(HPDAMAGE, Float.valueOf(damage));
     }
 
-    protected void readAdditionalSaveData(CompoundTag compound) {
+    protected void readAdditionalSaveData(ValueInput compound) {
         UUID uuid;
-        this.setLifespan(compound.getInt("Lifespan"));
-        if (compound.hasUUID("Owner")) {
-            uuid = compound.getUUID("Owner");
+        this.setLifespan(compound.getIntOr("Lifespan", 0));
+        if (compound.read("Owner", UUIDUtil.CODEC).isPresent()) {
+            uuid = compound.read("Owner", UUIDUtil.CODEC).orElse(null);
         } else {
-            String s = compound.getString("Owner");
-            uuid = OldUsersConverter.convertMobOwnerIfNecessary((MinecraftServer)this.getServer(), (String)s);
+            String s = compound.getStringOr("Owner", "");
+            uuid = OldUsersConverter.convertMobOwnerIfNecessary((MinecraftServer)this.level().getServer(), (String)s);
         }
-        if (compound.hasUUID("Target")) {
-            this.targetId = compound.getUUID("Target");
+        if (compound.read("Target", UUIDUtil.CODEC).isPresent()) {
+            this.targetId = compound.read("Target", UUIDUtil.CODEC).orElse(null);
         }
         if (uuid != null) {
             try {
@@ -196,20 +200,25 @@ extends Entity {
                 // empty catch block
             }
         }
-        this.setDamage(compound.getFloat("damage"));
-        this.setHpDamage(compound.getFloat("Hpdamage"));
+        this.setDamage(compound.getFloatOr("damage", 0.0f));
+        this.setHpDamage(compound.getFloatOr("Hpdamage", 0.0f));
     }
 
-    protected void addAdditionalSaveData(CompoundTag compound) {
+    protected void addAdditionalSaveData(ValueOutput compound) {
         compound.putInt("Lifespan", this.getLifespan());
         if (this.getCreatorEntityUUID() != null) {
-            compound.putUUID("Owner", this.getCreatorEntityUUID());
+            compound.store("Owner", UUIDUtil.CODEC, this.getCreatorEntityUUID());
         }
         if (this.finalTarget != null) {
-            compound.putUUID("Target", this.finalTarget.getUUID());
+            compound.store("Target", UUIDUtil.CODEC, this.finalTarget.getUUID());
         }
         compound.putFloat("damage", this.getDamage());
         compound.putFloat("Hpdamage", this.getHpDamage());
+    }
+
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return false;
     }
 }
 

@@ -53,9 +53,9 @@ extends Entity {
 
     @Inject(method={"canAttack(Lnet/minecraft/world/entity/LivingEntity;)Z"}, at={@At(value="HEAD")}, cancellable=true)
     public void onCanAttack(LivingEntity target, CallbackInfoReturnable<Boolean> cir) {
-        LivingEntity self = (LivingEntity)this;
+        LivingEntity self = (LivingEntity)(Object)this;
         if (self.hasEffect(ModEffect.EFFECTSTUN)) {
-            cir.setReturnValue((Object)false);
+            cir.setReturnValue(false);
         }
     }
 
@@ -74,17 +74,17 @@ extends Entity {
         Player player;
         block5: {
             block4: {
-                LivingEntity self = (LivingEntity)this;
+                LivingEntity self = (LivingEntity)(Object)this;
                 if (!(self instanceof Player)) break block4;
                 player = (Player)self;
                 if (effectInstance.getEffect().equals(ModEffect.EFFECTSTUN)) break block5;
             }
             return;
         }
-        if (EntityUtil.isEquipped((Item)ModItems.UNBREAKABLE_SKULL.get(), (LivingEntity)player) && !player.getCooldowns().isOnCooldown((Item)ModItems.UNBREAKABLE_SKULL.get())) {
+        if (EntityUtil.isEquipped((Item)ModItems.UNBREAKABLE_SKULL.get(), (LivingEntity)player) && !player.getCooldowns().isOnCooldown(ModItems.UNBREAKABLE_SKULL.get().getDefaultInstance())) {
             int cooldownTicks = 900;
-            player.getCooldowns().addCooldown((Item)ModItems.UNBREAKABLE_SKULL.get(), cooldownTicks);
-            cir.setReturnValue((Object)false);
+            player.getCooldowns().addCooldown(ModItems.UNBREAKABLE_SKULL.get().getDefaultInstance(), cooldownTicks);
+            cir.setReturnValue(false);
         }
     }
 }

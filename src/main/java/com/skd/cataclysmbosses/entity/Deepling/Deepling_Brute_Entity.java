@@ -27,7 +27,7 @@
  *  net.minecraft.world.entity.EquipmentSlot
  *  net.minecraft.world.entity.LivingEntity
  *  net.minecraft.world.entity.Mob
- *  SpawnReason
+ *  EntitySpawnReason
  *  net.minecraft.world.entity.MoverType
  *  net.minecraft.world.entity.PathfinderMob
  *  net.minecraft.world.entity.SpawnGroupData
@@ -100,7 +100,7 @@ import net.minecraft.world.entity.ai.goal.MoveToBlockGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.util.DefaultRandomPos;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.SpawnReason;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -114,6 +114,8 @@ import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jspecify.annotations.Nullable;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Deepling_Brute_Entity
 extends AbstractDeepling {
@@ -152,15 +154,15 @@ extends AbstractDeepling {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         compound.putInt("Moisture", this.getMoistness());
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        this.setMoistness(compound.getInt("Moisture"));
+        this.setMoistness(compound.getIntOr("Moisture", 0));
     }
 
     protected void populateDefaultEquipmentSlots(RandomSource p_219154_, DifficultyInstance p_219155_) {
@@ -183,12 +185,12 @@ extends AbstractDeepling {
         this.playSound((SoundEvent)ModSounds.DEEPLING_IDLE.get(), 0.15f, 0.6f);
     }
 
-    public boolean checkSpawnRules(LevelAccessor worldIn, SpawnReason spawnReasonIn) {
+    public boolean checkSpawnRules(LevelAccessor worldIn, EntitySpawnReason spawnReasonIn) {
         return ModEntities.rollSpawn(CMCommonConfig.Spawning.DeeplingBruteSpawnRolls, this.getRandom(), spawnReasonIn);
     }
 
     @Nullable
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_34088_, DifficultyInstance p_34089_, SpawnReason p_34090_, @Nullable SpawnGroupData p_34091_) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_34088_, DifficultyInstance p_34089_, EntitySpawnReason p_34090_, @Nullable SpawnGroupData p_34091_) {
         SpawnGroupData spawngroupdata = super.finalizeSpawn(p_34088_, p_34089_, p_34090_, p_34091_);
         RandomSource randomsource = p_34088_.getRandom();
         this.populateDefaultEquipmentSlots(randomsource, p_34089_);
@@ -199,8 +201,8 @@ extends AbstractDeepling {
         return p_32829_.isUnobstructed((Entity)this);
     }
 
-    public static boolean candeeplingSpawn(EntityType<? extends Deepling_Brute_Entity> guardian, LevelAccessor level, SpawnReason spawnType, BlockPos pos, RandomSource random) {
-        return level.getDifficulty() != Difficulty.PEACEFUL && (SpawnReason.isSpawner((SpawnReason)spawnType) || level.getFluidState(pos).is(FluidTags.WATER));
+    public static boolean candeeplingSpawn(EntityType<? extends Deepling_Brute_Entity> guardian, LevelAccessor level, EntitySpawnReason spawnType, BlockPos pos, RandomSource random) {
+        return level.getDifficulty() != Difficulty.PEACEFUL && (EntitySpawnReason.isSpawner((EntitySpawnReason)spawnType) || level.getFluidState(pos).is(FluidTags.WATER));
     }
 
     @Override
@@ -249,7 +251,7 @@ extends AbstractDeepling {
                 this.playSound((SoundEvent)ModSounds.DEEPLING_SWING.get(), 1.0f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
                 if (target != null && this.distanceTo(target) < 3.0f) {
                     float damage = (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE);
-                    target.hurt(this.damageSources().mobAttack((LivingEntity)this), damage);
+                    target.hurtOrSimulate(this.damageSources().mobAttack((LivingEntity)this), damage);
                 }
             }
         }
@@ -273,7 +275,7 @@ extends AbstractDeepling {
         if (!list.isEmpty()) {
             for (Entity entity : list) {
                 if (!(entity instanceof LivingEntity)) continue;
-                entity.hurt(this.damageSources().mobAttack((LivingEntity)this), (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE));
+                entity.hurtOrSimulate(this.damageSources().mobAttack((LivingEntity)this), (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE));
                 this.SpinAttackTicks = 0;
                 this.setDeltaMovement(this.getDeltaMovement().scale(-0.2));
                 break;
@@ -304,7 +306,6 @@ extends AbstractDeepling {
         return new AABB(this.getX() - (double)0.7f, this.getY(), this.getZ() - (double)0.7f, this.getX() + (double)0.7f, this.getY() + (double)2.6f, this.getZ() + (double)0.7f);
     }
 
-    @Override
     public EntityDimensions getSwimmingSize() {
         return SWIMMING_SIZE;
     }
@@ -320,8 +321,8 @@ extends AbstractDeepling {
     }
 
     @Override
-    protected AABB getAttackBoundingBox() {
-        AABB aabb = super.getAttackBoundingBox();
+    protected AABB getAttackBoundingBox(double range) {
+        AABB aabb = super.getAttackBoundingBox(range);
         return aabb.deflate(0.05, 0.0, 0.05);
     }
 

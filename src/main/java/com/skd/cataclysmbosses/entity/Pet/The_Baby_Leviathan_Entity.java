@@ -138,7 +138,7 @@ import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.OwnerHurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.OwnerHurtTargetGoal;
 import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.entity.animal.Bucketable;
+import net.minecraft.world.entity.Bucketable;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -152,6 +152,8 @@ import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class The_Baby_Leviathan_Entity
 extends LLibraryAnimationPet
@@ -201,12 +203,12 @@ Bucketable {
         return (this.random.nextFloat() - this.random.nextFloat()) * 0.2f + 2.0f;
     }
 
-    public boolean hurt(DamageSource source, float amount) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
         Entity entity = source.getDirectEntity();
         if (entity instanceof Mini_Abyss_Blast_Entity || entity instanceof Abyss_Blast_Entity || entity instanceof Portal_Abyss_Blast_Entity) {
             return false;
         }
-        return super.hurt(source, amount);
+        return super.hurtOrSimulate(source, amount);
     }
 
     public static AttributeSupplier.Builder babyleviathan() {
@@ -269,26 +271,26 @@ Bucketable {
         }
     }
 
-    public boolean isInvulnerableTo(DamageSource source) {
-        return source.is(DamageTypes.IN_WALL) || source.is(DamageTypes.FALLING_BLOCK) || super.isInvulnerableTo(source);
+    public boolean isInvulnerableTo(net.minecraft.server.level.ServerLevel level, DamageSource source) {
+        return source.is(DamageTypes.IN_WALL) || source.is(DamageTypes.FALLING_BLOCK) || super.isInvulnerableTo(level, source);
     }
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(FROM_BUCKET, (Object)false);
+        p_326229_.define(FROM_BUCKET, false);
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         compound.putBoolean("FromBucket", this.fromBucket());
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        this.setFromBucket(compound.getBoolean("FromBucket"));
+        this.setFromBucket(compound.getBooleanOr("FromBucket", false));
     }
 
     @Override
@@ -301,16 +303,18 @@ Bucketable {
     }
 
     public void setFromBucket(boolean sit) {
-        this.entityData.set(FROM_BUCKET, (Object)sit);
+        this.entityData.set(FROM_BUCKET, sit);
     }
 
     public void saveToBucketTag(@Nonnull ItemStack bucket) {
         Bucketable.saveDefaultDataToBucketTag((Mob)this, (ItemStack)bucket);
-        CustomData.update((DataComponentType)DataComponents.BUCKET_ENTITY_DATA, (ItemStack)bucket, this::addAdditionalSaveData);
+        CustomData.update((DataComponentType)DataComponents.BUCKET_ENTITY_DATA, (ItemStack)bucket, tag -> {
+            tag.putBoolean("FromBucket", this.fromBucket());
+        });
     }
 
     public void loadFromBucketTag(CompoundTag p_148832_) {
-        this.readAdditionalSaveData(p_148832_);
+        this.setFromBucket(p_148832_.getBooleanOr("FromBucket", false));
         Bucketable.loadDefaultDataFromBucketTag((Mob)this, (CompoundTag)p_148832_);
     }
 
@@ -350,7 +354,7 @@ Bucketable {
             }
             return InteractionResult.PASS;
         }
-        if (this.isTame() && (result = Bucketable.bucketMobPickup((Player)player, (InteractionHand)hand, (LivingEntity)this)).isPresent()) {
+        if (this.isTame() && (result = Bucketable.bucketMobPickup((Player)player, (InteractionHand)hand, this)).isPresent()) {
             return (InteractionResult)result.get();
         }
         InteractionResult interactionresult = itemstack.interactLivingEntity(player, (LivingEntity)this, hand);
@@ -360,7 +364,7 @@ Bucketable {
             if (this.getCommand() == 3) {
                 this.setCommand(0);
             }
-            player.displayClientMessage((Component)Component.translatable((String)("entity.cataclysm.all.command_" + this.getCommand()), (Object[])new Object[]{this.getName()}), true);
+            player.sendSystemMessage((Component)Component.translatable((String)("entity.cataclysm.all.command_" + this.getCommand()), (Object[])new Object[]{this.getName()}));
             boolean bl = sit = this.getCommand() == 2;
             if (sit) {
                 this.setOrderedToSit(true);
@@ -422,7 +426,7 @@ Bucketable {
             List<LivingEntity> hit = this.raytraceEntities((Level)this.level(), (double)inflateX, (double)inflateY, (double)inflateZ, (Vec3)new Vec3((double)this.getX(), (double)this.getY(), (double)this.getZ()), (Vec3)new Vec3((double)this.endPosX, (double)this.endPosY, (double)this.endPosZ)).entities;
             for (LivingEntity target : hit) {
                 if (this.isAlliedTo((Entity)target) || target instanceof The_Baby_Leviathan_Entity || target == this) continue;
-                target.hurt(this.damageSources().mobAttack((LivingEntity)this), (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE));
+                target.hurtOrSimulate(this.damageSources().mobAttack((LivingEntity)this), (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE));
             }
         }
     }
@@ -432,7 +436,7 @@ Bucketable {
         this.collidePosX = this.endPosX;
         this.collidePosY = this.endPosY;
         this.collidePosZ = this.endPosZ;
-        List entities = world.getEntitiesOfClass(LivingEntity.class, new AABB(Math.min(this.getX(), this.collidePosX), Math.min(this.getY(), this.collidePosY), Math.min(this.getZ(), this.collidePosZ), Math.max(this.getX(), this.collidePosX), Math.max(this.getY(), this.collidePosY), Math.max(this.getZ(), this.collidePosZ)).inflate(inflateX, inflateY, inflateZ));
+        List<LivingEntity> entities = world.getEntitiesOfClass(LivingEntity.class, new AABB(Math.min(this.getX(), this.collidePosX), Math.min(this.getY(), this.collidePosY), Math.min(this.getZ(), this.collidePosZ), Math.max(this.getX(), this.collidePosX), Math.max(this.getY(), this.collidePosY), Math.max(this.getZ(), this.collidePosZ)).inflate(inflateX, inflateY, inflateZ));
         for (LivingEntity entity : entities) {
             float pad = 2.5f;
             AABB aabb = entity.getBoundingBox().inflate((double)pad, (double)pad, (double)pad);
@@ -451,7 +455,7 @@ Bucketable {
         return new SmartBodyHelper2((Mob)this);
     }
 
-    public boolean isAlliedTo(Entity entityIn) {
+    public boolean considersEntityAsAlly(Entity entityIn) {
         if (this.isTame()) {
             LivingEntity livingentity = this.getOwner();
             if (entityIn == livingentity) {
@@ -464,7 +468,7 @@ Bucketable {
                 return livingentity.isAlliedTo(entityIn);
             }
         }
-        return super.isAlliedTo(entityIn);
+        return super.considersEntityAsAlly(entityIn);
     }
 
     public boolean isPushedByFluid() {

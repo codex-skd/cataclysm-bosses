@@ -10,7 +10,7 @@
  *  net.minecraft.sounds.SoundEvents
  *  net.minecraft.world.entity.Entity
  *  net.minecraft.world.entity.EntityType
- *  net.minecraft.world.entity.MobSpawnType
+ *  net.minecraft.world.entity.EntitySpawnReason
  *  net.minecraft.world.entity.animal.Bucketable
  *  net.minecraft.world.entity.player.Player
  *  net.minecraft.world.item.Item$Properties
@@ -31,8 +31,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.MobSpawnType;
-import net.minecraft.world.entity.animal.Bucketable;
+import net.minecraft.world.entity.EntitySpawnReason;
+import net.minecraft.world.entity.Bucketable;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -46,7 +46,7 @@ public class ModFishBucket
 extends MobBucketItem {
     private final EntityType<?> type;
 
-    public ModFishBucket(EntityType<?> fishTypeIn, Fluid fluid, Item.Properties builder) {
+    public ModFishBucket(EntityType<? extends net.minecraft.world.entity.Mob> fishTypeIn, Fluid fluid, Item.Properties builder) {
         super(fishTypeIn, fluid, SoundEvents.BUCKET_EMPTY_FISH, builder.stacksTo(1));
         this.type = fishTypeIn;
     }
@@ -59,10 +59,10 @@ extends MobBucketItem {
     }
 
     private void spawn(ServerLevel p_151142_, ItemStack p_151143_, BlockPos p_151144_) {
-        Entity entity = this.type.spawn(p_151142_, p_151143_, null, p_151144_, MobSpawnType.BUCKET, true, false);
+        Entity entity = this.type.spawn(p_151142_, p_151143_, null, p_151144_, EntitySpawnReason.BUCKET, true, false);
         if (entity instanceof Bucketable) {
             Bucketable bucketable = (Bucketable)entity;
-            CustomData customdata = (CustomData)p_151143_.getOrDefault(DataComponents.BUCKET_ENTITY_DATA, (Object)CustomData.EMPTY);
+            CustomData customdata = (CustomData)p_151143_.getOrDefault(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY);
             bucketable.loadFromBucketTag(customdata.copyTag());
             bucketable.setFromBucket(true);
         }

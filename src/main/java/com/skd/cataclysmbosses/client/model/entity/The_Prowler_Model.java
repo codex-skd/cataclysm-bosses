@@ -20,8 +20,9 @@ import com.skd.cataclysmbosses.entity.InternalAnimationMonster.The_Prowler_Entit
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.Map;
 import java.util.Optional;
-import net.minecraft.client.model.HierarchicalModel;
+import com.skd.cataclysmbosses.client.model.compat.CmHierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
@@ -31,7 +32,7 @@ import net.minecraft.client.model.geom.builders.PartDefinition;
 import org.jetbrains.annotations.NotNull;
 
 public class The_Prowler_Model
-extends HierarchicalModel<The_Prowler_Entity> {
+extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRenderState> {
     private final ModelPart root;
     private final ModelPart roots;
     private final ModelPart upperbody;
@@ -67,8 +68,8 @@ extends HierarchicalModel<The_Prowler_Entity> {
     private final Map<String, Optional<ModelPart>> optionalPartCache = new Object2ObjectOpenHashMap();
 
     public The_Prowler_Model(ModelPart root) {
+        super(root);
         this.root = root;
-        this.buildPartCache(root);
         this.roots = this.root.getChild("roots");
         this.upperbody = this.roots.getChild("upperbody");
         this.chestplate = this.upperbody.getChild("chestplate");
@@ -137,42 +138,8 @@ extends HierarchicalModel<The_Prowler_Entity> {
         return LayerDefinition.create((MeshDefinition)meshdefinition, (int)256, (int)256);
     }
 
-    public void setupAnim(The_Prowler_Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        this.root().getAllParts().forEach(ModelPart::resetPose);
-        this.upperbody.yRot += netHeadYaw * 0.6f * ((float)Math.PI / 180);
-        float sawspeed = entity.getAttackState() == 3 ? 0.0f : 0.5f;
-        this.animate(entity.getAnimationState("death"), Prowler_Animation.DEATH, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("idle"), Prowler_Animation.IDLE, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("spin"), Prowler_Animation.SPIN, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("melee"), Prowler_Animation.MELEE, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("strong_attack"), Prowler_Animation.STRONG_ATTACK, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("stun"), Prowler_Animation.STUN, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("laser"), Prowler_Animation.LASER, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("pierce"), Prowler_Animation.PIERCE, ageInTicks, 1.0f);
-        this.saw.xRot -= ageInTicks * sawspeed;
-    }
-
-    private void buildPartCache(ModelPart part) {
-        for (Map.Entry entry : part.children.entrySet()) {
-            String partName = (String)entry.getKey();
-            ModelPart childPart = (ModelPart)entry.getValue();
-            this.partCache.putIfAbsent(partName, childPart);
-            this.optionalPartCache.putIfAbsent(partName, Optional.of(childPart));
-            if (childPart.children.isEmpty()) continue;
-            this.buildPartCache(childPart);
-        }
-    }
-
-    @NotNull
-    public Optional<ModelPart> getAnyDescendantWithName(String name) {
-        if ("root".equals(name)) {
-            return Optional.of(this.root);
-        }
-        return this.optionalPartCache.getOrDefault(name, Optional.empty());
-    }
-
-    public ModelPart root() {
-        return this.root;
+        @Override
+    public void setupAnim(EntityRenderState state) {
+        super.setupAnim(state);
     }
 }
-

@@ -46,7 +46,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -55,11 +55,13 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.ItemUseAnimation;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.neoforged.neoforge.common.ItemAbility;
 import net.neoforged.neoforge.common.ItemAbilities;
 
 public class Soul_Render
@@ -76,7 +78,7 @@ extends Cataclysm_Weapon {
             if (livingEntity.isShiftKeyDown()) {
                 this.StrikeWindmillHalberd(level, (LivingEntity)player, 7, 5, 1.0, 1.0, 0.2, 1);
                 if (!level.isClientSide()) {
-                    player.getCooldowns().addCooldown((Item)this, CMCommonConfig.SoulRender.cooldown);
+                    player.getCooldowns().addCooldown(this.getDefaultInstance(), CMCommonConfig.SoulRender.cooldown);
                 }
             } else {
                 int t = Mth.clamp((int)i, (int)0, (int)60);
@@ -90,7 +92,7 @@ extends Cataclysm_Weapon {
                     charge.setdamage((float)player.getAttributeValue(net.minecraft.world.entity.ai.attributes.Attributes.ATTACK_DAMAGE));
                     hasSucceeded = true;
                     if (!level.isClientSide() && hasSucceeded) {
-                        player.getCooldowns().addCooldown((Item)this, CMCommonConfig.SoulRender.cooldown);
+                        player.getCooldowns().addCooldown(this.getDefaultInstance(), CMCommonConfig.SoulRender.cooldown);
                     }
                 }
             }
@@ -143,15 +145,15 @@ extends Cataclysm_Weapon {
         }
     }
 
-    public InteractionResultHolder<ItemStack> use(Level p_77659_1_, Player p_77659_2_, InteractionHand p_77659_3_) {
+    public InteractionResult use(Level p_77659_1_, Player p_77659_2_, InteractionHand p_77659_3_) {
         ItemStack item = p_77659_2_.getItemInHand(p_77659_3_);
         InteractionHand otherhand = p_77659_3_ == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
         ItemStack otheritem = p_77659_2_.getItemInHand(otherhand);
-        if (otheritem.canPerformAction(ItemAbilities.SHIELD_BLOCK) && !p_77659_2_.getCooldowns().isOnCooldown(otheritem.getItem())) {
-            return InteractionResultHolder.fail((Object)item);
+        if (otheritem.has(net.minecraft.core.component.DataComponents.BLOCKS_ATTACKS) && !p_77659_2_.getCooldowns().isOnCooldown(otheritem)) {
+            return InteractionResult.FAIL;
         }
         p_77659_2_.startUsingItem(p_77659_3_);
-        return InteractionResultHolder.consume((Object)item);
+        return InteractionResult.CONSUME;
     }
 
     public boolean isEnchantable(ItemStack stack) {
@@ -191,9 +193,9 @@ extends Cataclysm_Weapon {
         return ItemUseAnimation.BLOCK;
     }
 
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltips, TooltipFlag flags) {
-        tooltips.add((Component)Component.translatable((String)"item.cataclysm.soul_render.desc").withStyle(ChatFormatting.DARK_GREEN));
-        tooltips.add((Component)Component.translatable((String)"item.cataclysm.soul_render2.desc").withStyle(ChatFormatting.DARK_GREEN));
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, java.util.function.Consumer<Component> builder, TooltipFlag flags) {
+        builder.accept((Component)Component.translatable((String)"item.cataclysm.soul_render.desc").withStyle(ChatFormatting.DARK_GREEN));
+        builder.accept((Component)Component.translatable((String)"item.cataclysm.soul_render2.desc").withStyle(ChatFormatting.DARK_GREEN));
     }
 }
 

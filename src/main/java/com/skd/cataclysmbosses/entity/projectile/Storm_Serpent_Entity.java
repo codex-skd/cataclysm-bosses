@@ -32,6 +32,7 @@ import com.skd.cataclysmbosses.init.ModEffect;
 import com.skd.cataclysmbosses.init.ModEntities;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -50,6 +51,8 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Storm_Serpent_Entity
 extends Entity {
@@ -85,9 +88,9 @@ extends Entity {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(STATE, (Object)0);
-        p_326229_.define(DAMAGE, (Object)Float.valueOf(0.0f));
-        p_326229_.define(RIGHT, (Object)false);
+        p_326229_.define(STATE, 0);
+        p_326229_.define(DAMAGE, Float.valueOf(0.0f));
+        p_326229_.define(RIGHT, false);
     }
 
     public AnimationState getAnimationState(String input) {
@@ -131,7 +134,7 @@ extends Entity {
     }
 
     public void setState(int state) {
-        this.entityData.set(STATE, (Object)state);
+        this.entityData.set(STATE, state);
     }
 
     public boolean getRight() {
@@ -139,7 +142,7 @@ extends Entity {
     }
 
     public void setRight(boolean right) {
-        this.entityData.set(RIGHT, (Object)right);
+        this.entityData.set(RIGHT, right);
     }
 
     public float getDamage() {
@@ -147,7 +150,7 @@ extends Entity {
     }
 
     public void setDamage(float damage) {
-        this.entityData.set(DAMAGE, (Object)Float.valueOf(damage));
+        this.entityData.set(DAMAGE, Float.valueOf(damage));
     }
 
     public void setCaster(@Nullable LivingEntity p_190549_1_) {
@@ -164,24 +167,24 @@ extends Entity {
         return this.caster;
     }
 
-    protected void readAdditionalSaveData(CompoundTag compound) {
-        this.warmupDelayTicks = compound.getInt("Warmup");
-        if (compound.hasUUID("Owner")) {
-            this.casterUuid = compound.getUUID("Owner");
+    protected void readAdditionalSaveData(ValueInput compound) {
+        this.warmupDelayTicks = compound.getIntOr("Warmup", 0);
+        if (compound.read("Owner", UUIDUtil.CODEC).isPresent()) {
+            this.casterUuid = compound.read("Owner", UUIDUtil.CODEC).orElse(null);
         }
-        if (compound.hasUUID("Target")) {
-            this.targetId = compound.getUUID("Target");
+        if (compound.read("Target", UUIDUtil.CODEC).isPresent()) {
+            this.targetId = compound.read("Target", UUIDUtil.CODEC).orElse(null);
         }
-        this.setDamage(compound.getFloat("Damage"));
+        this.setDamage(compound.getFloatOr("Damage", 0.0f));
     }
 
-    protected void addAdditionalSaveData(CompoundTag compound) {
+    protected void addAdditionalSaveData(ValueOutput compound) {
         if (this.finalTarget != null) {
-            compound.putUUID("Target", this.finalTarget.getUUID());
+            compound.store("Target", UUIDUtil.CODEC, this.finalTarget.getUUID());
         }
         compound.putInt("Warmup", this.warmupDelayTicks);
         if (this.casterUuid != null) {
-            compound.putUUID("Owner", this.casterUuid);
+            compound.store("Owner", UUIDUtil.CODEC, this.casterUuid);
         }
         compound.putFloat("Damage", this.getDamage());
     }
@@ -308,8 +311,8 @@ extends Entity {
         if (Hitentity.isAlive() && !Hitentity.isInvulnerable() && Hitentity != livingentity) {
             boolean flag;
             if (livingentity == null) {
-                Hitentity.hurt(this.damageSources().magic(), this.getDamage());
-            } else if (!livingentity.isAlliedTo((Entity)Hitentity) && !Hitentity.isAlliedTo((Entity)livingentity) && (flag = Hitentity.hurt(this.damageSources().indirectMagic((Entity)this, (Entity)livingentity), this.getDamage()))) {
+                Hitentity.hurtOrSimulate(this.damageSources().magic(), this.getDamage());
+            } else if (!livingentity.isAlliedTo((Entity)Hitentity) && !Hitentity.isAlliedTo((Entity)livingentity) && (flag = Hitentity.hurtOrSimulate(this.damageSources().indirectMagic((Entity)this, (Entity)livingentity), this.getDamage()))) {
                 MobEffectInstance effectinstance = new MobEffectInstance(ModEffect.EFFECTWETNESS, 150, 4, false, true, true);
                 Hitentity.addEffect(effectinstance);
             }
@@ -333,6 +336,11 @@ extends Entity {
         }
         int i = this.lifeTicks - 2;
         return i <= 0 ? 1.0f : 1.0f - ((float)i - p_36937_) / 20.0f;
+    }
+
+    @Override
+    public boolean hurtServer(ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return false;
     }
 }
 

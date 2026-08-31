@@ -36,6 +36,7 @@
  *  net.minecraft.world.phys.Vec3
  */
 package com.skd.cataclysmbosses.entity.Deepling;
+import net.minecraft.server.level.ServerLevel;
 
 import com.skd.cataclysmbosses.entity.AI.AnimalAIRandomSwimming;
 import com.skd.cataclysmbosses.entity.AI.EntityAINearestTarget3D;
@@ -43,7 +44,6 @@ import com.skd.cataclysmbosses.entity.Deepling.AbstractDeepling;
 import com.skd.cataclysmbosses.entity.Deepling.Deepling_Angler_Entity;
 import com.skd.cataclysmbosses.entity.etc.AquaticMoveController;
 import com.skd.cataclysmbosses.entity.etc.path.SemiAquaticPathNavigator;
-import com.skd.cataclysmbosses.entity.projectile.Spike_Spike_Entity;
 import com.skd.cataclysmbosses.init.ModTag;
 import com.skd.nautilusapi.server.animation.Animation;
 import com.skd.nautilusapi.server.animation.AnimationHandler;
@@ -77,6 +77,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Spike_Entity
 extends Monster
@@ -103,7 +105,7 @@ implements IAnimatedEntity {
     }
 
     protected SoundEvent getAmbientSound() {
-        return SoundEvents.PUFFER_FISH_AMBIENT;
+        return SoundEvents.PUFFER_FISH_FLOP;
     }
 
     protected SoundEvent getDeathSound() {
@@ -138,16 +140,16 @@ implements IAnimatedEntity {
         return Monster.createMonsterAttributes().add(Attributes.ATTACK_DAMAGE, 2.0).add(Attributes.MOVEMENT_SPEED, 0.3).add(Attributes.MAX_HEALTH, 12.0);
     }
 
-    public boolean hurt(DamageSource p_32820_, float p_32821_) {
+    public boolean hurtServer(ServerLevel level, DamageSource p_32820_, float p_32821_) {
         LivingEntity livingentity;
         Entity entity;
         if (this.level().isClientSide()) {
             return false;
         }
-        if (!p_32820_.is(DamageTypeTags.AVOIDS_GUARDIAN_THORNS) && !p_32820_.is(DamageTypes.THORNS) && (entity = p_32820_.getDirectEntity()) instanceof LivingEntity && (livingentity = (LivingEntity)entity).hurt(this.damageSources().thorns((Entity)this), 1.0f)) {
+        if (!p_32820_.is(DamageTypeTags.AVOIDS_GUARDIAN_THORNS) && !p_32820_.is(DamageTypes.THORNS) && (entity = p_32820_.getDirectEntity()) instanceof LivingEntity && (livingentity = (LivingEntity)entity).hurtOrSimulate(this.damageSources().thorns((Entity)this), 1.0f)) {
             livingentity.addEffect(new MobEffectInstance(MobEffects.POISON, 40, 0), (Entity)this);
         }
-        return super.hurt(p_32820_, p_32821_);
+        return super.hurtOrSimulate(p_32820_, p_32821_);
     }
 
     public void tick() {
@@ -175,18 +177,18 @@ implements IAnimatedEntity {
                 this.playSound(SoundEvents.PHANTOM_BITE, 0.4f, 1.0f / (this.getRandom().nextFloat() * 0.4f + 0.8f));
                 if (target != null) {
                     float damage = (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE);
-                    target.hurt(this.damageSources().mobAttack((LivingEntity)this), damage);
+                    target.hurtOrSimulate(this.damageSources().mobAttack((LivingEntity)this), damage);
                 }
             }
         }
     }
 
     protected void handleAirSupply(int p_30344_) {
-        if (this.isAlive() && !this.isInWaterOrBubble()) {
+        if (this.isAlive() && !this.isInWater()) {
             this.setAirSupply(p_30344_ - 1);
             if (this.getAirSupply() == -20) {
                 this.setAirSupply(0);
-                this.hurt(this.damageSources().drown(), 0.01f);
+                this.hurtOrSimulate(this.damageSources().drown(), 0.01f);
             }
         } else {
             this.setAirSupply(1000);
@@ -199,14 +201,14 @@ implements IAnimatedEntity {
         this.handleAirSupply(i);
     }
 
-    public boolean isAlliedTo(Entity entityIn) {
+    public boolean considersEntityAsAlly(Entity entityIn) {
         if (entityIn == this) {
             return true;
         }
-        if (super.isAlliedTo(entityIn)) {
+        if (super.considersEntityAsAlly(entityIn)) {
             return true;
         }
-        if (entityIn.getType().is(ModTag.TEAM_THE_LEVIATHAN)) {
+        if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_THE_LEVIATHAN)) {
             return this.getTeam() == null && entityIn.getTeam() == null;
         }
         return false;
@@ -218,18 +220,18 @@ implements IAnimatedEntity {
         if (!this.level().isClientSide()) {
             for (int i = 0; i < shardCount; ++i) {
                 float f = (float)(i + 1) / (float)shardCount * 360.0f;
-                Spike_Spike_Entity shard = new Spike_Spike_Entity(this.level(), (LivingEntity)this);
+                com.skd.cataclysmbosses.entity.projectile.Spike_Entity shard = new com.skd.cataclysmbosses.entity.projectile.Spike_Entity(this.level(), (LivingEntity)this);
                 shard.shoot(this.random.nextFloat() * 0.4f * 2.0f - 0.4f, this.random.nextFloat() * 0.25f + 0.1f, this.random.nextFloat() * 0.4f * 2.0f - 0.4f, 0.35f, 1.0f);
                 this.level().addFreshEntity((Entity)shard);
             }
         }
     }
 
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
     }
 
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
     }
 

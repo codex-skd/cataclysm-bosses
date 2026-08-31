@@ -45,15 +45,18 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.ItemUseAnimation;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.common.ItemAbilities;
@@ -66,8 +69,8 @@ extends Cataclysm_Weapon {
         super(group);
     }
 
-    public void inventoryTick(ItemStack stack, Level level, Entity holder, int slot, boolean isSelected) {
-        if (!level.isClientSide() && stack.get(ModDataComponents.THROWN_ANCHOR) != null && this.getThrownEntity(level, stack) == null) {
+    public void inventoryTick(ItemStack stack, ServerLevel level, Entity holder, @Nullable EquipmentSlot slot) {
+        if (stack.get(ModDataComponents.THROWN_ANCHOR) != null && this.getThrownEntity(level, stack) == null) {
             stack.remove(ModDataComponents.THROWN_ANCHOR);
         }
     }
@@ -101,7 +104,7 @@ extends Cataclysm_Weapon {
                 float angleStep = 25.0f;
                 double firstAngleOffset = (double)(numberOfWaves - 1) / 2.0 * (double)angleStep;
                 if (p_43396_.isShiftKeyDown()) {
-                    player.getCooldowns().addCooldown((Item)this, CMCommonConfig.Ceraunus.cooldown);
+                    player.getCooldowns().addCooldown(this.getDefaultInstance(), CMCommonConfig.Ceraunus.cooldown);
                     p_43395_.playSound((Player)null, player.getX(), player.getY(), player.getZ(), (SoundEvent)ModSounds.HEAVY_SMASH.get(), SoundSource.PLAYERS, 0.6f, 1.0f);
                     for (int k = 0; k < numberOfWaves; ++k) {
                         double angle = (double)player.getYRot() - firstAngleOffset + (double)((float)k * angleStep);
@@ -119,11 +122,12 @@ extends Cataclysm_Weapon {
                     launchedBlock.setBaseDamage((float)player.getAttributeValue(Attributes.ATTACK_DAMAGE));
                     launchedBlock.shootFromRotation((Entity)player, player.getXRot(), player.getYRot(), 0.0f, 2.5f, 1.0f);
                     if (p_43395_.addFreshEntity((Entity)launchedBlock)) {
-                        p_43394_.set(ModDataComponents.THROWN_ANCHOR, (Object)launchedBlock.getUUID());
+                        p_43394_.set(ModDataComponents.THROWN_ANCHOR.get(), launchedBlock.getUUID());
                     }
                 }
             }
         }
+        return false;
     }
 
     public static float getPowerForTime(int p_40662_) {
@@ -148,13 +152,13 @@ extends Cataclysm_Weapon {
         return null;
     }
 
-    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+    public InteractionResult use(Level world, Player player, InteractionHand hand) {
         ItemStack itemstack = player.getItemInHand(hand);
         if (itemstack.get(ModDataComponents.THROWN_ANCHOR) == null && world.getWorldBorder().isWithinBounds(player.blockPosition())) {
             player.startUsingItem(hand);
-            return InteractionResultHolder.consume((Object)itemstack);
+            return InteractionResult.CONSUME;
         }
-        return InteractionResultHolder.fail((Object)itemstack);
+        return InteractionResult.FAIL;
     }
 
     public static boolean getThrowing(ItemStack itemStack) {

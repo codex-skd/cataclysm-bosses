@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "R": "cataclysm:ancient_metal_ingot",
+    "n": "cataclysm:koboleton_bone"
+  },
+  "pattern": [
+    "R R",
+    "nnn",
+    "RnR"
+  ],
+  "result": {
+    "id": "cataclysm:bone_reptile_chestplate"
+  }
+}

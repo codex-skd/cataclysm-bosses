@@ -24,21 +24,24 @@ import com.skd.cataclysmbosses.entity.projectile.ThrownCoral_Bardiche_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Thrown_Coral_Bardiche_Renderer
-extends EntityRenderer<ThrownCoral_Bardiche_Entity> {
+extends CmEntityRenderer<ThrownCoral_Bardiche_Entity> {
     private static final Identifier VOID_HOWITZER_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/coral_bardiche.png");
     private final Coral_Bardiche_Model model = new Coral_Bardiche_Model();
 
@@ -46,14 +49,13 @@ extends EntityRenderer<ThrownCoral_Bardiche_Entity> {
         super(renderManagerIn);
     }
 
-    public void render(ThrownCoral_Bardiche_Entity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
+    protected void render(ThrownCoral_Bardiche_Entity entityIn, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
         matrixStackIn.pushPose();
         matrixStackIn.mulPose(Axis.YP.rotationDegrees(Mth.lerp((float)partialTicks, (float)entityIn.yRotO, (float)entityIn.getYRot()) - 90.0f));
         matrixStackIn.mulPose(Axis.ZP.rotationDegrees(Mth.lerp((float)partialTicks, (float)entityIn.xRotO, (float)entityIn.getXRot()) + 90.0f));
-        VertexConsumer vertexconsumer = ItemRenderer.getFoilBufferDirect((MultiBufferSource)bufferIn, (RenderType)this.model.renderType(this.getTextureLocation(entityIn)), (boolean)false, (boolean)entityIn.isFoil());
-        this.model.renderToBuffer(matrixStackIn, vertexconsumer, packedLightIn, OverlayTexture.NO_OVERLAY);
+        VertexConsumer vertexconsumer = bufferIn.getFoilBuffer(RenderTypes.entityCutout(this.getTextureLocation(entityIn)), (boolean)entityIn.isFoil());
+        this.model.renderToBuffer(matrixStackIn, vertexconsumer, packedLightIn, OverlayTexture.NO_OVERLAY, -1);
         matrixStackIn.popPose();
-        super.render((Entity)entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
     }
 
     public Identifier getTextureLocation(ThrownCoral_Bardiche_Entity entity) {

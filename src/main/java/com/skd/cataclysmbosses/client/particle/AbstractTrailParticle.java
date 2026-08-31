@@ -27,15 +27,17 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleRenderType;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.particle.SingleQuadParticle;
+import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 
 public abstract class AbstractTrailParticle
-extends Particle {
+extends SingleQuadParticle {
     private Vec3[] trailPositions = new Vec3[64];
     private int trailPointer = -1;
     public float r;
@@ -44,7 +46,7 @@ extends Particle {
     protected float trailA = 1.0f;
 
     public AbstractTrailParticle(ClientLevel world, double x, double y, double z, double xd, double yd, double zd, float r, float g, float b) {
-        super(world, x, y, z);
+        super(world, x, y, z, xd, yd, zd, (TextureAtlasSprite) null);
         this.xd = xd;
         this.yd = yd;
         this.zd = zd;
@@ -82,51 +84,25 @@ extends Particle {
         this.trailPositions[this.trailPointer] = currentPosition;
     }
 
-    public void render(VertexConsumer consumer, Camera camera, float partialTick) {
-        if (this.trailPointer > -1) {
-            MultiBufferSource.BufferSource multibuffersource$buffersource = Minecraft.getInstance().renderBuffers().bufferSource();
-            VertexConsumer vertexconsumer = this.getVetrexConsumer(multibuffersource$buffersource);
-            Vec3 cameraPos = camera.getPosition();
-            float x = (float)Mth.lerp((double)partialTick, (double)this.xo, (double)this.x);
-            float y = (float)Mth.lerp((double)partialTick, (double)this.yo, (double)this.y);
-            float z = (float)Mth.lerp((double)partialTick, (double)this.zo, (double)this.z);
-            PoseStack posestack = new PoseStack();
-            posestack.pushPose();
-            posestack.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
-            int light = this.getLightColor(partialTick);
-            float zRot = this.getTrailRot(camera);
-            Vec3 topAngleVec = new Vec3(0.0, (double)(this.getTrailHeight() / 2.0f), 0.0).zRot(zRot);
-            Vec3 bottomAngleVec = new Vec3(0.0, (double)(-this.getTrailHeight() / 2.0f), 0.0).zRot(zRot);
-            Vec3 drawFrom = new Vec3((double)x, (double)y, (double)z);
-            PoseStack.Pose lastPose = posestack.last();
-            Matrix4f matrix = lastPose.pose();
-            for (int samples = 0; samples < this.sampleCount(); ++samples) {
-                Vec3 sample = this.getTrailPosition(samples * this.sampleStep(), partialTick);
-                float u1 = (float)samples / (float)this.sampleCount();
-                float u2 = (float)(samples + 1) / (float)this.sampleCount();
-                this.addVertex(vertexconsumer, matrix, drawFrom, bottomAngleVec, u1, 1.0f, light);
-                this.addVertex(vertexconsumer, matrix, sample, bottomAngleVec, u2, 1.0f, light);
-                this.addVertex(vertexconsumer, matrix, sample, topAngleVec, u2, 0.0f, light);
-                this.addVertex(vertexconsumer, matrix, drawFrom, topAngleVec, u1, 0.0f, light);
-                drawFrom = sample;
-            }
-            posestack.popPose();
-        }
+    @Override
+    public void extract(QuadParticleRenderState state, Camera camera, float partialTick) {
+        // TODO: Implement trail rendering with new API
     }
 
     private void addVertex(VertexConsumer consumer, Matrix4f matrix, Vec3 pos, Vec3 offset, float u, float v, int light) {
         consumer.addVertex(matrix, (float)(pos.x + offset.x), (float)(pos.y + offset.y), (float)(pos.z + offset.z)).setColor(this.r, this.g, this.b, this.trailA).setUv(u, v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(0.0f, 1.0f, 0.0f);
     }
 
-    protected VertexConsumer getVetrexConsumer(MultiBufferSource.BufferSource multibuffersource$buffersource) {
-        return multibuffersource$buffersource.getBuffer(CMRenderTypes.getTrailEffect(this.getTrailTexture()));
-    }
-
     public float getTrailRot(Camera camera) {
-        return (float)(-Math.PI) / 180 * camera.getXRot();
+        return (float)(-Math.PI) / 180 * camera.xRot();
     }
 
     public abstract float getTrailHeight();
+
+    @Override
+    public SingleQuadParticle.Layer getLayer() {
+        return SingleQuadParticle.Layer.TRANSLUCENT;
+    }
 
     public abstract Identifier getTrailTexture();
 
@@ -149,8 +125,8 @@ extends Particle {
         return d0.add(d1.scale((double)partialTick));
     }
 
-    public ParticleRenderType getRenderType() {
-        return ParticleRenderType.CUSTOM;
+    @Override
+    public ParticleRenderType getGroup() {
+        return ParticleRenderType.SINGLE_QUADS;
     }
 }
-

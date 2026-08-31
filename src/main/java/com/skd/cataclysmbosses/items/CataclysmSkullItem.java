@@ -19,10 +19,10 @@ package com.skd.cataclysmbosses.items;
 
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Equipable;
+// import net.minecraft.world.item.Equipable; // Removed in 26.2
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.StandingAndWallBlockItem;
@@ -31,17 +31,22 @@ import net.minecraft.world.level.block.Block;
 
 public class CataclysmSkullItem
 extends StandingAndWallBlockItem
-implements Equipable {
+{ // implements Equipable - removed in 26.2
     public CataclysmSkullItem(Block floorBlock, Block wallBlock, Item.Properties properties) {
-        super(floorBlock, wallBlock, properties, Direction.DOWN);
+        super(floorBlock, wallBlock, Direction.DOWN, properties);
     }
 
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
-        return this.swapWithEquipmentSlot((Item)this, level, player, hand);
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        net.minecraft.world.item.equipment.Equippable equippable = stack.get(net.minecraft.core.component.DataComponents.EQUIPPABLE);
+        if (equippable != null && equippable.swappable()) {
+            return equippable.swapWithEquipmentSlot(stack, player);
+        }
+        return InteractionResult.PASS;
     }
 
-    public EquipmentSlot getEquipmentSlot() {
-        return EquipmentSlot.HEAD;
+    public net.minecraft.world.entity.EquipmentSlot getEquipmentSlot(ItemStack stack) {
+        return net.minecraft.world.entity.EquipmentSlot.HEAD;
     }
 }
 

@@ -56,7 +56,9 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -75,6 +77,8 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.event.EventHooks;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Death_Laser_Beam_Entity
 extends Entity {
@@ -109,7 +113,6 @@ extends Entity {
 
     public Death_Laser_Beam_Entity(EntityType<? extends Death_Laser_Beam_Entity> type, Level world) {
         super(type, world);
-        this.noCulling = true;
         if (world.isClientSide()) {
             this.attractorPos = new Vec3[]{new Vec3(0.0, 0.0, 0.0)};
         }
@@ -132,6 +135,11 @@ extends Entity {
 
     public PushReaction getPistonPushReaction() {
         return PushReaction.IGNORE;
+    }
+
+    @Override
+    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
+        return false;
     }
 
     public void tick() {
@@ -172,14 +180,14 @@ extends Entity {
         }
         if (this.tickCount > 20) {
             this.calculateEndPos();
-            List<LivingEntity> hit = this.raytraceEntities((Level)this.level(), (Vec3)new Vec3((double)this.getX(), (double)this.getY(), (double)this.getZ()), (Vec3)new Vec3((double)this.endPosX, (double)this.endPosY, (double)this.endPosZ), (boolean)false, (boolean)true, (boolean)true).entities;
+            List<LivingEntity> hit = (List<LivingEntity>)this.raytraceEntities((Level)this.level(), (Vec3)new Vec3((double)this.getX(), (double)this.getY(), (double)this.getZ()), (Vec3)new Vec3((double)this.endPosX, (double)this.endPosY, (double)this.endPosZ), (boolean)false, (boolean)true, (boolean)true).entities;
             if (this.blockSide != null) {
                 this.spawnExplosionParticles(5);
                 if (!this.level().isClientSide()) {
                     BlockState block;
                     for (BlockPos pos : BlockPos.betweenClosed((int)Mth.floor((double)(this.collidePosX - 0.5)), (int)Mth.floor((double)(this.collidePosY - 0.5)), (int)Mth.floor((double)(this.collidePosZ - 0.5)), (int)Mth.floor((double)(this.collidePosX + 0.5)), (int)Mth.floor((double)(this.collidePosY + 0.5)), (int)Mth.floor((double)(this.collidePosZ + 0.5)))) {
                         block = this.level().getBlockState(pos);
-                        if (block.isAir() || !block.is(ModTag.CM_GLASS) || !EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) continue;
+                        if (block.isAir() || !block.is(ModTag.CM_GLASS) || !(this.level() instanceof ServerLevel) || !EventHooks.canEntityGrief((ServerLevel)this.level(), (Entity)this)) continue;
                         this.level().destroyBlock(pos, true);
                     }
                     for (BlockPos pos : BlockPos.betweenClosed((int)Mth.floor((double)(this.collidePosX - 2.5)), (int)Mth.floor((double)(this.collidePosY - 2.5)), (int)Mth.floor((double)(this.collidePosZ - 2.5)), (int)Mth.floor((double)(this.collidePosX + 2.5)), (int)Mth.floor((double)(this.collidePosY + 2.5)), (int)Mth.floor((double)(this.collidePosZ + 2.5)))) {
@@ -193,7 +201,7 @@ extends Entity {
                             if (this.level().isEmptyBlock(blockpos1)) {
                                 this.level().setBlockAndUpdate(blockpos1, BaseFireBlock.getState((BlockGetter)this.level(), (BlockPos)blockpos1));
                             }
-                        } else if (EventHooks.canEntityGrief((Level)this.level(), (Entity)this) && this.level().isEmptyBlock(blockpos1)) {
+                        } else if (this.level() instanceof ServerLevel && EventHooks.canEntityGrief((ServerLevel)this.level(), (Entity)this) && this.level().isEmptyBlock(blockpos1)) {
                             this.level().setBlockAndUpdate(blockpos1, BaseFireBlock.getState((BlockGetter)this.level(), (BlockPos)blockpos1));
                         }
                     }
@@ -202,7 +210,7 @@ extends Entity {
             if (!this.level().isClientSide()) {
                 for (LivingEntity target : hit) {
                     if (this.caster == null || this.caster.isAlliedTo((Entity)target) || target == this.caster) continue;
-                    boolean flag = target.hurt(CMDamageTypes.causeDeathLaserDamage(this, this.caster), (float)((double)this.getDamage() + Math.min((double)this.getDamage(), (double)(target.getMaxHealth() * this.getHpDamage()) * 0.01)));
+                    boolean flag = target.hurtOrSimulate(CMDamageTypes.causeDeathLaserDamage(this, this.caster), (float)((double)this.getDamage() + Math.min((double)this.getDamage(), (double)(target.getMaxHealth() * this.getHpDamage()) * 0.01)));
                     if (!this.getFire() || !flag) continue;
                     target.igniteForSeconds(5.0f);
                 }
@@ -225,14 +233,14 @@ extends Entity {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(YAW, (Object)Float.valueOf(0.0f));
-        p_326229_.define(PITCH, (Object)Float.valueOf(0.0f));
-        p_326229_.define(DURATION, (Object)0);
-        p_326229_.define(CASTER, (Object)-1);
-        p_326229_.define(HEAD, (Object)0);
-        p_326229_.define(FIRE, (Object)false);
-        p_326229_.define(DAMAGE, (Object)Float.valueOf(0.0f));
-        p_326229_.define(HPDAMAGE, (Object)Float.valueOf(0.0f));
+        p_326229_.define(YAW, Float.valueOf(0.0f));
+        p_326229_.define(PITCH, Float.valueOf(0.0f));
+        p_326229_.define(DURATION, 0);
+        p_326229_.define(CASTER, -1);
+        p_326229_.define(HEAD, 0);
+        p_326229_.define(FIRE, false);
+        p_326229_.define(DAMAGE, Float.valueOf(0.0f));
+        p_326229_.define(HPDAMAGE, Float.valueOf(0.0f));
     }
 
     public float getDamage() {
@@ -240,7 +248,7 @@ extends Entity {
     }
 
     public void setDamage(float damage) {
-        this.entityData.set(DAMAGE, (Object)Float.valueOf(damage));
+        this.entityData.set(DAMAGE, Float.valueOf(damage));
     }
 
     public float getHpDamage() {
@@ -248,7 +256,7 @@ extends Entity {
     }
 
     public void setHpDamage(float damage) {
-        this.entityData.set(HPDAMAGE, (Object)Float.valueOf(damage));
+        this.entityData.set(HPDAMAGE, Float.valueOf(damage));
     }
 
     public float getYaw() {
@@ -256,7 +264,7 @@ extends Entity {
     }
 
     public void setYaw(float yaw) {
-        this.entityData.set(YAW, (Object)Float.valueOf(yaw));
+        this.entityData.set(YAW, Float.valueOf(yaw));
     }
 
     public float getPitch() {
@@ -264,7 +272,7 @@ extends Entity {
     }
 
     public void setPitch(float pitch) {
-        this.entityData.set(PITCH, (Object)Float.valueOf(pitch));
+        this.entityData.set(PITCH, Float.valueOf(pitch));
     }
 
     public int getDuration() {
@@ -272,7 +280,7 @@ extends Entity {
     }
 
     public void setDuration(int duration) {
-        this.entityData.set(DURATION, (Object)duration);
+        this.entityData.set(DURATION, duration);
     }
 
     public int getHead() {
@@ -280,7 +288,7 @@ extends Entity {
     }
 
     public void setHead(int head) {
-        this.entityData.set(HEAD, (Object)head);
+        this.entityData.set(HEAD, head);
     }
 
     public int getCasterID() {
@@ -288,7 +296,7 @@ extends Entity {
     }
 
     public void setCasterID(int id) {
-        this.entityData.set(CASTER, (Object)id);
+        this.entityData.set(CASTER, id);
     }
 
     public boolean getFire() {
@@ -296,13 +304,13 @@ extends Entity {
     }
 
     public void setFire(boolean fire) {
-        this.entityData.set(FIRE, (Object)fire);
+        this.entityData.set(FIRE, fire);
     }
 
-    protected void readAdditionalSaveData(CompoundTag nbt) {
+    protected void readAdditionalSaveData(ValueInput nbt) {
     }
 
-    protected void addAdditionalSaveData(CompoundTag nbt) {
+    protected void addAdditionalSaveData(ValueOutput nbt) {
     }
 
     private void calculateEndPos() {
@@ -332,7 +340,7 @@ extends Entity {
             this.collidePosZ = this.endPosZ;
             this.blockSide = null;
         }
-        List entities = world.getEntitiesOfClass(LivingEntity.class, new AABB(Math.min(this.getX(), this.collidePosX), Math.min(this.getY(), this.collidePosY), Math.min(this.getZ(), this.collidePosZ), Math.max(this.getX(), this.collidePosX), Math.max(this.getY(), this.collidePosY), Math.max(this.getZ(), this.collidePosZ)).inflate(1.0, 1.0, 1.0));
+        List<LivingEntity> entities = world.getEntitiesOfClass(LivingEntity.class, new AABB(Math.min(this.getX(), this.collidePosX), Math.min(this.getY(), this.collidePosY), Math.min(this.getZ(), this.collidePosZ), Math.max(this.getX(), this.collidePosX), Math.max(this.getY(), this.collidePosY), Math.max(this.getZ(), this.collidePosZ)).inflate(1.0, 1.0, 1.0));
         for (LivingEntity entity : entities) {
             if (entity == this.caster) continue;
             float pad = entity.getPickRadius() + 0.5f;

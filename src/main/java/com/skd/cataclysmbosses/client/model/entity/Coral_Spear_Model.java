@@ -56,7 +56,7 @@ extends AdvancedEntityModel<ThrownCoral_Spear_Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.coral_spear, (Object)this.head, (Object)this.head2, (Object)this.coral, (Object)this.coral2);
+        return ImmutableList.of(this.coral_spear, this.head, this.head2, this.coral, this.coral2);
     }
 
     public void setupAnim(ThrownCoral_Spear_Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {

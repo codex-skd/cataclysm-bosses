@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": "cataclysm:obsidian_bricks"
+  },
+  "result": {
+    "id": "cataclysm:obsidian_brick_wall",
+    "count": 6
+  }
+}

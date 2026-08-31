@@ -44,6 +44,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -92,7 +95,7 @@ extends BlockEntity {
                     ScreenShake_Entity.ScreenShake(level, Vec3.atCenterOf((Vec3i)pos), 20.0f, 0.05f, 0, 120);
                 }
                 if (entity.Animaitonticks == 28) {
-                    level.playSound((Player)null, pos, (SoundEvent)ModSounds.DOOR_OF_SEAL_OPEN.get(), SoundSource.BLOCKS, 4.0f, level.random.nextFloat() * 0.2f + 1.0f);
+                    level.playSound((Player)null, pos, (SoundEvent)ModSounds.DOOR_OF_SEAL_OPEN.get(), SoundSource.BLOCKS, 4.0f, level.getRandom().nextFloat() * 0.2f + 1.0f);
                     float x = (float)pos.getX() + 0.5f;
                     float y = pos.getY();
                     float z = (float)pos.getZ() + 0.5f;
@@ -138,14 +141,16 @@ extends BlockEntity {
         }
     }
 
-    protected void loadAdditional(CompoundTag p_155745_, HolderLookup.Provider p_323876_) {
-        super.loadAdditional(p_155745_, p_323876_);
-        this.Animaitonticks = p_155745_.getInt("animationTicks");
+    @Override
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
+        this.Animaitonticks = input.getIntOr("animationTicks", 0);
     }
 
-    protected void saveAdditional(CompoundTag p_187518_, HolderLookup.Provider p_324418_) {
-        super.saveAdditional(p_187518_, p_324418_);
-        p_187518_.putInt("animationTicks", this.Animaitonticks);
+    @Override
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        output.putInt("animationTicks", this.Animaitonticks);
     }
 }
 

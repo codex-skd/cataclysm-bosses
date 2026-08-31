@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "cataclysm:black_steel_ingot"
+  ],
+  "result": {
+    "count": 9,
+    "id": "cataclysm:black_steel_nugget"
+  }
+}

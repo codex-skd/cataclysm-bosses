@@ -20,8 +20,9 @@ import com.skd.cataclysmbosses.entity.InternalAnimationMonster.AcropolisMonsters
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.Map;
 import java.util.Optional;
-import net.minecraft.client.model.HierarchicalModel;
+import com.skd.cataclysmbosses.client.model.compat.CmHierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
@@ -31,7 +32,7 @@ import net.minecraft.client.model.geom.builders.PartDefinition;
 import org.jetbrains.annotations.NotNull;
 
 public class Symbiocto_Model
-extends HierarchicalModel<Symbiocto_Entity> {
+extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRenderState> {
     private final ModelPart root;
     private final ModelPart everything;
     private final ModelPart octo_head;
@@ -55,8 +56,8 @@ extends HierarchicalModel<Symbiocto_Entity> {
     private final Map<String, Optional<ModelPart>> optionalPartCache = new Object2ObjectOpenHashMap();
 
     public Symbiocto_Model(ModelPart root) {
+        super(root);
         this.root = root;
-        this.buildPartCache(root);
         this.everything = this.root.getChild("everything");
         this.octo_head = this.everything.getChild("octo_head");
         this.back_tentacle1 = this.octo_head.getChild("back_tentacle1");
@@ -101,56 +102,8 @@ extends HierarchicalModel<Symbiocto_Entity> {
         return LayerDefinition.create((MeshDefinition)meshdefinition, (int)128, (int)128);
     }
 
-    public void setupAnim(Symbiocto_Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        this.root().getAllParts().forEach(ModelPart::resetPose);
-        this.animateHeadLookTarget(netHeadYaw, headPitch);
-        this.animateWalk(Symbiocto_Animation.WALK, limbSwing, limbSwingAmount, 2.0f, 4.0f);
-        this.animate(entity.getAnimationState("idle"), Symbiocto_Animation.IDLE, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("attack"), Symbiocto_Animation.ATTACK, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("spit"), Symbiocto_Animation.INK, ageInTicks, 1.0f);
-        if (this.riding) {
-            this.octo_head.z += 1.0f;
-            this.octo_head.xRot -= (float)Math.toRadians(22.5);
-            this.right_tentacle1.zRot -= (float)Math.toRadians(52.5);
-            this.left_tentacle1.zRot += (float)Math.toRadians(52.5);
-            this.right_tentacle2.zRot -= (float)Math.toRadians(20.0);
-            this.left_tentacle2.zRot += (float)Math.toRadians(20.0);
-            this.right_tentacle3.zRot -= (float)Math.toRadians(7.5);
-            this.left_tentacle3.zRot += (float)Math.toRadians(7.5);
-            this.face_tentacle1.xRot += (float)Math.toRadians(105.0);
-            this.face_tentacle2.xRot += (float)Math.toRadians(105.0);
-            this.face_tentacle3.xRot += (float)Math.toRadians(105.0);
-            this.back_tentacle1.xRot -= (float)Math.toRadians(75.0);
-            this.back_tentacle2.xRot -= (float)Math.toRadians(75.0);
-            this.back_tentacle3.xRot -= (float)Math.toRadians(75.0);
-        }
-    }
-
-    private void buildPartCache(ModelPart part) {
-        for (Map.Entry entry : part.children.entrySet()) {
-            String partName = (String)entry.getKey();
-            ModelPart childPart = (ModelPart)entry.getValue();
-            this.partCache.putIfAbsent(partName, childPart);
-            this.optionalPartCache.putIfAbsent(partName, Optional.of(childPart));
-            if (childPart.children.isEmpty()) continue;
-            this.buildPartCache(childPart);
-        }
-    }
-
-    @NotNull
-    public Optional<ModelPart> getAnyDescendantWithName(String name) {
-        if ("root".equals(name)) {
-            return Optional.of(this.root);
-        }
-        return this.optionalPartCache.getOrDefault(name, Optional.empty());
-    }
-
-    private void animateHeadLookTarget(float yRot, float xRot) {
-        this.everything.yRot = yRot * ((float)Math.PI / 180);
-    }
-
-    public ModelPart root() {
-        return this.root;
+        @Override
+    public void setupAnim(EntityRenderState state) {
+        super.setupAnim(state);
     }
 }
-

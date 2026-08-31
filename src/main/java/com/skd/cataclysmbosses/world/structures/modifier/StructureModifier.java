@@ -24,7 +24,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import java.util.List;
 
 public class StructureModifier {
-    public static final Codec<StructureModifier> CODEC = RecordCodecBuilder.create(builder -> builder.group((App)StructureConditionType.CONDITION_CODEC.fieldOf("condition").forGetter(modifier -> modifier.condition), (App)StructureActionType.ACTION_CODEC.listOf().fieldOf("actions").forGetter(modifier -> modifier.actions), (App)StructureTargetSelectorType.TARGET_SELECTOR_CODEC.fieldOf("target_selector").forGetter(modifier -> modifier.targetSelector)).apply((Applicative)builder, StructureModifier::new));
+    public static final Codec<StructureModifier> CODEC = RecordCodecBuilder.create(builder -> builder.group(StructureConditionType.CONDITION_CODEC.fieldOf("condition").forGetter(modifier -> modifier.condition), StructureActionType.ACTION_CODEC.listOf().fieldOf("actions").forGetter(modifier -> modifier.actions), StructureTargetSelectorType.TARGET_SELECTOR_CODEC.fieldOf("target_selector").forGetter(modifier -> modifier.targetSelector)).apply(builder, StructureModifier::new));
     private final StructureCondition condition;
     private final List<StructureAction> actions;
     private final StructureTargetSelector targetSelector;

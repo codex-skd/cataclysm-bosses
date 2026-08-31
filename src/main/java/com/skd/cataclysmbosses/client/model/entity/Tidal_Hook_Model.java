@@ -70,7 +70,7 @@ extends AdvancedEntityModel<Tidal_Hook_Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.body, (Object)this.claw, (Object)this.claw2, (Object)this.claw3, (Object)this.claw4);
+        return ImmutableList.of(this.body, this.claw, this.claw2, this.claw3, this.claw4);
     }
 
     public void setupAnim(Tidal_Hook_Entity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {

@@ -29,7 +29,7 @@
  *  net.minecraft.world.entity.EntityType
  *  net.minecraft.world.entity.LivingEntity
  *  net.minecraft.world.entity.Mob
- *  SpawnReason
+ *  EntitySpawnReason
  *  net.minecraft.world.entity.MoverType
  *  net.minecraft.world.entity.PathfinderMob
  *  net.minecraft.world.entity.ai.attributes.AttributeSupplier$Builder
@@ -120,7 +120,7 @@ import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.util.DefaultRandomPos;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.SpawnReason;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -132,6 +132,8 @@ import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.fluids.FluidType;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Coral_Golem_Entity
 extends LLibrary_Monster
@@ -182,8 +184,8 @@ implements ISemiAquatic {
         return Monster.createMonsterAttributes().add(Attributes.FOLLOW_RANGE, 20.0).add(Attributes.MOVEMENT_SPEED, (double)0.28f).add(Attributes.ATTACK_DAMAGE, 11.0).add(Attributes.MAX_HEALTH, 110.0).add(Attributes.ARMOR, 5.0).add(Attributes.STEP_HEIGHT, 1.5).add(Attributes.KNOCKBACK_RESISTANCE, 0.8);
     }
 
-    public boolean hurt(DamageSource source, float damage) {
-        return super.hurt(source, damage);
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
+        return super.hurtOrSimulate(source, damage);
     }
 
     @Override
@@ -192,15 +194,15 @@ implements ISemiAquatic {
         p_326229_.define(GOLEMSWIM, false);
     }
 
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
     }
 
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
     }
 
-    public boolean checkSpawnRules(LevelAccessor worldIn, SpawnReason spawnReasonIn) {
+    public boolean checkSpawnRules(LevelAccessor worldIn, EntitySpawnReason spawnReasonIn) {
         if (ModEntities.rollSpawn(CMCommonConfig.Spawning.CoralgolemSpawnRolls, this.getRandom(), spawnReasonIn) && worldIn instanceof ServerLevel) {
             ServerLevel serverLevel = (ServerLevel)worldIn;
             if (super.checkSpawnRules(worldIn, spawnReasonIn)) {
@@ -215,8 +217,8 @@ implements ISemiAquatic {
         return p_32829_.isUnobstructed((Entity)this);
     }
 
-    public static boolean cangolemSpawn(EntityType<? extends Coral_Golem_Entity> guardian, LevelAccessor level, SpawnReason spawnType, BlockPos pos, RandomSource random) {
-        return level.getDifficulty() != Difficulty.PEACEFUL && (SpawnReason.isSpawner((SpawnReason)spawnType) || level.getFluidState(pos).is(FluidTags.WATER));
+    public static boolean cangolemSpawn(EntityType<? extends Coral_Golem_Entity> guardian, LevelAccessor level, EntitySpawnReason spawnType, BlockPos pos, RandomSource random) {
+        return level.getDifficulty() != Difficulty.PEACEFUL && (EntitySpawnReason.isSpawner((EntitySpawnReason)spawnType) || level.getFluidState(pos).is(FluidTags.WATER));
     }
 
     boolean wantsToSwim() {
@@ -247,7 +249,7 @@ implements ISemiAquatic {
         if (!this.isInWater() && !this.isLandNavigator) {
             this.switchNavigator(true);
         }
-        if (flag1 = this.canInFluidType(this.getEyeInFluidType())) {
+        if (flag1 = this.canBreatheUnderwater()) {
             if (this.level().noCollision(this, this.getBoundingBox()) && !this.getSwim()) {
                 this.setSwim(true);
             }
@@ -334,8 +336,8 @@ implements ISemiAquatic {
         ScreenShake_Entity.ScreenShake(this.level(), this.position(), 10.0f, 0.15f, 0, 20);
         this.playSound((SoundEvent)ModSounds.EXPLOSION.get(), 0.5f, 1.0f + this.getRandom().nextFloat() * 0.1f);
         for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate((double)grow))) {
-            if (this.isAlliedTo(entity) || entity instanceof Coral_Golem_Entity || entity == this) continue;
-            entity.hurt(this.damageSources().mobAttack((LivingEntity)this), (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) + (float)this.random.nextInt(damage));
+            if (this.considersCoralAlly(entity) || entity instanceof Coral_Golem_Entity || entity == this) continue;
+            entity.hurtOrSimulate(this.damageSources().mobAttack((LivingEntity)this), (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) + (float)this.random.nextInt(damage));
             this.launch(entity, true);
         }
     }
@@ -360,14 +362,14 @@ implements ISemiAquatic {
         e.push(d0 / d2 * (double)f, huge ? 0.5 : (double)0.2f, d1 / d2 * (double)f);
     }
 
-    public boolean isAlliedTo(@Nullable Entity entityIn) {
+    public boolean considersCoralAlly(@Nullable Entity entityIn) {
         if (entityIn == this) {
             return true;
         }
-        if (super.isAlliedTo(entityIn)) {
+        if (super.considersEntityAsAlly(entityIn)) {
             return true;
         }
-        if (entityIn != null && entityIn.getType().is(ModTag.TEAM_THE_LEVIATHAN)) {
+        if (entityIn != null && entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_THE_LEVIATHAN)) {
             return this.getTeam() == null && entityIn.getTeam() == null;
         }
         return false;

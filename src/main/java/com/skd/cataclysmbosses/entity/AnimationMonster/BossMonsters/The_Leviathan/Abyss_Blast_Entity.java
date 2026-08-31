@@ -66,6 +66,8 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.event.EventHooks;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Abyss_Blast_Entity
 extends Entity {
@@ -99,7 +101,6 @@ extends Entity {
 
     public Abyss_Blast_Entity(EntityType<? extends Abyss_Blast_Entity> type, Level world) {
         super(type, world);
-        this.noCulling = true;
         if (world.isClientSide()) {
             this.attractorPos = new Vec3[]{new Vec3(0.0, 0.0, 0.0)};
         }
@@ -164,7 +165,7 @@ extends Entity {
                 if (!this.level().isClientSide()) {
                     for (BlockPos pos : BlockPos.betweenClosed((int)Mth.floor((double)(this.collidePosX - 0.5)), (int)Mth.floor((double)(this.collidePosY - 0.5)), (int)Mth.floor((double)(this.collidePosZ - 0.5)), (int)Mth.floor((double)(this.collidePosX + 0.5)), (int)Mth.floor((double)(this.collidePosY + 0.5)), (int)Mth.floor((double)(this.collidePosZ + 0.5)))) {
                         BlockState block = this.level().getBlockState(pos);
-                        if (block.isAir() || block.is(ModTag.LEVIATHAN_IMMUNE) || !EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) continue;
+                        if (block.isAir() || block.is(ModTag.LEVIATHAN_IMMUNE) || !(this.level() instanceof net.minecraft.server.level.ServerLevel) || !EventHooks.canEntityGrief((net.minecraft.server.level.ServerLevel)this.level(), (Entity)this)) continue;
                         this.level().destroyBlock(pos, false);
                     }
                 }
@@ -172,7 +173,7 @@ extends Entity {
             if (!this.level().isClientSide()) {
                 for (LivingEntity target : hit) {
                     boolean flag;
-                    if (this.caster == null || this.caster.isAlliedTo((Entity)target) || target == this.caster || !(flag = target.hurt(CMDamageTypes.causeDeathLaserDamage(this, this.caster), (float)((double)this.getDamage() + Math.min((double)this.getDamage(), (double)(target.getMaxHealth() * this.getHpDamage()) * 0.01))))) continue;
+                    if (this.caster == null || this.caster.isAlliedTo((Entity)target) || target == this.caster || !(flag = target.hurtOrSimulate(CMDamageTypes.causeDeathLaserDamage(this, this.caster), (float)((double)this.getDamage() + Math.min((double)this.getDamage(), (double)(target.getMaxHealth() * this.getHpDamage()) * 0.01))))) continue;
                     MobEffectInstance effectinstance1 = target.getEffect(ModEffect.EFFECTABYSSAL_BURN);
                     int i = 1;
                     if (effectinstance1 != null) {
@@ -204,13 +205,13 @@ extends Entity {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(YAW, (Object)Float.valueOf(0.0f));
-        p_326229_.define(PITCH, (Object)Float.valueOf(0.0f));
-        p_326229_.define(DURATION, (Object)0);
-        p_326229_.define(CASTER, (Object)-1);
-        p_326229_.define(BEAMDIRECTION, (Object)Float.valueOf(90.0f));
-        p_326229_.define(DAMAGE, (Object)Float.valueOf(0.0f));
-        p_326229_.define(HPDAMAGE, (Object)Float.valueOf(0.0f));
+        p_326229_.define(YAW, Float.valueOf(0.0f));
+        p_326229_.define(PITCH, Float.valueOf(0.0f));
+        p_326229_.define(DURATION, 0);
+        p_326229_.define(CASTER, -1);
+        p_326229_.define(BEAMDIRECTION, Float.valueOf(90.0f));
+        p_326229_.define(DAMAGE, Float.valueOf(0.0f));
+        p_326229_.define(HPDAMAGE, Float.valueOf(0.0f));
     }
 
     public float getDamage() {
@@ -218,7 +219,7 @@ extends Entity {
     }
 
     public void setDamage(float damage) {
-        this.entityData.set(DAMAGE, (Object)Float.valueOf(damage));
+        this.entityData.set(DAMAGE, Float.valueOf(damage));
     }
 
     public float getHpDamage() {
@@ -226,7 +227,7 @@ extends Entity {
     }
 
     public void setHpDamage(float damage) {
-        this.entityData.set(HPDAMAGE, (Object)Float.valueOf(damage));
+        this.entityData.set(HPDAMAGE, Float.valueOf(damage));
     }
 
     public float getYaw() {
@@ -234,7 +235,7 @@ extends Entity {
     }
 
     public void setYaw(float yaw) {
-        this.entityData.set(YAW, (Object)Float.valueOf(yaw));
+        this.entityData.set(YAW, Float.valueOf(yaw));
     }
 
     public float getPitch() {
@@ -242,7 +243,7 @@ extends Entity {
     }
 
     public void setPitch(float pitch) {
-        this.entityData.set(PITCH, (Object)Float.valueOf(pitch));
+        this.entityData.set(PITCH, Float.valueOf(pitch));
     }
 
     public int getDuration() {
@@ -250,7 +251,7 @@ extends Entity {
     }
 
     public void setDuration(int duration) {
-        this.entityData.set(DURATION, (Object)duration);
+        this.entityData.set(DURATION, duration);
     }
 
     public float getBeamDirection() {
@@ -258,7 +259,7 @@ extends Entity {
     }
 
     public void setBeamDirection(float beamDirection) {
-        this.entityData.set(BEAMDIRECTION, (Object)Float.valueOf(beamDirection));
+        this.entityData.set(BEAMDIRECTION, Float.valueOf(beamDirection));
     }
 
     public int getCasterID() {
@@ -266,19 +267,19 @@ extends Entity {
     }
 
     public void setCasterID(int id) {
-        this.entityData.set(CASTER, (Object)id);
+        this.entityData.set(CASTER, id);
     }
 
-    protected void readAdditionalSaveData(CompoundTag compound) {
-        this.setYaw(compound.getFloat("Yaw"));
-        this.setPitch(compound.getFloat("Pitch"));
-        this.setDuration(compound.getInt("Duration"));
-        this.setBeamDirection(compound.getFloat("BeamDirection"));
-        this.setDamage(compound.getFloat("damage"));
-        this.setHpDamage(compound.getFloat("Hpdamage"));
+    protected void readAdditionalSaveData(ValueInput compound) {
+        this.setYaw(compound.getFloatOr("Yaw", 0.0f));
+        this.setPitch(compound.getFloatOr("Pitch", 0.0f));
+        this.setDuration(compound.getIntOr("Duration", 0));
+        this.setBeamDirection(compound.getFloatOr("BeamDirection", 0.0f));
+        this.setDamage(compound.getFloatOr("damage", 0.0f));
+        this.setHpDamage(compound.getFloatOr("Hpdamage", 0.0f));
     }
 
-    protected void addAdditionalSaveData(CompoundTag compound) {
+    protected void addAdditionalSaveData(ValueOutput compound) {
         compound.putFloat("Yaw", this.getYaw());
         compound.putFloat("Pitch", this.getPitch());
         compound.putInt("Duration", this.getDuration());
@@ -314,7 +315,7 @@ extends Entity {
             this.collidePosZ = this.endPosZ;
             this.blockSide = null;
         }
-        List entities = world.getEntitiesOfClass(LivingEntity.class, new AABB(Math.min(this.getX(), this.collidePosX), Math.min(this.getY(), this.collidePosY), Math.min(this.getZ(), this.collidePosZ), Math.max(this.getX(), this.collidePosX), Math.max(this.getY(), this.collidePosY), Math.max(this.getZ(), this.collidePosZ)).inflate(2.0, 2.0, 2.0));
+        List<LivingEntity> entities = world.getEntitiesOfClass(LivingEntity.class, new AABB(Math.min(this.getX(), this.collidePosX), Math.min(this.getY(), this.collidePosY), Math.min(this.getZ(), this.collidePosZ), Math.max(this.getX(), this.collidePosX), Math.max(this.getY(), this.collidePosY), Math.max(this.getZ(), this.collidePosZ)).inflate(2.0, 2.0, 2.0));
         for (LivingEntity entity : entities) {
             if (entity == this.caster) continue;
             float pad = entity.getPickRadius() + 0.5f;
@@ -378,6 +379,11 @@ extends Entity {
         public void addEntityHit(LivingEntity entity) {
             this.entities.add(entity);
         }
+    }
+
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return false;
     }
 }
 

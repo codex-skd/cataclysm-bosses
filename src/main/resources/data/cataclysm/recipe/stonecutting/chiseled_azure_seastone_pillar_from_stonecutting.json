@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": [
+    "cataclysm:azure_seastone",
+    "cataclysm:azure_seastone_bricks",
+    "cataclysm:polished_azure_seastone"
+  ],
+  "result": {
+    "count": 1,
+    "id": "cataclysm:chiseled_azure_seastone_pillar"
+  }
+}

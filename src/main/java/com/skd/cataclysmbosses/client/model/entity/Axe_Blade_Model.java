@@ -49,7 +49,7 @@ extends AdvancedEntityModel<Axe_Blade_Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.root, (Object)this.blade, (Object)this.vfx, (Object)this.cube_r1, (Object)this.cube_r2);
+        return ImmutableList.of(this.root, this.blade, this.vfx, this.cube_r1, this.cube_r2);
     }
 
     public BasicModelPart root() {

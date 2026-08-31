@@ -30,10 +30,11 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
+import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.ParticleRenderType;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -45,6 +46,9 @@ extends Particle {
     private double toY;
     private double toZ;
     private LightningRender lightningRender = new LightningRender();
+    private float rCol;
+    private float gCol;
+    private float bCol;
 
     public SparkTrailParticle(ClientLevel world, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, int r, int g, int b) {
         super(world, x, y, z);
@@ -59,32 +63,15 @@ extends Particle {
         this.bCol = b;
     }
 
-    public ParticleRenderType getRenderType() {
-        return ParticleRenderType.CUSTOM;
-    }
-
-    public void render(VertexConsumer vertexConsumer, Camera camera, float partialTick) {
-        Vec3 vec3 = camera.getPosition();
-        PoseStack posestack = new PoseStack();
-        MultiBufferSource.BufferSource multibuffersource$buffersource = Minecraft.getInstance().renderBuffers().bufferSource();
-        float f = (float)(Mth.lerp((double)partialTick, (double)this.xo, (double)this.x) - vec3.x());
-        float f1 = (float)(Mth.lerp((double)partialTick, (double)this.yo, (double)this.y) - vec3.y());
-        float f2 = (float)(Mth.lerp((double)partialTick, (double)this.zo, (double)this.z) - vec3.z());
-        float scale = 1.85f;
-        posestack.pushPose();
-        posestack.translate(f, f1, f2);
-        posestack.scale(scale, scale, scale);
-        LightningBoltData.BoltRenderInfo lightningBoltData = new LightningBoltData.BoltRenderInfo(0.5f, 0.1f, 0.5f, 0.85f, new Vector4f(this.rCol / 255.0f, this.gCol / 255.0f, this.bCol / 255.0f, 1.0f), 0.9f);
-        LightningBoltData bolt = new LightningBoltData(lightningBoltData, Vec3.ZERO, new Vec3(this.toX, this.toY, this.toZ), 2).size(0.05f).lifespan(this.lifetime).spawn(LightningBoltData.SpawnFunction.CONSECUTIVE);
-        this.lightningRender.update((Object)this, bolt, partialTick);
-        this.lightningRender.render(partialTick, posestack, (MultiBufferSource)multibuffersource$buffersource);
-        posestack.popPose();
+    @Override
+    public ParticleRenderType getGroup() {
+        return ParticleRenderType.SINGLE_QUADS;
     }
 
     @OnlyIn(value=Dist.CLIENT)
     public static class Factory
     implements ParticleProvider<SparkTrailParticleOptions> {
-        public Particle createParticle(SparkTrailParticleOptions data, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public Particle createParticle(SparkTrailParticleOptions data, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, RandomSource random) {
             SparkTrailParticle particle = new SparkTrailParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, data.r(), data.g(), data.b());
             return particle;
         }

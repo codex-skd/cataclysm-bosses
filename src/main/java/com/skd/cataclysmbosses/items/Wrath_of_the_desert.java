@@ -34,13 +34,15 @@ import java.util.List;
 import java.util.Optional;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -57,24 +59,23 @@ extends Item {
         super(group);
     }
 
-    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+    public InteractionResult use(Level world, Player player, InteractionHand hand) {
         ItemStack itemstack = player.getItemInHand(hand);
         player.startUsingItem(hand);
-        return InteractionResultHolder.consume((Object)itemstack);
+        return InteractionResult.CONSUME;
     }
 
     public int getUseDuration(ItemStack pStack, LivingEntity pEntity) {
         return 72000;
     }
 
-    public void inventoryTick(ItemStack stack, Level level, Entity entity, int i, boolean held) {
+    public void inventoryTick(ItemStack stack, ServerLevel level, Entity entity, @javax.annotation.Nullable EquipmentSlot slot) {
         LivingEntity living;
-        super.inventoryTick(stack, level, entity, i, held);
         boolean using = entity instanceof LivingEntity && (living = (LivingEntity)entity).getUseItem().equals(stack);
         int useTime = Wrath_of_the_desert.getUseTime(stack);
-        ChargeAnimationComponent flaskContents = (ChargeAnimationComponent)stack.getOrDefault(ModDataComponents.CHARGE_ANIMATION, (Object)ChargeAnimationComponent.EMPTY);
+        ChargeAnimationComponent flaskContents = (ChargeAnimationComponent)stack.getOrDefault(ModDataComponents.CHARGE_ANIMATION, ChargeAnimationComponent.EMPTY);
         if (flaskContents.PrevUseTime() != flaskContents.UseTime()) {
-            stack.update(ModDataComponents.CHARGE_ANIMATION, (Object)flaskContents, component -> component.tryAddDose(useTime, Wrath_of_the_desert.getUseTime(stack)));
+            stack.update(ModDataComponents.CHARGE_ANIMATION.get(), flaskContents, component -> component.tryAddDose(useTime, Wrath_of_the_desert.getUseTime(stack)));
         }
         int maxLoadTime = Wrath_of_the_desert.getMaxLoadTime();
         if (using && useTime < maxLoadTime) {
@@ -96,8 +97,8 @@ extends Item {
     }
 
     public static void setUseTime(ItemStack stack, int useTime) {
-        ChargeAnimationComponent flaskContents = (ChargeAnimationComponent)stack.getOrDefault(ModDataComponents.CHARGE_ANIMATION, (Object)ChargeAnimationComponent.EMPTY);
-        stack.update(ModDataComponents.CHARGE_ANIMATION, (Object)flaskContents, component -> component.tryAddDose(useTime, Wrath_of_the_desert.getUseTime(stack)));
+        ChargeAnimationComponent flaskContents = (ChargeAnimationComponent)stack.getOrDefault(ModDataComponents.CHARGE_ANIMATION, ChargeAnimationComponent.EMPTY);
+        stack.update(ModDataComponents.CHARGE_ANIMATION.get(), flaskContents, component -> component.tryAddDose(useTime, Wrath_of_the_desert.getUseTime(stack)));
     }
 
     public static float getLerpedUseTime(ItemStack stack, float f) {
@@ -130,7 +131,7 @@ extends Item {
         Vec3 lookVec = living.getViewVector(1.0f);
         Vec3 destVec = srcVec.add(lookVec.x() * range, lookVec.y() * range, lookVec.z() * range);
         float var9 = 2.0f;
-        List possibleList = level.getEntities((Entity)living, living.getBoundingBox().expandTowards(lookVec.x() * range, lookVec.y() * range, lookVec.z() * range).inflate((double)var9, (double)var9, (double)var9));
+        List<Entity> possibleList = level.getEntities((Entity)living, living.getBoundingBox().expandTowards(lookVec.x() * range, lookVec.y() * range, lookVec.z() * range).inflate((double)var9, (double)var9, (double)var9));
         double hitDist = 0.0;
         for (Entity possibleEntity : possibleList) {
             double possibleDist;
@@ -183,9 +184,10 @@ extends Item {
                     level.addFreshEntity((Entity)largefireball);
                 }
                 level.playSound((Player)null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0f, 1.0f / (level.getRandom().nextFloat() * 0.4f + 1.2f) + f * 0.5f);
-                player.awardStat(Stats.ITEM_USED.get((Object)this));
+                player.awardStat(Stats.ITEM_USED.get(this));
             }
         }
+        return false;
     }
 
     public boolean isEnchantable(ItemStack stack) {

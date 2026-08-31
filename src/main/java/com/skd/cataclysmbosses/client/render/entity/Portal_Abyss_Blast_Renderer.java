@@ -29,9 +29,11 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
@@ -42,10 +44,11 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Portal_Abyss_Blast_Renderer
-extends EntityRenderer<Portal_Abyss_Blast_Entity> {
+extends CmEntityRenderer<Portal_Abyss_Blast_Entity> {
     private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/abyss_laser_beam.png");
     private static final float TEXTURE_WIDTH = 256.0f;
     private static final float TEXTURE_HEIGHT = 32.0f;
@@ -66,7 +69,7 @@ extends EntityRenderer<Portal_Abyss_Blast_Entity> {
         return true;
     }
 
-    public void render(Portal_Abyss_Blast_Entity solarBeam, float entityYaw, float delta, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
+    protected void render(Portal_Abyss_Blast_Entity solarBeam, float delta, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
         this.clearerView = solarBeam.caster instanceof Player && Minecraft.getInstance().player == solarBeam.caster && Minecraft.getInstance().options.getCameraType() == CameraType.FIRST_PERSON;
         double collidePosX = solarBeam.prevCollidePosX + (solarBeam.collidePosX - solarBeam.prevCollidePosX) * (double)delta;
         double collidePosY = solarBeam.prevCollidePosY + (solarBeam.collidePosY - solarBeam.prevCollidePosY) * (double)delta;
@@ -103,7 +106,7 @@ extends EntityRenderer<Portal_Abyss_Blast_Entity> {
 
     private void renderEnd(int frame, Direction side, PoseStack matrixStackIn, VertexConsumer builder, int packedLightIn) {
         matrixStackIn.pushPose();
-        Quaternionf quat = this.entityRenderDispatcher.cameraOrientation();
+        Quaternionf quat = this.entityRenderDispatcher.camera.rotation();
         matrixStackIn.mulPose(quat);
         this.renderFlatQuad(frame, matrixStackIn, builder, packedLightIn);
         matrixStackIn.popPose();
@@ -139,13 +142,13 @@ extends EntityRenderer<Portal_Abyss_Blast_Entity> {
         matrixStackIn.mulPose(new Quaternionf().rotationX(-pitch * ((float)Math.PI / 180)));
         matrixStackIn.pushPose();
         if (!this.clearerView) {
-            matrixStackIn.mulPose(new Quaternionf().rotationY(Minecraft.getInstance().gameRenderer.getMainCamera().getXRot() + 90.0f));
+            matrixStackIn.mulPose(new Quaternionf().rotationY(Minecraft.getInstance().getEntityRenderDispatcher().camera.xRot() + 90.0f));
         }
         this.drawBeam(length, frame, matrixStackIn, builder, packedLightIn);
         matrixStackIn.popPose();
         if (!this.clearerView) {
             matrixStackIn.pushPose();
-            matrixStackIn.mulPose(new Quaternionf().rotationY((-Minecraft.getInstance().gameRenderer.getMainCamera().getXRot() - 90.0f) * ((float)Math.PI / 180)));
+            matrixStackIn.mulPose(new Quaternionf().rotationY((-Minecraft.getInstance().getEntityRenderDispatcher().camera.xRot() - 90.0f) * ((float)Math.PI / 180)));
             this.drawBeam(length, frame, matrixStackIn, builder, packedLightIn);
             matrixStackIn.popPose();
         }

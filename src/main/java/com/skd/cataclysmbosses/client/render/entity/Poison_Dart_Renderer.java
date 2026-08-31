@@ -23,8 +23,10 @@ import com.skd.cataclysmbosses.entity.projectile.Poison_Dart_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -33,10 +35,11 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Poison_Dart_Renderer
-extends EntityRenderer<Poison_Dart_Entity> {
+extends CmEntityRenderer<Poison_Dart_Entity> {
     private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/poison_dart.png");
 
     public Poison_Dart_Renderer(EntityRendererProvider.Context renderManagerIn) {
@@ -47,47 +50,8 @@ extends EntityRenderer<Poison_Dart_Entity> {
         return TEXTURE;
     }
 
-    public void render(Poison_Dart_Entity p_113839_, float p_113840_, float p_113841_, PoseStack p_113842_, MultiBufferSource p_113843_, int p_113844_) {
-        p_113842_.pushPose();
-        p_113842_.mulPose(Axis.YP.rotationDegrees(Mth.lerp((float)p_113841_, (float)p_113839_.yRotO, (float)p_113839_.getYRot()) - 90.0f));
-        p_113842_.mulPose(Axis.ZP.rotationDegrees(Mth.lerp((float)p_113841_, (float)p_113839_.xRotO, (float)p_113839_.getXRot())));
-        boolean i = false;
-        float f = 0.0f;
-        float f1 = 0.5f;
-        float f2 = 0.0f;
-        float f3 = 0.15625f;
-        float f4 = 0.0f;
-        float f5 = 0.15625f;
-        float f6 = 0.15625f;
-        float f7 = 0.3125f;
-        float f8 = 0.05625f;
-        float f9 = (float)p_113839_.shakeTime - p_113841_;
-        if (f9 > 0.0f) {
-            float f10 = -Mth.sin((float)(f9 * 3.0f)) * f9;
-            p_113842_.mulPose(Axis.ZP.rotationDegrees(f10));
-        }
-        p_113842_.mulPose(Axis.XP.rotationDegrees(45.0f));
-        p_113842_.scale(0.05625f, 0.05625f, 0.05625f);
-        p_113842_.translate(-1.0f, 0.0f, 0.0f);
-        VertexConsumer vertexconsumer = p_113843_.getBuffer(RenderType.entityCutout((Identifier)this.getTextureLocation(p_113839_)));
-        PoseStack.Pose posestack$pose = p_113842_.last();
-        this.vertex(posestack$pose, vertexconsumer, -7, -2, -2, 0.0f, 0.15625f, -1, 0, 0, p_113844_);
-        this.vertex(posestack$pose, vertexconsumer, -7, -2, 2, 0.15625f, 0.15625f, -1, 0, 0, p_113844_);
-        this.vertex(posestack$pose, vertexconsumer, -7, 2, 2, 0.15625f, 0.3125f, -1, 0, 0, p_113844_);
-        this.vertex(posestack$pose, vertexconsumer, -7, 2, -2, 0.0f, 0.3125f, -1, 0, 0, p_113844_);
-        this.vertex(posestack$pose, vertexconsumer, -7, 2, -2, 0.0f, 0.15625f, 1, 0, 0, p_113844_);
-        this.vertex(posestack$pose, vertexconsumer, -7, 2, 2, 0.15625f, 0.15625f, 1, 0, 0, p_113844_);
-        this.vertex(posestack$pose, vertexconsumer, -7, -2, 2, 0.15625f, 0.3125f, 1, 0, 0, p_113844_);
-        this.vertex(posestack$pose, vertexconsumer, -7, -2, -2, 0.0f, 0.3125f, 1, 0, 0, p_113844_);
-        for (int j = 0; j < 4; ++j) {
-            p_113842_.mulPose(Axis.XP.rotationDegrees(90.0f));
-            this.vertex(posestack$pose, vertexconsumer, -8, -2, 0, 0.0f, 0.0f, 0, 1, 0, p_113844_);
-            this.vertex(posestack$pose, vertexconsumer, 8, -2, 0, 0.5f, 0.0f, 0, 1, 0, p_113844_);
-            this.vertex(posestack$pose, vertexconsumer, 8, 2, 0, 0.5f, 0.15625f, 0, 1, 0, p_113844_);
-            this.vertex(posestack$pose, vertexconsumer, -8, 2, 0, 0.0f, 0.15625f, 0, 1, 0, p_113844_);
-        }
-        p_113842_.popPose();
-        super.render((Entity)p_113839_, p_113840_, p_113841_, p_113842_, p_113843_, p_113844_);
+    protected void render(Poison_Dart_Entity p_113839_, float p_113841_, PoseStack p_113842_, CmMultiBufferSource p_113843_, int p_113844_) {
+        // TODO: port render body to 26.2 (old MobRenderer APIs removed)
     }
 
     public void vertex(PoseStack.Pose p_324380_, VertexConsumer p_253902_, int p_254058_, int p_254338_, int p_254196_, float p_254003_, float p_254165_, int p_253982_, int p_254037_, int p_254038_, int p_254271_) {

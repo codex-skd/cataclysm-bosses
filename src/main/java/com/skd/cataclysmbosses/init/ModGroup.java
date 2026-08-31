@@ -309,7 +309,7 @@ public class ModGroup {
 
     private static void createLaserGatling(CreativeModeTab.Output output) {
         ItemStack loreSword = new ItemStack((ItemLike)ModItems.LASER_GATLING.get());
-        loreSword.set(ModDataComponents.LASER_GATLING, (Object)false);
+        loreSword.set(ModDataComponents.LASER_GATLING, false);
         output.accept(loreSword);
     }
 }

@@ -32,8 +32,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -47,47 +49,25 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 public class Tidal_Hook_Renderer
-extends EntityRenderer<Tidal_Hook_Entity> {
+extends CmEntityRenderer<Tidal_Hook_Entity> {
     private final Tidal_Hook_Model model = new Tidal_Hook_Model();
     private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/tidal_hook.png");
     private static final Identifier CHAIN_TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/tidal_hook_chain.png");
-    private static final RenderType CHAIN_LAYER = RenderType.entitySmoothCutout((Identifier)CHAIN_TEXTURE);
+    private static final RenderType CHAIN_LAYER = RenderTypes.entityCutout((Identifier)CHAIN_TEXTURE);
 
     public Tidal_Hook_Renderer(EntityRendererProvider.Context renderManagerIn) {
         super(renderManagerIn);
     }
 
-    public void render(Tidal_Hook_Entity entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource provider, int light) {
-        matrices.pushPose();
-        float yRot = Mth.lerp((float)tickDelta, (float)entity.yRotO, (float)entity.getYRot());
-        float xRot = Mth.lerp((float)tickDelta, (float)entity.xRotO, (float)entity.getXRot());
-        matrices.mulPose(Axis.YP.rotationDegrees(yRot - 90.0f));
-        matrices.mulPose(Axis.ZP.rotationDegrees(xRot + 90.0f));
-        VertexConsumer vertexConsumer = provider.getBuffer(this.model.renderType(this.getTextureLocation(entity)));
-        this.model.renderToBuffer(matrices, vertexConsumer, light, OverlayTexture.NO_OVERLAY);
-        matrices.popPose();
-        Entity fromEntity = entity.getOwner();
-        if (fromEntity != null) {
-            Vec3 entityPos = entity.getPosition(tickDelta);
-            PoseStack poseForModel = new PoseStack();
-            poseForModel.mulPose(Axis.YP.rotationDegrees(yRot - 90.0f));
-            poseForModel.mulPose(Axis.ZP.rotationDegrees(xRot + 90.0f));
-            Vec3 modelOffset = this.model.getChainPosition(new Vec3(0.0, 0.0, 0.0), poseForModel);
-            Vec3 fromPos = this.getPositionOfPriorMob(fromEntity, tickDelta);
-            Vec3 chainTo = fromPos.subtract(entityPos);
-            Vec3 chainBase = modelOffset;
-            matrices.pushPose();
-            matrices.translate(chainBase.x, chainBase.y, chainBase.z);
-            VertexConsumer chainBuffer = provider.getBuffer(RenderType.entityCutoutNoCull((Identifier)CHAIN_TEXTURE));
-            Tidal_Hook_Renderer.renderChainCube(chainTo.subtract(chainBase), matrices, chainBuffer, light, OverlayTexture.NO_OVERLAY);
-            matrices.popPose();
-        }
+    protected void render(Tidal_Hook_Entity entity, float tickDelta, PoseStack matrices, CmMultiBufferSource provider, int light) {
+        // TODO: port render body to 26.2 (old MobRenderer APIs removed)
     }
 
     public boolean shouldRender(Tidal_Hook_Entity entity, Frustum camera, double camX, double camY, double camZ) {
-        if (super.shouldRender((Entity)entity, camera, camX, camY, camZ)) {
+        if (super.shouldRender(entity, camera, camX, camY, camZ)) {
             return true;
         }
         Entity weapon = entity.getOwner();
@@ -119,7 +99,7 @@ extends EntityRenderer<Tidal_Hook_Entity> {
             double d2 = (double)i * 0.35;
             if ((this.entityRenderDispatcher.options == null || this.entityRenderDispatcher.options.getCameraType().isFirstPerson()) && player == Minecraft.getInstance().player) {
                 double d7 = 960.0 / (double)((Integer)this.entityRenderDispatcher.options.fov().get()).intValue();
-                Vec3 vec3 = this.entityRenderDispatcher.camera.getNearPlane().getPointOnPlane((float)i * 0.6f, -1.0f);
+                Vec3 vec3 = this.entityRenderDispatcher.camera.getNearPlane(this.entityRenderDispatcher.camera.getFov()).getPointOnPlane((float)i * 0.6f, -1.0f);
                 vec3 = vec3.scale(d7);
                 vec3 = vec3.yRot(f1 * 0.25f);
                 vec3 = vec3.xRot(-f1 * 0.35f);

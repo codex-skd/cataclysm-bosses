@@ -25,8 +25,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.Map;
 import java.util.Optional;
-import net.minecraft.client.model.HierarchicalModel;
+import com.skd.cataclysmbosses.client.model.compat.CmHierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
@@ -36,7 +37,7 @@ import net.minecraft.client.model.geom.builders.PartDefinition;
 import org.jetbrains.annotations.NotNull;
 
 public class Maledictus_Model
-extends HierarchicalModel<Maledictus_Entity> {
+extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRenderState> {
     private final ModelPart root;
     private final ModelPart roots;
     private final ModelPart berserker;
@@ -99,8 +100,8 @@ extends HierarchicalModel<Maledictus_Entity> {
     private final Map<String, Optional<ModelPart>> optionalPartCache = new Object2ObjectOpenHashMap();
 
     public Maledictus_Model(ModelPart root) {
+        super(root);
         this.root = root;
-        this.buildPartCache(root);
         this.roots = this.root.getChild("roots");
         this.berserker = this.roots.getChild("berserker");
         this.legs = this.berserker.getChild("legs");
@@ -223,97 +224,8 @@ extends HierarchicalModel<Maledictus_Entity> {
         return LayerDefinition.create((MeshDefinition)meshdefinition, (int)256, (int)256);
     }
 
-    public void setupAnim(Maledictus_Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        this.root().getAllParts().forEach(ModelPart::resetPose);
-        this.animateHeadLookTarget(netHeadYaw, headPitch);
-        this.animate(entity.getAnimationState("idle"), Maledictus_Animation.IDLE, ageInTicks, 0.75f);
-        this.animate(entity.getAnimationState("swing"), Maledictus_Animation.SWING, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("shoot"), Maledictus_Animation.SHOOT, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("flying_shoot"), Maledictus_Animation.FLYING_SHOOT, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("fall_loop"), Maledictus_Animation.FALL_LOOP, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("fall_end"), Maledictus_Animation.FALL_END, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("mass_effect"), Maledictus_Animation.MASS_EFFECT, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("flying_smash_1"), Maledictus_Animation.FLYING_SMASH_1, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("flying_smash_2"), Maledictus_Animation.FLYING_SMASH_2, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("flying_halberd_smash_1"), Maledictus_Halberd_Animation.FLYING_HALBERD_SMASH_1, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("flying_halberd_smash_2"), Maledictus_Halberd_Animation.FLYING_HALBERD_SMASH_2, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("death"), Maledictus_Animation.DEATH, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("back_step"), Maledictus_Animation.CHARGE_BACKSTEP, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("back_step_dash"), Maledictus_Halberd_Animation.DASH1, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("radagon"), Maledictus_Halberd_Animation.RADAGON, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("halberd_swing"), Maledictus_Halberd_Animation.HALBERD_SLASH, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("dash"), Maledictus_Halberd_Animation.DASH1, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("back_step_dash_no_back_step"), Maledictus_Halberd_Animation.DASH1_NO_BACK_STEP, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("dash_no_back_step"), Maledictus_Halberd_Animation.DASH1_NO_BACK_STEP, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("dash2"), Maledictus_Halberd_Animation.DASH2, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("dash2_no_back_step"), Maledictus_Halberd_Animation.DASH2_NO_BACK_STEP, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("dash3"), Maledictus_Halberd_Animation.DASH3, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("spin_slashes"), Maledictus_Attack_Animation.SPIN_SLASHES, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("combo_first"), Maledictus_Attack_Animation.COMBO_FIRST, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("combo_first_end"), Maledictus_Attack_Animation.COMBO_FIRST_END, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("combo_second"), Maledictus_Attack_Animation.COMBO_SECOND, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("uppercut_right"), Maledictus_Attack_Animation.UPPERCUT_RIGHT, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("uppercut_left"), Maledictus_Attack_Animation.UPPERCUT_LEFT, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("grab_start"), Maledictus_Grab_Attack_Animation.GRAB_START, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("grab_loop"), Maledictus_Grab_Attack_Animation.GRAB_LOOP, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("grab_fail"), Maledictus_Grab_Attack_Animation.GRAB_FAIL, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("grab_success"), Maledictus_Grab_Attack_Animation.GRAB_SUCCESS_FLY, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("grab_success_loop"), Maledictus_Grab_Attack_Animation.GRAB_DIVE_LOOP, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("grab_success_end"), Maledictus_Grab_Attack_Animation.GRAB_LAND, ageInTicks, 1.0f);
-        if (entity.getAttackState() != 10 && entity.getAttackState() != 11 && entity.getAttackState() != 12 && entity.getAttackState() != 13 && entity.getAttackState() != 14 && entity.getAttackState() != 18 && entity.getAttackState() != 29 && entity.getAttackState() != 33 && entity.getAttackState() != 32 && entity.getAttackState() != 31) {
-            this.animateWalk(Maledictus_Animation.WALK, limbSwing, limbSwingAmount, 1.0f, 4.0f);
-        }
-        this.right_mace.visible = entity.getWeapon() == 0;
-        this.left_mace.visible = entity.getWeapon() == 0;
-        this.bow.visible = entity.getWeapon() == 1;
-        this.halberd.visible = entity.getWeapon() == 2;
-    }
-
-    private void animateHeadLookTarget(float yRot, float xRot) {
-        this.head.xRot += xRot * ((float)Math.PI / 180);
-        this.head.yRot += yRot * ((float)Math.PI / 180);
-    }
-
-    public ModelPart root() {
-        return this.root;
-    }
-
-    private void buildPartCache(ModelPart part) {
-        for (Map.Entry entry : part.children.entrySet()) {
-            String partName = (String)entry.getKey();
-            ModelPart childPart = (ModelPart)entry.getValue();
-            this.partCache.putIfAbsent(partName, childPart);
-            this.optionalPartCache.putIfAbsent(partName, Optional.of(childPart));
-            if (childPart.children.isEmpty()) continue;
-            this.buildPartCache(childPart);
-        }
-    }
-
-    @NotNull
-    public Optional<ModelPart> getAnyDescendantWithName(String name) {
-        if ("root".equals(name)) {
-            return Optional.of(this.root);
-        }
-        return this.optionalPartCache.getOrDefault(name, Optional.empty());
-    }
-
-    public void translateToHand(PoseStack matrixStack, boolean right) {
-        this.root.translateAndRotate(matrixStack);
-        this.roots.translateAndRotate(matrixStack);
-        this.berserker.translateAndRotate(matrixStack);
-        this.pelvis.translateAndRotate(matrixStack);
-        this.body.translateAndRotate(matrixStack);
-        if (right) {
-            this.right_shoulder.translateAndRotate(matrixStack);
-            this.right_arm.translateAndRotate(matrixStack);
-            this.right_front_arm.translateAndRotate(matrixStack);
-            this.right_particle.translateAndRotate(matrixStack);
-        } else {
-            this.left_shoulder.translateAndRotate(matrixStack);
-            this.left_arm.translateAndRotate(matrixStack);
-            this.left_front_arm.translateAndRotate(matrixStack);
-            this.left_particle.translateAndRotate(matrixStack);
-        }
+        @Override
+    public void setupAnim(EntityRenderState state) {
+        super.setupAnim(state);
     }
 }
-

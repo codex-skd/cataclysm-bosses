@@ -34,7 +34,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
@@ -43,6 +43,8 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Spike_Entity
 extends ThrowableItemProjectile {
@@ -51,14 +53,14 @@ extends ThrowableItemProjectile {
     }
 
     public Spike_Entity(Level worldIn, LivingEntity throwerIn) {
-        super((EntityType)ModEntities.LIONFISH_SPIKE.get(), throwerIn, world);
+        super((EntityType)ModEntities.LIONFISH_SPIKE.get(), throwerIn, worldIn, new ItemStack(ModItems.LIONFISH_SPIKE.get()));
     }
 
-    public void addAdditionalSaveData(CompoundTag tag) {
+    public void addAdditionalSaveData(ValueOutput tag) {
         super.addAdditionalSaveData(tag);
     }
 
-    public void readAdditionalSaveData(CompoundTag tag) {
+    public void readAdditionalSaveData(ValueInput tag) {
         super.readAdditionalSaveData(tag);
     }
 
@@ -72,11 +74,11 @@ extends ThrowableItemProjectile {
         Entity entity = result.getEntity();
         float i = 4.0f;
         if (shooter instanceof LivingEntity) {
-            if (entity != shooter && !shooter.isAlliedTo(entity) && entity.hurt(this.damageSources().mobProjectile((Entity)this, (LivingEntity)shooter), i) && entity instanceof LivingEntity) {
+            if (entity != shooter && !shooter.isAlliedTo(entity) && entity.hurtOrSimulate(this.damageSources().mobProjectile((Entity)this, (LivingEntity)shooter), i) && entity instanceof LivingEntity) {
                 ((LivingEntity)entity).addEffect(new MobEffectInstance(MobEffects.POISON, 60, 0), (Entity)this);
             }
         } else {
-            entity.hurt(this.damageSources().mobProjectile((Entity)this, null), i);
+            entity.hurtOrSimulate(this.damageSources().mobProjectile((Entity)this, null), i);
         }
     }
 
@@ -100,7 +102,7 @@ extends ThrowableItemProjectile {
     public void handleEntityEvent(byte id) {
         if (id == 3) {
             for (int i = 0; i < 8; ++i) {
-                this.level().addParticle((ParticleOptions)new ItemParticleOption(ParticleTypes.ITEM, new ItemStack((ItemLike)ModItems.LIONFISH_SPIKE.get())), this.getX(), this.getY(), this.getZ(), this.random.nextGaussian() * 0.2, this.random.nextGaussian() * 0.2, this.random.nextGaussian() * 0.2);
+                this.level().addParticle((ParticleOptions)new ItemParticleOption(ParticleTypes.ITEM, (Item)ModItems.LIONFISH_SPIKE.get()), this.getX(), this.getY(), this.getZ(), this.random.nextGaussian() * 0.2, this.random.nextGaussian() * 0.2, this.random.nextGaussian() * 0.2);
             }
         }
     }

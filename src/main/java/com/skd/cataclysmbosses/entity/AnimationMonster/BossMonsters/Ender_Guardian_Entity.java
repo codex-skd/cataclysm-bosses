@@ -14,7 +14,7 @@
  *  net.minecraft.core.particles.ParticleOptions
  *  net.minecraft.core.particles.ParticleTypes
  *  net.minecraft.nbt.CompoundTag
- *  net.minecraft.nbt.NbtUtils
+
  *  net.minecraft.network.chat.Component
  *  net.minecraft.network.protocol.common.custom.CustomPacketPayload
  *  net.minecraft.network.syncher.EntityDataAccessor
@@ -116,7 +116,7 @@ import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -150,8 +150,8 @@ import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.RandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
-import net.minecraft.world.entity.animal.AbstractGolem;
-import net.minecraft.world.entity.animal.IronGolem;
+import net.minecraft.world.entity.animal.golem.AbstractGolem;
+import net.minecraft.world.entity.animal.golem.IronGolem;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
@@ -173,6 +173,8 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Ender_Guardian_Entity
 extends LLibrary_Boss_Monster {
@@ -214,8 +216,8 @@ extends LLibrary_Boss_Monster {
         this.xpReward = 300;
         this.setPathfindingMalus(PathType.UNPASSABLE_RAIL, 0.0f);
         this.setPathfindingMalus(PathType.WATER, -1.0f);
-        this.setPathfindingMalus(PathType.DANGER_FIRE, 0.0f);
-        this.setPathfindingMalus(PathType.DAMAGE_FIRE, 0.0f);
+        this.setPathfindingMalus(PathType.FIRE, 0.0f);
+        this.setPathfindingMalus(PathType.DAMAGING, 0.0f);
         this.setConfigattribute((LivingEntity)this, CMCommonConfig.EnderGuardian.healthMultiplier, CMCommonConfig.EnderGuardian.attackMultiplier);
     }
 
@@ -227,7 +229,7 @@ extends LLibrary_Boss_Monster {
     protected void registerGoals() {
         this.goalSelector.addGoal(2, (Goal)new AttackMoveGoal(this, true, 1.0));
         this.goalSelector.addGoal(1, (Goal)new PunchAttackGoal(this));
-        this.goalSelector.addGoal(1, (Goal)new AttackAnimationGoal2<Ender_Guardian_Entity>(this, this, GUARDIAN_MASS_DESTRUCTION, 39, 50){
+        this.goalSelector.addGoal(1, (Goal)new AttackAnimationGoal2<Ender_Guardian_Entity>(this, GUARDIAN_MASS_DESTRUCTION, 39, 50){
 
             public void start() {
                 super.start();
@@ -260,9 +262,9 @@ extends LLibrary_Boss_Monster {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(IS_HELMETLESS, (Object)false);
+        p_326229_.define(IS_HELMETLESS, false);
         p_326229_.define(TELEPORT_POS, Optional.empty());
-        p_326229_.define(USED_MASS_DESTRUCTION, (Object)true);
+        p_326229_.define(USED_MASS_DESTRUCTION, true);
     }
 
     private static Animation getRandomAttack(RandomSource rand) {
@@ -284,22 +286,22 @@ extends LLibrary_Boss_Monster {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         Optional<BlockPos> restPos = this.getTeleportPos();
         if (restPos.isPresent()) {
-            compound.put("TeleportPos", NbtUtils.writeBlockPos((BlockPos)this.getTeleportPos().get()));
+            compound.store("TeleportPos", BlockPos.CODEC, (BlockPos)this.getTeleportPos().get());
         }
         compound.putBoolean("is_Helmetless", this.getIsHelmetless());
         compound.putBoolean("used_mass_destruction", this.getUsedMassDestruction());
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        NbtUtils.readBlockPos((CompoundTag)compound, (String)"TeleportPos").ifPresent(this::setTeleportPos);
-        this.setIsHelmetless(compound.getBoolean("is_Helmetless"));
-        this.setUsedMassDestruction(compound.getBoolean("used_mass_destruction"));
+        compound.read("TeleportPos", BlockPos.CODEC).ifPresent(this::setTeleportPos);
+        this.setIsHelmetless(compound.getBooleanOr("is_Helmetless", false));
+        this.setUsedMassDestruction(compound.getBooleanOr("used_mass_destruction", false));
         if (this.hasCustomName()) {
             this.bossInfo.setName(this.getDisplayName());
         }
@@ -313,7 +315,7 @@ extends LLibrary_Boss_Monster {
             this.getAttribute(Attributes.ARMOR).setBaseValue(20.0);
             this.getAttribute(Attributes.MOVEMENT_SPEED).setBaseValue((double)0.27f);
         }
-        this.entityData.set(IS_HELMETLESS, (Object)isHelmetless);
+        this.entityData.set(IS_HELMETLESS, isHelmetless);
     }
 
     public boolean getIsHelmetless() {
@@ -321,7 +323,7 @@ extends LLibrary_Boss_Monster {
     }
 
     public void setUsedMassDestruction(boolean usedMassDestruction) {
-        this.entityData.set(USED_MASS_DESTRUCTION, (Object)usedMassDestruction);
+        this.entityData.set(USED_MASS_DESTRUCTION, usedMassDestruction);
     }
 
     public boolean getUsedMassDestruction() {
@@ -346,7 +348,7 @@ extends LLibrary_Boss_Monster {
     }
 
     @Override
-    public boolean hurt(DamageSource source, float damage) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         boolean attack;
         if (this.getAnimation() == GUARDIAN_MASS_DESTRUCTION && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
             return false;
@@ -361,7 +363,7 @@ extends LLibrary_Boss_Monster {
         if (entity instanceof AbstractGolem) {
             damage = (float)((double)damage * 0.5);
         }
-        if ((attack = super.hurt(source, damage)) && this.getIsHelmetless()) {
+        if ((attack = super.hurtOrSimulate(source, damage)) && this.getIsHelmetless()) {
             this.playSound(SoundEvents.SHULKER_HURT, 1.0f, 0.8f);
         }
         return attack;
@@ -387,8 +389,9 @@ extends LLibrary_Boss_Monster {
         return CMCommonConfig.EnderGuardian.rangeCap;
     }
 
-    public boolean isInvulnerableTo(DamageSource source) {
-        return source.is(DamageTypes.IN_WALL) || super.isInvulnerableTo(source);
+    @Override
+    public boolean isInvulnerableTo(ServerLevel level, DamageSource source) {
+        return source.is(DamageTypes.IN_WALL) || super.isInvulnerableTo(level, source);
     }
 
     @Override
@@ -545,7 +548,7 @@ extends LLibrary_Boss_Monster {
                 if (!this.level().isClientSide()) {
                     if (CMCommonConfig.EnderGuardian.ignoreMobGriefing) {
                         this.BlockBreaking(CMCommonConfig.EnderGuardian.BlockBreakingX, CMCommonConfig.EnderGuardian.BlockBreakingY, CMCommonConfig.EnderGuardian.BlockBreakingZ);
-                    } else if (EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+                    } else if (this.level() instanceof ServerLevel && EventHooks.canEntityGrief((ServerLevel)this.level(), (Entity)this)) {
                         this.BlockBreaking(CMCommonConfig.EnderGuardian.BlockBreakingX, CMCommonConfig.EnderGuardian.BlockBreakingY, CMCommonConfig.EnderGuardian.BlockBreakingZ);
                     }
                 }
@@ -674,8 +677,8 @@ extends LLibrary_Boss_Monster {
         BlockEntity blockEntity = serverLevel.getBlockEntity(pos);
         if (blockEntity instanceof Boss_Respawn_Spawner_Block_Entity) {
             Boss_Respawn_Spawner_Block_Entity spawnerblockentity = (Boss_Respawn_Spawner_Block_Entity)blockEntity;
-            spawnerblockentity.setEntityId((EntityType)ModEntities.ENDER_GUARDIAN.get());
-            spawnerblockentity.setTheItem(((Item)ModItems.VOID_EYE.get()).getDefaultInstance());
+            spawnerblockentity.spawnType = (EntityType)ModEntities.ENDER_GUARDIAN.get();
+            spawnerblockentity.item = ((Item)ModItems.VOID_EYE.get()).getDefaultInstance();
         }
     }
 
@@ -701,8 +704,8 @@ extends LLibrary_Boss_Monster {
                 float entityRelativeAngle = entityHitAngle - entityAttackingAngle;
                 float entityHitDistance = (float)Math.sqrt((entityHit.getZ() - this.getZ()) * (entityHit.getZ() - this.getZ()) + (entityHit.getX() - this.getX()) * (entityHit.getX() - this.getX()));
                 if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || entityHit instanceof Ender_Guardian_Entity) continue;
-                boolean flag = entityHit.hurt(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage, (double)(entityHit.getMaxHealth() * hpdamage))));
-                if (entityHit.isDamageSourceBlocked(damagesource) && entityHit instanceof Player) {
+                boolean flag = entityHit.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage, (double)(entityHit.getMaxHealth() * hpdamage))));
+                if (entityHit.isBlocking() && entityHit instanceof Player) {
                     Player player = (Player)entityHit;
                     if (shieldbreakticks > 0) {
                         EntityUtil.disableShield(player, shieldbreakticks);
@@ -725,8 +728,8 @@ extends LLibrary_Boss_Monster {
             DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
             for (LivingEntity entityHit : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate((double)grow))) {
                 if (this.isAlliedTo((Entity)entityHit) || entityHit instanceof Ender_Guardian_Entity || entityHit == this) continue;
-                entityHit.hurt(damagesource, (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) * damage);
-                if (entityHit.isDamageSourceBlocked(damagesource) && entityHit instanceof Player) {
+                entityHit.hurtOrSimulate(damagesource, (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) * damage);
+                if (entityHit.isBlocking() && entityHit instanceof Player) {
                     Player player = (Player)entityHit;
                     if (ticks > 0) {
                         EntityUtil.disableShield(player, ticks);
@@ -999,7 +1002,7 @@ extends LLibrary_Boss_Monster {
                 BlockPos Pos = this.blockPosition();
                 double sx = Pos.getX();
                 double sz = Pos.getZ();
-                Direction dir = Direction.getNearest((double)(tx - sx), (double)0.0, (double)(tz - sz));
+                Direction dir = Direction.getNearest((int)Math.round(tx - sx), 0, (int)Math.round(tz - sz), Direction.NORTH);
                 double cx = dir.getStepX();
                 double cz = dir.getStepZ();
                 double offsetangle = Math.toRadians(6.0);
@@ -1020,7 +1023,7 @@ extends LLibrary_Boss_Monster {
 
     private boolean teleport(double p_32544_, double p_32545_, double p_32546_) {
         BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos(p_32544_, p_32545_, p_32546_);
-        while (blockpos$mutableblockpos.getY() > this.level().getMinBuildHeight() && !this.level().getBlockState((BlockPos)blockpos$mutableblockpos).blocksMotion()) {
+        while (blockpos$mutableblockpos.getY() > this.level().getMinY() && !this.level().getBlockState((BlockPos)blockpos$mutableblockpos).blocksMotion()) {
             blockpos$mutableblockpos.move(Direction.DOWN);
         }
         BlockState blockstate = this.level().getBlockState((BlockPos)blockpos$mutableblockpos);
@@ -1053,7 +1056,7 @@ extends LLibrary_Boss_Monster {
         Level level = this.level();
         if (level.hasChunkAt(blockpos)) {
             boolean flag1 = false;
-            while (!flag1 && blockpos.getY() > level.getMinBuildHeight()) {
+            while (!flag1 && blockpos.getY() > level.getMinY()) {
                 BlockPos blockpos1 = blockpos.below();
                 BlockState blockstate = level.getBlockState(blockpos1);
                 if (blockstate.blocksMotion()) {
@@ -1081,7 +1084,7 @@ extends LLibrary_Boss_Monster {
         return true;
     }
 
-    protected boolean isAffectedByFluids() {
+    public boolean isAffectedByFluids() {
         return false;
     }
 
@@ -1090,7 +1093,7 @@ extends LLibrary_Boss_Monster {
     }
 
     public ItemEntity spawnAtLocation(ItemStack stack) {
-        ItemEntity itementity = this.spawnAtLocation(stack, 0.0f);
+        ItemEntity itementity = this.spawnAtLocation((ServerLevel)this.level(), stack, 0.0f);
         if (itementity != null) {
             itementity.setDeltaMovement(itementity.getDeltaMovement().multiply(0.0, 3.5, 0.0));
             itementity.setGlowingTag(true);
@@ -1099,14 +1102,14 @@ extends LLibrary_Boss_Monster {
         return itementity;
     }
 
-    public boolean isAlliedTo(Entity entityIn) {
+    public boolean considersEntityAsAlly(Entity entityIn) {
         if (entityIn == this) {
             return true;
         }
-        if (super.isAlliedTo(entityIn)) {
+        if (super.considersEntityAsAlly(entityIn)) {
             return true;
         }
-        if (entityIn.getType().is(ModTag.TEAM_ENDER_GUARDIAN)) {
+        if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_ENDER_GUARDIAN)) {
             return this.getTeam() == null && entityIn.getTeam() == null;
         }
         return false;
@@ -1193,7 +1196,7 @@ extends LLibrary_Boss_Monster {
                 } else {
                     Ender_Guardian_Entity.this.setYRot(Ender_Guardian_Entity.this.yRotO);
                 }
-                if (Ender_Guardian_Entity.this.getAnimationTick() == 24 && target != null && Ender_Guardian_Entity.this.random.nextInt(2) == 0 && Ender_Guardian_Entity.this.distanceTo((Entity)target) <= 4.0f) {
+                if (Ender_Guardian_Entity.this.getAnimationTick() == 24 && target != null && Ender_Guardian_Entity.this.getRandom().nextInt(2) == 0 && Ender_Guardian_Entity.this.distanceTo((Entity)target) <= 4.0f) {
                     AnimationHandler.INSTANCE.sendAnimationMessage((Entity)Ender_Guardian_Entity.this, GUARDIAN_LEFT_SWING);
                 }
             }
@@ -1204,7 +1207,7 @@ extends LLibrary_Boss_Monster {
                 } else {
                     Ender_Guardian_Entity.this.setYRot(Ender_Guardian_Entity.this.yRotO);
                 }
-                if (Ender_Guardian_Entity.this.getAnimationTick() == 26 && target != null && Ender_Guardian_Entity.this.random.nextInt(2) == 0 && Ender_Guardian_Entity.this.distanceTo((Entity)target) <= 4.0f) {
+                if (Ender_Guardian_Entity.this.getAnimationTick() == 26 && target != null && Ender_Guardian_Entity.this.getRandom().nextInt(2) == 0 && Ender_Guardian_Entity.this.distanceTo((Entity)target) <= 4.0f) {
                     AnimationHandler.INSTANCE.sendAnimationMessage((Entity)Ender_Guardian_Entity.this, GUARDIAN_RIGHT_SWING);
                 }
             }

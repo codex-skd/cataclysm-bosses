@@ -82,7 +82,7 @@ extends AbstractIterator<VoxelShape> {
         BlockGetter blockgetter;
         int i = SectionPos.blockToSectionCoord((int)p_186412_);
         int j = SectionPos.blockToSectionCoord((int)p_186413_);
-        long k = ChunkPos.asLong((int)i, (int)j);
+        long k = ChunkPos.pack((int)i, (int)j);
         if (this.cachedBlockGetter != null && this.cachedBlockGetterPos == k) {
             return this.cachedBlockGetter;
         }

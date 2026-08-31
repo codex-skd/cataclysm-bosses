@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###"
+  ],
+  "key": {
+    "#": "cataclysm:chorus_planks"
+  },
+  "result": {
+    "id": "cataclysm:chorus_slab",
+    "count": 6
+  }
+}

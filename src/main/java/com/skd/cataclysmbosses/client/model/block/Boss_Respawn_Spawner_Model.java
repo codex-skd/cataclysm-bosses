@@ -71,7 +71,7 @@ extends AdvancedEntityModel<Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.root, (Object)this.bone, (Object)this.one, (Object)this.two, (Object)this.three, (Object)this.four, (Object)this.bone2, (Object)this.bone3);
+        return ImmutableList.of(this.root, this.bone, this.one, this.two, this.three, this.four, this.bone2, this.bone3);
     }
 
     public void setupAnim(Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
@@ -81,7 +81,7 @@ extends AdvancedEntityModel<Entity> {
     public void animate(Boss_Respawn_Spawner_Block_Entity entity, float partialTick) {
         this.resetToDefaultPose();
         float ageInTicks = (float)entity.tickCount + partialTick;
-        this.animate(entity.getAnimationState("opening"), Boss_Respawn_Spawner_Animation.SPAWNING, ageInTicks, 1.0f);
+        this.animate(entity.openingAnimationState, Boss_Respawn_Spawner_Animation.SPAWNING, ageInTicks, 1.0f);
     }
 
     public void setRotationAngle(AdvancedModelBox AdvancedModelBox2, float x, float y, float z) {

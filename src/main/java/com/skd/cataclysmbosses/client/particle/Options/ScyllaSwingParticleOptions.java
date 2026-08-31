@@ -34,7 +34,7 @@ public record ScyllaSwingParticleOptions(float scale, float yaw, float pitch) im
         buf.writeFloat(option.yaw);
         buf.writeFloat(option.pitch);
     }, buf -> new ScyllaSwingParticleOptions(buf.readFloat(), buf.readFloat(), buf.readFloat()));
-    public static MapCodec<ScyllaSwingParticleOptions> MAP_CODEC = RecordCodecBuilder.mapCodec(object -> object.group((App)Codec.FLOAT.fieldOf("scale").forGetter(p -> Float.valueOf(p.scale)), (App)Codec.FLOAT.fieldOf("yaw").forGetter(p -> Float.valueOf(p.yaw)), (App)Codec.FLOAT.fieldOf("pitch").forGetter(p -> Float.valueOf(p.pitch))).apply((Applicative)object, ScyllaSwingParticleOptions::new));
+    public static MapCodec<ScyllaSwingParticleOptions> MAP_CODEC = RecordCodecBuilder.mapCodec(object -> object.group(Codec.FLOAT.fieldOf("scale").forGetter(p -> Float.valueOf(p.scale)), Codec.FLOAT.fieldOf("yaw").forGetter(p -> Float.valueOf(p.yaw)), Codec.FLOAT.fieldOf("pitch").forGetter(p -> Float.valueOf(p.pitch))).apply(object, ScyllaSwingParticleOptions::new));
 
     @NotNull
     public ParticleType<ScyllaSwingParticleOptions> getType() {

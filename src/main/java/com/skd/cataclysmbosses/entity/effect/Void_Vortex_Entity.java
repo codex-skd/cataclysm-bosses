@@ -46,6 +46,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Void_Vortex_Entity
 extends Entity {
@@ -121,7 +123,7 @@ extends Entity {
     }
 
     public void setLifespan(int i) {
-        this.entityData.set(LIFESPAN, (Object)i);
+        this.entityData.set(LIFESPAN, i);
     }
 
     public int getCasterID() {
@@ -129,7 +131,7 @@ extends Entity {
     }
 
     public void setCasterID(int id) {
-        this.entityData.set(CASTER, (Object)id);
+        this.entityData.set(CASTER, id);
     }
 
     public void setOwner(@Nullable LivingEntity p_19719_) {
@@ -147,18 +149,23 @@ extends Entity {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(LIFESPAN, (Object)300);
-        p_326229_.define(CASTER, (Object)-1);
+        p_326229_.define(LIFESPAN, 300);
+        p_326229_.define(CASTER, -1);
     }
 
-    protected void readAdditionalSaveData(CompoundTag compound) {
-        this.setLifespan(compound.getInt("Lifespan"));
-        this.setCasterID(compound.getInt("CasterId"));
+    protected void readAdditionalSaveData(ValueInput compound) {
+        this.setLifespan(compound.getIntOr("Lifespan", 0));
+        this.setCasterID(compound.getIntOr("CasterId", 0));
     }
 
-    protected void addAdditionalSaveData(CompoundTag compound) {
+    protected void addAdditionalSaveData(ValueOutput compound) {
         compound.putInt("Lifespan", this.getLifespan());
         compound.putInt("CasterId", this.getCasterID());
+    }
+
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return false;
     }
 }
 

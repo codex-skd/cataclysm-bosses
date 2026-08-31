@@ -52,7 +52,7 @@ extends AdvancedEntityModel<Abyss_Blast_Portal_Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.root, (Object)this.portal);
+        return ImmutableList.of(this.root, this.portal);
     }
 
     public void setupAnim(Abyss_Blast_Portal_Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {

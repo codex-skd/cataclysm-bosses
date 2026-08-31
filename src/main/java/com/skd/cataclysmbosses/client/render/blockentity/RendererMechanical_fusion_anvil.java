@@ -4,48 +4,65 @@
  * Could not load the following classes:
  *  com.mojang.blaze3d.vertex.PoseStack
  *  com.mojang.math.Axis
+ *  net.minecraft.client.Minecraft
  *  net.minecraft.client.renderer.MultiBufferSource
  *  net.minecraft.client.renderer.rendertype.RenderType
  *  net.minecraft.client.renderer.blockentity.BlockEntityRenderer
  *  net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider$Context
- *  net.minecraft.core.Direction
+ *  net.minecraft.client.renderer.entity.EntityRenderDispatcher
+ *  net.minecraft.client.renderer.entity.ItemRenderer
+ *  net.minecraft.client.renderer.texture.OverlayTexture
  *  net.minecraft.resources.Identifier
- *  net.minecraft.world.level.block.state.properties.Property
+ *  net.minecraft.world.entity.Entity
+ *  net.minecraft.world.item.ItemDisplayContext
+ *  net.minecraft.world.item.ItemStack
+ *  net.minecraft.world.level.Level
  */
 package com.skd.cataclysmbosses.client.render.blockentity;
 
 import com.skd.cataclysmbosses.blockentities.Mechanical_fusion_Anvil_Block_Entity;
-import com.skd.cataclysmbosses.blocks.Mechanical_fusion_Anvil;
-import com.skd.cataclysmbosses.client.model.block.Mechanical_Anvil_Model;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.core.Direction;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.item.ItemModelResolver;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import org.jspecify.annotations.Nullable;
 
-public class RendererMechanical_fusion_anvil<T extends Mechanical_fusion_Anvil_Block_Entity>
-implements BlockEntityRenderer<T> {
-    private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/block/mechanical_fusion_anvil.png");
-    private static final Identifier LAYER_TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/block/mechanical_fusion_anvil_layer.png");
-    private static final Mechanical_Anvil_Model MODEL = new Mechanical_Anvil_Model();
-
-    public RendererMechanical_fusion_anvil(BlockEntityRendererProvider.Context rendererDispatcherIn) {
+@OnlyIn(Dist.CLIENT)
+public class RendererMechanical_fusion_anvil
+implements BlockEntityRenderer<Mechanical_fusion_Anvil_Block_Entity, BlockEntityRenderState> {
+    
+    public RendererMechanical_fusion_anvil(BlockEntityRendererProvider.Context context) {
+        // Constructor - store any needed references
     }
 
-    public void render(T tileEntityIn, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
-        matrixStackIn.pushPose();
-        float f = ((Direction)tileEntityIn.getBlockState().getValue((Property)Mechanical_fusion_Anvil.FACING)).toYRot();
-        matrixStackIn.translate(0.5f, 1.5f, 0.5f);
-        matrixStackIn.mulPose(Axis.YP.rotationDegrees(-f + 90.0f));
-        matrixStackIn.scale(-1.0f, -1.0f, 1.0f);
-        MODEL.animate((Mechanical_fusion_Anvil_Block_Entity)((Object)tileEntityIn), partialTicks);
-        MODEL.renderToBuffer(matrixStackIn, bufferIn.getBuffer(RenderType.entityCutoutNoCull((Identifier)TEXTURE)), combinedLightIn, combinedOverlayIn);
-        MODEL.renderToBuffer(matrixStackIn, bufferIn.getBuffer(RenderType.entityTranslucentCull((Identifier)LAYER_TEXTURE)), combinedLightIn, combinedOverlayIn);
-        matrixStackIn.popPose();
+    @Override
+    public BlockEntityRenderState createRenderState() {
+        return new BlockEntityRenderState();
+    }
+
+    @Override
+    public void extractRenderState(Mechanical_fusion_Anvil_Block_Entity blockEntity, BlockEntityRenderState state, float partialTicks, Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
+        BlockEntityRenderState.extractBase(blockEntity, state, breakProgress);
+        // TODO: Extract block entity data to render state
+    }
+
+    @Override
+    public void submit(BlockEntityRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
+        // TODO: Implement rendering with new API
     }
 }
-

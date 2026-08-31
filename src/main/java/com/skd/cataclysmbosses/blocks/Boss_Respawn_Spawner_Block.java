@@ -69,7 +69,7 @@ extends BaseEntityBlock {
 
     public Boss_Respawn_Spawner_Block(BlockBehaviour.Properties properties) {
         super(properties);
-        this.registerDefaultState((BlockState)((BlockState)this.stateDefinition.any()).setValue((Property)LIT, (Comparable)Boolean.valueOf(false)));
+        this.registerDefaultState((BlockState)((BlockState)this.stateDefinition.any()).setValue(LIT, false));
     }
 
     @Nullable
@@ -79,7 +79,7 @@ extends BaseEntityBlock {
 
     @Nullable
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level p_152180_, BlockState p_152181_, BlockEntityType<T> p_152182_) {
-        return Boss_Respawn_Spawner_Block.createTickerHelper(p_152182_, (BlockEntityType)((BlockEntityType)ModTileentites.BOSS_RESPAWNER.get()), Boss_Respawn_Spawner_Block_Entity::tick);
+        return p_152182_ == ModTileentites.BOSS_RESPAWNER.get() ? (level, pos, state, entity) -> ((Boss_Respawn_Spawner_Block_Entity)entity).tick() : null;
     }
 
     // protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
@@ -102,7 +102,7 @@ extends BaseEntityBlock {
     }
 
     protected RenderShape getRenderShape(BlockState state) {
-        return RenderShape.ENTITYBLOCK_ANIMATED;
+        return RenderShape.INVISIBLE;
     }
 }
 

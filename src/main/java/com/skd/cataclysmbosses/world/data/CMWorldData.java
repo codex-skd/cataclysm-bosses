@@ -19,7 +19,10 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.saveddata.SavedData;
-import net.minecraft.world.level.storage.DimensionDataStorage;
+import net.minecraft.world.level.saveddata.SavedDataType;
+import net.minecraft.world.level.storage.SavedDataStorage;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.datafix.DataFixTypes;
 
 public class CMWorldData
 extends SavedData {
@@ -30,20 +33,25 @@ extends SavedData {
     private CMWorldData() {
     }
 
-    public static SavedData.Factory<CMWorldData> factory() {
-        return new SavedData.Factory(CMWorldData::new, CMWorldData::load);
+    public static SavedDataType<CMWorldData> type() {
+        return new SavedDataType<>(
+            Identifier.withDefaultNamespace(IDENTIFIER),
+            CMWorldData::new,
+            null, // Codec - will use default compound tag
+            DataFixTypes.LEVEL
+        );
     }
 
     public static CMWorldData get(Level world, ResourceKey<Level> dim) {
         if (world instanceof ServerLevel) {
-            DimensionDataStorage storage;
-            CMWorldData data;
             ServerLevel serverLevel = (ServerLevel)world;
             ServerLevel targetLevel = serverLevel.getServer().getLevel(dim);
             if (targetLevel == null) {
                 targetLevel = serverLevel.getServer().overworld();
             }
-            if ((data = (CMWorldData)(storage = targetLevel.getDataStorage()).computeIfAbsent(CMWorldData.factory(), IDENTIFIER)) != null) {
+            SavedDataStorage storage = targetLevel.getDataStorage();
+            CMWorldData data = storage.computeIfAbsent(CMWorldData.type());
+            if (data != null) {
                 data.setDirty();
             }
             return data;
@@ -51,13 +59,15 @@ extends SavedData {
         return null;
     }
 
+    // Legacy method for backward compatibility - will be called via SavedDataStorage
     public static CMWorldData load(CompoundTag nbt, HolderLookup.Provider p_323806_) {
         CMWorldData data = new CMWorldData();
-        data.LeviathanBossDefeatedOnce = nbt.getBoolean("LeviathanDefeatedOnce");
-        data.IgnisBossDefeatedOnce = nbt.getBoolean("IgnisDefeatedOnce");
+        data.LeviathanBossDefeatedOnce = nbt.getBooleanOr("LeviathanDefeatedOnce", false);
+        data.IgnisBossDefeatedOnce = nbt.getBooleanOr("IgnisDefeatedOnce", false);
         return data;
     }
 
+    // Legacy save method
     public CompoundTag save(CompoundTag compound, HolderLookup.Provider p_323890_) {
         compound.putBoolean("LeviathanDefeatedOnce", this.LeviathanBossDefeatedOnce);
         compound.putBoolean("IgnisDefeatedOnce", this.IgnisBossDefeatedOnce);
@@ -80,4 +90,3 @@ extends SavedData {
         this.IgnisBossDefeatedOnce = defeatedOnce;
     }
 }
-

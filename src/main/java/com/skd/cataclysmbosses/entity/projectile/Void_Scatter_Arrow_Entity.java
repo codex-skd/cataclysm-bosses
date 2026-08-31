@@ -71,7 +71,7 @@ extends AbstractArrow {
         double z = this.getZ();
         if (this.level().isClientSide()) {
             for (int l2 = 0; l2 < 8; ++l2) {
-                this.level().addParticle((ParticleOptions)new ItemParticleOption(ParticleTypes.ITEM, new ItemStack((ItemLike)ModItems.VOID_SCATTER_ARROW.get())), x, y, z, this.random.nextGaussian() * 0.1, this.random.nextDouble() * 0.15, this.random.nextGaussian() * 0.1);
+                this.level().addParticle((ParticleOptions)new ItemParticleOption(ParticleTypes.ITEM, ModItems.VOID_SCATTER_ARROW.get()), x, y, z, this.random.nextGaussian() * 0.1, this.random.nextDouble() * 0.15, this.random.nextGaussian() * 0.1);
             }
         } else {
             List<Vec3> directions = this.getShootVectors(this.random, 0.0f);

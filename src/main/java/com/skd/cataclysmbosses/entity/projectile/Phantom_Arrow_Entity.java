@@ -37,6 +37,7 @@ import com.skd.cataclysmbosses.init.ModParticle;
 import com.skd.cataclysmbosses.util.CMDamageTypes;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -59,6 +60,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Phantom_Arrow_Entity
 extends AbstractArrow {
@@ -69,6 +72,8 @@ extends AbstractArrow {
     private UUID targetId;
     private boolean stopSeeking;
     private boolean impactParticleSpawn = false;
+    private int life = 0;
+    private double baseDamage = 2.0;
 
     public Phantom_Arrow_Entity(EntityType type, Level worldIn) {
         super(type, worldIn);
@@ -98,7 +103,7 @@ extends AbstractArrow {
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(TRANSPARENCY, (Object)0);
+        p_326229_.define(TRANSPARENCY, 0);
     }
 
     public int getTransparency() {
@@ -106,20 +111,20 @@ extends AbstractArrow {
     }
 
     public void setTransparency(int trans) {
-        this.entityData.set(TRANSPARENCY, (Object)trans);
+        this.entityData.set(TRANSPARENCY, trans);
     }
 
-    public void addAdditionalSaveData(CompoundTag p_37357_) {
+    public void addAdditionalSaveData(ValueOutput p_37357_) {
         super.addAdditionalSaveData(p_37357_);
         if (this.finalTarget != null) {
-            p_37357_.putUUID("Target", this.finalTarget.getUUID());
+            p_37357_.store("Target", UUIDUtil.CODEC, this.finalTarget.getUUID());
         }
     }
 
-    public void readAdditionalSaveData(CompoundTag p_37353_) {
+    public void readAdditionalSaveData(ValueInput p_37353_) {
         super.readAdditionalSaveData(p_37353_);
-        if (p_37353_.hasUUID("Target")) {
-            this.targetId = p_37353_.getUUID("Target");
+        if (p_37353_.read("Target", UUIDUtil.CODEC).isPresent()) {
+            this.targetId = p_37353_.read("Target", UUIDUtil.CODEC).orElse(null);
         }
     }
 
@@ -135,7 +140,7 @@ extends AbstractArrow {
                 }
             }
             this.setTransparency(this.life);
-            if (!this.inGround && !this.stopSeeking && (this.finalTarget != null && this.finalTarget.isAlive() || this.finalTarget instanceof Player && !this.finalTarget.isSpectator()) && (sqrt = (float)this.getDeltaMovement().length()) > 1.25f && this.tickCount > 2 && this.finalTarget != null && (arcVec = this.finalTarget.position().add(0.0, (double)(0.65f * this.finalTarget.getBbHeight()), 0.0).subtract(this.position())).length() > (double)this.finalTarget.getBbWidth()) {
+            if (!this.isInGround() && !this.stopSeeking && (this.finalTarget != null && this.finalTarget.isAlive() || this.finalTarget instanceof Player && !this.finalTarget.isSpectator()) && (sqrt = (float)this.getDeltaMovement().length()) > 1.25f && this.tickCount > 2 && this.finalTarget != null && (arcVec = this.finalTarget.position().add(0.0, (double)(0.65f * this.finalTarget.getBbHeight()), 0.0).subtract(this.position())).length() > (double)this.finalTarget.getBbWidth()) {
                 this.setDeltaMovement(this.getDeltaMovement().scale(0.625).add(arcVec.normalize().scale((double)0.4775f)));
             }
         } else {
@@ -150,6 +155,11 @@ extends AbstractArrow {
                 this.level().addParticle((ParticleOptions)ModParticle.CURSED_FLAME.get(), this.getX() + d5 * (double)i / 4.0, this.getY() + d6 * (double)i / 4.0, this.getZ() + d1 * (double)i / 4.0, 0.0, 0.0, 0.0);
             }
         }
+    }
+
+    @Override
+    public void setBaseDamage(double damage) {
+        this.baseDamage = damage;
     }
 
     protected void tickDespawn() {
@@ -171,7 +181,7 @@ extends AbstractArrow {
 
     protected void onHitEntity(EntityHitResult p_37573_) {
         Entity entity = p_37573_.getEntity();
-        float f = (float)this.getBaseDamage();
+        float f = (float)this.baseDamage;
         Entity entity1 = this.getOwner();
         DamageSource damagesource = CMDamageTypes.causeMaledictioSagittaDamage((Entity)this, (Entity)(entity1 == null ? this : entity1));
         Level level = this.level();
@@ -179,12 +189,12 @@ extends AbstractArrow {
             ServerLevel serverlevel = (ServerLevel)level;
             f = EnchantmentHelper.modifyDamage((ServerLevel)serverlevel, (ItemStack)this.getWeaponItem(), (Entity)entity, (DamageSource)damagesource, (float)f);
         }
-        boolean flag = entity.getType() == EntityType.ENDERMAN;
+        boolean flag = entity.getType() == net.minecraft.world.entity.EntityTypes.ENDERMAN;
         this.stopSeeking = true;
         if (this.isOnFire() && !flag) {
             entity.igniteForSeconds(5.0f);
         }
-        if (entity.hurt(damagesource, f)) {
+        if (entity.hurtOrSimulate(damagesource, f)) {
             if (flag) {
                 return;
             }
@@ -203,7 +213,7 @@ extends AbstractArrow {
             this.setYRot(this.getYRot() + 180.0f);
             this.yRotO += 180.0f;
             if (!this.level().isClientSide() && this.getDeltaMovement().lengthSqr() < 1.0E-7 && this.pickup == AbstractArrow.Pickup.ALLOWED) {
-                this.spawnAtLocation(this.getPickupItem(), 0.1f);
+                this.spawnAtLocation((ServerLevel)this.level(), this.getPickupItem(), 0.1f);
             }
             this.discard();
         }

@@ -20,8 +20,9 @@ import com.skd.cataclysmbosses.entity.Pet.Netherite_Ministrosity_Entity;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.Map;
 import java.util.Optional;
-import net.minecraft.client.model.HierarchicalModel;
+import com.skd.cataclysmbosses.client.model.compat.CmHierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
@@ -31,7 +32,7 @@ import net.minecraft.client.model.geom.builders.PartDefinition;
 import org.jetbrains.annotations.NotNull;
 
 public class Netherite_Ministrosity_Model
-extends HierarchicalModel<Netherite_Ministrosity_Entity> {
+extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRenderState> {
     private final ModelPart root;
     private final ModelPart roots;
     private final ModelPart mid_root;
@@ -46,8 +47,8 @@ extends HierarchicalModel<Netherite_Ministrosity_Entity> {
     private final Map<String, Optional<ModelPart>> optionalPartCache = new Object2ObjectOpenHashMap();
 
     public Netherite_Ministrosity_Model(ModelPart root) {
+        super(root);
         this.root = root;
-        this.buildPartCache(root);
         this.roots = this.root.getChild("roots");
         this.mid_root = this.roots.getChild("mid_root");
         this.legs = this.mid_root.getChild("legs");
@@ -74,47 +75,8 @@ extends HierarchicalModel<Netherite_Ministrosity_Entity> {
         return LayerDefinition.create((MeshDefinition)meshdefinition, (int)64, (int)64);
     }
 
-    public void setupAnim(Netherite_Ministrosity_Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        this.root().getAllParts().forEach(ModelPart::resetPose);
-        this.animateHeadLookTarget(netHeadYaw, headPitch);
-        this.animate(entity.getAnimationState("idle"), Netherite_Ministrosity_Animation.IDLE, ageInTicks, 1.0f);
-        this.animateWalk(Netherite_Ministrosity_Animation.WALK, limbSwing, limbSwingAmount, 2.0f, 2.0f);
-        if (!entity.getIsAwaken()) {
-            this.applyStatic(Netherite_Ministrosity_Animation.SLEEP);
-        }
-        this.animate(entity.getAnimationState("operation"), Netherite_Ministrosity_Animation.OPERATION, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("chest_open"), Netherite_Ministrosity_Animation.CHEST_OPEN, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("chest_loop"), Netherite_Ministrosity_Animation.CHEST_LOOP, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("chest_close"), Netherite_Ministrosity_Animation.CHEST_CLOSE, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("sit_start"), Netherite_Ministrosity_Animation.SIT, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("sit_end"), Netherite_Ministrosity_Animation.SIT_END, ageInTicks, 1.0f);
-    }
-
-    private void buildPartCache(ModelPart part) {
-        for (Map.Entry entry : part.children.entrySet()) {
-            String partName = (String)entry.getKey();
-            ModelPart childPart = (ModelPart)entry.getValue();
-            this.partCache.putIfAbsent(partName, childPart);
-            this.optionalPartCache.putIfAbsent(partName, Optional.of(childPart));
-            if (childPart.children.isEmpty()) continue;
-            this.buildPartCache(childPart);
-        }
-    }
-
-    @NotNull
-    public Optional<ModelPart> getAnyDescendantWithName(String name) {
-        if ("root".equals(name)) {
-            return Optional.of(this.root);
-        }
-        return this.optionalPartCache.getOrDefault(name, Optional.empty());
-    }
-
-    private void animateHeadLookTarget(float yRot, float xRot) {
-        this.roots.yRot = yRot * ((float)Math.PI / 180);
-    }
-
-    public ModelPart root() {
-        return this.root;
+        @Override
+    public void setupAnim(EntityRenderState state) {
+        super.setupAnim(state);
     }
 }
-

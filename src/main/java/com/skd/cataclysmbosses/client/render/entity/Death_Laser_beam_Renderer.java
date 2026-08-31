@@ -36,8 +36,10 @@ import java.util.Map;
 import java.util.UUID;
 import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
@@ -50,10 +52,11 @@ import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Quaternionf;
 import org.joml.Quaternionfc;
 import org.joml.Vector4f;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Death_Laser_beam_Renderer
-extends EntityRenderer<Death_Laser_Beam_Entity> {
+extends CmEntityRenderer<Death_Laser_Beam_Entity> {
     private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/harbinger/death_laser_beam.png");
     private static final float TEXTURE_WIDTH = 256.0f;
     private static final float TEXTURE_HEIGHT = 32.0f;
@@ -70,7 +73,7 @@ extends EntityRenderer<Death_Laser_Beam_Entity> {
         return TEXTURE;
     }
 
-    public void render(Death_Laser_Beam_Entity solarBeam, float entityYaw, float delta, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
+    protected void render(Death_Laser_Beam_Entity solarBeam, float delta, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
         this.clearerView = solarBeam.caster instanceof Player && Minecraft.getInstance().player == solarBeam.caster && Minecraft.getInstance().options.getCameraType() == CameraType.FIRST_PERSON;
         double collidePosX = solarBeam.prevCollidePosX + (solarBeam.collidePosX - solarBeam.prevCollidePosX) * (double)delta;
         double collidePosY = solarBeam.prevCollidePosY + (solarBeam.collidePosY - solarBeam.prevCollidePosY) * (double)delta;
@@ -106,7 +109,7 @@ extends EntityRenderer<Death_Laser_Beam_Entity> {
         this.drawVertex(matrixstack$entry, builder, 0.75f, -0.75f, 0.0f, maxU, minV, 1.0f, packedLightIn);
     }
 
-    private void renderLighting(float frame, PoseStack poseStack, Death_Laser_Beam_Entity entity, MultiBufferSource buffer) {
+    private void renderLighting(float frame, PoseStack poseStack, Death_Laser_Beam_Entity entity, CmMultiBufferSource buffer) {
         double x = Mth.lerp((double)frame, (double)entity.xOld, (double)entity.getX());
         double y = Mth.lerp((double)frame, (double)entity.yOld, (double)entity.getY());
         double z = Mth.lerp((double)frame, (double)entity.zOld, (double)entity.getZ());
@@ -126,7 +129,9 @@ extends EntityRenderer<Death_Laser_Beam_Entity> {
                 lightningRender.update((Object)entity, bolt1, frame);
                 lightningRender.update((Object)entity, bolt2, frame);
             }
-            lightningRender.render(frame, poseStack, buffer);
+            // PORT TODO(26.2): LightningRender.render now needs SubmitNodeCollector, but the
+            // bridge render() only provides CmMultiBufferSource. Needs bridge plumbing change.
+            // lightningRender.render(frame, poseStack, buffer);
             poseStack.popPose();
         }
         if (entity.isRemoved() && this.lightningRenderMap.containsKey(entity.getUUID())) {
@@ -146,7 +151,7 @@ extends EntityRenderer<Death_Laser_Beam_Entity> {
             return;
         }
         matrixStackIn.pushPose();
-        Quaternionf quat = this.entityRenderDispatcher.cameraOrientation();
+        Quaternionf quat = this.entityRenderDispatcher.camera.rotation();
         matrixStackIn.mulPose(quat);
         this.renderFlatQuad(frame, matrixStackIn, builder, packedLightIn);
         matrixStackIn.popPose();
@@ -154,7 +159,7 @@ extends EntityRenderer<Death_Laser_Beam_Entity> {
 
     private void renderEnd(int frame, Direction side, PoseStack matrixStackIn, VertexConsumer builder, int packedLightIn) {
         matrixStackIn.pushPose();
-        Quaternionf quat = this.entityRenderDispatcher.cameraOrientation();
+        Quaternionf quat = this.entityRenderDispatcher.camera.rotation();
         matrixStackIn.mulPose(quat);
         this.renderFlatQuad(frame, matrixStackIn, builder, packedLightIn);
         matrixStackIn.popPose();
@@ -190,13 +195,13 @@ extends EntityRenderer<Death_Laser_Beam_Entity> {
         matrixStackIn.mulPose(CMMathUtil.quatFromRotationXYZ(-pitch, 0.0f, 0.0f, true));
         matrixStackIn.pushPose();
         if (!this.clearerView) {
-            matrixStackIn.mulPose(new Quaternionf().rotationY(Minecraft.getInstance().gameRenderer.getMainCamera().getXRot() + 90.0f));
+            matrixStackIn.mulPose(new Quaternionf().rotationY(Minecraft.getInstance().getEntityRenderDispatcher().camera.xRot() + 90.0f));
         }
         this.drawBeam(length, frame, matrixStackIn, builder, packedLightIn);
         matrixStackIn.popPose();
         if (!this.clearerView) {
             matrixStackIn.pushPose();
-            matrixStackIn.mulPose(new Quaternionf().rotationY((-Minecraft.getInstance().gameRenderer.getMainCamera().getXRot() - 90.0f) * ((float)Math.PI / 180)));
+            matrixStackIn.mulPose(new Quaternionf().rotationY((-Minecraft.getInstance().getEntityRenderDispatcher().camera.xRot() - 90.0f) * ((float)Math.PI / 180)));
             this.drawBeam(length, frame, matrixStackIn, builder, packedLightIn);
             matrixStackIn.popPose();
         }

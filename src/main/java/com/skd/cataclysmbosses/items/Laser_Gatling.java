@@ -40,7 +40,8 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -79,7 +80,7 @@ extends Item {
         return stack.getDamageValue() < stack.getMaxDamage() - 1;
     }
 
-    public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand handIn) {
+    public InteractionResult use(Level worldIn, Player playerIn, InteractionHand handIn) {
         ItemStack itemstack = playerIn.getItemInHand(handIn);
         playerIn.startUsingItem(handIn);
         if (!Laser_Gatling.isUsable(itemstack)) {
@@ -93,7 +94,7 @@ extends Item {
                 itemstack.setDamageValue(0);
             }
         }
-        return InteractionResultHolder.consume((Object)itemstack);
+        return InteractionResult.CONSUME;
     }
 
     public ItemStack findAmmo(Player entity) {
@@ -114,7 +115,7 @@ extends Item {
 
     public void onUseTick(Level worldIn, LivingEntity livingEntityIn, ItemStack stack, int count) {
         if (Laser_Gatling.isUsable(stack)) {
-            stack.set(ModDataComponents.LASER_GATLING, (Object)false);
+            stack.set(ModDataComponents.LASER_GATLING.get(), false);
             if (count % 2 == 0) {
                 Vec3 vector3d = livingEntityIn.getViewVector(1.0f);
                 Vec3 vec3 = vector3d.normalize();
@@ -140,7 +141,7 @@ extends Item {
                 flag = true;
             }
             if (flag) {
-                ((Player)livingEntityIn).getCooldowns().addCooldown((Item)this, 20);
+                ((Player)livingEntityIn).getCooldowns().addCooldown(this.getDefaultInstance(), 20);
                 stack.setDamageValue(0);
             }
             livingEntityIn.stopUsingItem();
@@ -148,25 +149,23 @@ extends Item {
     }
 
     public boolean releaseUsing(ItemStack stack, Level world, LivingEntity living, int remainingUseTicks) {
-        stack.set(ModDataComponents.LASER_GATLING, (Object)false);
+        stack.set(ModDataComponents.LASER_GATLING.get(), false);
         return true;
     }
 
-    public void inventoryTick(ItemStack stack, Level level, Entity entity, int i, boolean held) {
+    public void inventoryTick(ItemStack stack, ServerLevel level, Entity entity, @javax.annotation.Nullable EquipmentSlot slot) {
         LivingEntity living;
-        boolean using;
-        super.inventoryTick(stack, level, entity, i, held);
-        boolean bl = using = entity instanceof LivingEntity && (living = (LivingEntity)entity).getUseItem().equals(stack);
+        boolean using = entity instanceof LivingEntity && (living = (LivingEntity)entity).getUseItem().equals(stack);
         if (using) {
-            stack.set(ModDataComponents.LASER_GATLING, (Object)true);
+            stack.set(ModDataComponents.LASER_GATLING.get(), true);
         }
         if (!using) {
-            stack.set(ModDataComponents.LASER_GATLING, (Object)false);
+            stack.set(ModDataComponents.LASER_GATLING.get(), false);
         }
     }
 
     public static boolean isCharged(ItemStack p_40933_) {
-        return (Boolean)p_40933_.getOrDefault(ModDataComponents.LASER_GATLING, (Object)true);
+        return (Boolean)p_40933_.getOrDefault(ModDataComponents.LASER_GATLING.get(), true);
     }
 
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flags) {

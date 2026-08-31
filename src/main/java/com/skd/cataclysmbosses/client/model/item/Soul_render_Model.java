@@ -65,7 +65,7 @@ extends AdvancedEntityModel<Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.root, (Object)this.halberd, (Object)this.halberd2);
+        return ImmutableList.of(this.root, this.halberd, this.halberd2);
     }
 
     public BasicModelPart root() {

@@ -12,13 +12,15 @@
  *  net.neoforged.api.distmarker.OnlyIn
  */
 package com.skd.cataclysmbosses.client.render.entity;
+import com.skd.cataclysmbosses.client.render.compat.CmMobRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 
 import com.skd.cataclysmbosses.client.model.entity.Koboleton_Model;
 import com.skd.cataclysmbosses.client.render.layer.LayerGenericGlowing;
 import com.skd.cataclysmbosses.client.render.layer.LayerKoboletonItem;
 import com.skd.cataclysmbosses.entity.AnimationMonster.Koboleton_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
@@ -28,14 +30,19 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Koboleton_Renderer
-extends MobRenderer<Koboleton_Entity, Koboleton_Model> {
+extends CmMobRenderer<Koboleton_Entity> {
     private static final Identifier KOBOLETON_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/koboleton/koboleton.png");
     private static final Identifier KOBOLETON_LAYER_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/koboleton/koboleton_layer.png");
 
     public Koboleton_Renderer(EntityRendererProvider.Context renderManagerIn) {
-        super(renderManagerIn, (EntityModel)new Koboleton_Model(), 0.5f);
-        this.addLayer(new LayerKoboletonItem((RenderLayerParent)this, renderManagerIn.getItemInHandRenderer()));
+        super(renderManagerIn, new Koboleton_Model(), 0.5f);
+        this.addLayer(new LayerKoboletonItem((RenderLayerParent)this, net.minecraft.client.Minecraft.getInstance().getEntityRenderDispatcher().getItemInHandRenderer()));
         this.addLayer(new LayerGenericGlowing(this, KOBOLETON_LAYER_TEXTURES));
+    }
+
+    @Override
+    protected void render(Koboleton_Entity entity, float partialTicks, PoseStack poseStack, CmMultiBufferSource buffer, int packedLight) {
+        // TODO: port render body to 26.2 (old MobRenderer APIs removed)
     }
 
     public Identifier getTextureLocation(Koboleton_Entity entity) {

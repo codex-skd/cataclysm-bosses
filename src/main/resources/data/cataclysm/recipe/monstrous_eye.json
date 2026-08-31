@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "#N#",
+    "GEG",
+    "#N#"
+  ],
+  "key": {
+    "#": "minecraft:lava_bucket",
+    "N": "minecraft:netherite_scrap",
+    "G": "minecraft:blackstone",
+    "E": "minecraft:ender_eye"
+  },
+  "result": {
+    "id": "cataclysm:monstrous_eye",
+    "count": 1
+  }
+}

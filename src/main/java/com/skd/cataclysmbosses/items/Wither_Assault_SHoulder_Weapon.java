@@ -36,7 +36,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -62,7 +62,7 @@ extends Item {
         return 72000;
     }
 
-    public void releaseUsing(ItemStack p_43394_, Level p_43395_, LivingEntity p_43396_, int p_43397_) {
+    public boolean releaseUsing(ItemStack p_43394_, Level p_43395_, LivingEntity p_43396_, int p_43397_) {
         if (p_43396_ instanceof Player) {
             Player player = (Player)p_43396_;
             int i = this.getUseDuration(p_43394_, p_43396_) - p_43397_;
@@ -75,7 +75,7 @@ extends Item {
                         rocket.setRadius(3.5f);
                         rocket.shootFromRotation((Entity)player, player.getXRot(), player.getYRot(), 0.0f, f * 1.0f, 1.0f);
                         if (p_43395_.addFreshEntity((Entity)rocket)) {
-                            player.getCooldowns().addCooldown((Item)this, CMCommonConfig.WASW.howitzerCooldown);
+                            player.getCooldowns().addCooldown(this.getDefaultInstance(), CMCommonConfig.WASW.howitzerCooldown);
                         }
                     }
                 } else if (!p_43395_.isClientSide()) {
@@ -97,11 +97,12 @@ extends Item {
                     witherskull.setXRot(xRot);
                     witherskull.setPosRaw(x, p_43396_.getEyeY(), Z);
                     if (p_43395_.addFreshEntity((Entity)witherskull)) {
-                        player.getCooldowns().addCooldown((Item)this, CMCommonConfig.WASW.missileCooldown);
+                        player.getCooldowns().addCooldown(this.getDefaultInstance(), CMCommonConfig.WASW.missileCooldown);
                     }
                 }
             }
         }
+        return false;
     }
 
     public static float getPowerForTime(int p_40662_) {
@@ -112,10 +113,10 @@ extends Item {
         return f;
     }
 
-    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+    public InteractionResult use(Level world, Player player, InteractionHand hand) {
         ItemStack itemstack = player.getItemInHand(hand);
         player.startUsingItem(hand);
-        return InteractionResultHolder.consume((Object)itemstack);
+        return InteractionResult.CONSUME;
     }
 
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flags) {

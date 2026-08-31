@@ -34,7 +34,7 @@ public record ParryParticleOptions(float r, float g, float b) implements Particl
         buf.writeFloat(option.g);
         buf.writeFloat(option.b);
     }, buf -> new ParryParticleOptions(buf.readFloat(), buf.readFloat(), buf.readFloat()));
-    public static MapCodec<ParryParticleOptions> MAP_CODEC = RecordCodecBuilder.mapCodec(object -> object.group((App)Codec.FLOAT.fieldOf("r").forGetter(p -> Float.valueOf(p.r)), (App)Codec.FLOAT.fieldOf("g").forGetter(p -> Float.valueOf(p.g)), (App)Codec.FLOAT.fieldOf("b").forGetter(p -> Float.valueOf(p.b))).apply((Applicative)object, ParryParticleOptions::new));
+    public static MapCodec<ParryParticleOptions> MAP_CODEC = RecordCodecBuilder.mapCodec(object -> object.group(Codec.FLOAT.fieldOf("r").forGetter(p -> Float.valueOf(p.r)), Codec.FLOAT.fieldOf("g").forGetter(p -> Float.valueOf(p.g)), Codec.FLOAT.fieldOf("b").forGetter(p -> Float.valueOf(p.b))).apply(object, ParryParticleOptions::new));
 
     @NotNull
     public ParticleType<ParryParticleOptions> getType() {

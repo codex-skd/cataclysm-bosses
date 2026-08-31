@@ -28,7 +28,7 @@ package com.skd.cataclysmbosses.entity.projectile;
 
 import com.skd.cataclysmbosses.init.ModEntities;
 import com.skd.cataclysmbosses.init.ModItems;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.particles.ParticleOptions;
@@ -48,6 +48,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Eye_Of_Dungeon_Entity
 extends Entity
@@ -77,7 +79,9 @@ implements ItemSupplier {
     }
 
     public void setItem(ItemStack p_32046_) {
-        this.getEntityData().set(DATA_ITEM_STACK, (Object)((ItemStack)Util.make((Object)p_32046_.copy(), p_36978_ -> p_36978_.setCount(1))));
+        ItemStack stack = p_32046_.copy();
+        stack.setCount(1);
+        this.getEntityData().set(DATA_ITEM_STACK, stack);
     }
 
     private ItemStack getItemRaw() {
@@ -89,7 +93,7 @@ implements ItemSupplier {
     }
 
     public void setR(int r) {
-        this.entityData.set(R, (Object)r);
+        this.entityData.set(R, r);
     }
 
     public int getG() {
@@ -97,7 +101,7 @@ implements ItemSupplier {
     }
 
     public void setG(int g) {
-        this.entityData.set(G, (Object)g);
+        this.entityData.set(G, g);
     }
 
     public int getB() {
@@ -105,14 +109,14 @@ implements ItemSupplier {
     }
 
     public void setB(int b) {
-        this.entityData.set(B, (Object)b);
+        this.entityData.set(B, b);
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(DATA_ITEM_STACK, (Object)ItemStack.EMPTY);
-        p_326229_.define(R, (Object)0);
-        p_326229_.define(G, (Object)0);
-        p_326229_.define(B, (Object)0);
+        p_326229_.define(DATA_ITEM_STACK, ItemStack.EMPTY);
+        p_326229_.define(R, 0);
+        p_326229_.define(G, 0);
+        p_326229_.define(B, 0);
     }
 
     public void lerpMotion(double p_36984_, double p_36985_, double p_36986_) {
@@ -212,25 +216,21 @@ implements ItemSupplier {
         return Mth.lerp((float)0.2f, (float)p_37274_, (float)p_37275_);
     }
 
-    public void addAdditionalSaveData(CompoundTag p_36975_) {
+    public void addAdditionalSaveData(ValueOutput p_36975_) {
         ItemStack itemstack = this.getItemRaw();
         if (!itemstack.isEmpty()) {
-            p_36975_.put("Item", this.getItem().save((HolderLookup.Provider)this.registryAccess()));
+            p_36975_.store("Item", ItemStack.CODEC, this.getItem());
         }
         p_36975_.putInt("R", this.getR());
         p_36975_.putInt("G", this.getG());
         p_36975_.putInt("B", this.getB());
     }
 
-    public void readAdditionalSaveData(CompoundTag p_36970_) {
-        if (p_36970_.contains("Item", 10)) {
-            this.setItem(ItemStack.parse((HolderLookup.Provider)this.registryAccess(), (Tag)p_36970_.getCompound("Item")).orElse(this.getDefaultItem()));
-        } else {
-            this.setItem(this.getDefaultItem());
-        }
-        this.setR(p_36970_.getInt("R"));
-        this.setG(p_36970_.getInt("G"));
-        this.setB(p_36970_.getInt("B"));
+    public void readAdditionalSaveData(ValueInput p_36970_) {
+        this.setItem(p_36970_.read("Item", ItemStack.CODEC).orElse(this.getDefaultItem()));
+        this.setR(p_36970_.getIntOr("R", 0));
+        this.setG(p_36970_.getIntOr("G", 0));
+        this.setB(p_36970_.getIntOr("B", 0));
     }
 
     private ItemStack getDefaultItem() {
@@ -242,6 +242,11 @@ implements ItemSupplier {
     }
 
     public boolean isAttackable() {
+        return false;
+    }
+
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
         return false;
     }
 

@@ -35,6 +35,7 @@ extends AdvancedEntityModel<Deepling_Entity> {
     public final AdvancedModelBox right_arm;
     public final AdvancedModelBox left_arm;
     private ModelAnimator animator;
+    public boolean riding;
 
     public Deepling_Model() {
         this.texWidth = 64;
@@ -92,7 +93,7 @@ extends AdvancedEntityModel<Deepling_Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.root, (Object)this.left_leg, (Object)this.right_leg, (Object)this.body, (Object)this.headwear, (Object)this.head, (Object)this.head2, (Object)this.r_fin, (Object)this.l_fin, (Object)this.right_arm, (Object)this.left_arm);
+        return ImmutableList.of(this.root, this.left_leg, this.right_leg, this.body, this.headwear, this.head, this.head2, this.r_fin, this.l_fin, this.right_arm, this.left_arm);
     }
 
     public void animate(Deepling_Entity entity, float f, float f1, float f2, float f3, float f4) {

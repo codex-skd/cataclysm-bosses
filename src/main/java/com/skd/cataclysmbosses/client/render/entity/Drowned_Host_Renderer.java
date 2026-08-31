@@ -12,6 +12,8 @@
  *  net.minecraft.world.entity.monster.Zombie
  */
 package com.skd.cataclysmbosses.client.render.entity;
+import com.skd.cataclysmbosses.client.render.compat.CmMobRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
 
 import com.skd.cataclysmbosses.client.model.CMModelLayers;
 import com.skd.cataclysmbosses.client.model.entity.Drowned_Host_Model;
@@ -24,15 +26,20 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.monster.zombie.Zombie;
 
 public class Drowned_Host_Renderer
-extends AbstractZombieRenderer<Drowned_Host_Entity, Drowned_Host_Model<Drowned_Host_Entity>> {
+extends CmMobRenderer<Drowned_Host_Entity> {
     private static final Identifier DROWNED_LOCATION = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/sea/drowned_host.png");
 
     public Drowned_Host_Renderer(EntityRendererProvider.Context p_173964_) {
-        super(p_173964_, new Drowned_Host_Model(p_173964_.bakeLayer(CMModelLayers.DROWNED_HOST)), new Drowned_Host_Model(p_173964_.bakeLayer(CMModelLayers.DROWNED_HOST_INNER_ARMOR)), new Drowned_Host_Model(p_173964_.bakeLayer(CMModelLayers.DROWNED_HOST_OUTER_ARMOR)));
+        super(p_173964_, new Drowned_Host_Model(p_173964_.bakeLayer(CMModelLayers.DROWNED_HOST)), 0.5f);
         this.addLayer(new Drowned_Host_Outer_Layer(this, p_173964_.getModelSet()));
+    }
+
+    @Override
+    protected void render(Drowned_Host_Entity entity, float partialTicks, PoseStack poseStack, com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource buffer, int packedLight) {
+        // TODO: port render body to 26.2 (old MobRenderer APIs removed)
     }
 
     public Identifier getTextureLocation(Zombie entity) {

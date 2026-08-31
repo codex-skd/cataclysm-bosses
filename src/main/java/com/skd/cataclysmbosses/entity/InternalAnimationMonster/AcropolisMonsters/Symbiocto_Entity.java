@@ -83,6 +83,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Symbiocto_Entity
 extends Monster
@@ -127,7 +129,7 @@ implements RangedAttackMob {
     }
 
     public void travel(Vec3 travelVector) {
-        if (this.isControlledByLocalInstance() && this.isInWater() && this.wantsToSwim()) {
+        if (this.isLocalInstanceAuthoritative() && this.isInWater() && this.wantsToSwim()) {
             this.moveRelative(0.01f, travelVector);
             this.move(MoverType.SELF, this.getDeltaMovement());
             this.setDeltaMovement(this.getDeltaMovement().scale(0.9));
@@ -171,7 +173,7 @@ implements RangedAttackMob {
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(ATTACK_STATE, (Object)0);
+        p_326229_.define(ATTACK_STATE, 0);
     }
 
     public void onSyncedDataUpdated(EntityDataAccessor<?> p_21104_) {
@@ -196,28 +198,28 @@ implements RangedAttackMob {
 
     public void setAttackState(int input) {
         this.attackTicks = 0;
-        this.entityData.set(ATTACK_STATE, (Object)input);
+        this.entityData.set(ATTACK_STATE, input);
         this.level().broadcastEntityEvent((Entity)this, (byte)(-input));
     }
 
-    public boolean isInvulnerableTo(DamageSource source) {
-        return source.is(DamageTypes.IN_WALL) || super.isInvulnerableTo(source);
+    public boolean isInvulnerableTo(net.minecraft.server.level.ServerLevel level, DamageSource source) {
+        return source.is(DamageTypes.IN_WALL) || super.isInvulnerableTo(level, source);
     }
 
     public void stopAllAnimationStates() {
         this.spitAnimationState.stop();
     }
 
-    public boolean doHurtTarget(Entity p_219472_) {
+    public boolean doHurtTarget(net.minecraft.server.level.ServerLevel level, Entity p_219472_) {
         this.level().broadcastEntityEvent((Entity)this, (byte)4);
-        return super.doHurtTarget(p_219472_);
+        return super.doHurtTarget(level, p_219472_);
     }
 
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
     }
 
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
     }
 
@@ -245,14 +247,14 @@ implements RangedAttackMob {
         super.aiStep();
     }
 
-    public boolean isAlliedTo(Entity entityIn) {
+    public boolean considersEntityAsAlly(Entity entityIn) {
         if (entityIn == this) {
             return true;
         }
-        if (super.isAlliedTo(entityIn)) {
+        if (super.considersEntityAsAlly(entityIn)) {
             return true;
         }
-        if (entityIn.getType().is(ModTag.TEAM_SCYLLA)) {
+        if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_SCYLLA)) {
             return this.getTeam() == null && entityIn.getTeam() == null;
         }
         return false;

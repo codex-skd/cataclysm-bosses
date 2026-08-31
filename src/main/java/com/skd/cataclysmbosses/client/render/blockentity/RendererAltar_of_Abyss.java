@@ -9,81 +9,60 @@
  *  net.minecraft.client.renderer.rendertype.RenderType
  *  net.minecraft.client.renderer.blockentity.BlockEntityRenderer
  *  net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider$Context
+ *  net.minecraft.client.renderer.entity.EntityRenderDispatcher
+ *  net.minecraft.client.renderer.entity.ItemRenderer
  *  net.minecraft.client.renderer.texture.OverlayTexture
- *  net.minecraft.client.resources.model.BakedModel
- *  net.minecraft.core.Direction
  *  net.minecraft.resources.Identifier
- *  net.minecraft.world.entity.LivingEntity
+ *  net.minecraft.world.entity.Entity
  *  net.minecraft.world.item.ItemDisplayContext
  *  net.minecraft.world.item.ItemStack
- *  net.minecraft.world.level.block.state.properties.Property
+ *  net.minecraft.world.level.Level
  */
 package com.skd.cataclysmbosses.client.render.blockentity;
 
 import com.skd.cataclysmbosses.blockentities.AltarOfAbyss_Block_Entity;
-import com.skd.cataclysmbosses.blocks.Altar_Of_Abyss_Block;
-import com.skd.cataclysmbosses.client.model.block.Altar_of_Abyss_Model;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.core.Direction;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.item.ItemModelResolver;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import org.jspecify.annotations.Nullable;
 
-public class RendererAltar_of_Abyss<T extends AltarOfAbyss_Block_Entity>
-implements BlockEntityRenderer<T> {
-    private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/block/altar_of_abyss.png");
-    private static final Altar_of_Abyss_Model MODEL = new Altar_of_Abyss_Model();
-
-    public RendererAltar_of_Abyss(BlockEntityRendererProvider.Context rendererDispatcherIn) {
+@OnlyIn(Dist.CLIENT)
+public class RendererAltar_of_Abyss
+implements BlockEntityRenderer<AltarOfAbyss_Block_Entity, BlockEntityRenderState> {
+    
+    public RendererAltar_of_Abyss(BlockEntityRendererProvider.Context context) {
+        // Constructor - store any needed references
     }
 
-    public void render(T tileEntityIn, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int combinedLightIn, int combinedOverlayIn) {
-        matrixStackIn.pushPose();
-        Direction dir = (Direction)tileEntityIn.getBlockState().getValue((Property)Altar_Of_Abyss_Block.FACING);
-        if (dir == Direction.NORTH) {
-            matrixStackIn.translate(0.5, 1.5, 0.5);
-        } else if (dir == Direction.EAST) {
-            matrixStackIn.translate(0.5f, 1.5f, 0.5f);
-        } else if (dir == Direction.SOUTH) {
-            matrixStackIn.translate(0.5, 1.5, 0.5);
-        } else if (dir == Direction.WEST) {
-            matrixStackIn.translate(0.5f, 1.5f, 0.5f);
-        }
-        matrixStackIn.mulPose(dir.getOpposite().getRotation());
-        matrixStackIn.mulPose(Axis.XP.rotationDegrees(90.0f));
-        matrixStackIn.pushPose();
-        MODEL.animate((AltarOfAbyss_Block_Entity)((Object)tileEntityIn), partialTicks);
-        MODEL.renderToBuffer(matrixStackIn, bufferIn.getBuffer(RenderType.entityCutoutNoCull((Identifier)TEXTURE)), combinedLightIn, combinedOverlayIn);
-        matrixStackIn.popPose();
-        matrixStackIn.popPose();
-        this.renderItem(tileEntityIn, partialTicks, matrixStackIn, bufferIn, combinedLightIn);
+    @Override
+    public BlockEntityRenderState createRenderState() {
+        return new BlockEntityRenderState();
     }
 
-    public void renderItem(T tileEntityIn, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int combinedLightIn) {
-        ItemStack stack = ((AltarOfAbyss_Block_Entity)((Object)tileEntityIn)).getItem(0);
-        float f2 = (float)((AltarOfAbyss_Block_Entity)((Object)tileEntityIn)).tickCount + partialTicks;
-        if (!stack.isEmpty()) {
-            matrixStackIn.pushPose();
-            matrixStackIn.translate(0.5f, 0.9f, 0.5f);
-            matrixStackIn.mulPose(Axis.YP.rotationDegrees(f2));
-            BakedModel ibakedmodel = Minecraft.getInstance().getItemRenderer().getModel(stack, tileEntityIn.getLevel(), (LivingEntity)null, 0);
-            boolean flag = ibakedmodel.isGui3d();
-            if (!flag) {
-                matrixStackIn.translate(0.0f, 0.0f, 0.0f);
-            }
-            Minecraft.getInstance().getItemRenderer().render(stack, ItemDisplayContext.GROUND, false, matrixStackIn, bufferIn, combinedLightIn, OverlayTexture.NO_OVERLAY, ibakedmodel);
-            matrixStackIn.popPose();
-        }
+    @Override
+    public void extractRenderState(AltarOfAbyss_Block_Entity blockEntity, BlockEntityRenderState state, float partialTicks, Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
+        BlockEntityRenderState.extractBase(blockEntity, state, breakProgress);
+        // TODO: Extract block entity data to render state
+    }
+
+    @Override
+    public void submit(BlockEntityRenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
+        // TODO: Implement rendering with new API
     }
 }
-

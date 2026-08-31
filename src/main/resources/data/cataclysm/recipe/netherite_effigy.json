@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "n#R",
+    "#c#",
+    "i#i"
+  ],
+  "key": {
+    "#": "minecraft:nether_brick",
+    "i": "minecraft:gold_ingot",
+    "R": "minecraft:redstone_block",
+    "n": "minecraft:netherite_ingot",
+    "c": "minecraft:totem_of_undying"
+  },
+  "result": {
+    "id": "cataclysm:netherite_effigy",
+    "count": 1
+  }
+}

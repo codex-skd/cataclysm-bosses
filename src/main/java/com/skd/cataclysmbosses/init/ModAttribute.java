@@ -27,7 +27,7 @@ import net.neoforged.neoforge.event.entity.EntityAttributeModificationEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-@EventBusSubscriber(modid="the_sundering", bus=EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid="cataclysm_bosses")
 public class ModAttribute {
     public static final DeferredRegister<Attribute> ATTRIBUTES = DeferredRegister.create((ResourceKey)Registries.ATTRIBUTE, (String)"cataclysm");
     public static final DeferredHolder<Attribute, Attribute> ADDITIONAL_CRITICAL_DAMAGE = ATTRIBUTES.register("additional_critical_damage", () -> new RangedAttribute("attribute.cataclysm.additional_critical_damage", 0.0, -512.0, 512.0).setSyncable(true));

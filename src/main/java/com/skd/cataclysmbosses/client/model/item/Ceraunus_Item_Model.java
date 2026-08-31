@@ -127,7 +127,7 @@ extends AdvancedEntityModel<Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.anchor, (Object)this.cube_r1, (Object)this.cube_r2, (Object)this.cube_r3, (Object)this.cube_r4, (Object)this.cube_r5, (Object)this.cube_r6, (Object)this.cube_r7, (Object)this.cube_r8, (Object)this.cube_r9, (Object)this.cube_r10, (Object)this.cube_r11, (Object[])new AdvancedModelBox[]{this.cube_r12, this.chain, this.cube_r13});
+        return ImmutableList.of(this.anchor, this.cube_r1, this.cube_r2, this.cube_r3, this.cube_r4, this.cube_r5, this.cube_r6, this.cube_r7, this.cube_r8, this.cube_r9, this.cube_r10, this.cube_r11, this.cube_r12, this.chain, this.cube_r13);
     }
 
     public BasicModelPart root() {

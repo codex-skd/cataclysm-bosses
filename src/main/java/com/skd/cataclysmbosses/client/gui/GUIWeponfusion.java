@@ -12,9 +12,10 @@
 package com.skd.cataclysmbosses.client.gui;
 
 import com.skd.cataclysmbosses.inventory.WeaponfusionMenu;
-// import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.ItemCombinerScreen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ItemCombinerMenu;
@@ -24,14 +25,15 @@ extends ItemCombinerScreen<WeaponfusionMenu> {
     private static final Identifier SMITHING_LOCATION = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/gui/fusion.png");
 
     public GUIWeponfusion(WeaponfusionMenu p_99290_, Inventory p_99291_, Component p_99292_) {
-        super((ItemCombinerMenu)p_99290_, p_99291_, p_99292_, SMITHING_LOCATION);
+        super(p_99290_, p_99291_, p_99292_, SMITHING_LOCATION);
         this.titleLabelX = 66;
         this.titleLabelY = 18;
     }
 
-    protected void renderErrorIcon(GuiGraphics p_282905_, int p_283237_, int p_282237_) {
+    @Override
+    protected void extractErrorIcon(GuiGraphicsExtractor p_282905_, int p_283237_, int p_282237_) {
         if ((((WeaponfusionMenu)this.menu).getSlot(0).hasItem() || ((WeaponfusionMenu)this.menu).getSlot(1).hasItem()) && !((WeaponfusionMenu)this.menu).getSlot(((WeaponfusionMenu)this.menu).getResultSlot()).hasItem()) {
-            p_282905_.blit(SMITHING_LOCATION, p_283237_ + 99, p_282237_ + 45, this.imageWidth, 0, 28, 21);
+            p_282905_.blit(RenderPipelines.GUI_TEXTURED, SMITHING_LOCATION, p_283237_ + 99, p_282237_ + 45, (float)this.imageWidth, 0.0f, 28, 21, 256, 256);
         }
     }
 

@@ -48,9 +48,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.PickaxeItem;
-import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -59,15 +58,15 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class Void_forge
-extends PickaxeItem {
-    public Void_forge(Tier toolMaterial, Item.Properties props) {
-        super(toolMaterial, props);
+extends Item {
+    public Void_forge(Item.Properties props) {
+        super(props);
     }
 
     public void hurtEnemy(ItemStack heldItemStack, LivingEntity target, LivingEntity attacker) {
         if (!target.level().isClientSide()) {
             target.playSound((SoundEvent)ModSounds.HAMMERTIME.get(), 0.5f, 0.5f);
-            target.knockback(1.0, attacker.getX() - target.getX(), attacker.getZ() - target.getZ());
+            target.push(attacker.getX() - target.getX(), 0.0, attacker.getZ() - target.getZ());
         }
         return;
     }
@@ -85,7 +84,7 @@ extends PickaxeItem {
             ScreenShake_Entity.ScreenShake(world, player.position(), 30.0f, 0.1f, 0, 30);
             for (Vec3 vector3d : all) {
                 float f = (float)Mth.atan2((double)vector3d.z, (double)vector3d.x);
-                player.getCooldowns().addCooldown((Item)this, CMCommonConfig.VoidForge.cooldown);
+                player.getCooldowns().addCooldown(this.getDefaultInstance(), CMCommonConfig.VoidForge.cooldown);
                 for (int i = 0; i < 5; ++i) {
                     double d2 = 1.75 * (double)(i + 1);
                     int j = 1 * i;
@@ -136,9 +135,9 @@ extends PickaxeItem {
         return false;
     }
 
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flags) {
-        tooltip.add((Component)Component.translatable((String)"item.cataclysm.void_forge.desc").withStyle(ChatFormatting.DARK_GREEN));
-        tooltip.add((Component)Component.translatable((String)"item.cataclysm.void_forge.desc2").withStyle(ChatFormatting.DARK_GREEN));
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, java.util.function.Consumer<Component> builder, TooltipFlag flags) {
+        builder.accept((Component)Component.translatable((String)"item.cataclysm.void_forge.desc").withStyle(ChatFormatting.DARK_GREEN));
+        builder.accept((Component)Component.translatable((String)"item.cataclysm.void_forge.desc2").withStyle(ChatFormatting.DARK_GREEN));
     }
 }
 

@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "#": "cataclysm:azure_seastone"
+  },
+  "pattern": [
+    " # ",
+    " # ",
+    " # "
+  ],
+  "result": {
+    "count": 6,
+    "id": "cataclysm:azure_seastone_mural_empty"
+  }
+}

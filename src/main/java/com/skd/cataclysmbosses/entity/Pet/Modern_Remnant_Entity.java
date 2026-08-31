@@ -80,7 +80,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.advancements.triggers.CriteriaTriggers;
 import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.component.DataComponents;
@@ -119,7 +119,7 @@ import net.minecraft.world.entity.ai.goal.target.NonTameRandomTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.OwnerHurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.OwnerHurtTargetGoal;
 import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.entity.animal.Bucketable;
+import net.minecraft.world.entity.Bucketable;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -132,6 +132,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Modern_Remnant_Entity
 extends LLibraryAnimationPet
@@ -183,7 +185,7 @@ implements Bucketable {
         this.targetSelector.addGoal(1, (Goal)new OwnerHurtByTargetGoal((TamableAnimal)this));
         this.targetSelector.addGoal(2, (Goal)new OwnerHurtTargetGoal((TamableAnimal)this));
         this.targetSelector.addGoal(4, (Goal)new HurtByTargetGoal((PathfinderMob)this, new Class[0]));
-        this.targetSelector.addGoal(5, (Goal)new NonTameRandomTargetGoal((TamableAnimal)this, LivingEntity.class, false, ModEntities.buildPredicateFromTag(ModTag.MODERN_REMNANT_TARGET)));
+        this.targetSelector.addGoal(5, (Goal)new NonTameRandomTargetGoal((TamableAnimal)this, LivingEntity.class, false, (entity, level) -> ModEntities.buildPredicateFromTag(ModTag.MODERN_REMNANT_TARGET).test(entity)));
     }
 
     public void travel(Vec3 vec3d) {
@@ -196,26 +198,26 @@ implements Bucketable {
         super.travel(vec3d);
     }
 
-    public boolean isInvulnerableTo(DamageSource source) {
-        return source.is(DamageTypes.IN_WALL) || source.is(DamageTypes.FALLING_BLOCK) || super.isInvulnerableTo(source);
+    public boolean isInvulnerableTo(net.minecraft.server.level.ServerLevel level, DamageSource source) {
+        return source.is(DamageTypes.IN_WALL) || source.is(DamageTypes.FALLING_BLOCK) || super.isInvulnerableTo(level, source);
     }
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(FROM_BUCKET, (Object)false);
+        p_326229_.define(FROM_BUCKET, false);
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         compound.putBoolean("FromBucket", this.fromBucket());
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        this.setFromBucket(compound.getBoolean("FromBucket"));
+        this.setFromBucket(compound.getBooleanOr("FromBucket", false));
     }
 
     @Override
@@ -228,16 +230,18 @@ implements Bucketable {
     }
 
     public void setFromBucket(boolean sit) {
-        this.entityData.set(FROM_BUCKET, (Object)sit);
+        this.entityData.set(FROM_BUCKET, sit);
     }
 
     public void saveToBucketTag(@Nonnull ItemStack bucket) {
         Bucketable.saveDefaultDataToBucketTag((Mob)this, (ItemStack)bucket);
-        CustomData.update((DataComponentType)DataComponents.BUCKET_ENTITY_DATA, (ItemStack)bucket, this::addAdditionalSaveData);
+        CustomData.update((DataComponentType)DataComponents.BUCKET_ENTITY_DATA, (ItemStack)bucket, tag -> {
+            tag.putBoolean("FromBucket", this.fromBucket());
+        });
     }
 
     public void loadFromBucketTag(CompoundTag p_148832_) {
-        this.readAdditionalSaveData(p_148832_);
+        this.setFromBucket(p_148832_.getBooleanOr("FromBucket", false));
         Bucketable.loadDefaultDataFromBucketTag((Mob)this, (CompoundTag)p_148832_);
     }
 
@@ -286,7 +290,7 @@ implements Bucketable {
             if (this.getCommand() == 3) {
                 this.setCommand(0);
             }
-            player.displayClientMessage((Component)Component.translatable((String)("entity.cataclysm.all.command_" + this.getCommand()), (Object[])new Object[]{this.getName()}), true);
+            player.sendSystemMessage((Component)Component.translatable((String)("entity.cataclysm.all.command_" + this.getCommand()), (Object[])new Object[]{this.getName()}));
             boolean bl = sit = this.getCommand() == 2;
             if (sit) {
                 this.setOrderedToSit(true);
@@ -311,7 +315,7 @@ implements Bucketable {
                 CriteriaTriggers.FILLED_BUCKET.trigger((ServerPlayer)p_148829_, itemstack1);
             }
             p_148831_.discard();
-            return Optional.of(InteractionResult.sidedSuccess((boolean)level.isClientSide()));
+            return Optional.of(level.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.SUCCESS_SERVER);
         }
         return Optional.empty();
     }
@@ -338,7 +342,7 @@ implements Bucketable {
         return new SmartBodyHelper2((Mob)this);
     }
 
-    public boolean isAlliedTo(Entity entityIn) {
+    public boolean considersEntityAsAlly(Entity entityIn) {
         if (this.isTame()) {
             LivingEntity livingentity = this.getOwner();
             if (entityIn == livingentity) {
@@ -351,7 +355,7 @@ implements Bucketable {
                 return livingentity.isAlliedTo(entityIn);
             }
         }
-        return super.isAlliedTo(entityIn);
+        return super.considersEntityAsAlly(entityIn);
     }
 
     @Override
@@ -458,7 +462,7 @@ implements Bucketable {
                 }
                 if (this.mob.getAnimation() == MODERN_REMNANT_BITE && this.mob.getAnimationTick() == 5 && this.mob.distanceTo((Entity)target) < this.mob.getBbWidth() * 2.5f * this.mob.getBbWidth() * 2.5f + target.getBbWidth()) {
                     float damage = (float)this.mob.getAttributeValue(Attributes.ATTACK_DAMAGE);
-                    target.hurt(Modern_Remnant_Entity.this.damageSources().mobAttack((LivingEntity)this.mob), damage);
+                    target.hurtOrSimulate(Modern_Remnant_Entity.this.damageSources().mobAttack((LivingEntity)this.mob), damage);
                 }
             }
         }

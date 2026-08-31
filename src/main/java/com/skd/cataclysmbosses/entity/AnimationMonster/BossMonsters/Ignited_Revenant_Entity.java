@@ -68,6 +68,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -93,6 +94,8 @@ import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Ignited_Revenant_Entity
 extends LLibrary_Boss_Monster {
@@ -141,7 +144,7 @@ extends LLibrary_Boss_Monster {
     }
 
     public ItemEntity spawnAtLocation(ItemStack stack) {
-        ItemEntity itementity = this.spawnAtLocation(stack, 0.0f);
+        ItemEntity itementity = this.spawnAtLocation((ServerLevel)this.level(), stack, 0.0f);
         if (itementity != null) {
             itementity.setGlowingTag(true);
             itementity.setExtendedLifetime();
@@ -150,7 +153,7 @@ extends LLibrary_Boss_Monster {
     }
 
     @Override
-    public boolean hurt(DamageSource source, float damage) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         double itemDamage;
         LivingEntity living;
         ItemStack itemstack;
@@ -161,20 +164,16 @@ extends LLibrary_Boss_Monster {
             return false;
         }
         if (damage > 0.0f && this.canBlockDamageSource(source)) {
-            this.hurtCurrentlyUsedShield(damage);
-            if (!source.is(DamageTypeTags.IS_PROJECTILE) && entity instanceof LivingEntity) {
-                this.blockUsingShield((LivingEntity)entity);
-            }
             this.playSound(SoundEvents.ANVIL_PLACE, 0.3f, 0.5f);
             return false;
         }
-        return super.hurt(source, damage);
+        return super.hurtOrSimulate(source, damage);
     }
 
     private double getApproximateAttackDamageWithItem(LivingEntity living, ItemStack p_330413_) {
         ItemAttributeModifiers itemattributemodifiers = (ItemAttributeModifiers)p_330413_.getOrDefault(DataComponents.ATTRIBUTE_MODIFIERS, (Object)ItemAttributeModifiers.EMPTY);
         itemattributemodifiers = p_330413_.getAttributeModifiers();
-        return itemattributemodifiers.compute(living.getAttributeBaseValue(Attributes.ATTACK_DAMAGE), EquipmentSlot.MAINHAND);
+        return itemattributemodifiers.compute(Attributes.ATTACK_DAMAGE, living.getAttributeBaseValue(Attributes.ATTACK_DAMAGE), net.minecraft.world.entity.EquipmentSlot.MAINHAND);
     }
 
     private boolean canBlockDamageSource(DamageSource damageSourceIn) {
@@ -197,22 +196,22 @@ extends LLibrary_Boss_Monster {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(ANGER, (Object)false);
-        p_326229_.define(SHIELD_DURABILITY, (Object)0);
+        p_326229_.define(ANGER, false);
+        p_326229_.define(SHIELD_DURABILITY, 0);
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
     }
 
     public void setIsAnger(boolean isAnger) {
-        this.entityData.set(ANGER, (Object)isAnger);
+        this.entityData.set(ANGER, isAnger);
     }
 
     public boolean getIsAnger() {
@@ -220,7 +219,7 @@ extends LLibrary_Boss_Monster {
     }
 
     public void setShieldDurability(int ShieldDurability) {
-        this.entityData.set(SHIELD_DURABILITY, (Object)ShieldDurability);
+        this.entityData.set(SHIELD_DURABILITY, ShieldDurability);
     }
 
     public int getShieldDurability() {
@@ -262,7 +261,7 @@ extends LLibrary_Boss_Monster {
             if (this.getAnimation() == NO_ANIMATION && this.getIsAnger() && this.getShieldDurability() < 4 && this.tickCount % (6 + this.getShieldDurability() * 2) == 0) {
                 for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(1.25))) {
                     boolean flag;
-                    if (this.isAlliedTo((Entity)entity) || entity instanceof Ignited_Revenant_Entity || entity == this || !(flag = entity.hurt(this.damageSources().mobAttack((LivingEntity)this), (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE)))) continue;
+                    if (this.isAlliedTo((Entity)entity) || entity instanceof Ignited_Revenant_Entity || entity == this || !(flag = entity.hurtOrSimulate(this.damageSources().mobAttack((LivingEntity)this), (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE)))) continue;
                     double d0 = entity.getX() - this.getX();
                     double d1 = entity.getZ() - this.getZ();
                     double d2 = Math.max(d0 * d0 + d1 * d1, 0.001);
@@ -272,14 +271,14 @@ extends LLibrary_Boss_Monster {
         }
     }
 
-    public boolean isAlliedTo(Entity entityIn) {
+    public boolean considersEntityAsAlly(Entity entityIn) {
         if (entityIn == this) {
             return true;
         }
-        if (super.isAlliedTo(entityIn)) {
+        if (super.considersEntityAsAlly(entityIn)) {
             return true;
         }
-        if (entityIn.getType().is(ModTag.TEAM_IGNIS)) {
+        if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_IGNIS)) {
             return this.getTeam() == null && entityIn.getTeam() == null;
         }
         return false;
@@ -332,7 +331,9 @@ extends LLibrary_Boss_Monster {
             double vy = 0.0;
             double vz = Mth.sin((float)throwAngle);
             Blazing_Bone_Entity projectile = new Blazing_Bone_Entity(this.level(), (float)CMCommonConfig.IgnitedRevenant.BlazingBoneDamage, (LivingEntity)this);
-            projectile.moveTo(sx, sy, sz, (float)i * 45.0f, this.getXRot());
+            projectile.setPos(sx, sy, sz);
+            projectile.setYRot((float)i * 45.0f);
+            projectile.setXRot(this.getXRot());
             float speed = 0.5f;
             projectile.shoot(vx, vy, vz, speed, 1.0f);
             this.level().addFreshEntity((Entity)projectile);
@@ -351,7 +352,9 @@ extends LLibrary_Boss_Monster {
             double vy = 0.0;
             double vz = Mth.sin((float)throwAngle);
             Blazing_Bone_Entity projectile = new Blazing_Bone_Entity(this.level(), (float)CMCommonConfig.IgnitedRevenant.BlazingBoneDamage, (LivingEntity)this);
-            projectile.moveTo(sx, sy, sz, (float)i * 60.0f, this.getXRot());
+            projectile.setPos(sx, sy, sz);
+            projectile.setYRot((float)i * 60.0f);
+            projectile.setXRot(this.getXRot());
             float speed = 0.6f;
             projectile.shoot(vx, vy, vz, speed, 1.0f);
             this.level().addFreshEntity((Entity)projectile);
@@ -370,7 +373,9 @@ extends LLibrary_Boss_Monster {
             double vy = 0.0;
             double vz = Mth.sin((float)throwAngle);
             Blazing_Bone_Entity projectile = new Blazing_Bone_Entity(this.level(), (float)CMCommonConfig.IgnitedRevenant.BlazingBoneDamage, (LivingEntity)this);
-            projectile.moveTo(sx, sy, sz, (float)i * 36.0f, this.getXRot());
+            projectile.setPos(sx, sy, sz);
+            projectile.setYRot((float)i * 36.0f);
+            projectile.setXRot(this.getXRot());
             float speed = 0.4f;
             projectile.shoot(vx, vy, vz, speed, 1.0f);
             this.level().addFreshEntity((Entity)projectile);
@@ -409,7 +414,7 @@ extends LLibrary_Boss_Monster {
                 ((Ignited_Revenant_Entity)this.entity).getLookControl().setLookAt((Entity)target, 30.0f, 30.0f);
             }
             if (((Ignited_Revenant_Entity)this.entity).getAnimationTick() == 5) {
-                switch (Ignited_Revenant_Entity.this.random.nextInt(3)) {
+                switch (Ignited_Revenant_Entity.this.getRandom().nextInt(3)) {
                     case 0: {
                         Ignited_Revenant_Entity.this.launchbone1();
                         break;
@@ -425,7 +430,7 @@ extends LLibrary_Boss_Monster {
                 }
             }
             if (((Ignited_Revenant_Entity)this.entity).getAnimationTick() == 10) {
-                switch (Ignited_Revenant_Entity.this.random.nextInt(3)) {
+                switch (Ignited_Revenant_Entity.this.getRandom().nextInt(3)) {
                     case 0: {
                         Ignited_Revenant_Entity.this.launchbone1();
                         break;
@@ -441,7 +446,7 @@ extends LLibrary_Boss_Monster {
                 }
             }
             if (((Ignited_Revenant_Entity)this.entity).getAnimationTick() == 15) {
-                switch (Ignited_Revenant_Entity.this.random.nextInt(3)) {
+                switch (Ignited_Revenant_Entity.this.getRandom().nextInt(3)) {
                     case 0: {
                         Ignited_Revenant_Entity.this.launchbone1();
                         break;
@@ -457,7 +462,7 @@ extends LLibrary_Boss_Monster {
                 }
             }
             if (((Ignited_Revenant_Entity)this.entity).getAnimationTick() == 20) {
-                switch (Ignited_Revenant_Entity.this.random.nextInt(3)) {
+                switch (Ignited_Revenant_Entity.this.getRandom().nextInt(3)) {
                     case 0: {
                         Ignited_Revenant_Entity.this.launchbone1();
                         break;
@@ -519,7 +524,9 @@ extends LLibrary_Boss_Monster {
             mouthPos = mouthPos.add(new Vec3(0.0, 0.0, 0.0).xRot((float)Math.toRadians(-Ignited_Revenant_Entity.this.getXRot())).yRot((float)Math.toRadians(-Ignited_Revenant_Entity.this.yHeadRot)));
             Ashen_Breath_Entity breath = new Ashen_Breath_Entity((EntityType<? extends Ashen_Breath_Entity>)((EntityType)ModEntities.ASHEN_BREATH.get()), Ignited_Revenant_Entity.this.level(), (float)CMCommonConfig.IgnitedRevenant.AshenbreathDamage, (LivingEntity)Ignited_Revenant_Entity.this);
             if (Ignited_Revenant_Entity.this.getAnimationTick() == 27) {
-                breath.absMoveTo(mouthPos.x, mouthPos.y, mouthPos.z, Ignited_Revenant_Entity.this.yHeadRot, Ignited_Revenant_Entity.this.getXRot());
+                breath.snapTo(mouthPos.x, mouthPos.y, mouthPos.z);
+                breath.setYRot(Ignited_Revenant_Entity.this.yHeadRot);
+                breath.setXRot(Ignited_Revenant_Entity.this.getXRot());
                 Ignited_Revenant_Entity.this.level().addFreshEntity((Entity)breath);
             }
         }

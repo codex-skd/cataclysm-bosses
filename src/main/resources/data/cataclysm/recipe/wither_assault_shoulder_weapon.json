@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "nG ",
+    "GRG",
+    " Gn"
+  ],
+  "key": {
+    "n": "cataclysm:witherite_ingot",
+    "G": "minecraft:gunpowder",
+    "R": "minecraft:redstone_block"
+  },
+  "result": {
+    "id": "cataclysm:wither_assault_shoulder_weapon",
+    "count": 1
+  }
+}

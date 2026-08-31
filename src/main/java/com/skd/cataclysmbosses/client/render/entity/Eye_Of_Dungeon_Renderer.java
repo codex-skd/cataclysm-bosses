@@ -27,10 +27,12 @@ import com.skd.cataclysmbosses.client.render.CMRenderTypes;
 import com.skd.cataclysmbosses.entity.projectile.Eye_Of_Dungeon_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.BlockPos;
@@ -42,23 +44,25 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Matrix4f;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Eye_Of_Dungeon_Renderer
-extends EntityRenderer<Eye_Of_Dungeon_Entity> {
-    private final ItemRenderer itemRenderer;
+extends CmEntityRenderer<Eye_Of_Dungeon_Entity> {
+    private final ItemModelResolver itemModelResolver;
     private static final Identifier TRAIL_TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/particle/gathering_lightning.png");
 
     public Eye_Of_Dungeon_Renderer(EntityRendererProvider.Context renderManagerIn) {
         super(renderManagerIn);
-        this.itemRenderer = renderManagerIn.getItemRenderer();
+        this.itemModelResolver = renderManagerIn.getItemModelResolver();
     }
 
-    public void render(Eye_Of_Dungeon_Entity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
-        if (entityIn.tickCount >= 2 || !(this.entityRenderDispatcher.camera.getEntity().distanceToSqr((Entity)entityIn) < 12.25)) {
+    protected void render(Eye_Of_Dungeon_Entity entityIn, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
+        if (entityIn.tickCount >= 2 || !(this.entityRenderDispatcher.camera.entity().distanceToSqr((Entity)entityIn) < 12.25)) {
             matrixStackIn.pushPose();
-            matrixStackIn.mulPose(this.entityRenderDispatcher.cameraOrientation());
-            this.itemRenderer.renderStatic(entityIn.getItem(), ItemDisplayContext.GROUND, packedLightIn, OverlayTexture.NO_OVERLAY, matrixStackIn, bufferIn, entityIn.level(), entityIn.getId());
+            matrixStackIn.mulPose(this.entityRenderDispatcher.camera.rotation());
+            // PORT TODO(26.2): re-wire item render
+            // this.itemModelResolver.renderItem(entityIn.getItem(), ItemDisplayContext.GROUND, packedLightIn, OverlayTexture.NO_OVERLAY, matrixStackIn, bufferIn, entityIn.level(), entityIn.getId());
             matrixStackIn.popPose();
             if (entityIn.hasTrail()) {
                 double x = Mth.lerp((double)partialTicks, (double)entityIn.xOld, (double)entityIn.getX());
@@ -72,11 +76,10 @@ extends EntityRenderer<Eye_Of_Dungeon_Entity> {
                 this.renderTrail(entityIn, partialTicks, matrixStackIn, bufferIn, r, g, b, 1.0f, packedLightIn);
                 matrixStackIn.popPose();
             }
-            super.render((Entity)entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
         }
     }
 
-    private void renderTrail(Eye_Of_Dungeon_Entity entityIn, float partialTicks, PoseStack poseStack, MultiBufferSource bufferIn, float trailR, float trailG, float trailB, float trailA, int packedLightIn) {
+    private void renderTrail(Eye_Of_Dungeon_Entity entityIn, float partialTicks, PoseStack poseStack, CmMultiBufferSource bufferIn, float trailR, float trailG, float trailB, float trailA, int packedLightIn) {
         int sampleSize = 10;
         float trailHeight = 0.1f;
         float trailZRot = 0.0f;

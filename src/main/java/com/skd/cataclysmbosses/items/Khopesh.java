@@ -10,14 +10,12 @@
 package com.skd.cataclysmbosses.items;
 
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.SwordItem;
-import net.minecraft.world.item.Tier;
-import net.minecraft.world.item.Tiers;
+import net.minecraft.world.item.ToolMaterial;
 
 public class Khopesh
-extends SwordItem {
+extends Item {
     public Khopesh(Item.Properties group) {
-        super((Tier)Tiers.STONE, group);
+        super(group);
     }
 }
 

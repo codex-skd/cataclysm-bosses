@@ -25,8 +25,9 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.Map;
 import java.util.Optional;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.HierarchicalModel;
+import com.skd.cataclysmbosses.client.model.compat.CmHierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
@@ -36,7 +37,7 @@ import net.minecraft.client.model.geom.builders.PartDefinition;
 import org.jetbrains.annotations.NotNull;
 
 public class Ancient_Remnant_Rework_Model
-extends HierarchicalModel<Ancient_Remnant_Entity> {
+extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRenderState> {
     private final ModelPart root;
     private final ModelPart roots;
     private final ModelPart mid_pivot;
@@ -119,8 +120,8 @@ extends HierarchicalModel<Ancient_Remnant_Entity> {
     private final Map<String, Optional<ModelPart>> optionalPartCache = new Object2ObjectOpenHashMap();
 
     public Ancient_Remnant_Rework_Model(ModelPart root) {
+        super(root);
         this.root = root;
-        this.buildPartCache(root);
         this.roots = this.root.getChild("roots");
         this.mid_pivot = this.roots.getChild("mid_pivot");
         this.pelvis = this.mid_pivot.getChild("pelvis");
@@ -283,79 +284,8 @@ extends HierarchicalModel<Ancient_Remnant_Entity> {
         return LayerDefinition.create((MeshDefinition)meshdefinition, (int)512, (int)512);
     }
 
-    public void setupAnim(Ancient_Remnant_Entity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        this.root().getAllParts().forEach(ModelPart::resetPose);
-        this.animateHeadLookTarget(netHeadYaw, headPitch);
-        if (entityIn.getAttackState() != 10 && entityIn.getAttackState() != 11 && entityIn.getAttackState() != 12 && !entityIn.isSleep()) {
-            this.animateWalk(Ancient_Remnant_Animation.WALK, limbSwing, limbSwingAmount, 1.0f, 4.0f);
-        }
-        this.animate(entityIn.getAnimationState("idle"), Ancient_Remnant_Animation.IDLE, ageInTicks, entityIn.getNecklace() ? 1.0f : 0.15f);
-        this.animate(entityIn.getAnimationState("death"), Ancient_Remnant_Animation.DEATH, ageInTicks, 1.0f);
-        this.animate(entityIn.getAnimationState("right_bite"), Ancient_Remnant_Animation.RIGHT_BITE, ageInTicks, 1.0f);
-        this.animate(entityIn.getAnimationState("sandstorm_roar"), Ancient_Remnant_Animation.SAND_STORM_ROAR, ageInTicks, 1.0f);
-        this.animate(entityIn.getAnimationState("phase_roar"), Ancient_Remnant_Animation.PHASE_ROAR, ageInTicks, 1.0f);
-        this.animate(entityIn.getAnimationState("sleep"), Ancient_Remnant_Animation.SLEEP, ageInTicks, 1.0f);
-        this.animate(entityIn.getAnimationState("awaken"), Ancient_Remnant_Animation.AWAKEN, ageInTicks, 1.0f);
-        this.animate(entityIn.getAnimationState("left_double_stomp"), Ancient_Remnant_Power_Animation.DOUBLE_STOMP2, ageInTicks, 1.0f);
-        this.animate(entityIn.getAnimationState("right_double_stomp"), Ancient_Remnant_Power_Animation.DOUBLE_STOMP1, ageInTicks, 1.0f);
-        this.animate(entityIn.getAnimationState("ground_tail"), Ancient_Remnant_Power_Animation.GROUND_TAIL, ageInTicks, 1.0f);
-        this.animate(entityIn.getAnimationState("tail_swing"), Ancient_Remnant_Power_Animation.TAIL_SWING, ageInTicks, 1.0f);
-        this.animate(entityIn.getAnimationState("monolith"), Ancient_Remnant_Power_Animation.MONOLITH, ageInTicks, 1.0f);
-        this.animate(entityIn.getAnimationState("right_stomp"), Ancient_Remnant_Animation.STOMP1, ageInTicks, 1.0f);
-        this.animate(entityIn.getAnimationState("left_stomp"), Ancient_Remnant_Animation.STOMP2, ageInTicks, 1.0f);
-        this.animate(entityIn.getAnimationState("charge"), Ancient_Remnant_Animation.CHARGE, ageInTicks, 1.0f);
-        this.animate(entityIn.getAnimationState("charge_prepare"), Ancient_Remnant_Animation.CHARGE_PREPARE, ageInTicks, 1.0f);
-        this.animate(entityIn.getAnimationState("charge_stun"), Ancient_Remnant_Animation.CHARGE_STUN, ageInTicks, 1.0f);
-        float partialTick = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
-        if (!entityIn.isSleep()) {
-            this.articulateLegs(entityIn.legSolver, partialTick);
-        }
-        if (!entityIn.getNecklace()) {
-            this.applyStatic(Ancient_Remnant_Animation.SLEEP);
-        }
-        this.desert_necklace.visible = entityIn.getNecklace();
-    }
-
-    private void animateHeadLookTarget(float yRot, float xRot) {
-        this.head.xRot += xRot * ((float)Math.PI / 180);
-        this.head.yRot += yRot * ((float)Math.PI / 180);
-    }
-
-    private void buildPartCache(ModelPart part) {
-        for (Map.Entry entry : part.children.entrySet()) {
-            String partName = (String)entry.getKey();
-            ModelPart childPart = (ModelPart)entry.getValue();
-            this.partCache.putIfAbsent(partName, childPart);
-            this.optionalPartCache.putIfAbsent(partName, Optional.of(childPart));
-            if (childPart.children.isEmpty()) continue;
-            this.buildPartCache(childPart);
-        }
-    }
-
-    @NotNull
-    public Optional<ModelPart> getAnyDescendantWithName(String name) {
-        if ("root".equals(name)) {
-            return Optional.of(this.root);
-        }
-        return this.optionalPartCache.getOrDefault(name, Optional.empty());
-    }
-
-    private void articulateLegs(LegSolver legs, float partialTick) {
-        float heightBackLeft = legs.legs[0].getHeight(partialTick);
-        float heightBackRight = legs.legs[1].getHeight(partialTick);
-        float max = (1.0f - Ancient_Remnant_Rework_Model.smin(1.0f - heightBackLeft, 1.0f - heightBackRight, 0.1f)) * 0.8f;
-        this.roots.y += max * 16.0f;
-        this.right_leg.y += (heightBackRight - max) * 16.0f;
-        this.left_leg.y += (heightBackLeft - max) * 16.0f;
-    }
-
-    private static float smin(float a, float b, float k) {
-        float h = Math.max(k - Math.abs(a - b), 0.0f) / k;
-        return Math.min(a, b) - h * h * k * 0.25f;
-    }
-
-    public ModelPart root() {
-        return this.root;
+        @Override
+    public void setupAnim(EntityRenderState state) {
+        super.setupAnim(state);
     }
 }
-

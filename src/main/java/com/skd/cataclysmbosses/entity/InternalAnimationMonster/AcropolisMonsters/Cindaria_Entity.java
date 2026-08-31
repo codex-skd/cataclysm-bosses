@@ -35,6 +35,7 @@
  *  net.minecraft.world.phys.Vec3
  */
 package com.skd.cataclysmbosses.entity.InternalAnimationMonster.AcropolisMonsters;
+import net.minecraft.server.level.ServerLevel;
 
 import com.skd.cataclysmbosses.entity.InternalAnimationMonster.AI.InternalAttackGoal;
 import com.skd.cataclysmbosses.entity.InternalAnimationMonster.Internal_Animation_Monster;
@@ -77,6 +78,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Cindaria_Entity
 extends Internal_Animation_Monster {
@@ -124,7 +127,7 @@ extends Internal_Animation_Monster {
     }
 
     public void travel(Vec3 travelVector) {
-        if (this.isControlledByLocalInstance() && this.isInWater() && this.wantsToSwim()) {
+        if (this.isLocalInstanceAuthoritative() && this.isInWater() && this.wantsToSwim()) {
             this.moveRelative(0.01f, travelVector);
             this.move(MoverType.SELF, this.getDeltaMovement());
             this.setDeltaMovement(this.getDeltaMovement().scale(0.9));
@@ -149,9 +152,9 @@ extends Internal_Animation_Monster {
         }
     }
 
-    public boolean hurt(DamageSource source, float damage) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         Entity entity = source.getDirectEntity();
-        return super.hurt(source, damage);
+        return super.hurtOrSimulate(source, damage);
     }
 
     protected int decreaseAirSupply(int air) {
@@ -230,11 +233,11 @@ extends Internal_Animation_Monster {
         return 40;
     }
 
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
     }
 
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
     }
 
@@ -269,8 +272,8 @@ extends Internal_Animation_Monster {
                 float entityRelativeAngle = entityHitAngle - entityAttackingAngle;
                 float entityHitDistance = (float)Math.sqrt((entityHit.getZ() - this.getZ()) * (entityHit.getZ() - this.getZ()) + (entityHit.getX() - this.getX()) * (entityHit.getX() - this.getX()));
                 if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || this.isAlliedTo((Entity)entityHit) || entityHit instanceof Cindaria_Entity || entityHit == this) continue;
-                boolean hurt = entityHit.hurt(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
-                if (entityHit.isDamageSourceBlocked(damagesource) && entityHit instanceof Player) {
+                boolean hurt = entityHit.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
+                if (entityHit.isBlocking() && entityHit instanceof Player) {
                     Player player = (Player)entityHit;
                     if (shieldbreakticks > 0) {
                         EntityUtil.disableShield(player, shieldbreakticks);
@@ -285,14 +288,14 @@ extends Internal_Animation_Monster {
         }
     }
 
-    public boolean isAlliedTo(Entity entityIn) {
+    public boolean considersEntityAsAlly(Entity entityIn) {
         if (entityIn == this) {
             return true;
         }
-        if (super.isAlliedTo(entityIn)) {
+        if (super.considersEntityAsAlly(entityIn)) {
             return true;
         }
-        if (entityIn.getType().is(ModTag.TEAM_SCYLLA)) {
+        if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_SCYLLA)) {
             return this.getTeam() == null && entityIn.getTeam() == null;
         }
         return false;

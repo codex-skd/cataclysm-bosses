@@ -20,8 +20,9 @@ import com.skd.cataclysmbosses.entity.InternalAnimationMonster.Kobolediator_Enti
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.Map;
 import java.util.Optional;
-import net.minecraft.client.model.HierarchicalModel;
+import com.skd.cataclysmbosses.client.model.compat.CmHierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
@@ -31,7 +32,7 @@ import net.minecraft.client.model.geom.builders.PartDefinition;
 import org.jetbrains.annotations.NotNull;
 
 public class Kobolediator_Model
-extends HierarchicalModel<Kobolediator_Entity> {
+extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRenderState> {
     private final ModelPart root;
     private final ModelPart everything;
     private final ModelPart mid_root;
@@ -64,8 +65,9 @@ extends HierarchicalModel<Kobolediator_Entity> {
     private final Map<String, Optional<ModelPart>> optionalPartCache = new Object2ObjectOpenHashMap();
 
     public Kobolediator_Model(ModelPart root) {
+        super(root);
         this.root = root;
-        this.buildPartCache(root);
+
         this.everything = this.root.getChild("everything");
         this.mid_root = this.everything.getChild("mid_root");
         this.pelvis = this.mid_root.getChild("pelvis");
@@ -128,52 +130,8 @@ extends HierarchicalModel<Kobolediator_Entity> {
         return LayerDefinition.create((MeshDefinition)meshdefinition, (int)256, (int)256);
     }
 
-    public void setupAnim(Kobolediator_Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        this.root().getAllParts().forEach(ModelPart::resetPose);
-        this.animateHeadLookTarget(netHeadYaw, headPitch);
-        if (entity.getAttackState() != 6 && !entity.isSleep()) {
-            this.animateWalk(Kobolediator_Animation.WALK, limbSwing, limbSwingAmount, 1.0f, 4.0f);
-        }
-        this.animate(entity.getAnimationState("idle"), Kobolediator_Animation.IDLE, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("awake"), Kobolediator_Animation.AWAKE, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("sword1"), Kobolediator_Animation.SWORD1, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("sword2"), Kobolediator_Animation.SWORD2, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("charge"), Kobolediator_Animation.CHARGE, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("charge_prepare"), Kobolediator_Animation.CHARGE_PREPARE, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("charge_end"), Kobolediator_Animation.CHARGE_END, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("death"), Kobolediator_Animation.DEATH, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("block"), Kobolediator_Animation.BLOCK, ageInTicks, 1.0f);
-        if (!entity.getAwaken()) {
-            this.applyStatic(Kobolediator_Animation.SLEEP);
-        }
-    }
-
-    private void buildPartCache(ModelPart part) {
-        for (Map.Entry entry : part.children.entrySet()) {
-            String partName = (String)entry.getKey();
-            ModelPart childPart = (ModelPart)entry.getValue();
-            this.partCache.putIfAbsent(partName, childPart);
-            this.optionalPartCache.putIfAbsent(partName, Optional.of(childPart));
-            if (childPart.children.isEmpty()) continue;
-            this.buildPartCache(childPart);
-        }
-    }
-
-    @NotNull
-    public Optional<ModelPart> getAnyDescendantWithName(String name) {
-        if ("root".equals(name)) {
-            return Optional.of(this.root);
-        }
-        return this.optionalPartCache.getOrDefault(name, Optional.empty());
-    }
-
-    private void animateHeadLookTarget(float yRot, float xRot) {
-        this.head.xRot += xRot * ((float)Math.PI / 180);
-        this.head.yRot = yRot * ((float)Math.PI / 180);
-    }
-
-    public ModelPart root() {
-        return this.root;
+        @Override
+    public void setupAnim(EntityRenderState state) {
+        super.setupAnim(state);
     }
 }
-

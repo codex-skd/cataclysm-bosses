@@ -28,34 +28,34 @@ import net.neoforged.neoforge.common.world.ModifiableStructureInfo;
 public class CMWorldRegistry {
     public static void addBiomeSpawns(Holder<Biome> biome, ModifiableBiomeInfo.BiomeInfo.Builder builder) {
         if (biome.is(ModTag.DEEPLINGS_SPAWN) && CMCommonConfig.Spawning.DeeplingSpawnWeight > 0) {
-            builder.getMobSpawnSettings().getSpawner(MobCategory.MONSTER).add(new MobSpawnSettings.SpawnerData((EntityType)ModEntities.DEEPLING.get(), CMCommonConfig.Spawning.DeeplingSpawnWeight, 1, 1));
+            builder.getMobSpawnSettings().addSpawn(MobCategory.MONSTER, CMCommonConfig.Spawning.DeeplingSpawnWeight, new MobSpawnSettings.SpawnerData((EntityType)ModEntities.DEEPLING.get(), 1, 1));
         }
         if (biome.is(ModTag.DEEPLINGS_SPAWN) && CMCommonConfig.Spawning.DeeplingAnglerSpawnWeight > 0) {
-            builder.getMobSpawnSettings().getSpawner(MobCategory.MONSTER).add(new MobSpawnSettings.SpawnerData((EntityType)ModEntities.DEEPLING_ANGLER.get(), CMCommonConfig.Spawning.DeeplingAnglerSpawnWeight, 1, 1));
+            builder.getMobSpawnSettings().addSpawn(MobCategory.MONSTER, CMCommonConfig.Spawning.DeeplingAnglerSpawnWeight, new MobSpawnSettings.SpawnerData((EntityType)ModEntities.DEEPLING_ANGLER.get(), 1, 1));
         }
         if (biome.is(ModTag.DEEPLINGS_SPAWN) && CMCommonConfig.Spawning.DeeplingBruteSpawnWeight > 0) {
-            builder.getMobSpawnSettings().getSpawner(MobCategory.MONSTER).add(new MobSpawnSettings.SpawnerData((EntityType)ModEntities.DEEPLING_BRUTE.get(), CMCommonConfig.Spawning.DeeplingBruteSpawnWeight, 1, 1));
+            builder.getMobSpawnSettings().addSpawn(MobCategory.MONSTER, CMCommonConfig.Spawning.DeeplingBruteSpawnWeight, new MobSpawnSettings.SpawnerData((EntityType)ModEntities.DEEPLING_BRUTE.get(), 1, 1));
         }
         if (biome.is(ModTag.DEEPLINGS_SPAWN) && CMCommonConfig.Spawning.DeeplingPriestSpawnWeight > 0) {
-            builder.getMobSpawnSettings().getSpawner(MobCategory.MONSTER).add(new MobSpawnSettings.SpawnerData((EntityType)ModEntities.DEEPLING_PRIEST.get(), CMCommonConfig.Spawning.DeeplingPriestSpawnWeight, 1, 1));
+            builder.getMobSpawnSettings().addSpawn(MobCategory.MONSTER, CMCommonConfig.Spawning.DeeplingPriestSpawnWeight, new MobSpawnSettings.SpawnerData((EntityType)ModEntities.DEEPLING_PRIEST.get(), 1, 1));
         }
         if (biome.is(ModTag.DEEPLINGS_SPAWN) && CMCommonConfig.Spawning.DeeplingWarlockSpawnWeight > 0) {
-            builder.getMobSpawnSettings().getSpawner(MobCategory.MONSTER).add(new MobSpawnSettings.SpawnerData((EntityType)ModEntities.DEEPLING_WARLOCK.get(), CMCommonConfig.Spawning.DeeplingWarlockSpawnWeight, 1, 1));
+            builder.getMobSpawnSettings().addSpawn(MobCategory.MONSTER, CMCommonConfig.Spawning.DeeplingWarlockSpawnWeight, new MobSpawnSettings.SpawnerData((EntityType)ModEntities.DEEPLING_WARLOCK.get(), 1, 1));
         }
         if (biome.is(ModTag.DEEPLINGS_SPAWN) && CMCommonConfig.Spawning.CoralgolemSpawnWeight > 0) {
-            builder.getMobSpawnSettings().getSpawner(MobCategory.MONSTER).add(new MobSpawnSettings.SpawnerData((EntityType)ModEntities.CORAL_GOLEM.get(), CMCommonConfig.Spawning.CoralgolemSpawnWeight, 1, 1));
+            builder.getMobSpawnSettings().addSpawn(MobCategory.MONSTER, CMCommonConfig.Spawning.CoralgolemSpawnWeight, new MobSpawnSettings.SpawnerData((EntityType)ModEntities.CORAL_GOLEM.get(), 1, 1));
         }
         if (biome.is(ModTag.AMETHYST_CRAB_SPAWN) && CMCommonConfig.Spawning.AmethystCrabSpawnWeight > 0) {
-            builder.getMobSpawnSettings().getSpawner(MobCategory.MONSTER).add(new MobSpawnSettings.SpawnerData((EntityType)ModEntities.AMETHYST_CRAB.get(), CMCommonConfig.Spawning.AmethystCrabSpawnWeight, 1, 1));
+            builder.getMobSpawnSettings().addSpawn(MobCategory.MONSTER, CMCommonConfig.Spawning.AmethystCrabSpawnWeight, new MobSpawnSettings.SpawnerData((EntityType)ModEntities.AMETHYST_CRAB.get(), 1, 1));
         }
         if (biome.is(ModTag.KOBOLETON_SPAWN) && CMCommonConfig.Spawning.KoboletonSpawnWeight > 0) {
-            builder.getMobSpawnSettings().getSpawner(MobCategory.MONSTER).add(new MobSpawnSettings.SpawnerData((EntityType)ModEntities.KOBOLETON.get(), CMCommonConfig.Spawning.KoboletonSpawnWeight, 2, 3));
+            builder.getMobSpawnSettings().addSpawn(MobCategory.MONSTER, CMCommonConfig.Spawning.KoboletonSpawnWeight, new MobSpawnSettings.SpawnerData((EntityType)ModEntities.KOBOLETON.get(), 2, 3));
         }
     }
 
     public static void modifyStructure(Holder<Structure> structure, ModifiableStructureInfo.StructureInfo.Builder builder) {
         if (structure.is(ModTag.BERSERKER_SPAWN) && CMCommonConfig.Spawning.IgnitedBerserkerSpawnWeight > 0) {
-            builder.getStructureSettings().getOrAddSpawnOverrides(MobCategory.MONSTER).addSpawn(new MobSpawnSettings.SpawnerData((EntityType)ModEntities.IGNITED_BERSERKER.get(), CMCommonConfig.Spawning.IgnitedBerserkerSpawnWeight, 1, 1));
+            builder.getStructureSettings().getOrAddSpawnOverrides(MobCategory.MONSTER).addSpawn(new MobSpawnSettings.SpawnerData((EntityType)ModEntities.IGNITED_BERSERKER.get(), 1, 1), CMCommonConfig.Spawning.IgnitedBerserkerSpawnWeight);
         }
     }
 }

@@ -26,9 +26,11 @@ import com.skd.cataclysmbosses.client.render.CMRenderTypes;
 import com.skd.cataclysmbosses.entity.projectile.Wither_Homing_Missile_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
@@ -39,10 +41,11 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Matrix4f;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Wither_Homing_Missile_Renderer
-extends EntityRenderer<Wither_Homing_Missile_Entity> {
+extends CmEntityRenderer<Wither_Homing_Missile_Entity> {
     private static final Identifier WITHER_MISSILE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/harbinger/wither_homing_missile.png");
     private static final Identifier TRAIL_TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/particle/amogus.png");
     protected final EntityRenderDispatcher entityRenderDispatcher;
@@ -57,15 +60,15 @@ extends EntityRenderer<Wither_Homing_Missile_Entity> {
         return 15;
     }
 
-    public void render(Wither_Homing_Missile_Entity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
+    protected void render(Wither_Homing_Missile_Entity entityIn, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
         matrixStackIn.pushPose();
         matrixStackIn.scale(-1.5f, -1.5f, 1.5f);
         matrixStackIn.translate(0.0f, 0.04f, 0.0f);
         float f = Mth.rotLerp((float)partialTicks, (float)entityIn.yRotO, (float)entityIn.getYRot());
         float f1 = Mth.lerp((float)partialTicks, (float)entityIn.xRotO, (float)entityIn.getXRot());
-        VertexConsumer vertexconsumer = bufferIn.getBuffer(this.model.renderType(this.getTextureLocation(entityIn)));
+        VertexConsumer vertexconsumer = bufferIn.getBuffer(RenderTypes.entityCutout(this.getTextureLocation(entityIn)));
         this.model.setupAnim(entityIn, 0.0f, 0.0f, 0.0f, f, f1);
-        this.model.renderToBuffer(matrixStackIn, vertexconsumer, packedLightIn, OverlayTexture.NO_OVERLAY);
+        this.model.renderToBuffer(matrixStackIn, vertexconsumer, packedLightIn, OverlayTexture.NO_OVERLAY, -1);
         matrixStackIn.popPose();
         if (entityIn.hasTrail()) {
             double x = Mth.lerp((double)partialTicks, (double)entityIn.xOld, (double)entityIn.getX());
@@ -79,17 +82,16 @@ extends EntityRenderer<Wither_Homing_Missile_Entity> {
             this.renderTrail(entityIn, partialTicks, matrixStackIn, bufferIn, r, g, b, 1.0f, packedLightIn);
             matrixStackIn.popPose();
         }
-        super.render((Entity)entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
     }
 
-    private void renderTrail(Wither_Homing_Missile_Entity entityIn, float partialTicks, PoseStack poseStack, MultiBufferSource bufferIn, float trailR, float trailG, float trailB, float trailA, int packedLightIn) {
+    private void renderTrail(Wither_Homing_Missile_Entity entityIn, float partialTicks, PoseStack poseStack, CmMultiBufferSource bufferIn, float trailR, float trailG, float trailB, float trailA, int packedLightIn) {
         int sampleSize = 10;
         float trailWidth = 0.2f;
         PoseStack.Pose lastPose = poseStack.last();
         Matrix4f matrix = lastPose.pose();
         VertexConsumer vertexconsumer = bufferIn.getBuffer(CMRenderTypes.getLightTrailEffect(TRAIL_TEXTURE));
         Vec3 drawFrom = entityIn.getTrailPosition(0, partialTicks);
-        Vec3 cameraPos = this.entityRenderDispatcher.camera.getPosition();
+        Vec3 cameraPos = this.entityRenderDispatcher.camera.position();
         for (int i = 0; i < sampleSize; ++i) {
             Vec3 sample = entityIn.getTrailPosition(i + 1, partialTicks);
             float u1 = (float)i / (float)sampleSize;

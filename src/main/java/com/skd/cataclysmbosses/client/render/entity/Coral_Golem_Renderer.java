@@ -11,11 +11,13 @@
  *  net.neoforged.api.distmarker.OnlyIn
  */
 package com.skd.cataclysmbosses.client.render.entity;
+import com.skd.cataclysmbosses.client.render.compat.CmMobRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 
 import com.skd.cataclysmbosses.client.model.entity.Coral_Golem_Model;
 import com.skd.cataclysmbosses.entity.Deepling.Coral_Golem_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.Identifier;
@@ -24,11 +26,16 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Coral_Golem_Renderer
-extends MobRenderer<Coral_Golem_Entity, Coral_Golem_Model> {
+extends CmMobRenderer<Coral_Golem_Entity> {
     private static final Identifier CORALSSUS_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/deepling/coral_golem.png");
 
     public Coral_Golem_Renderer(EntityRendererProvider.Context renderManagerIn) {
-        super(renderManagerIn, (EntityModel)new Coral_Golem_Model(), 1.5f);
+        super(renderManagerIn, new Coral_Golem_Model(), 1.5f);
+    }
+
+    @Override
+    protected void render(Coral_Golem_Entity entity, float partialTicks, PoseStack poseStack, CmMultiBufferSource buffer, int packedLight) {
+        // TODO: port render body to 26.2 (old MobRenderer APIs removed)
     }
 
     public Identifier getTextureLocation(Coral_Golem_Entity entity) {

@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:stonecutting",
+  "count": 1,
+  "ingredient": [
+    "minecraft:polished_blackstone"
+  ],
+  "result": {
+    "count": 1,
+    "id": "cataclysm:blackstone_pillar"
+  }
+}

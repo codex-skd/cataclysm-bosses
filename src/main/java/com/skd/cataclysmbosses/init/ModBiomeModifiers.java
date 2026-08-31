@@ -21,6 +21,6 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
 public class ModBiomeModifiers {
     public static final DeferredRegister<MapCodec<? extends BiomeModifier>> BIOME_MODIFIER_SERIALIZERS = DeferredRegister.create((ResourceKey)NeoForgeRegistries.Keys.BIOME_MODIFIER_SERIALIZERS, (String)"cataclysm");
-    public static final DeferredHolder<MapCodec<? extends BiomeModifier>, MapCodec<CMMobSpawnBiomeModifier>> CM_MOB_SPAWN_BIOME_MODIFIER_TYPE = BIOME_MODIFIER_SERIALIZERS.register("cataclysm_mob_spawns", () -> MapCodec.unit((Object)CMMobSpawnBiomeModifier.INSTANCE));
+    public static final DeferredHolder<MapCodec<? extends BiomeModifier>, MapCodec<CMMobSpawnBiomeModifier>> CM_MOB_SPAWN_BIOME_MODIFIER_TYPE = BIOME_MODIFIER_SERIALIZERS.register("cataclysm_mob_spawns", () -> MapCodec.unit(CMMobSpawnBiomeModifier.INSTANCE));
 }
 

@@ -36,6 +36,7 @@
  *  net.minecraft.world.phys.Vec3
  */
 package com.skd.cataclysmbosses.entity.InternalAnimationMonster;
+import net.minecraft.server.level.ServerLevel;
 
 import com.skd.cataclysmbosses.config.CMCommonConfig;
 import com.skd.cataclysmbosses.entity.InternalAnimationMonster.AI.InternalAttackGoal;
@@ -85,6 +86,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class The_Prowler_Entity
 extends Internal_Animation_Monster {
@@ -133,14 +136,14 @@ extends Internal_Animation_Monster {
                 The_Prowler_Entity.this.spin_cooldown = 80;
             }
         });
-        this.goalSelector.addGoal(1, (Goal)new InternalAttackGoal(this, this, 0, 5, 0, 50, 38, 5.0f){
+        this.goalSelector.addGoal(1, (Goal)new InternalAttackGoal(this, 0, 5, 0, 50, 38, 5.0f){
 
             @Override
             public boolean canUse() {
                 return super.canUse() && this.entity.getRandom().nextFloat() * 100.0f < 20.0f;
             }
         });
-        this.goalSelector.addGoal(1, (Goal)new InternalAttackGoal(this, this, 0, 6, 0, 55, 45, 6.0f){
+        this.goalSelector.addGoal(1, (Goal)new InternalAttackGoal(this, 0, 6, 0, 55, 45, 6.0f){
 
             @Override
             public boolean canUse() {
@@ -148,7 +151,7 @@ extends Internal_Animation_Monster {
                 return super.canUse() && this.entity.getRandom().nextFloat() * 100.0f < 20.0f && target != null && (double)this.entity.distanceTo((Entity)target) >= 2.75;
             }
         });
-        this.goalSelector.addGoal(1, (Goal)new InternalAttackGoal(this, this, 0, 7, 0, 80, 38, 4.25f){
+        this.goalSelector.addGoal(1, (Goal)new InternalAttackGoal(this, 0, 7, 0, 80, 38, 4.25f){
 
             @Override
             public boolean canUse() {
@@ -162,7 +165,7 @@ extends Internal_Animation_Monster {
         return Monster.createMonsterAttributes().add(Attributes.FOLLOW_RANGE, 30.0).add(Attributes.MOVEMENT_SPEED, (double)0.28f).add(Attributes.ATTACK_DAMAGE, 14.0).add(Attributes.MAX_HEALTH, 160.0).add(Attributes.ARMOR, 10.0).add(Attributes.STEP_HEIGHT, 1.5).add(Attributes.KNOCKBACK_RESISTANCE, 0.95);
     }
 
-    public boolean hurt(DamageSource source, float damage) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         double distSqr;
         if (source.is(CMDamageTypes.EMP) && this.getAttackState() != 1) {
             this.setAttackState(1);
@@ -181,7 +184,7 @@ extends Internal_Animation_Monster {
                 return false;
             }
         }
-        return super.hurt(source, damage);
+        return super.hurtOrSimulate(source, damage);
     }
 
     protected int decreaseAirSupply(int air) {
@@ -193,11 +196,11 @@ extends Internal_Animation_Monster {
         super.defineSynchedData(p_326229_);
     }
 
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
     }
 
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
     }
 
@@ -403,7 +406,7 @@ extends Internal_Animation_Monster {
                 float entityRelativeAngle = entityHitAngle - entityAttackingAngle;
                 float entityHitDistance = (float)Math.sqrt((entityHit.getZ() - this.getZ()) * (entityHit.getZ() - this.getZ()) + (entityHit.getX() - this.getX()) * (entityHit.getX() - this.getX()));
                 if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || this.isAlliedTo((Entity)entityHit) || entityHit instanceof The_Prowler_Entity || entityHit == this) continue;
-                entityHit.hurt(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
+                entityHit.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
             }
         }
     }
@@ -429,14 +432,14 @@ extends Internal_Animation_Monster {
         this.level().addFreshEntity((Entity)laserBeam);
     }
 
-    public boolean isAlliedTo(Entity entityIn) {
+    public boolean considersEntityAsAlly(Entity entityIn) {
         if (entityIn == this) {
             return true;
         }
-        if (super.isAlliedTo(entityIn)) {
+        if (super.considersEntityAsAlly(entityIn)) {
             return true;
         }
-        if (entityIn.getType().is(ModTag.TEAM_THE_HARBINGER)) {
+        if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_THE_HARBINGER)) {
             return this.getTeam() == null && entityIn.getTeam() == null;
         }
         return false;

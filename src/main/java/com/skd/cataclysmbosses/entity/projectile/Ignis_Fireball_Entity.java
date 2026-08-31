@@ -70,6 +70,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Ignis_Fireball_Entity
 extends CMAbstractHurtingProjectile {
@@ -154,7 +156,7 @@ extends CMAbstractHurtingProjectile {
                     LivingEntity owner = (LivingEntity)shooter;
                     DamageSource damagesource = this.damageSources().mobProjectile((Entity)this, owner);
                     float damage = this.isSoul() ? 8.0f : 6.0f;
-                    flag = entity instanceof LivingEntity ? entity.hurt(this.damageSources().mobProjectile((Entity)this, owner), damage + ((LivingEntity)entity).getMaxHealth() * 0.07f) : entity.hurt(this.damageSources().mobProjectile((Entity)this, owner), damage);
+                    flag = entity instanceof LivingEntity ? entity.hurtOrSimulate(this.damageSources().mobProjectile((Entity)this, owner), damage + ((LivingEntity)entity).getMaxHealth() * 0.07f) : entity.hurtOrSimulate(this.damageSources().mobProjectile((Entity)this, owner), damage);
                     if (flag) {
                         if (entity.isAlive()) {
                             EnchantmentHelper.doPostAttackEffects((ServerLevel)serverlevel, (Entity)entity, (DamageSource)damagesource);
@@ -166,7 +168,7 @@ extends CMAbstractHurtingProjectile {
                         }
                     }
                 } else {
-                    flag = entity.hurt(this.damageSources().magic(), 5.0f);
+                    flag = entity.hurtOrSimulate(this.damageSources().magic(), 5.0f);
                 }
                 IgnisExplosion explosion = new IgnisExplosion(this.level(), (Entity)this, null, null, this.getX(), this.getY(), this.getZ(), 1.0f, true, Explosion.BlockInteraction.KEEP);
                 explosion.explode();
@@ -204,9 +206,9 @@ extends CMAbstractHurtingProjectile {
         if (hitresult$type == HitResult.Type.ENTITY) {
             EntityHitResult entityhitresult = (EntityHitResult)result;
             Entity entity = entityhitresult.getEntity();
-            if (entity.getType().is(EntityTypeTags.REDIRECTABLE_PROJECTILE) && entity instanceof Projectile) {
+            if (entity.getType().builtInRegistryHolder().is(EntityTypeTags.REDIRECTABLE_PROJECTILE) && entity instanceof Projectile) {
                 Projectile projectile = (Projectile)entity;
-                projectile.deflect(ProjectileDeflection.AIM_DEFLECT, this.getOwner(), this.getOwner(), true);
+                projectile.deflect(ProjectileDeflection.AIM_DEFLECT, this.getOwner(), null, true);
             }
             this.onHitEntity(entityhitresult);
             this.level().gameEvent((Holder)GameEvent.PROJECTILE_LAND, result.getLocation(), GameEvent.Context.of((Entity)this, (BlockState)null));
@@ -223,6 +225,9 @@ extends CMAbstractHurtingProjectile {
     }
 
     @Override
+    protected float getInertia() {
+        return 0.95f;
+    }
 
     public Vec3 getTrailPosition(int pointer, float partialTick) {
         if (this.isRemoved()) {
@@ -241,12 +246,12 @@ extends CMAbstractHurtingProjectile {
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(SOUL, (Object)false);
-        p_326229_.define(FIRED, (Object)false);
+        p_326229_.define(SOUL, false);
+        p_326229_.define(FIRED, false);
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         compound.putBoolean("is_soul", this.isSoul());
         compound.putInt("timer", this.timer);
@@ -254,11 +259,11 @@ extends CMAbstractHurtingProjectile {
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        this.setSoul(compound.getBoolean("is_soul"));
-        this.timer = compound.getInt("timer");
-        this.setFired(compound.getBoolean("fired"));
+        this.setSoul(compound.getBooleanOr("is_soul", false));
+        this.timer = compound.getIntOr("timer", 0);
+        this.setFired(compound.getBooleanOr("fired", false));
     }
 
     public boolean isSoul() {
@@ -266,11 +271,11 @@ extends CMAbstractHurtingProjectile {
     }
 
     public void setSoul(boolean IsSoul) {
-        this.entityData.set(SOUL, (Object)IsSoul);
+        this.entityData.set(SOUL, IsSoul);
     }
 
     public void setFired(boolean fired) {
-        this.entityData.set(FIRED, (Object)fired);
+        this.entityData.set(FIRED, fired);
     }
 
     public boolean getFired() {

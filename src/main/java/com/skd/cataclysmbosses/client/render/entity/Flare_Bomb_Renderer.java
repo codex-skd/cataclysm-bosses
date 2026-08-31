@@ -26,21 +26,25 @@ import com.skd.cataclysmbosses.client.render.CMRenderTypes;
 import com.skd.cataclysmbosses.entity.projectile.Flare_Bomb_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderState;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Quaternionf;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 public class Flare_Bomb_Renderer
-extends EntityRenderer<Flare_Bomb_Entity> {
+extends CmEntityRenderer<Flare_Bomb_Entity> {
     private static final Identifier OUTER_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/monstrosity/flare_bomb_outer.png");
     private static final Identifier INNER_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/monstrosity/flare_bomb_inner.png");
     private static final Identifier TRAIL_TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/particle/amogus.png");
@@ -52,14 +56,18 @@ extends EntityRenderer<Flare_Bomb_Entity> {
         this.model = new Flare_Bomb_Model(renderManagerIn.bakeLayer(CMModelLayers.FLARE_BOMB_MODEL));
     }
 
-    public void render(Flare_Bomb_Entity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
+    protected void render(Flare_Bomb_Entity entityIn, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
         matrixStackIn.pushPose();
+        float entityYaw = Mth.rotLerp(partialTicks, entityIn.yRotO, entityIn.getYRot());
         matrixStackIn.mulPose(new Quaternionf().setAngleAxis(entityYaw * ((float)Math.PI / 180), 0.0f, -1.0f, 0.0f));
         VertexConsumer VertexConsumer2 = bufferIn.getBuffer(CMRenderTypes.CMEyes(this.getTextureLocation(entityIn)));
-        this.model.setupAnim(entityIn, 0.0f, 0.0f, (float)entityIn.tickCount + partialTicks, 0.0f, 0.0f);
-        this.model.renderToBuffer(matrixStackIn, VertexConsumer2, packedLightIn, OverlayTexture.NO_OVERLAY);
+        CmEntityRenderState state = new CmEntityRenderState();
+        state.entity = entityIn;
+        state.partialTick = partialTicks;
+        this.model.setupAnim(state);
+        this.model.renderToBuffer(matrixStackIn, VertexConsumer2, packedLightIn, OverlayTexture.NO_OVERLAY, -1);
         VertexConsumer VertexConsumer22 = bufferIn.getBuffer(CMRenderTypes.CMEyes(OUTER_TEXTURES));
-        int i = FastColor.ARGB32.color((int)102, (int)255, (int)255, (int)255);
+        int i = ARGB.color((int)102, (int)255, (int)255, (int)255);
         this.model.renderToBuffer(matrixStackIn, VertexConsumer22, packedLightIn, OverlayTexture.NO_OVERLAY, i);
         matrixStackIn.popPose();
         if (entityIn.hasTrail()) {
@@ -81,7 +89,7 @@ extends EntityRenderer<Flare_Bomb_Entity> {
         return 15;
     }
 
-    private void renderTrail(Flare_Bomb_Entity entityIn, float partialTicks, PoseStack poseStack, MultiBufferSource bufferIn, float trailR, float trailG, float trailB, float trailA, int packedLightIn) {
+    private void renderTrail(Flare_Bomb_Entity entityIn, float partialTicks, PoseStack poseStack, CmMultiBufferSource bufferIn, float trailR, float trailG, float trailB, float trailA, int packedLightIn) {
         int sampleSize = 10;
         float trailHeight = 0.5f;
         float trailZRot = 0.0f;

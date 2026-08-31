@@ -16,6 +16,9 @@
  *  net.neoforged.api.distmarker.OnlyIn
  */
 package com.skd.cataclysmbosses.client.render.entity;
+import com.skd.cataclysmbosses.client.render.compat.CmMobRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderState;
 
 import com.skd.cataclysmbosses.client.model.CMModelLayers;
 import com.skd.cataclysmbosses.client.model.entity.The_Prowler_Model;
@@ -28,7 +31,6 @@ import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.WalkAnimationState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
@@ -36,17 +38,22 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(value=Dist.CLIENT)
 public class The_Prowler_Renderer
-extends MobRenderer<The_Prowler_Entity, The_Prowler_Model> {
+extends CmMobRenderer<The_Prowler_Entity> {
     private final RandomSource rnd = RandomSource.create();
     private static final Identifier PROWLER_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/factory/the_prowler.png");
     private static final Identifier[] TEXTURE_PROGRESS = new Identifier[4];
 
     public The_Prowler_Renderer(EntityRendererProvider.Context renderManagerIn) {
-        super(renderManagerIn, (EntityModel)new The_Prowler_Model(renderManagerIn.bakeLayer(CMModelLayers.PROWLER_MODEL)), 0.7f);
+        super(renderManagerIn, new The_Prowler_Model(renderManagerIn.bakeLayer(CMModelLayers.PROWLER_MODEL)), 0.7f);
         this.addLayer(new The_Prowler_Layer(this));
         for (int i = 0; i < 4; ++i) {
             The_Prowler_Renderer.TEXTURE_PROGRESS[i] = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)("textures/entity/factory/the_prowler_" + i + ".png"));
         }
+    }
+
+    @Override
+    protected void render(The_Prowler_Entity entity, float partialTicks, PoseStack poseStack, com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource buffer, int packedLight) {
+        // TODO: port render body to 26.2 (old MobRenderer APIs removed)
     }
 
     protected float getFlipDegrees(The_Prowler_Entity entity) {
@@ -63,12 +70,13 @@ extends MobRenderer<The_Prowler_Entity, The_Prowler_Model> {
         return TEXTURE_PROGRESS[Mth.clamp((int)age, (int)0, (int)4)];
     }
 
-    public Vec3 getRenderOffset(The_Prowler_Entity entityIn, float partialTicks) {
+    public Vec3 getRenderOffset(CmEntityRenderState state) {
+        The_Prowler_Entity entityIn = (The_Prowler_Entity) state.entity;
         if (entityIn.getAttackState() == 1) {
             double d0 = 0.05;
             return new Vec3(this.rnd.nextGaussian() * d0, 0.0, this.rnd.nextGaussian() * d0);
         }
-        return super.getRenderOffset((Entity)entityIn, partialTicks);
+        return super.getRenderOffset(state);
     }
 
     protected void scale(The_Prowler_Entity entitylivingbaseIn, PoseStack matrixStackIn, float partialTickTime) {

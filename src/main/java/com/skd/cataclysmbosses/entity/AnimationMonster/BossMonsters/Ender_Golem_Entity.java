@@ -51,6 +51,7 @@
  *  net.neoforged.neoforge.event.EventHooks
  */
 package com.skd.cataclysmbosses.entity.AnimationMonster.BossMonsters;
+import net.minecraft.server.level.ServerLevel;
 
 import com.skd.cataclysmbosses.config.CMCommonConfig;
 import com.skd.cataclysmbosses.entity.AI.CmAttackGoal;
@@ -94,8 +95,8 @@ import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
-import net.minecraft.world.entity.animal.AbstractGolem;
-import net.minecraft.world.entity.animal.IronGolem;
+import net.minecraft.world.entity.animal.golem.AbstractGolem;
+import net.minecraft.world.entity.animal.golem.IronGolem;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -105,6 +106,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.event.EventHooks;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Ender_Golem_Entity
 extends LLibrary_Boss_Monster {
@@ -166,7 +169,7 @@ extends LLibrary_Boss_Monster {
     }
 
     @Override
-    public boolean hurt(DamageSource source, float damage) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         if (!(this.getAnimation() != VOID_RUNE_ATTACK && this.getIsAwaken() || !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY) && source.is(DamageTypes.MAGIC))) {
             damage = (float)((double)damage * 0.5);
         }
@@ -175,29 +178,29 @@ extends LLibrary_Boss_Monster {
         if (entity instanceof AbstractGolem) {
             damage = (float)((double)damage * 0.5);
         }
-        return super.hurt(source, damage);
+        return super.hurtOrSimulate(source, damage);
     }
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(IS_AWAKEN, (Object)false);
+        p_326229_.define(IS_AWAKEN, false);
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         compound.putBoolean("is_Awaken", this.getIsAwaken());
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        this.setIsAwaken(compound.getBoolean("is_Awaken"));
+        this.setIsAwaken(compound.getBooleanOr("is_Awaken", false));
     }
 
     public void setIsAwaken(boolean isAwaken) {
-        this.entityData.set(IS_AWAKEN, (Object)isAwaken);
+        this.entityData.set(IS_AWAKEN, isAwaken);
     }
 
     public boolean getIsAwaken() {
@@ -235,7 +238,7 @@ extends LLibrary_Boss_Monster {
                 if (!this.level().isClientSide()) {
                     if (CMCommonConfig.EnderGolem.ignoreMobGriefing) {
                         this.BlockBreaking(4, 4, 4);
-                    } else if (EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+                    } else if (this.level() instanceof net.minecraft.server.level.ServerLevel && EventHooks.canEntityGrief((net.minecraft.server.level.ServerLevel)this.level(), (Entity)this)) {
                         this.BlockBreaking(4, 4, 4);
                     }
                 }
@@ -243,8 +246,8 @@ extends LLibrary_Boss_Monster {
             if ((this.getAnimation() == ANIMATION_ATTACK1 || this.getAnimation() == ANIMATION_ATTACK2) && this.getAnimationTick() == 13) {
                 this.playSound((SoundEvent)ModSounds.GOLEMATTACK.get(), 1.0f, 1.0f);
                 if (target != null && target.isAlive() && this.distanceTo((Entity)target) < 4.75f) {
-                    target.hurt(this.damageSources().mobAttack((LivingEntity)this), (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) + (float)this.random.nextInt(4));
-                    target.knockback(1.25, this.getX() - target.getX(), this.getZ() - target.getZ());
+                    target.hurtOrSimulate(this.damageSources().mobAttack((LivingEntity)this), (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) + (float)this.random.nextInt(4));
+                    target.knockback(1.25, this.getX() - target.getX(), this.getZ() - target.getZ(), this.damageSources().mobAttack((LivingEntity)this), 0.5f);
                 }
             }
             if (this.getAnimation() == VOID_RUNE_ATTACK) {
@@ -254,7 +257,7 @@ extends LLibrary_Boss_Monster {
                     if (!this.level().isClientSide()) {
                         if (CMCommonConfig.EnderGolem.ignoreMobGriefing) {
                             this.BlockBreaking(4, 4, 4);
-                        } else if (EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+                        } else if (this.level() instanceof net.minecraft.server.level.ServerLevel && EventHooks.canEntityGrief((net.minecraft.server.level.ServerLevel)this.level(), (Entity)this)) {
                             this.BlockBreaking(4, 4, 4);
                         }
                     }
@@ -325,7 +328,7 @@ extends LLibrary_Boss_Monster {
             DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
             for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate((double)grow))) {
                 if (this.isAlliedTo((Entity)entity) || entity instanceof Ender_Golem_Entity || entity == this) continue;
-                entity.hurt(damagesource, (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) + (float)this.random.nextInt(damage));
+                entity.hurtOrSimulate(damagesource, (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) + (float)this.random.nextInt(damage));
                 this.launch(entity, true);
             }
         }
@@ -385,14 +388,14 @@ extends LLibrary_Boss_Monster {
         e.push(d0 / d2 * (double)f, huge ? 0.5 : (double)0.2f, d1 / d2 * (double)f);
     }
 
-    public boolean isAlliedTo(Entity entityIn) {
+    public boolean considersEntityAsAlly(Entity entityIn) {
         if (entityIn == this) {
             return true;
         }
-        if (super.isAlliedTo(entityIn)) {
+        if (super.considersEntityAsAlly(entityIn)) {
             return true;
         }
-        if (entityIn.getType().is(ModTag.TEAM_ENDER_GUARDIAN)) {
+        if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_ENDER_GUARDIAN)) {
             return this.getTeam() == null && entityIn.getTeam() == null;
         }
         return false;

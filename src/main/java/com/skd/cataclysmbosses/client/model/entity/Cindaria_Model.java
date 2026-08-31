@@ -20,8 +20,9 @@ import com.skd.cataclysmbosses.entity.InternalAnimationMonster.AcropolisMonsters
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.Map;
 import java.util.Optional;
-import net.minecraft.client.model.HierarchicalModel;
+import com.skd.cataclysmbosses.client.model.compat.CmHierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
@@ -31,7 +32,7 @@ import net.minecraft.client.model.geom.builders.PartDefinition;
 import org.jetbrains.annotations.NotNull;
 
 public class Cindaria_Model
-extends HierarchicalModel<Cindaria_Entity> {
+extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRenderState> {
     private final ModelPart root;
     private final ModelPart everything;
     private final ModelPart lowerBody;
@@ -56,12 +57,12 @@ extends HierarchicalModel<Cindaria_Entity> {
     private final ModelPart rightLeg2;
     private final ModelPart leftLeg;
     private final ModelPart leftLeg2;
-    private final Map<String, ModelPart> partCache = new Object2ObjectOpenHashMap();
-    private final Map<String, Optional<ModelPart>> optionalPartCache = new Object2ObjectOpenHashMap();
+    private final java.util.function.Function<String, ModelPart> partLookup;
 
     public Cindaria_Model(ModelPart root) {
+        super(root);
         this.root = root;
-        this.buildPartCache(root);
+        this.partLookup = root.createPartLookup();
         this.everything = this.root.getChild("everything");
         this.lowerBody = this.everything.getChild("lowerBody");
         this.upperBody = this.lowerBody.getChild("upperBody");
@@ -122,42 +123,16 @@ extends HierarchicalModel<Cindaria_Entity> {
         return LayerDefinition.create((MeshDefinition)meshdefinition, (int)256, (int)256);
     }
 
-    private void buildPartCache(ModelPart part) {
-        for (Map.Entry entry : part.children.entrySet()) {
-            String partName = (String)entry.getKey();
-            ModelPart childPart = (ModelPart)entry.getValue();
-            this.partCache.putIfAbsent(partName, childPart);
-            this.optionalPartCache.putIfAbsent(partName, Optional.of(childPart));
-            if (childPart.children.isEmpty()) continue;
-            this.buildPartCache(childPart);
-        }
-    }
-
     @NotNull
     public Optional<ModelPart> getAnyDescendantWithName(String name) {
         if ("root".equals(name)) {
             return Optional.of(this.root);
         }
-        return this.optionalPartCache.getOrDefault(name, Optional.empty());
+        return Optional.ofNullable(this.partLookup.apply(name));
     }
 
-    public void setupAnim(Cindaria_Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        this.root().getAllParts().forEach(ModelPart::resetPose);
-        this.animateHeadLookTarget(netHeadYaw, headPitch);
-        this.animateWalk(Cindaria_Animation.WALK, limbSwing, limbSwingAmount, 1.0f, 1.5f);
-        this.animate(entity.getAnimationState("idle"), Cindaria_Animation.IDLE, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("magic1"), Cindaria_Animation.MAGIC, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("melee"), Cindaria_Animation.MELEE, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("death"), Cindaria_Animation.DEATH, ageInTicks, 1.0f);
-    }
-
-    private void animateHeadLookTarget(float yRot, float xRot) {
-        this.head.xRot = xRot * ((float)Math.PI / 180);
-        this.head.yRot = yRot * ((float)Math.PI / 180);
-    }
-
-    public ModelPart root() {
-        return this.root;
+        @Override
+    public void setupAnim(EntityRenderState state) {
+        super.setupAnim(state);
     }
 }
-

@@ -37,7 +37,7 @@
  *  net.minecraft.world.entity.EntityType
  *  net.minecraft.world.entity.LivingEntity
  *  net.minecraft.world.entity.Mob
- *  net.minecraft.world.entity.MobSpawnType
+ *  net.minecraft.world.entity.EntitySpawnReason
  *  net.minecraft.world.entity.PathfinderMob
  *  net.minecraft.world.entity.SpawnGroupData
  *  net.minecraft.world.entity.ai.attributes.AttributeSupplier$Builder
@@ -143,7 +143,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -156,11 +156,11 @@ import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.RandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
-import net.minecraft.world.entity.animal.AbstractGolem;
-import net.minecraft.world.entity.animal.IronGolem;
+import net.minecraft.world.entity.animal.golem.AbstractGolem;
+import net.minecraft.world.entity.animal.golem.IronGolem;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.npc.AbstractVillager;
+import net.minecraft.world.entity.npc.villager.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -181,6 +181,8 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.entity.PartEntity;
 import net.neoforged.neoforge.event.EventHooks;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Netherite_Monstrosity_Entity
 extends IABoss_monster {
@@ -225,7 +227,7 @@ extends IABoss_monster {
         this.setPathfindingMalus(PathType.UNPASSABLE_RAIL, 0.0f);
         this.setPathfindingMalus(PathType.LAVA, 0.0f);
         this.setPathfindingMalus(PathType.WATER, -1.0f);
-        this.setPathfindingMalus(PathType.DANGER_FIRE, 0.0f);
+        this.setPathfindingMalus(PathType.FIRE, 0.0f);
         this.setConfigattribute((LivingEntity)this, CMCommonConfig.NetheriteMonstrosity.healthMultiplier, CMCommonConfig.NetheriteMonstrosity.attackMultiplier);
     }
 
@@ -237,7 +239,7 @@ extends IABoss_monster {
         this.targetSelector.addGoal(2, (Goal)new NearestAttackableTargetGoal((Mob)this, Player.class, true));
         this.targetSelector.addGoal(3, (Goal)new NearestAttackableTargetGoal((Mob)this, IronGolem.class, true));
         this.targetSelector.addGoal(3, (Goal)new NearestAttackableTargetGoal((Mob)this, AbstractVillager.class, true));
-        this.goalSelector.addGoal(5, (Goal)new InternalMoveGoal(this, this, false, 1.0){
+        this.goalSelector.addGoal(5, (Goal)new InternalMoveGoal(this, false, 1.0){
 
             @Override
             public boolean canUse() {
@@ -298,11 +300,11 @@ extends IABoss_monster {
     }
 
     public boolean attackEntityFromPart(Netherite_Monstrosity_Part netherite_monstrosity_part, DamageSource source, float amount) {
-        return this.hurt(source, amount);
+        return this.hurtOrSimulate(source, amount);
     }
 
     @Override
-    public boolean hurt(DamageSource source, float damage) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         boolean attack;
         if (this.getAttackState() == 4 && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
             return false;
@@ -311,7 +313,7 @@ extends IABoss_monster {
         if (entity instanceof AbstractGolem) {
             damage *= 0.5f;
         }
-        if ((attack = super.hurt(source, damage)) && !this.getIsAwaken() && this.isAlive()) {
+        if ((attack = super.hurtOrSimulate(source, damage)) && !this.getIsAwaken() && this.isAlive()) {
             this.setIsAwaken(true);
         }
         return attack;
@@ -321,7 +323,7 @@ extends IABoss_monster {
         if (part == this.headPart) {
             damage = Math.min(Float.MAX_VALUE, damage * 1.5f);
         }
-        boolean attack = super.hurt(source, damage);
+        boolean attack = super.hurtOrSimulate(source, damage);
         return attack;
     }
 
@@ -397,9 +399,9 @@ extends IABoss_monster {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(IS_BERSERK, (Object)false);
-        p_326229_.define(IS_AWAKEN, (Object)false);
-        p_326229_.define(MAGAZINE, (Object)0);
+        p_326229_.define(IS_BERSERK, false);
+        p_326229_.define(IS_AWAKEN, false);
+        p_326229_.define(MAGAZINE, 0);
     }
 
     public boolean isSleep() {
@@ -411,7 +413,7 @@ extends IABoss_monster {
     }
 
     public void setIsBerserk(boolean isBerserk) {
-        this.entityData.set(IS_BERSERK, (Object)isBerserk);
+        this.entityData.set(IS_BERSERK, isBerserk);
     }
 
     public boolean getIsBerserk() {
@@ -427,7 +429,7 @@ extends IABoss_monster {
     }
 
     public void setIsAwaken(boolean isAwaken) {
-        this.entityData.set(IS_AWAKEN, (Object)isAwaken);
+        this.entityData.set(IS_AWAKEN, isAwaken);
         this.bossInfo.setVisible(isAwaken);
         if (isAwaken) {
             this.PlayerCounter(this.level());
@@ -439,7 +441,7 @@ extends IABoss_monster {
     }
 
     public void setMagazine(int isAwaken) {
-        this.entityData.set(MAGAZINE, (Object)isAwaken);
+        this.entityData.set(MAGAZINE, isAwaken);
     }
 
     public int getMagazine() {
@@ -549,14 +551,14 @@ extends IABoss_monster {
             BlockEntity blockEntity = targetLevel.getBlockEntity(targetPos);
             if (blockEntity instanceof Boss_Respawn_Spawner_Block_Entity) {
                 Boss_Respawn_Spawner_Block_Entity spawnerBlockEntity = (Boss_Respawn_Spawner_Block_Entity)blockEntity;
-                spawnerBlockEntity.setEntityId((EntityType)ModEntities.NETHERITE_MONSTROSITY.get());
-                spawnerBlockEntity.setTheItem(((Item)ModItems.MONSTROUS_EYE.get()).getDefaultInstance());
+                spawnerBlockEntity.spawnType = (EntityType)ModEntities.NETHERITE_MONSTROSITY.get();
+                spawnerBlockEntity.item = ((Item)ModItems.MONSTROUS_EYE.get()).getDefaultInstance();
             }
         }
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         compound.putBoolean("is_Berserk", this.getIsBerserk());
         compound.putBoolean("is_Awaken", this.getIsAwaken());
@@ -564,11 +566,11 @@ extends IABoss_monster {
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        this.setIsBerserk(compound.getBoolean("is_Berserk"));
-        this.setIsAwaken(compound.getBoolean("is_Awaken"));
-        this.setMagazine(compound.getInt("Magazine"));
+        this.setIsBerserk(compound.getBooleanOr("is_Berserk", false));
+        this.setIsAwaken(compound.getBooleanOr("is_Awaken", false));
+        this.setMagazine(compound.getIntOr("Magazine", 0));
         if (this.hasCustomName()) {
             this.bossInfo.setName(this.getDisplayName());
         }
@@ -576,19 +578,19 @@ extends IABoss_monster {
 
     private void floatStrider() {
         CollisionContext lvt_1_1_;
-        if (this.isInLava() && (lvt_1_1_ = CollisionContext.of((Entity)this)).isAbove(LiquidBlock.STABLE_SHAPE, this.blockPosition().below(), true) && !this.level().getFluidState(this.blockPosition().above()).is(FluidTags.LAVA)) {
+        if (this.isInLava() && (lvt_1_1_ = CollisionContext.of((Entity)this)).isAbove(this.getLiquidCollisionShape(), this.blockPosition().below(), true) && !this.level().getFluidState(this.blockPosition().above()).is(FluidTags.LAVA)) {
             this.setOnGround(true);
         }
     }
 
-    public boolean isAlliedTo(Entity entityIn) {
+    public boolean considersEntityAsAlly(Entity entityIn) {
         if (entityIn == this) {
             return true;
         }
-        if (super.isAlliedTo(entityIn)) {
+        if (super.considersEntityAsAlly(entityIn)) {
             return true;
         }
-        if (entityIn.getType().is(ModTag.TEAM_MONSTROSITY)) {
+        if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_MONSTROSITY)) {
             return this.getTeam() == null && entityIn.getTeam() == null;
         }
         return false;
@@ -678,8 +680,8 @@ extends IABoss_monster {
     }
 
     @Override
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_29678_, DifficultyInstance p_29679_, MobSpawnType spawnType, @Nullable SpawnGroupData p_29681_) {
-        if (spawnType == MobSpawnType.COMMAND || spawnType == MobSpawnType.SPAWN_EGG || MobSpawnType.isSpawner((MobSpawnType)spawnType) || spawnType == MobSpawnType.DISPENSER) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_29678_, DifficultyInstance p_29679_, EntitySpawnReason spawnType, @Nullable SpawnGroupData p_29681_) {
+        if (spawnType == EntitySpawnReason.COMMAND || spawnType == EntitySpawnReason.SPAWN_ITEM_USE || EntitySpawnReason.isSpawner((EntitySpawnReason)spawnType) || spawnType == EntitySpawnReason.DISPENSER) {
             this.setIsAwaken(true);
         }
         return super.finalizeSpawn(p_29678_, p_29679_, spawnType, p_29681_);
@@ -749,7 +751,7 @@ extends IABoss_monster {
             if (this.attackTicks > 19 && this.attackTicks < 49 && !this.level().isClientSide()) {
                 if (CMCommonConfig.NetheriteMonstrosity.ignoreMobGriefing) {
                     this.ChargeBlockBreaking();
-                } else if (EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+                } else if (this.level() instanceof net.minecraft.server.level.ServerLevel sl && EventHooks.canEntityGrief(sl, (Entity)this)) {
                     this.ChargeBlockBreaking();
                 }
                 double yaw = Math.toRadians(this.getYRot() + 90.0f);
@@ -759,7 +761,7 @@ extends IABoss_monster {
                 DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
                 for (LivingEntity Lentity : this.level().getEntitiesOfClass(LivingEntity.class, attackRange)) {
                     boolean flag;
-                    if (this.isAlliedTo((Entity)Lentity) || Lentity instanceof Netherite_Monstrosity_Entity || Lentity == this || !(flag = Lentity.hurt(damagesource, (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) * 0.4f))) continue;
+                    if (this.isAlliedTo((Entity)Lentity) || Lentity instanceof Netherite_Monstrosity_Entity || Lentity == this || !(flag = Lentity.hurtOrSimulate(damagesource, (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) * 0.4f))) continue;
                     double theta = (double)this.yBodyRot * (Math.PI / 180);
                     double vec = -2.5;
                     double vecX = Math.cos(theta += 1.5707963267948966);
@@ -946,12 +948,12 @@ extends IABoss_monster {
         fallingBlockEntity.push(0.0, 0.2 + this.getRandom().nextGaussian() * 0.04, 0.0);
         this.level().addFreshEntity((Entity)fallingBlockEntity);
         AABB selection = new AABB(px - 0.5, (double)blockpos.getY() + d0 - 1.0, pz - 0.5, px + 0.5, (double)blockpos.getY() + d0 + (double)mxy, pz + 0.5);
-        List hit = this.level().getEntitiesOfClass(LivingEntity.class, selection);
+        List<LivingEntity> hit = this.level().getEntitiesOfClass(LivingEntity.class, selection);
         if (!hit.isEmpty()) {
             for (LivingEntity entity : hit) {
                 if (this.isAlliedTo((Entity)entity) || entity instanceof Kobolediator_Entity || entity == this) continue;
-                boolean flag = entity.hurt(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
-                if (entity.isDamageSourceBlocked(damagesource) && entity instanceof Player) {
+                boolean flag = entity.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
+                if (entity.isBlocking() && entity instanceof Player) {
                     Player player = (Player)entity;
                     if (shieldbreakticks > 0) {
                         EntityUtil.disableShield(player, shieldbreakticks);
@@ -1000,8 +1002,8 @@ extends IABoss_monster {
             DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
             for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(area))) {
                 if (this.isAlliedTo((Entity)entity) || entity instanceof Netherite_Monstrosity_Entity || entity == this) continue;
-                boolean flag = entity.hurt(damagesource, (float)((double)((float)this.getAttributeValue(Attributes.ATTACK_DAMAGE)) + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE), (double)(entity.getMaxHealth() * (float)CMCommonConfig.NetheriteMonstrosity.SmashHpdamage))));
-                if (entity.isDamageSourceBlocked(damagesource) && entity instanceof Player) {
+                boolean flag = entity.hurtOrSimulate(damagesource, (float)((double)((float)this.getAttributeValue(Attributes.ATTACK_DAMAGE)) + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE), (double)(entity.getMaxHealth() * (float)CMCommonConfig.NetheriteMonstrosity.SmashHpdamage))));
+                if (entity.isBlocking() && entity instanceof Player) {
                     Player player = (Player)entity;
                     EntityUtil.disableShield(player, 120);
                 }
@@ -1092,7 +1094,7 @@ extends IABoss_monster {
         int MthX = Mth.floor((double)this.getX());
         int MthY = Mth.floor((double)this.getY());
         int MthZ = Mth.floor((double)this.getZ());
-        if (!this.level().isClientSide() && EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+        if (this.level() instanceof net.minecraft.server.level.ServerLevel sl && EventHooks.canEntityGrief(sl, (Entity)this)) {
             for (int k2 = -x; k2 <= x; ++k2) {
                 for (int l2 = -z; l2 <= z; ++l2) {
                     for (int j = 0; j <= y; ++j) {
@@ -1119,7 +1121,7 @@ extends IABoss_monster {
     }
 
     private void BlockBreaking() {
-        if (!this.isNoAi() && !this.level().isClientSide() && this.blockBreakCounter == 0 && EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+        if (!this.isNoAi() && this.level() instanceof net.minecraft.server.level.ServerLevel sl && this.blockBreakCounter == 0 && EventHooks.canEntityGrief(sl, (Entity)this)) {
             AABB box = this.getBoundingBox();
             BlockPos min = new BlockPos(Mth.floor((double)box.minX), Mth.floor((double)box.minY), Mth.floor((double)box.minZ));
             BlockPos max = new BlockPos(Mth.floor((double)box.maxX), Mth.floor((double)box.maxY), Mth.floor((double)box.maxZ));
@@ -1148,7 +1150,7 @@ extends IABoss_monster {
         return this.getHealth() <= this.getMaxHealth() * 0.4f;
     }
 
-    protected boolean isAffectedByFluids() {
+    public boolean isAffectedByFluids() {
         return false;
     }
 
@@ -1157,7 +1159,7 @@ extends IABoss_monster {
     }
 
     public ItemEntity spawnAtLocation(ItemStack stack) {
-        ItemEntity itementity = this.spawnAtLocation(stack, 0.0f);
+        ItemEntity itementity = this.spawnAtLocation((ServerLevel)this.level(), stack, 0.0f);
         if (itementity != null) {
             itementity.setDeltaMovement(itementity.getDeltaMovement().multiply(0.0, 3.5, 0.0));
             itementity.setGlowingTag(true);

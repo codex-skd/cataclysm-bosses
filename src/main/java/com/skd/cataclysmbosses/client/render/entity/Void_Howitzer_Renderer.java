@@ -24,8 +24,10 @@ import com.skd.cataclysmbosses.entity.projectile.Void_Howitzer_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -35,10 +37,11 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Void_Howitzer_Renderer
-extends EntityRenderer<Void_Howitzer_Entity> {
+extends CmEntityRenderer<Void_Howitzer_Entity> {
     private static final Identifier VOID_HOWITZER_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/void_howitzer.png");
     private final Void_Howitzer_Model model = new Void_Howitzer_Model();
 
@@ -46,16 +49,15 @@ extends EntityRenderer<Void_Howitzer_Entity> {
         super(renderManagerIn);
     }
 
-    public void render(Void_Howitzer_Entity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
+    protected void render(Void_Howitzer_Entity entityIn, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
         matrixStackIn.pushPose();
         matrixStackIn.scale(1.5f, 1.5f, 1.5f);
         matrixStackIn.translate(0.0, 0.25, 0.0);
         matrixStackIn.mulPose(Axis.YP.rotationDegrees(Mth.lerp((float)partialTicks, (float)entityIn.yRotO, (float)entityIn.getYRot()) - 180.0f));
         matrixStackIn.mulPose(Axis.XP.rotationDegrees(Mth.lerp((float)partialTicks, (float)entityIn.xRotO, (float)entityIn.getXRot())));
-        VertexConsumer VertexConsumer2 = bufferIn.getBuffer(RenderType.entityTranslucent((Identifier)this.getTextureLocation(entityIn)));
-        this.model.renderToBuffer(matrixStackIn, VertexConsumer2, packedLightIn, OverlayTexture.NO_OVERLAY);
+        VertexConsumer VertexConsumer2 = bufferIn.getBuffer(RenderTypes.entityTranslucent((Identifier)this.getTextureLocation(entityIn)));
+        this.model.renderToBuffer(matrixStackIn, VertexConsumer2, packedLightIn, OverlayTexture.NO_OVERLAY, -1);
         matrixStackIn.popPose();
-        super.render((Entity)entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
     }
 
     protected int getBlockLightLevel(Void_Howitzer_Entity entityIn, BlockPos pos) {

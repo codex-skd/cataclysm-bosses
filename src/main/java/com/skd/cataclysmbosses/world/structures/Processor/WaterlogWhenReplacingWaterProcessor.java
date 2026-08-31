@@ -36,26 +36,35 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructurePlac
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessor;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureProcessorType;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import org.jspecify.annotations.Nullable;
 
 public class WaterlogWhenReplacingWaterProcessor
-extends StructureProcessor {
+implements StructureProcessor {
     public static final MapCodec<WaterlogWhenReplacingWaterProcessor> CODEC = MapCodec.unit(WaterlogWhenReplacingWaterProcessor::new);
 
     private WaterlogWhenReplacingWaterProcessor() {
     }
 
-    public StructureTemplate.StructureBlockInfo processBlock(LevelReader levelReader, BlockPos pos, BlockPos pos2, BlockPos pos3, StructureTemplate.StructureBlockInfo infoIn, StructurePlaceSettings settings) {
+    @Override
+    public StructureTemplate.@Nullable StructureBlockInfo processBlock(
+        LevelReader levelReader,
+        BlockPos targetPosition,
+        BlockPos referencePos,
+        BlockPos templateRelativePos,
+        StructureTemplate.StructureBlockInfo infoIn,
+        StructurePlaceSettings settings
+    ) {
         if (infoIn.state().hasProperty((Property)BlockStateProperties.WATERLOGGED)) {
             WorldGenRegion worldGenRegion;
-            if (levelReader instanceof WorldGenRegion && !(worldGenRegion = (WorldGenRegion)levelReader).getCenter().equals((Object)new ChunkPos(infoIn.pos()))) {
+            if (levelReader instanceof WorldGenRegion && !(worldGenRegion = (WorldGenRegion)levelReader).getCenter().equals(ChunkPos.containing(infoIn.pos()))) {
                 return infoIn;
             }
             BlockState blockState = levelReader.getChunk(infoIn.pos()).getBlockState(infoIn.pos());
             boolean isWater = blockState.getFluidState().is(FluidTags.WATER);
             if (isWater) {
                 ChunkAccess chunk = levelReader.getChunk(infoIn.pos());
-                int minY = chunk.getMinBuildHeight();
-                int maxY = chunk.getMaxBuildHeight();
+                int minY = chunk.getMinY();
+                int maxY = chunk.getMaxY() + 1;
                 int currentY = infoIn.pos().getY();
                 if (currentY >= minY && currentY <= maxY) {
                     ((LevelAccessor)levelReader).scheduleTick(infoIn.pos(), infoIn.state().getBlock(), 0);
@@ -66,8 +75,9 @@ extends StructureProcessor {
         return infoIn;
     }
 
-    protected StructureProcessorType getType() {
-        return ModStructureProcessor.WATERLOGGING_WHEN_REPLACING_WATER_PROCESSOR.get();
+    @Override
+    public MapCodec<? extends StructureProcessor> codec() {
+        return CODEC;
     }
-}
 
+}

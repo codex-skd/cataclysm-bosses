@@ -42,6 +42,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -67,6 +68,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Axe_Blade_Entity
 extends Entity {
@@ -105,7 +108,9 @@ extends Entity {
 
     public Axe_Blade_Entity(EntityType<? extends Axe_Blade_Entity> type, LivingEntity p_36827_, double getX, double gety, double getz, double p_36821_, double p_36822_, double p_36823_, float damage, Level level) {
         this(type, level);
-        this.moveTo(getX, gety, getz, this.getYRot(), this.getXRot());
+        this.setPos(getX, gety, getz);
+        this.setYRot((float)this.getYRot());
+        this.setXRot((float)this.getXRot());
         this.setOwner(p_36827_);
         this.setDamage(damage);
         this.reapplyPosition();
@@ -118,8 +123,8 @@ extends Entity {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(DAMAGE, (Object)Float.valueOf(0.0f));
-        p_326229_.define(TRANSPARENCY, (Object)0);
+        p_326229_.define(DAMAGE, Float.valueOf(0.0f));
+        p_326229_.define(TRANSPARENCY, 0);
     }
 
     public void setOwner(@Nullable LivingEntity p_190549_1_) {
@@ -148,7 +153,7 @@ extends Entity {
     }
 
     public void setDamage(float damage) {
-        this.entityData.set(DAMAGE, (Object)Float.valueOf(damage));
+        this.entityData.set(DAMAGE, Float.valueOf(damage));
     }
 
     public int getTransparency() {
@@ -156,7 +161,7 @@ extends Entity {
     }
 
     public void setTransparency(int trans) {
-        this.entityData.set(TRANSPARENCY, (Object)trans);
+        this.entityData.set(TRANSPARENCY, trans);
     }
 
     public boolean shouldRenderAtSqrDistance(double p_36837_) {
@@ -185,7 +190,7 @@ extends Entity {
         if ((raytraceresult = ProjectileUtil.getHitResultOnMoveVector((Entity)this, this::canHitEntity)).getType() != HitResult.Type.MISS) {
             this.onHit(raytraceresult);
         }
-        this.checkInsideBlocks();
+        this.applyEffectsFromBlocks();
         Vec3 vec3 = this.getDeltaMovement();
         double d0 = this.getX() + vec3.x;
         double d1 = this.getY() + vec3.y;
@@ -202,7 +207,7 @@ extends Entity {
             LivingEntity entity1 = this.getOwner();
             if (entity1 instanceof LivingEntity) {
                 LivingEntity livingentity = entity1;
-                entity.hurt(this.damageSources().mobProjectile((Entity)this, livingentity), this.getDamage());
+                entity.hurtOrSimulate(this.damageSources().mobProjectile((Entity)this, livingentity), this.getDamage());
                 if (entity1 instanceof LivingEntity) {
                     // empty if block
                 }
@@ -242,27 +247,32 @@ extends Entity {
         return 0.85f;
     }
 
-    protected void readAdditionalSaveData(CompoundTag compound) {
-        ListTag listtag;
-        if (compound.hasUUID("Owner")) {
-            this.casterUuid = compound.getUUID("Owner");
-        }
-        if (compound.contains("power", 9) && (listtag = compound.getList("power", 6)).size() == 3) {
-            this.xPower = listtag.getDouble(0);
-            this.yPower = listtag.getDouble(1);
-            this.zPower = listtag.getDouble(2);
-        }
-        this.leftOwner = compound.getBoolean("LeftOwner");
+    @Override
+    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
+        return false;
     }
 
-    protected void addAdditionalSaveData(CompoundTag compound) {
+    protected void readAdditionalSaveData(ValueInput compound) {
+        ListTag listtag;
+        if (compound.read("Owner", UUIDUtil.CODEC).isPresent()) {
+            this.casterUuid = compound.read("Owner", UUIDUtil.CODEC).orElse(null);
+        }
+        this.xPower = compound.getDoubleOr("power_x", 0.0);
+        this.yPower = compound.getDoubleOr("power_y", 0.0);
+        this.zPower = compound.getDoubleOr("power_z", 0.0);
+        this.leftOwner = compound.getBooleanOr("LeftOwner", false);
+    }
+
+    protected void addAdditionalSaveData(ValueOutput compound) {
         if (this.casterUuid != null) {
-            compound.putUUID("Owner", this.casterUuid);
+            compound.store("Owner", UUIDUtil.CODEC, this.casterUuid);
         }
         if (this.leftOwner) {
             compound.putBoolean("LeftOwner", true);
         }
-        compound.put("power", (Tag)this.newDoubleList(new double[]{this.xPower, this.yPower, this.zPower}));
+        compound.putDouble("power_x", this.xPower);
+        compound.putDouble("power_y", this.yPower);
+        compound.putDouble("power_z", this.zPower);
     }
 
     private boolean checkLeftOwner() {

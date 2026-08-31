@@ -40,6 +40,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -61,6 +62,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
 import net.minecraft.world.scores.PlayerTeam;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Abstract_Summoned_Entity
 extends PathfinderMob
@@ -69,7 +72,7 @@ IFollower {
     private boolean hasLimitedLife;
     private int limitedLifeTicks;
     protected static final EntityDataAccessor<Byte> DATA_FLAGS_ID = SynchedEntityData.defineId(Abstract_Summoned_Entity.class, (EntityDataSerializer)EntityDataSerializers.BYTE);
-    protected static final EntityDataAccessor<Optional<UUID>> DATA_OWNERUUID_ID = SynchedEntityData.defineId(Abstract_Summoned_Entity.class, (EntityDataSerializer)EntityDataSerializers.OPTIONAL_UUID);
+    protected static final EntityDataAccessor<String> DATA_OWNERUUID_ID = SynchedEntityData.defineId(Abstract_Summoned_Entity.class, (EntityDataSerializer)EntityDataSerializers.STRING);
 
     public Abstract_Summoned_Entity(EntityType entity, Level world) {
         super(entity, world);
@@ -77,28 +80,28 @@ IFollower {
 
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
-        builder.define(DATA_FLAGS_ID, (Object)0);
-        builder.define(DATA_OWNERUUID_ID, Optional.empty());
+        builder.define(DATA_FLAGS_ID, (byte)0);
+        builder.define(DATA_OWNERUUID_ID, "");
     }
 
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         if (this.getOwnerUUID() != null) {
-            compound.putUUID("Owner", this.getOwnerUUID());
+            compound.store("Owner", UUIDUtil.CODEC, this.getOwnerUUID());
         }
         if (this.hasLimitedLife) {
             compound.putInt("LifeTicks", this.limitedLifeTicks);
         }
     }
 
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         UUID uuid;
         super.readAdditionalSaveData(compound);
-        if (compound.hasUUID("Owner")) {
-            uuid = compound.getUUID("Owner");
+        if (compound.read("Owner", UUIDUtil.CODEC).isPresent()) {
+            uuid = compound.read("Owner", UUIDUtil.CODEC).orElse(null);
         } else {
-            String s = compound.getString("Owner");
-            uuid = OldUsersConverter.convertMobOwnerIfNecessary((MinecraftServer)this.getServer(), (String)s);
+            String s = compound.getStringOr("Owner", "");
+            uuid = OldUsersConverter.convertMobOwnerIfNecessary((MinecraftServer)this.level().getServer(), (String)s);
         }
         if (uuid != null) {
             try {
@@ -109,8 +112,8 @@ IFollower {
                 this.setTame(false, true);
             }
         }
-        if (compound.contains("LifeTicks")) {
-            this.setLimitedLife(compound.getInt("LifeTicks"));
+        if (compound.getInt("LifeTicks").isPresent()) {
+            this.setLimitedLife(compound.getIntOr("LifeTicks", 0));
         }
     }
 
@@ -153,9 +156,9 @@ IFollower {
     public void setTame(boolean tame, boolean applyTamingSideEffects) {
         byte b0 = (Byte)this.entityData.get(DATA_FLAGS_ID);
         if (tame) {
-            this.entityData.set(DATA_FLAGS_ID, (Object)((byte)(b0 | 4)));
+            this.entityData.set(DATA_FLAGS_ID, ((byte)(b0 | 4)));
         } else {
-            this.entityData.set(DATA_FLAGS_ID, (Object)((byte)(b0 & 0xFFFFFFFB)));
+            this.entityData.set(DATA_FLAGS_ID, ((byte)(b0 & 0xFFFFFFFB)));
         }
         if (applyTamingSideEffects) {
             this.applyTamingSideEffects();
@@ -174,11 +177,17 @@ IFollower {
 
     @Nullable
     public UUID getOwnerUUID() {
-        return ((Optional)this.entityData.get(DATA_OWNERUUID_ID)).orElse(null);
+        String s = this.entityData.get(DATA_OWNERUUID_ID);
+        return s.isEmpty() ? null : java.util.UUID.fromString(s);
     }
 
     public void setOwnerUUID(@Nullable UUID uuid) {
-        this.entityData.set(DATA_OWNERUUID_ID, Optional.ofNullable(uuid));
+        this.entityData.set(DATA_OWNERUUID_ID, uuid == null ? "" : uuid.toString());
+    }
+
+    @Override
+    public net.minecraft.world.entity.EntityReference<LivingEntity> getOwnerReference() {
+        return net.minecraft.world.entity.EntityReference.of(this.getOwnerUUID());
     }
 
     public void tame(Player player) {
@@ -206,7 +215,7 @@ IFollower {
         return super.getTeam();
     }
 
-    public boolean isAlliedTo(Entity entity) {
+    public boolean considersEntityAsAlly(Entity entity) {
         if (this.isTame()) {
             LivingEntity livingentity = this.getOwner();
             if (entity == livingentity) {
@@ -216,7 +225,7 @@ IFollower {
                 return livingentity.isAlliedTo(entity);
             }
         }
-        return super.isAlliedTo(entity);
+        return super.considersEntityAsAlly(entity);
     }
 
     public void tryToTeleportToOwner() {
@@ -246,7 +255,8 @@ IFollower {
         if (!this.canTeleportTo(new BlockPos(x, y, z))) {
             return false;
         }
-        this.moveTo((double)x + 0.5, y, (double)z + 0.5, this.getYRot(), this.getXRot());
+        this.setPos((double)x + 0.5, (double)y, (double)z + 0.5);
+        this.setRot(this.getYRot(), this.getXRot());
         this.navigation.stop();
         return true;
     }

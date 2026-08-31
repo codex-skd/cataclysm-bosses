@@ -60,6 +60,7 @@
  *  net.neoforged.neoforge.network.PacketDistributor
  */
 package com.skd.cataclysmbosses.entity.InternalAnimationMonster.AcropolisMonsters;
+import net.minecraft.server.level.ServerLevel;
 
 import com.skd.cataclysmbosses.client.particle.Options.NotSpinTrailParticleOptions;
 import com.skd.cataclysmbosses.client.particle.Options.RingParticleOptions;
@@ -140,6 +141,8 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Clawdian_Entity
 extends Internal_Animation_Monster
@@ -209,7 +212,7 @@ implements IHoldEntity {
                 return super.canUse() && !Clawdian_Entity.this.isDangerousFallZone((PathfinderMob)this.entity, targetPos) && Clawdian_Entity.this.getRandom().nextFloat() * 100.0f < 17.0f && Clawdian_Entity.this.charge_cooldown <= 0 && this.entity.onGround() && !this.entity.isSwimming();
             }
         });
-        this.goalSelector.addGoal(2, (Goal)new InternalStateGoal(this, this, 5, 5, 6, 45, 45){
+        this.goalSelector.addGoal(2, (Goal)new InternalStateGoal(this, 5, 5, 6, 45, 45){
 
             @Override
             public void tick() {
@@ -348,7 +351,7 @@ implements IHoldEntity {
     }
 
     public void travel(Vec3 travelVector) {
-        if (this.isControlledByLocalInstance() && this.isInWater() && this.wantsToSwim()) {
+        if (this.isLocalInstanceAuthoritative() && this.isInWater() && this.wantsToSwim()) {
             this.moveRelative(0.01f, travelVector);
             this.move(MoverType.SELF, this.getDeltaMovement());
             this.setDeltaMovement(this.getDeltaMovement().scale(0.9));
@@ -364,7 +367,7 @@ implements IHoldEntity {
             return false;
         }
         PathType pathTypeAtTarget = evaluator.getPathType((Mob)mob, (BlockPos)pos.mutable());
-        if (pathTypeAtTarget == PathType.DAMAGE_CAUTIOUS || pathTypeAtTarget == PathType.DAMAGE_FIRE || pathTypeAtTarget == PathType.DAMAGE_OTHER || pathTypeAtTarget == PathType.DANGER_FIRE || pathTypeAtTarget == PathType.DANGER_OTHER) {
+        if (pathTypeAtTarget == PathType.DAMAGE_CAUTIOUS || pathTypeAtTarget == PathType.DAMAGING || pathTypeAtTarget == PathType.DAMAGING || pathTypeAtTarget == PathType.FIRE || pathTypeAtTarget == PathType.BLOCKED) {
             return true;
         }
         BlockPos.MutableBlockPos checkPos = pos.mutable().move(Direction.DOWN);
@@ -399,7 +402,7 @@ implements IHoldEntity {
         }
     }
 
-    public boolean hurt(DamageSource source, float damage) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         boolean flag;
         Entity rider;
         Entity entity = source.getDirectEntity();
@@ -413,7 +416,7 @@ implements IHoldEntity {
         if (source.is(ModTag.BLOCK_SELF_REGEN)) {
             this.self_regen = 80;
         }
-        if ((flag = super.hurt(source, damage)) && this.getBackstep() < 10) {
+        if ((flag = super.hurtOrSimulate(source, damage)) && this.getBackstep() < 10) {
             this.setBackstep(this.getBackstep() + 1);
         }
         return flag;
@@ -488,7 +491,7 @@ implements IHoldEntity {
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
         p_326229_.define(HOLD_STATE, Optional.empty());
-        p_326229_.define(BACKSTEP_METER, (Object)0);
+        p_326229_.define(BACKSTEP_METER, 0);
     }
 
     public void setHoldBlock(@Nullable BlockState state) {
@@ -497,7 +500,7 @@ implements IHoldEntity {
 
     @Nullable
     public BlockState getHoldBlock() {
-        return ((Optional)this.entityData.get(HOLD_STATE)).orElse(null);
+        return (BlockState)((Optional<?>)this.entityData.get(HOLD_STATE)).orElse(null);
     }
 
     public int getBackstep() {
@@ -505,7 +508,7 @@ implements IHoldEntity {
     }
 
     public void setBackstep(int hurt) {
-        this.entityData.set(BACKSTEP_METER, (Object)hurt);
+        this.entityData.set(BACKSTEP_METER, hurt);
     }
 
     public void onSyncedDataUpdated(EntityDataAccessor<?> p_21104_) {
@@ -593,23 +596,23 @@ implements IHoldEntity {
         return 45;
     }
 
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         BlockState blockstate = this.getHoldBlock();
         if (blockstate != null) {
-            compound.put("holdBlockState", (Tag)NbtUtils.writeBlockState((BlockState)blockstate));
+            compound.store("holdBlockState", net.minecraft.world.level.block.state.BlockState.CODEC, blockstate);
         }
         compound.putInt("backstep", this.getBackstep());
     }
 
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        BlockState blockstate = null;
-        if (compound.contains("holdBlockState", 10) && (blockstate = NbtUtils.readBlockState((HolderGetter)this.level().holderLookup(Registries.BLOCK), (CompoundTag)compound.getCompound("holdBlockState"))).isAir()) {
+        BlockState blockstate = compound.read("holdBlockState", net.minecraft.world.level.block.state.BlockState.CODEC).orElse(null);
+        if (blockstate != null && blockstate.isAir()) {
             blockstate = null;
         }
         this.setHoldBlock(blockstate);
-        this.setBackstep(compound.getInt("backstep"));
+        this.setBackstep(compound.getIntOr("backstep", 0));
     }
 
     public float NatureRegen() {
@@ -688,14 +691,14 @@ implements IHoldEntity {
         if (this.getAttackState() == 5 && !this.level().isClientSide()) {
             if (CMCommonConfig.Clawdian.ignoreMobGriefing) {
                 this.ChargeBlockBreaking();
-            } else if (EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+            } else if (this.level() instanceof net.minecraft.server.level.ServerLevel sl && EventHooks.canEntityGrief(sl, (Entity)this)) {
                 this.ChargeBlockBreaking();
             }
             DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
             if (this.tickCount % 2 == 0) {
                 for (LivingEntity Lentity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(0.2))) {
                     boolean flag;
-                    if (this.isAlliedTo((Entity)Lentity) || Lentity instanceof Clawdian_Entity || Lentity == this || !(flag = Lentity.hurt(damagesource, (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) * 0.6f)) || !Lentity.onGround()) continue;
+                    if (this.isAlliedTo((Entity)Lentity) || Lentity instanceof Clawdian_Entity || Lentity == this || !(flag = Lentity.hurtOrSimulate(damagesource, (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) * 0.6f)) || !Lentity.onGround()) continue;
                     double d0 = Lentity.getX() - this.getX();
                     double d1 = Lentity.getZ() - this.getZ();
                     double d2 = Math.max(d0 * d0 + d1 * d1, 0.001);
@@ -717,16 +720,16 @@ implements IHoldEntity {
                 double vec = 2.0;
                 if (!this.level().isClientSide()) {
                     int numberOfWaves = 6;
-                    angleStep = 35.0f;
+                    float angleStep = 35.0f;
                     double firstAngleOffset = (double)(numberOfWaves - 1) / 2.0 * (double)angleStep;
-                    for (i = 0; i < numberOfWaves; ++i) {
-                        angle = (double)this.yBodyRot - firstAngleOffset + (double)((float)i * angleStep);
-                        rad = Math.toRadians(angle);
-                        dx = -Math.sin(rad);
-                        dz = Math.cos(rad);
-                        spawnX = this.getX() + vecX * vec;
-                        spawnY = this.getY();
-                        spawnZ = this.getZ() + vecZ * vec;
+                    for (int i = 0; i < numberOfWaves; ++i) {
+                        double angle = (double)this.yBodyRot - firstAngleOffset + (double)((float)i * angleStep);
+                        double rad = Math.toRadians(angle);
+                        double dx = -Math.sin(rad);
+                        double dz = Math.cos(rad);
+                        double spawnX = this.getX() + vecX * vec;
+                        double spawnY = this.getY();
+                        double spawnZ = this.getZ() + vecZ * vec;
                         Wave_Entity WaveEntity = new Wave_Entity(this.level(), (LivingEntity)this, 80, 9.0f);
                         WaveEntity.setPos(spawnX, spawnY, spawnZ);
                         WaveEntity.setState(1);
@@ -735,16 +738,16 @@ implements IHoldEntity {
                     }
                 } else {
                     int numberOfWaves = 14;
-                    angleStep = 15.0f;
+                    float angleStep = 15.0f;
                     double firstAngleOffset = (double)(numberOfWaves - 1) / 2.0 * (double)angleStep;
-                    for (i = 0; i < numberOfWaves; ++i) {
-                        angle = (double)this.yBodyRot - firstAngleOffset + (double)((float)i * angleStep);
-                        rad = Math.toRadians(angle);
-                        dx = -Math.sin(rad);
-                        dz = Math.cos(rad);
-                        spawnX = this.getX() + vecX * vec;
-                        spawnY = this.getY();
-                        spawnZ = this.getZ() + vecZ * vec;
+                    for (int i = 0; i < numberOfWaves; ++i) {
+                        double angle = (double)this.yBodyRot - firstAngleOffset + (double)((float)i * angleStep);
+                        double rad = Math.toRadians(angle);
+                        double dx = -Math.sin(rad);
+                        double dz = Math.cos(rad);
+                        double spawnX = this.getX() + vecX * vec;
+                        double spawnY = this.getY();
+                        double spawnZ = this.getZ() + vecZ * vec;
                         double extraX = spawnX + dx * (1.0 + this.random.nextDouble() / 2.0);
                         double extraY = spawnY + 0.9 + this.random.nextDouble() * 0.5;
                         double extraZ = spawnZ + dz * (1.0 + this.random.nextDouble() / 2.0);
@@ -870,18 +873,18 @@ implements IHoldEntity {
                 fallingBlockEntity.push(0.0, 0.2 + this.getRandom().nextGaussian() * 0.15, 0.0);
                 this.level().addFreshEntity((Entity)fallingBlockEntity);
                 AABB selection = new AABB(px - 0.5, minY, pz - 0.5, px + 0.5, maxY, pz + 0.5);
-                List hit = this.level().getEntitiesOfClass(LivingEntity.class, selection);
+                List<LivingEntity> hit = this.level().getEntitiesOfClass(LivingEntity.class, selection);
                 for (LivingEntity entity : hit) {
                     if (this.isAlliedTo((Entity)entity) || entity instanceof Clawdian_Entity || entity == this) continue;
-                    boolean flag = entity.hurt(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
-                    if (entity.isDamageSourceBlocked(damagesource) && entity instanceof Player) {
+                    boolean flag = entity.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
+                    if (entity.isBlocking() && entity instanceof Player) {
                         Player player = (Player)entity;
                         if (shieldbreakticks > 0) {
                             EntityUtil.disableShield(player, shieldbreakticks);
                         }
                     }
                     if (!flag) continue;
-                    entity.setDeltaMovement(entity.getDeltaMovement().add(0.0, (double)airborne + this.level().random.nextDouble() * 0.15, 0.0));
+                    entity.setDeltaMovement(entity.getDeltaMovement().add(0.0, (double)airborne + this.level().getRandom().nextDouble() * 0.15, 0.0));
                 }
             }
         }
@@ -903,8 +906,8 @@ implements IHoldEntity {
                 float entityRelativeAngle = entityHitAngle - entityAttackingAngle;
                 float entityHitDistance = (float)Math.sqrt((entityHit.getZ() - this.getZ()) * (entityHit.getZ() - this.getZ()) + (entityHit.getX() - this.getX()) * (entityHit.getX() - this.getX()));
                 if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || this.isAlliedTo((Entity)entityHit) || entityHit instanceof Clawdian_Entity || entityHit == this) continue;
-                boolean hurt = entityHit.hurt(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
-                if (entityHit.isDamageSourceBlocked(damagesource) && entityHit instanceof Player) {
+                boolean hurt = entityHit.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
+                if (entityHit.isBlocking() && entityHit instanceof Player) {
                     Player player = (Player)entityHit;
                     if (shieldbreakticks > 0) {
                         EntityUtil.disableShield(player, shieldbreakticks);
@@ -935,17 +938,17 @@ implements IHoldEntity {
                 float entityRelativeAngle = entityHitAngle - entityAttackingAngle;
                 float entityHitDistance = (float)Math.sqrt((entityHit.getZ() - this.getZ()) * (entityHit.getZ() - this.getZ()) + (entityHit.getX() - this.getX()) * (entityHit.getX() - this.getX()));
                 if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || entityHit instanceof Clawdian_Entity || entityHit == this) continue;
-                if (!entityHit.getType().is(ModTag.IGNIS_CANT_POKE) && entityHit.isAlive() && this.getPassengers().isEmpty()) {
+                if (!entityHit.getType().builtInRegistryHolder().is(ModTag.IGNIS_CANT_POKE) && entityHit.isAlive() && this.getPassengers().isEmpty()) {
                     if (entityHit.isShiftKeyDown()) {
                         entityHit.setShiftKeyDown(false);
                     }
-                    if (!entityHit.hurt(damagesource, 1.0f)) continue;
-                    entityHit.startRiding((Entity)this, true);
+                    if (!entityHit.hurtOrSimulate(damagesource, 1.0f)) continue;
+                    entityHit.startRiding((Entity)this, true, true);
                     PacketDistributor.sendToPlayersTrackingEntityAndSelf((Entity)entityHit, (CustomPacketPayload)new MessageEntityCameraSwitch.ThridPerson(entityHit.getId()), (CustomPacketPayload[])new CustomPacketPayload[0]);
                     continue;
                 }
                 if (this.isAlliedTo((Entity)entityHit)) continue;
-                entityHit.hurt(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
+                entityHit.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
             }
         }
     }
@@ -967,14 +970,14 @@ implements IHoldEntity {
         }
     }
 
-    public boolean isAlliedTo(Entity entityIn) {
+    public boolean considersEntityAsAlly(Entity entityIn) {
         if (entityIn == this) {
             return true;
         }
-        if (super.isAlliedTo(entityIn)) {
+        if (super.considersEntityAsAlly(entityIn)) {
             return true;
         }
-        if (entityIn.getType().is(ModTag.TEAM_SCYLLA)) {
+        if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_SCYLLA)) {
             return this.getTeam() == null && entityIn.getTeam() == null;
         }
         return false;
@@ -1023,7 +1026,7 @@ implements IHoldEntity {
         return false;
     }
 
-    protected boolean isAffectedByFluids() {
+    public boolean isAffectedByFluids() {
         return true;
     }
 
@@ -1107,7 +1110,7 @@ implements IHoldEntity {
                 int count = 4;
                 if (target != null) {
                     double vec = 2.5;
-                    double offsetangle = Math.toRadians(4 + this.entity.random.nextInt(5));
+                    double offsetangle = Math.toRadians(4 + this.entity.getRandom().nextInt(5));
                     for (int i = 0; i <= count - 1; ++i) {
                         Accretion_Entity acc = new Accretion_Entity((EntityType<Accretion_Entity>)((EntityType)ModEntities.ACCRETION.get()), this.entity.level(), (LivingEntity)this.entity);
                         double angle = ((double)i - (double)(count - 1) / 2.0) * offsetangle;
@@ -1116,7 +1119,7 @@ implements IHoldEntity {
                         double x = d1 * Math.cos(angle) + d3 * Math.sin(angle);
                         double z = -d1 * Math.sin(angle) + d3 * Math.cos(angle);
                         double distance = Math.sqrt(x * x + z * z);
-                        double d2 = target.getY(0.2) - acc.getY() + ((double)this.entity.random.nextFloat() - 0.5) * (double)i;
+                        double d2 = target.getY(0.2) - acc.getY() + ((double)this.entity.getRandom().nextFloat() - 0.5) * (double)i;
                         double PosX = this.entity.getX() + vecX * vec;
                         double PosY = this.entity.getY() + (double)this.entity.getBbHeight() * 0.8;
                         double PosZ = this.entity.getZ() + vecZ * vec;
@@ -1131,14 +1134,14 @@ implements IHoldEntity {
                     double vec = 2.5;
                     double d1 = this.entity.getX() + vecX * tempvec - this.entity.getX();
                     double d3 = this.entity.getZ() + vecZ * tempvec - this.entity.getZ();
-                    double offsetangle = Math.toRadians(4 + this.entity.random.nextInt(5));
+                    double offsetangle = Math.toRadians(4 + this.entity.getRandom().nextInt(5));
                     for (int i = 0; i <= count - 1; ++i) {
                         Accretion_Entity acc = new Accretion_Entity((EntityType<Accretion_Entity>)((EntityType)ModEntities.ACCRETION.get()), this.entity.level(), (LivingEntity)this.entity);
                         double angle = ((double)i - (double)(count - 1) / 2.0) * offsetangle;
                         double x = d1 * Math.cos(angle) + d3 * Math.sin(angle);
                         double z = -d1 * Math.sin(angle) + d3 * Math.cos(angle);
                         double distance = Math.sqrt(x * x + z * z);
-                        double d2 = this.entity.getY(0.2) - acc.getY() + ((double)this.entity.random.nextFloat() - 0.5) * (double)i;
+                        double d2 = this.entity.getY(0.2) - acc.getY() + ((double)this.entity.getRandom().nextFloat() - 0.5) * (double)i;
                         double PosX = this.entity.getX() + vecX * vec;
                         double PosY = this.entity.getY() + (double)this.entity.getBbHeight() * 0.8;
                         double PosZ = this.entity.getZ() + vecZ * vec;
@@ -1166,7 +1169,7 @@ implements IHoldEntity {
                         acc.shoot(d1, d2 + distance * (double)0.2f, d3, 1.4f, 4.0f);
                         acc.setDamage(15.0f);
                         acc.setBlockState(this.entity.getHoldBlock());
-                        rider.startRiding((Entity)acc, true);
+                        rider.startRiding((Entity)acc, true, true);
                         acc.level().addFreshEntity((Entity)acc);
                     } else {
                         double d1 = target.getX() - this.entity.getX();
@@ -1181,7 +1184,7 @@ implements IHoldEntity {
                         acc.shoot(d1, d2 + distance * (double)0.2f, d3, 1.4f, 4.0f);
                         acc.setDamage(15.0f);
                         acc.setBlockState(this.entity.getHoldBlock());
-                        rider.startRiding((Entity)acc, true);
+                        rider.startRiding((Entity)acc, true, true);
                         acc.level().addFreshEntity((Entity)acc);
                     }
                 }

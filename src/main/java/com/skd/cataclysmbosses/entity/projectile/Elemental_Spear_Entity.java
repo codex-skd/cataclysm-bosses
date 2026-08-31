@@ -64,6 +64,8 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Elemental_Spear_Entity
 extends Projectile {
@@ -79,8 +81,8 @@ extends Projectile {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(DAMAGE, (Object)Float.valueOf(0.0f));
-        p_326229_.define(STATE, (Object)0);
+        p_326229_.define(DAMAGE, Float.valueOf(0.0f));
+        p_326229_.define(STATE, 0);
     }
 
     public AnimationState getAnimationState(String input) {
@@ -124,7 +126,7 @@ extends Projectile {
     }
 
     public void setState(int state) {
-        this.entityData.set(STATE, (Object)state);
+        this.entityData.set(STATE, state);
     }
 
     public float getDamage() {
@@ -132,7 +134,7 @@ extends Projectile {
     }
 
     public void setDamage(float damage) {
-        this.entityData.set(DAMAGE, (Object)Float.valueOf(damage));
+        this.entityData.set(DAMAGE, Float.valueOf(damage));
     }
 
     protected ClipContext.Block getClipType() {
@@ -154,7 +156,7 @@ extends Projectile {
             if (this.lifetick > 600) {
                 this.discard();
             }
-            this.checkInsideBlocks();
+            this.applyEffectsFromBlocks();
             Vec3 vec3 = this.getDeltaMovement();
             double d0 = this.getX() + vec3.x;
             double d1 = this.getY() + vec3.y;
@@ -181,9 +183,9 @@ extends Projectile {
         if (hitresult$type == HitResult.Type.ENTITY) {
             EntityHitResult entityhitresult = (EntityHitResult)result;
             Entity entity = entityhitresult.getEntity();
-            if (entity.getType().is(EntityTypeTags.REDIRECTABLE_PROJECTILE) && entity instanceof Projectile) {
+            if (entity.getType().builtInRegistryHolder().is(EntityTypeTags.REDIRECTABLE_PROJECTILE) && entity instanceof Projectile) {
                 Projectile projectile = (Projectile)entity;
-                projectile.deflect(ProjectileDeflection.AIM_DEFLECT, this.getOwner(), this.getOwner(), true);
+                projectile.deflect(ProjectileDeflection.AIM_DEFLECT, this.getOwner(), null, true);
             }
             this.onHitEntity(entityhitresult);
             this.level().gameEvent((Holder)GameEvent.PROJECTILE_LAND, result.getLocation(), GameEvent.Context.of((Entity)this, (BlockState)null));
@@ -203,20 +205,18 @@ extends Projectile {
         return 0.95f;
     }
 
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         compound.putDouble("acceleration_power", this.accelerationPower);
         compound.putFloat("Damage", this.getDamage());
         compound.putInt("State", this.getState());
     }
 
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        if (compound.contains("acceleration_power", 6)) {
-            this.accelerationPower = compound.getDouble("acceleration_power");
-        }
-        this.setDamage(compound.getFloat("Damage"));
-        this.setState(compound.getInt("State"));
+        this.accelerationPower = compound.getDoubleOr("acceleration_power", 0.0);
+        this.setDamage(compound.getFloatOr("Damage", 0.0f));
+        this.setState(compound.getIntOr("State", 0));
     }
 
     public boolean isPickable() {

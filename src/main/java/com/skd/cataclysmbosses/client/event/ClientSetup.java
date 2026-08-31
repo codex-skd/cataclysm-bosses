@@ -196,11 +196,10 @@ import com.skd.cataclysmbosses.init.ModKeybind;
 import com.skd.cataclysmbosses.init.ModMenu;
 import com.skd.cataclysmbosses.init.ModParticle;
 import com.skd.cataclysmbosses.init.ModTileentites;
-import net.minecraft.client.model.SkullModelBase;
+import net.minecraft.client.model.object.skull.SkullModelBase;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.renderer.blockentity.SkullBlockRenderer;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
-import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
@@ -212,12 +211,13 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
+import net.neoforged.neoforge.client.event.RegisterSpecialModelRendererEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
-import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
+// import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 
 public class ClientSetup {
     public static void ClientSetupevent(IEventBus bus) {
@@ -229,6 +229,11 @@ public class ClientSetup {
         bus.addListener(ClientSetup::createSkullModels);
         bus.addListener(ClientSetup::registerKeybinds);
         bus.addListener(ClientSetup::registerGuiLayers);
+        bus.addListener(ClientSetup::registerItemModels);
+    }
+
+    private static void registerItemModels(RegisterSpecialModelRendererEvent event) {
+        event.register(Identifier.fromNamespaceAndPath("cataclysm", "cm_item"), CMItemstackRenderer.Unbaked.MAP_CODEC);
     }
 
     private static void registerScreens(RegisterMenuScreensEvent event) {
@@ -364,9 +369,9 @@ public class ClientSetup {
     }
 
     public static void createSkullModels(EntityRenderersEvent.CreateSkullModels event) {
-        event.registerSkullModel((SkullBlock.Type)Cataclysm_Skull_Block.Types.KOBOLEDIATOR, (SkullModelBase)new KobolediatorHeadModel(event.getEntityModelSet().bakeLayer(CMModelLayers.KOBOLEDIATOR_HEAD_MODEL)));
-        event.registerSkullModel((SkullBlock.Type)Cataclysm_Skull_Block.Types.APTRGANGR, (SkullModelBase)new AptrgangrHeadModel(event.getEntityModelSet().bakeLayer(CMModelLayers.APTRGANGR_HEAD_MODEL)));
-        event.registerSkullModel((SkullBlock.Type)Cataclysm_Skull_Block.Types.DRAUGR, (SkullModelBase)new DraugrHeadModel(event.getEntityModelSet().bakeLayer(CMModelLayers.DRAUGR_HEAD_MODEL)));
+        event.registerSkullModel(Cataclysm_Skull_Block.Types.KOBOLEDIATOR, CMModelLayers.KOBOLEDIATOR_HEAD_MODEL, KobolediatorHeadModel::new, null);
+        event.registerSkullModel(Cataclysm_Skull_Block.Types.APTRGANGR, CMModelLayers.APTRGANGR_HEAD_MODEL, AptrgangrHeadModel::new, null);
+        event.registerSkullModel(Cataclysm_Skull_Block.Types.DRAUGR, CMModelLayers.DRAUGR_HEAD_MODEL, DraugrHeadModel::new, null);
     }
 
     private static void registerParticleFactories(RegisterParticleProvidersEvent registry) {
@@ -416,34 +421,22 @@ public class ClientSetup {
     }
 
     private static void doClientStuff(FMLClientSetupEvent event) {
-        try {
-            ItemProperties.register((Item)((Item)ModItems.BULWARK_OF_THE_FLAME.get()), (Identifier)Identifier.parse((String)"blocking"), (stack, p_239421_1_, p_239421_2_, j) -> p_239421_2_ != null && p_239421_2_.isUsingItem() && p_239421_2_.getUseItem() == stack ? 1.0f : 0.0f);
-            ItemProperties.register((Item)((Item)ModItems.SOUL_RENDER.get()), (Identifier)Identifier.parse((String)"blocking"), (stack, p_239421_1_, p_239421_2_, j) -> p_239421_2_ != null && p_239421_2_.isUsingItem() && p_239421_2_.getUseItem() == stack ? 1.0f : 0.0f);
-            ItemProperties.register((Item)((Item)ModItems.CORAL_SPEAR.get()), (Identifier)Identifier.parse((String)"throwing"), (stack, p_239421_1_, p_239421_2_, j) -> p_239421_2_ != null && p_239421_2_.isUsingItem() && p_239421_2_.getUseItem() == stack ? 1.0f : 0.0f);
-            ItemProperties.register((Item)((Item)ModItems.CORAL_BARDICHE.get()), (Identifier)Identifier.parse((String)"throwing"), (stack, p_239421_1_, p_239421_2_, j) -> p_239421_2_ != null && p_239421_2_.isUsingItem() && p_239421_2_.getUseItem() == stack ? 1.0f : 0.0f);
-            ItemProperties.register((Item)((Item)ModItems.MEAT_SHREDDER.get()), (Identifier)Identifier.parse((String)"using"), (stack, p_239421_1_, p_239421_2_, j) -> p_239421_2_ != null && p_239421_2_.isUsingItem() && p_239421_2_.getUseItem() == stack ? 1.0f : 0.0f);
-            ItemProperties.register((Item)((Item)ModItems.CORAL_CHUNK.get()), (Identifier)Identifier.parse((String)"chunk"), (stack, level, living, j) -> stack.getCount() % 3 == 0 ? 0.0f : (stack.getCount() % 3 == 1 ? 0.5f : 1.0f));
-            ItemProperties.register((Item)((Item)ModItems.BLACK_STEEL_TARGE.get()), (Identifier)Identifier.parse((String)"blocking"), (stack, p_239421_1_, p_239421_2_, j) -> p_239421_2_ != null && p_239421_2_.isUsingItem() && p_239421_2_.getUseItem() == stack ? 1.0f : 0.0f);
-            ItemProperties.register((Item)((Item)ModItems.AZURE_SEA_SHIELD.get()), (Identifier)Identifier.parse((String)"blocking"), (stack, p_239421_1_, p_239421_2_, j) -> p_239421_2_ != null && p_239421_2_.isUsingItem() && p_239421_2_.getUseItem() == stack ? 1.0f : 0.0f);
-            ItemProperties.register((Item)((Item)ModItems.ASTRAPE.get()), (Identifier)Identifier.parse((String)"throwing"), (stack, p_239421_1_, p_239421_2_, j) -> p_239421_2_ != null && p_239421_2_.isUsingItem() && p_239421_2_.getUseItem() == stack ? 1.0f : 0.0f);
-            ItemProperties.register((Item)((Item)ModItems.CERAUNUS.get()), (Identifier)Identifier.parse((String)"throwing"), (stack, level, entity, idk) -> stack.get(ModDataComponents.THROWN_ANCHOR) != null ? 1.0f : 0.0f);
-            ItemProperties.register((Item)((Item)ModItems.BRONTES.get()), (Identifier)Identifier.parse((String)"throwing"), (stack, level, entity, idk) -> stack.get(ModDataComponents.THROWN_HAMMER) != null ? 1.0f : 0.0f);
-        }
-        catch (Exception e) {
-            Cataclysm.LOGGER.warn("Could not load item models for weapons");
-        }
-        CuriosRendererRegistry.register((Item)((Item)ModItems.STICKY_GLOVES.get()), Sticky_Gloves_Renderer::new);
-        CuriosRendererRegistry.register((Item)((Item)ModItems.BLAZING_GRIPS.get()), Blazing_Grips_Renderer::new);
-        CuriosRendererRegistry.register((Item)((Item)ModItems.KOBOLEDIATOR_SKULL.get()), CurioHeadRenderer::new);
-        CuriosRendererRegistry.register((Item)((Item)ModItems.APTRGANGR_HEAD.get()), CurioHeadRenderer::new);
-        CuriosRendererRegistry.register((Item)((Item)ModItems.DRAUGR_HEAD.get()), CurioHeadRenderer::new);
-        CuriosRendererRegistry.register((Item)((Item)ModItems.CHITIN_CLAW.get()), Chitin_Claw_Renderer::new);
-        CuriosRendererRegistry.register((Item)((Item)ModItems.VITALITY_ANKH.get()), Vitality_Ankh_Renderer::new);
-        CuriosRendererRegistry.register((Item)((Item)ModItems.BELT_OF_BEGINNER.get()), Belt_Of_Beginner_Renderer::new);
-        CuriosRendererRegistry.register((Item)((Item)ModItems.BELT_OF_MONSTROSITY.get()), Belt_Of_Monstrosity_Renderer::new);
-        CuriosRendererRegistry.register((Item)((Item)ModItems.UNBREAKABLE_SKULL.get()), Unbreakable_Skull_Renderer::new);
-        CuriosRendererRegistry.register((Item)((Item)ModItems.BERSERKER_SOUL_AMULET.get()), Berserker_Soul_Amulet_Renderer::new);
-        CuriosRendererRegistry.register((Item)((Item)ModItems.STURDY_BOOTS.get()), Sturdy_Boots_Renderer::new);
+        // PORT TODO(26.2): CuriosRendererRegistry (the top.theillusivec4 shim) routes to a
+        // client service ICuriosClientExtensions that regalia_slots_api does not ship a binding
+        // for -> NoClassDefFoundError at FMLClientSetupEvent. Accessory-on-player rendering
+        // is disabled until wired to regalia native com.skd.regaliaslotsapi.api.client.ICurioRenderer.
+        // CuriosRendererRegistry.register((Item)((Item)ModItems.STICKY_GLOVES.get()), Sticky_Gloves_Renderer::new);
+        // CuriosRendererRegistry.register((Item)((Item)ModItems.BLAZING_GRIPS.get()), Blazing_Grips_Renderer::new);
+        // CuriosRendererRegistry.register((Item)((Item)ModItems.KOBOLEDIATOR_SKULL.get()), CurioHeadRenderer::new);
+        // CuriosRendererRegistry.register((Item)((Item)ModItems.APTRGANGR_HEAD.get()), CurioHeadRenderer::new);
+        // CuriosRendererRegistry.register((Item)((Item)ModItems.DRAUGR_HEAD.get()), CurioHeadRenderer::new);
+        // CuriosRendererRegistry.register((Item)((Item)ModItems.CHITIN_CLAW.get()), Chitin_Claw_Renderer::new);
+        // CuriosRendererRegistry.register((Item)((Item)ModItems.VITALITY_ANKH.get()), Vitality_Ankh_Renderer::new);
+        // CuriosRendererRegistry.register((Item)((Item)ModItems.BELT_OF_BEGINNER.get()), Belt_Of_Beginner_Renderer::new);
+        // CuriosRendererRegistry.register((Item)((Item)ModItems.BELT_OF_MONSTROSITY.get()), Belt_Of_Monstrosity_Renderer::new);
+        // CuriosRendererRegistry.register((Item)((Item)ModItems.UNBREAKABLE_SKULL.get()), Unbreakable_Skull_Renderer::new);
+        // CuriosRendererRegistry.register((Item)((Item)ModItems.BERSERKER_SOUL_AMULET.get()), Berserker_Soul_Amulet_Renderer::new);
+        // CuriosRendererRegistry.register((Item)((Item)ModItems.STURDY_BOOTS.get()), Sturdy_Boots_Renderer::new);
         SkullBlockRenderer.SKIN_BY_TYPE.put(Cataclysm_Skull_Block.Types.KOBOLEDIATOR, Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/koboleton/kobolediator.png"));
         SkullBlockRenderer.SKIN_BY_TYPE.put(Cataclysm_Skull_Block.Types.APTRGANGR, Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/draugar/aptrgangr.png"));
         SkullBlockRenderer.SKIN_BY_TYPE.put(Cataclysm_Skull_Block.Types.DRAUGR, Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/draugar/draugr.png"));
@@ -456,7 +449,7 @@ public class ClientSetup {
         event.registerItem((IClientItemExtensions)CustomArmorRenderProperties.INSTANCE.get(), new Item[]{(Item)ModItems.MONSTROUS_HELM.get()});
         event.registerItem((IClientItemExtensions)CustomArmorRenderProperties.INSTANCE.get(), new Item[]{(Item)ModItems.IGNITIUM_ELYTRA_CHESTPLATE.get()});
         event.registerItem((IClientItemExtensions)CustomArmorRenderProperties.INSTANCE.get(), new Item[]{(Item)ModItems.BLOOM_STONE_PAULDRONS.get()});
-        event.registerItem(CMItemstackRenderer.CLIENT_ITEM_EXTENSION, new Item[]{(Item)ModItems.BULWARK_OF_THE_FLAME.get(), (Item)ModItems.BLACK_STEEL_TARGE.get(), (Item)ModItems.GAUNTLET_OF_GUARD.get(), (Item)ModItems.GAUNTLET_OF_BULWARK.get(), (Item)ModItems.GAUNTLET_OF_MAELSTROM.get(), (Item)ModItems.THE_INCINERATOR.get(), (Item)ModItems.WITHER_ASSULT_SHOULDER_WEAPON.get(), (Item)ModItems.VOID_ASSULT_SHOULDER_WEAPON.get(), (Item)ModItems.CORAL_SPEAR.get(), (Item)ModItems.CORAL_BARDICHE.get(), (Item)ModItems.VOID_FORGE.get(), (Item)ModItems.INFERNAL_FORGE.get(), (Item)ModItems.TIDAL_CLAWS.get(), (Item)ModItems.MEAT_SHREDDER.get(), (Item)ModItems.LASER_GATLING.get(), (Item)ModItems.ANCIENT_SPEAR.get(), (Item)ModItems.CURSED_BOW.get(), (Item)ModItems.WRATH_OF_THE_DESERT.get(), (Item)ModItems.SOUL_RENDER.get(), (Item)ModItems.THE_ANNIHILATOR.get(), (Item)ModItems.THE_IMMOLATOR.get(), (Item)ModItems.ALTAR_OF_FIRE.get(), (Item)ModItems.ALTAR_OF_VOID.get(), (Item)ModItems.AZURE_SEA_SHIELD.get(), (Item)ModItems.ASTRAPE.get(), (Item)ModItems.CERAUNUS.get(), (Item)ModItems.BRONTES.get(), (Item)ModItems.ALTAR_OF_AMETHYST.get(), (Item)ModItems.ALTAR_OF_ABYSS.get(), (Item)ModItems.EMP.get(), (Item)ModItems.MECHANICAL_FUSION_ANVIL.get(), (Item)ModItems.ABYSSAL_EGG.get(), (Item)ModItems.KOBOLEDIATOR_SKULL.get(), (Item)ModItems.APTRGANGR_HEAD.get(), (Item)ModItems.DRAUGR_HEAD.get(), (Item)ModItems.GODDESS_STATUE.get(), (Item)ModItems.BOSS_RESPAWNER.get()});
+        // PORT NOTE (26.2): custom item renderers are wired via assets/cataclysm/items/*.json -> {"model":{"type":"minecraft:special","renderer":{"type":"cataclysm:cm_item"}}} (assets phase).
     }
 }
 

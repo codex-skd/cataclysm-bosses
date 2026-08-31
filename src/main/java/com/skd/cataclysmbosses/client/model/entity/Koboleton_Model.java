@@ -390,7 +390,7 @@ extends AdvancedEntityModel<Koboleton_Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.root, (Object)this.legs, (Object)this.right_leg, (Object)this.right_fore_leg, (Object)this.right_foot, (Object)this.left_leg, (Object)this.left_fore_leg, (Object)this.left_foot, (Object)this.pelvis, (Object)this.pelvis_cube, (Object)this.lower_body, (Object)this.body, (Object[])new AdvancedModelBox[]{this.right_arm, this.right_weapon, this.left_arm, this.left_weapon, this.head, this.nose, this.right_eyebrow, this.left_eyebrow, this.skull, this.jaw, this.neck, this.tail1, this.tail2});
+        return ImmutableList.of(this.root, this.legs, this.right_leg, this.right_fore_leg, this.right_foot, this.left_leg, this.left_fore_leg, this.left_foot, this.pelvis, this.pelvis_cube, this.lower_body, this.body, this.right_arm, this.right_weapon, this.left_arm, this.left_weapon, this.head, this.nose, this.right_eyebrow, this.left_eyebrow, this.skull, this.jaw, this.neck, this.tail1, this.tail2);
     }
 
     public BasicModelPart root() {

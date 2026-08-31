@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "##",
+    "##"
+  ],
+  "key": {
+    "#": "cataclysm:azure_seastone_bricks"
+  },
+  "result": {
+    "id": "cataclysm:azure_seastone_tiles",
+    "count": 4
+  }
+}

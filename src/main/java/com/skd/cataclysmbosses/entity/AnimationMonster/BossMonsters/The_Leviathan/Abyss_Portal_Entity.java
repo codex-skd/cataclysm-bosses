@@ -9,8 +9,7 @@
  *  net.minecraft.core.Vec3i
  *  net.minecraft.core.particles.ParticleOptions
  *  net.minecraft.core.particles.ParticleTypes
- *  net.minecraft.nbt.CompoundTag
- *  net.minecraft.nbt.NbtUtils
+
  *  net.minecraft.network.syncher.EntityDataAccessor
  *  net.minecraft.network.syncher.EntityDataSerializer
  *  net.minecraft.network.syncher.EntityDataSerializers
@@ -27,6 +26,7 @@
  */
 package com.skd.cataclysmbosses.entity.AnimationMonster.BossMonsters.The_Leviathan;
 
+import net.minecraft.world.entity.EntitySpawnReason;
 import com.skd.cataclysmbosses.entity.AnimationMonster.BossMonsters.The_Leviathan.The_Leviathan_Entity;
 import com.skd.cataclysmbosses.init.ModEntities;
 import java.util.ArrayList;
@@ -38,9 +38,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
+
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -52,13 +52,15 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Abyss_Portal_Entity
 extends Entity {
     protected static final EntityDataAccessor<Integer> LIFESPAN = SynchedEntityData.defineId(Abyss_Portal_Entity.class, (EntityDataSerializer)EntityDataSerializers.INT);
     protected static final EntityDataAccessor<Boolean> ENTRANCE = SynchedEntityData.defineId(Abyss_Portal_Entity.class, (EntityDataSerializer)EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Optional<BlockPos>> DESTINATION = SynchedEntityData.defineId(Abyss_Portal_Entity.class, (EntityDataSerializer)EntityDataSerializers.OPTIONAL_BLOCK_POS);
-    private static final EntityDataAccessor<Optional<UUID>> SISTER_UUID = SynchedEntityData.defineId(Abyss_Portal_Entity.class, (EntityDataSerializer)EntityDataSerializers.OPTIONAL_UUID);
+    private static final EntityDataAccessor<String> SISTER_UUID = SynchedEntityData.defineId(Abyss_Portal_Entity.class, (EntityDataSerializer)EntityDataSerializers.STRING);
     private boolean madeOpenNoise = false;
     private boolean madeCloseNoise = false;
     private boolean isDummy = false;
@@ -84,7 +86,7 @@ extends Entity {
             double particleZ = this.getBoundingBox().minZ + (double)this.random.nextFloat() * (this.getBoundingBox().maxZ - this.getBoundingBox().minZ);
             this.level().addParticle((ParticleOptions)ParticleTypes.PORTAL, particleX, particleY, particleZ, 0.1 * this.random.nextGaussian(), 0.1 * this.random.nextGaussian(), 0.1 * this.random.nextGaussian());
         }
-        ArrayList entities = new ArrayList();
+        ArrayList<Entity> entities = new ArrayList<Entity>();
         entities.addAll(this.level().getEntities((Entity)this, this.getBoundingBox().deflate((double)0.2f)));
         entities.addAll(this.level().getEntitiesOfClass(The_Leviathan_Entity.class, this.getBoundingBox().inflate(3.0)));
         if (!this.level().isClientSide() && this.getDestination() != null && this.getLifespan() > 20 && this.tickCount > 20 && this.getEntrance()) {
@@ -115,7 +117,7 @@ extends Entity {
     }
 
     public void setLifespan(int i) {
-        this.entityData.set(LIFESPAN, (Object)i);
+        this.entityData.set(LIFESPAN, i);
     }
 
     public boolean getEntrance() {
@@ -123,7 +125,7 @@ extends Entity {
     }
 
     public void setEntrance(boolean entrance) {
-        this.entityData.set(ENTRANCE, (Object)entrance);
+        this.entityData.set(ENTRANCE, entrance);
     }
 
     public void setDestination(@Nullable BlockPos destination) {
@@ -134,12 +136,13 @@ extends Entity {
     }
 
     @Nullable
+    @SuppressWarnings("unchecked")
     public BlockPos getDestination() {
-        return ((Optional)this.getEntityData().get(DESTINATION)).orElse(null);
+        return ((Optional<BlockPos>)this.getEntityData().get(DESTINATION)).orElse(null);
     }
 
     public void createAndSetSister(Level world, Direction dir) {
-        Abyss_Portal_Entity portal = (Abyss_Portal_Entity)((EntityType)ModEntities.ABYSS_PORTAL.get()).create(world);
+        Abyss_Portal_Entity portal = (Abyss_Portal_Entity)((EntityType)ModEntities.ABYSS_PORTAL.get()).create(world, EntitySpawnReason.EVENT);
         BlockPos safeDestination = this.getDestination();
         portal.teleportTo((float)safeDestination.getX() + 0.5f, (float)safeDestination.getY() + 0.5f, (float)safeDestination.getZ() + 0.5f);
         portal.link(this);
@@ -163,27 +166,27 @@ extends Entity {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(LIFESPAN, (Object)300);
-        p_326229_.define(SISTER_UUID, Optional.empty());
+        p_326229_.define(LIFESPAN, 300);
+        p_326229_.define(SISTER_UUID, "");
         p_326229_.define(DESTINATION, Optional.empty());
-        p_326229_.define(ENTRANCE, (Object)true);
+        p_326229_.define(ENTRANCE, true);
     }
 
-    protected void readAdditionalSaveData(CompoundTag compound) {
-        this.setLifespan(compound.getInt("Lifespan"));
-        NbtUtils.readBlockPos((CompoundTag)compound, (String)"Destination").ifPresent(this::setDestination);
-        if (compound.hasUUID("SisterUUID")) {
-            this.setSisterId(compound.getUUID("SisterUUID"));
+    protected void readAdditionalSaveData(ValueInput compound) {
+        this.setLifespan(compound.getIntOr("Lifespan", 0));
+        compound.read("Destination", BlockPos.CODEC).ifPresent(this::setDestination);
+        if (compound.read("SisterUUID", UUIDUtil.CODEC).isPresent()) {
+            this.setSisterId(compound.read("SisterUUID", UUIDUtil.CODEC).orElse(null));
         }
     }
 
-    protected void addAdditionalSaveData(CompoundTag compound) {
+    protected void addAdditionalSaveData(ValueOutput compound) {
         compound.putInt("Lifespan", this.getLifespan());
         if (this.getDestination() != null) {
-            compound.put("Destination", NbtUtils.writeBlockPos((BlockPos)this.getDestination()));
+            compound.store("Destination", BlockPos.CODEC, (BlockPos)this.getDestination());
         }
         if (this.getSisterId() != null) {
-            compound.putUUID("SisterUUID", this.getSisterId());
+            compound.store("SisterUUID", UUIDUtil.CODEC, this.getSisterId());
         }
     }
 
@@ -201,11 +204,17 @@ extends Entity {
 
     @Nullable
     public UUID getSisterId() {
-        return ((Optional)this.entityData.get(SISTER_UUID)).orElse(null);
+        String s = (String)this.entityData.get(SISTER_UUID);
+        return s.isEmpty() ? null : java.util.UUID.fromString(s);
     }
 
     public void setSisterId(@Nullable UUID uniqueId) {
-        this.entityData.set(SISTER_UUID, Optional.ofNullable(uniqueId));
+        this.entityData.set(SISTER_UUID, uniqueId == null ? "" : uniqueId.toString());
+    }
+
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return false;
     }
 }
 

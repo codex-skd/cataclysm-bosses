@@ -40,6 +40,7 @@
  */
 package com.skd.cataclysmbosses.structures;
 
+import net.minecraft.world.entity.EntitySpawnReason;
 import com.skd.cataclysmbosses.entity.AnimationMonster.BossMonsters.Ignited_Revenant_Entity;
 import com.skd.cataclysmbosses.init.ModEntities;
 import com.skd.cataclysmbosses.init.ModStructures;
@@ -48,6 +49,7 @@ import com.mojang.serialization.MapCodec;
 import java.util.Map;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
@@ -89,35 +91,35 @@ extends Structure {
     private static final Identifier ARENA6 = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"burning_arena6");
     private static final Identifier ARENA7 = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"burning_arena7");
     private static final Identifier ARENA8 = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"burning_arena8");
-    private static final Map<Identifier, BlockPos> OFFSET = ImmutableMap.builder().put((Object)ARENA1, (Object)new BlockPos(0, 1, 0)).put((Object)ARENA2, (Object)new BlockPos(0, 1, 0)).put((Object)ARENA3, (Object)new BlockPos(0, 1, 0)).put((Object)ARENA4, (Object)new BlockPos(0, 1, 0)).put((Object)ARENA5, (Object)new BlockPos(0, 1, 0)).put((Object)ARENA6, (Object)new BlockPos(0, 1, 0)).put((Object)ARENA7, (Object)new BlockPos(0, 1, 0)).put((Object)ARENA8, (Object)new BlockPos(0, 1, 0)).build();
+    private static final Map<Identifier, BlockPos> OFFSET = ImmutableMap.<Identifier, BlockPos>builder().put(ARENA1, new BlockPos(0, 1, 0)).put(ARENA2, new BlockPos(0, 1, 0)).put(ARENA3, new BlockPos(0, 1, 0)).put(ARENA4, new BlockPos(0, 1, 0)).put(ARENA5, new BlockPos(0, 1, 0)).put(ARENA6, new BlockPos(0, 1, 0)).put(ARENA7, new BlockPos(0, 1, 0)).put(ARENA8, new BlockPos(0, 1, 0)).build();
 
-    public static void start(StructureTemplateManager templateManager, BlockPos pos, Rotation rotation, StructurePieceAccessor pieceList, RandomSource random) {
+    public static void start(StructureTemplateManager templateManager, BlockPos pos, Rotation rotation, StructurePieceAccessor pieceList, RandomSource random, RegistryAccess registryAccess) {
         int x = pos.getX();
         int z = pos.getZ();
         BlockPos rotationOffSet = new BlockPos(0, 0, 0).rotate(rotation);
         BlockPos blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, ARENA1, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, ARENA1, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(0, 0, 38).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, ARENA2, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, ARENA2, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(47, 0, 0).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, ARENA3, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, ARENA3, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(47, 0, 38).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, ARENA4, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, ARENA4, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(0, 48, 0).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, ARENA5, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, ARENA5, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(0, 48, 38).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, ARENA6, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, ARENA6, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(47, 48, 0).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, ARENA7, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, ARENA7, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(47, 48, 38).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, ARENA8, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, ARENA8, blockpos, rotation, registryAccess));
     }
 
     public Burning_Arena_Structure(Structure.StructureSettings p_227593_) {
@@ -125,8 +127,8 @@ extends Structure {
     }
 
     public Optional<Structure.GenerationStub> findGenerationPoint(Structure.GenerationContext p_228964_) {
-        int i = p_228964_.chunkPos().x >> 16;
-        int j = p_228964_.chunkPos().z >> 16;
+        int i = p_228964_.chunkPos().x() >> 16;
+        int j = p_228964_.chunkPos().z() >> 16;
         BlockPos blockpos = new BlockPos(p_228964_.chunkPos().getMinBlockX(), 21, p_228964_.chunkPos().getMinBlockZ());
         WorldgenRandom worldgenrandom = new WorldgenRandom((RandomSource)new LegacyRandomSource(0L));
         worldgenrandom.setSeed((long)(i ^ j << 9) ^ p_228964_.seed());
@@ -137,7 +139,7 @@ extends Structure {
     private static void generatePieces(StructurePiecesBuilder p_197233_, Structure.GenerationContext p_197234_) {
         BlockPos blockpos = new BlockPos(p_197234_.chunkPos().getMinBlockX(), 21, p_197234_.chunkPos().getMinBlockZ());
         Rotation rotation = Rotation.getRandom((RandomSource)p_197234_.random());
-        Burning_Arena_Structure.start(p_197234_.structureTemplateManager(), blockpos, rotation, (StructurePieceAccessor)p_197233_, (RandomSource)p_197234_.random());
+        Burning_Arena_Structure.start(p_197234_.structureTemplateManager(), blockpos, rotation, (StructurePieceAccessor)p_197233_, (RandomSource)p_197234_.random(), p_197234_.registryAccess());
     }
 
     public StructureType<?> type() {
@@ -150,21 +152,21 @@ extends Structure {
 
     public static class Piece
     extends TemplateStructurePiece {
-        public Piece(StructureTemplateManager templateManagerIn, Identifier resourceLocationIn, BlockPos pos, Rotation rotation) {
-            super((StructurePieceType)ModStructures.BAP.get(), 0, templateManagerIn, resourceLocationIn, resourceLocationIn.toString(), Piece.makeSettings(rotation), Piece.makePosition(resourceLocationIn, pos));
+        public Piece(StructureTemplateManager templateManagerIn, Identifier resourceLocationIn, BlockPos pos, Rotation rotation, RegistryAccess registryAccess) {
+            super((StructurePieceType)ModStructures.BAP.get(), 0, templateManagerIn, resourceLocationIn, resourceLocationIn.toString(), Piece.makeSettings(rotation, registryAccess), Piece.makePosition(resourceLocationIn, pos));
         }
 
-        public Piece(StructureTemplateManager templateManagerIn, CompoundTag tagCompound) {
-            super((StructurePieceType)ModStructures.BAP.get(), tagCompound, templateManagerIn, p_162451_ -> Piece.makeSettings(Rotation.valueOf((String)tagCompound.getString("Rot"))));
+        public Piece(StructureTemplateManager templateManagerIn, CompoundTag tagCompound, RegistryAccess registryAccess) {
+            super((StructurePieceType)ModStructures.BAP.get(), tagCompound, templateManagerIn, p_162451_ -> Piece.makeSettings(Rotation.valueOf(tagCompound.getStringOr("Rot", "NONE")), registryAccess));
         }
 
         public Piece(StructurePieceSerializationContext context, CompoundTag tag) {
-            this(context.structureTemplateManager(), tag);
+            this(context.structureTemplateManager(), tag, context.registryAccess());
         }
 
-        private static StructurePlaceSettings makeSettings(Rotation p_163156_) {
+        private static StructurePlaceSettings makeSettings(Rotation p_163156_, RegistryAccess registryAccess) {
             BlockIgnoreProcessor blockignoreprocessor = BlockIgnoreProcessor.STRUCTURE_BLOCK;
-            StructurePlaceSettings structureplacesettings = new StructurePlaceSettings().setRotation(p_163156_).setMirror(Mirror.NONE).addProcessor((StructureProcessor)blockignoreprocessor).addProcessor((StructureProcessor)new ProtectedBlockProcessor(BlockTags.FEATURES_CANNOT_REPLACE));
+            StructurePlaceSettings structureplacesettings = new StructurePlaceSettings().setRotation(p_163156_).setMirror(Mirror.NONE).addProcessor((StructureProcessor)blockignoreprocessor).addProcessor((StructureProcessor)new ProtectedBlockProcessor(registryAccess.getOrThrow(BlockTags.FEATURES_CANNOT_REPLACE)));
             return structureplacesettings;
         }
 
@@ -180,8 +182,10 @@ extends Structure {
         protected void handleDataMarker(String function, BlockPos pos, ServerLevelAccessor worldIn, RandomSource rand, BoundingBox sbb) {
             if ("revenant".equals(function)) {
                 worldIn.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
-                Ignited_Revenant_Entity revenant = (Ignited_Revenant_Entity)((EntityType)ModEntities.IGNITED_REVENANT.get()).create((Level)worldIn.getLevel());
-                revenant.moveTo(pos, 180.0f, 180.0f);
+                Ignited_Revenant_Entity revenant = (Ignited_Revenant_Entity)((EntityType)ModEntities.IGNITED_REVENANT.get()).create((Level)worldIn.getLevel(), EntitySpawnReason.STRUCTURE);
+                revenant.setPos((double)pos.getX() + 0.5, (double)pos.getY(), (double)pos.getZ() + 0.5);
+                revenant.setYRot(180.0f);
+                revenant.setXRot(180.0f);
                 worldIn.addFreshEntity((Entity)revenant);
             }
         }

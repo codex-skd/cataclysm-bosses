@@ -29,6 +29,7 @@
  */
 package com.skd.cataclysmbosses.items;
 
+import net.minecraft.world.entity.EntitySpawnReason;
 import com.skd.cataclysmbosses.Attachment.TidalTentacleAttachment;
 import com.skd.cataclysmbosses.entity.projectile.Tidal_Hook_Entity;
 import com.skd.cataclysmbosses.entity.projectile.Tidal_Tentacle_Entity;
@@ -43,7 +44,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -90,7 +91,7 @@ implements ILeftClick {
             Level worldIn = playerIn.level();
             Entity closestValid = null;
             Vec3 playerEyes = playerIn.getEyePosition(1.0f);
-            BlockHitResult hitresult = worldIn.clip(new ClipContext(playerEyes, playerEyes.add(playerIn.getLookAngle().scale(16.0)), ClipContext.Block.VISUAL, ClipContext.Fluid.NONE, (Entity)playerIn));
+            net.minecraft.world.phys.HitResult hitresult = worldIn.clip(new ClipContext(playerEyes, playerEyes.add(playerIn.getLookAngle().scale(16.0)), ClipContext.Block.VISUAL, ClipContext.Fluid.NONE, (Entity)playerIn));
             if (hitresult instanceof EntityHitResult) {
                 Entity entity = ((EntityHitResult)hitresult).getEntity();
                 if (!entity.equals((Object)playerIn) && !playerIn.isAlliedTo(entity) && !entity.isAlliedTo((Entity)playerIn) && entity instanceof Mob && playerIn.hasLineOfSight(entity)) {
@@ -113,7 +114,7 @@ implements ILeftClick {
         if (!charge.hasTentacle() && TidalTentacleUtil.canLaunchTentacles(worldIn, playerIn)) {
             TidalTentacleUtil.retractFarTentacles(worldIn, playerIn);
             if (!worldIn.isClientSide() && closestValid != null) {
-                Tidal_Tentacle_Entity segment = (Tidal_Tentacle_Entity)((EntityType)ModEntities.TIDAL_TENTACLE.get()).create(worldIn);
+                Tidal_Tentacle_Entity segment = (Tidal_Tentacle_Entity)((EntityType)ModEntities.TIDAL_TENTACLE.get()).create(worldIn, EntitySpawnReason.EVENT);
                 segment.copyPosition((Entity)playerIn);
                 worldIn.addFreshEntity((Entity)segment);
                 segment.setCreatorEntityUUID(playerIn.getUUID());
@@ -128,7 +129,7 @@ implements ILeftClick {
         return false;
     }
 
-    public InteractionResultHolder<ItemStack> use(Level level, Player user, InteractionHand hand) {
+    public InteractionResult use(Level level, Player user, InteractionHand hand) {
         ItemStack stack = user.getItemInHand(hand);
         boolean flag = (Boolean)user.getData(ModDataAttachments.HOOK_FALLING);
         if (!level.isClientSide() && !flag) {
@@ -139,23 +140,24 @@ implements ILeftClick {
             level.addFreshEntity((Entity)hookshot);
         }
         user.startUsingItem(hand);
-        user.setData(ModDataAttachments.HOOK_FALLING, (Object)true);
+        user.setData(ModDataAttachments.HOOK_FALLING.get(), true);
         return super.use(level, user, hand);
     }
 
     public ItemStack finishUsingItem(ItemStack p_40712_, Level p_40713_, LivingEntity p_40714_) {
-        boolean flag = (Boolean)p_40714_.getData(ModDataAttachments.HOOK_FALLING);
+        boolean flag = (Boolean)p_40714_.getData(ModDataAttachments.HOOK_FALLING.get());
         if (flag) {
-            p_40714_.setData(ModDataAttachments.HOOK_FALLING, (Object)false);
+            p_40714_.setData(ModDataAttachments.HOOK_FALLING.get(), false);
         }
         return super.finishUsingItem(p_40712_, p_40713_, p_40714_);
     }
 
-    public void releaseUsing(ItemStack stack, Level world, LivingEntity user, int remainingUseTicks) {
-        boolean flag = (Boolean)user.getData(ModDataAttachments.HOOK_FALLING);
+    public boolean releaseUsing(ItemStack stack, Level world, LivingEntity user, int remainingUseTicks) {
+        boolean flag = (Boolean)user.getData(ModDataAttachments.HOOK_FALLING.get());
         if (flag) {
-            user.setData(ModDataAttachments.HOOK_FALLING, (Object)false);
+            user.setData(ModDataAttachments.HOOK_FALLING.get(), false);
         }
+        return false;
     }
 
     public boolean isEnchantable(ItemStack stack) {

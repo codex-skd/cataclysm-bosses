@@ -35,10 +35,12 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
@@ -52,12 +54,13 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
-public class Player_Ceraunus_Renderer extends EntityRenderer<Player_Ceraunus_Entity> {
+public class Player_Ceraunus_Renderer extends CmEntityRenderer<Player_Ceraunus_Entity> {
     private final Ceraunus_Model model;
-    private static final Identifier TEXTURE = new ResourceLocation("cataclysm_bosses", "textures/entity/player_ceraunus.png");
-    private static final Identifier CHAIN_TEXTURE = new ResourceLocation("cataclysm_bosses", "textures/entity/player_ceraunus_chain.png");
+    private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath("cataclysm", "textures/entity/player_ceraunus.png");
+    private static final Identifier CHAIN_TEXTURE = Identifier.fromNamespaceAndPath("cataclysm", "textures/entity/player_ceraunus_chain.png");
 
     public Player_Ceraunus_Renderer(EntityRendererProvider.Context renderManagerIn) {
         super(renderManagerIn);
@@ -65,17 +68,16 @@ public class Player_Ceraunus_Renderer extends EntityRenderer<Player_Ceraunus_Ent
     }
 
     @Override
-    public void render(Player_Ceraunus_Entity entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource provider, int light) {
+    protected void render(Player_Ceraunus_Entity entity, float tickDelta, PoseStack matrices, CmMultiBufferSource provider, int light) {
         matrices.pushPose();
         float yRot = Mth.lerp((float)tickDelta, (float)entity.yRotO, (float)entity.getYRot());
         float xRot = Mth.lerp((float)tickDelta, (float)entity.xRotO, (float)entity.getXRot());
         matrices.mulPose(Axis.YP.rotationDegrees(yRot - 90.0f));
         matrices.mulPose(Axis.ZP.rotationDegrees(xRot + 90.0f));
-        this.model.renderToBuffer(matrices, provider.getBuffer(this.model.renderType(TEXTURE)), light, OverlayTexture.NO_OVERLAY);
+        this.model.renderToBuffer(matrices, provider.getBuffer(RenderTypes.entityCutout(TEXTURE)), light, OverlayTexture.NO_OVERLAY, -1);
         matrices.popPose();
     }
 
-    @Override
     public Identifier getTextureLocation(Player_Ceraunus_Entity entity) {
         return TEXTURE;
     }

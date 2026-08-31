@@ -39,7 +39,7 @@ public class NoteBlockInstrumentMixin {
     private static NoteBlockInstrument[] $VALUES;
 
     @Invoker(value="<init>")
-    public static NoteBlockInstrument newInstrument(String name, int id, String enumName, Holder sound, NoteBlockInstrument.Type type) {
+    public static NoteBlockInstrument newInstrument(String name, int id, String enumName, Holder sound, Object type) {
         throw new AssertionError();
     }
 

@@ -21,8 +21,10 @@ import com.skd.cataclysmbosses.client.model.entity.Wither_Missile_Model;
 import com.skd.cataclysmbosses.entity.projectile.Wither_Missile_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
@@ -31,10 +33,11 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Wither_Missile_Renderer
-extends EntityRenderer<Wither_Missile_Entity> {
+extends CmEntityRenderer<Wither_Missile_Entity> {
     private static final Identifier WITHER_MISSILE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/harbinger/wither_missile.png");
     public Wither_Missile_Model model = new Wither_Missile_Model();
 
@@ -46,16 +49,15 @@ extends EntityRenderer<Wither_Missile_Entity> {
         return 15;
     }
 
-    public void render(Wither_Missile_Entity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
+    protected void render(Wither_Missile_Entity entityIn, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
         matrixStackIn.pushPose();
         matrixStackIn.scale(-1.0f, -1.0f, 1.0f);
         float f = Mth.rotLerp((float)partialTicks, (float)entityIn.yRotO, (float)entityIn.getYRot());
         float f1 = Mth.lerp((float)partialTicks, (float)entityIn.xRotO, (float)entityIn.getXRot());
-        VertexConsumer vertexconsumer = bufferIn.getBuffer(this.model.renderType(this.getTextureLocation(entityIn)));
+        VertexConsumer vertexconsumer = bufferIn.getBuffer(RenderTypes.entityCutout(this.getTextureLocation(entityIn)));
         this.model.setupAnim((Entity)entityIn, 0.0f, 0.0f, 0.0f, f, f1);
-        this.model.renderToBuffer(matrixStackIn, vertexconsumer, packedLightIn, OverlayTexture.NO_OVERLAY);
+        this.model.renderToBuffer(matrixStackIn, vertexconsumer, packedLightIn, OverlayTexture.NO_OVERLAY, -1);
         matrixStackIn.popPose();
-        super.render((Entity)entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
     }
 
     public Identifier getTextureLocation(Wither_Missile_Entity entity) {

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###",
+    "RAR",
+    "###"
+  ],
+  "key": {
+    "#": "cataclysm:witherite_ingot",
+    "R": "minecraft:redstone_block",
+    "A": "minecraft:anvil"
+  },
+  "result": {
+    "id": "cataclysm:mechanical_fusion_anvil",
+    "count": 1
+  }
+}

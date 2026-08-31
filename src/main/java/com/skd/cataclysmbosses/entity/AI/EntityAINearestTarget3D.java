@@ -28,7 +28,8 @@ extends NearestAttackableTargetGoal<T> {
     }
 
     public EntityAINearestTarget3D(Mob goalOwnerIn, Class<T> targetClassIn, int targetChanceIn, boolean checkSight, boolean nearbyOnlyIn, @Nullable Predicate<LivingEntity> targetPredicate) {
-        super(goalOwnerIn, targetClassIn, targetChanceIn, checkSight, nearbyOnlyIn, targetPredicate);
+        super(goalOwnerIn, targetClassIn, targetChanceIn, checkSight, nearbyOnlyIn,
+            targetPredicate == null ? null : (net.minecraft.world.entity.ai.targeting.TargetingConditions.Selector)((livingEntity, serverLevel) -> targetPredicate.test(livingEntity)));
     }
 
     protected AABB getTargetSearchArea(double targetDistance) {

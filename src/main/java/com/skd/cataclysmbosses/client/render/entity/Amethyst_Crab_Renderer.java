@@ -11,11 +11,13 @@
  *  net.neoforged.api.distmarker.OnlyIn
  */
 package com.skd.cataclysmbosses.client.render.entity;
+import com.skd.cataclysmbosses.client.render.compat.CmMobRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 
 import com.skd.cataclysmbosses.client.model.entity.Amethyst_Crab_Model;
 import com.skd.cataclysmbosses.entity.AnimationMonster.BossMonsters.Amethyst_Crab_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.Identifier;
@@ -24,12 +26,17 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Amethyst_Crab_Renderer
-extends MobRenderer<Amethyst_Crab_Entity, Amethyst_Crab_Model> {
+extends CmMobRenderer<Amethyst_Crab_Entity> {
     private static final Identifier TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/amethyst_crab.png");
     private static final Identifier KRABS_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/mr_amethyst_krabs.png");
 
     public Amethyst_Crab_Renderer(EntityRendererProvider.Context renderManagerIn) {
-        super(renderManagerIn, (EntityModel)new Amethyst_Crab_Model(), 1.5f);
+        super(renderManagerIn, new Amethyst_Crab_Model(), 1.5f);
+    }
+
+    @Override
+    protected void render(Amethyst_Crab_Entity entity, float partialTicks, PoseStack poseStack, CmMultiBufferSource buffer, int packedLight) {
+        // TODO: port render body to 26.2 (old MobRenderer APIs removed)
     }
 
     public Identifier getTextureLocation(Amethyst_Crab_Entity entity) {

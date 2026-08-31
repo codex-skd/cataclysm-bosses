@@ -32,6 +32,7 @@ import com.skd.cataclysmbosses.init.ModTag;
 import java.util.Optional;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -51,10 +52,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class The_Leviathan_Tongue_Entity
 extends Entity {
-    private static final EntityDataAccessor<Optional<UUID>> CONTROLLER_UUID = SynchedEntityData.defineId(The_Leviathan_Tongue_Entity.class, (EntityDataSerializer)EntityDataSerializers.OPTIONAL_UUID);
+    private static final EntityDataAccessor<String> CONTROLLER_UUID = SynchedEntityData.defineId(The_Leviathan_Tongue_Entity.class, (EntityDataSerializer)EntityDataSerializers.STRING);
     private static final EntityDataAccessor<Integer> CONTROLLER_ID = SynchedEntityData.defineId(The_Leviathan_Tongue_Entity.class, (EntityDataSerializer)EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> TARGET_ID = SynchedEntityData.defineId(The_Leviathan_Tongue_Entity.class, (EntityDataSerializer)EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> DURATION = SynchedEntityData.defineId(The_Leviathan_Tongue_Entity.class, (EntityDataSerializer)EntityDataSerializers.INT);
@@ -67,12 +70,12 @@ extends Entity {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(CONTROLLER_UUID, Optional.empty());
-        p_326229_.define(CONTROLLER_ID, (Object)-1);
-        p_326229_.define(TARGET_ID, (Object)-1);
-        p_326229_.define(DURATION, (Object)0);
-        p_326229_.define(MAX_DURATION, (Object)0);
-        p_326229_.define(COMING_BACK, (Object)false);
+        p_326229_.define(CONTROLLER_UUID, "");
+        p_326229_.define(CONTROLLER_ID, -1);
+        p_326229_.define(TARGET_ID, -1);
+        p_326229_.define(DURATION, 0);
+        p_326229_.define(MAX_DURATION, 0);
+        p_326229_.define(COMING_BACK, false);
     }
 
     public void tick() {
@@ -88,17 +91,17 @@ extends Entity {
         if (!this.level().isClientSide()) {
             if (CMCommonConfig.Leviathan.ignoreMobGriefing) {
                 this.blockbreak(0.25, 0.25, 0.25);
-            } else if (EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+            } else if (this.level() instanceof net.minecraft.server.level.ServerLevel && EventHooks.canEntityGrief((net.minecraft.server.level.ServerLevel)this.level(), (Entity)this)) {
                 this.blockbreak(0.25, 0.25, 0.25);
             }
         }
         if (controller instanceof The_Leviathan_Entity) {
             The_Leviathan_Entity levi = (The_Leviathan_Entity)controller;
-            this.entityData.set(CONTROLLER_ID, (Object)levi.getId());
+            this.entityData.set(CONTROLLER_ID, levi.getId());
             levi.setTongueUUID(this.getUUID());
             if (!this.level().isClientSide()) {
                 LivingEntity e = levi.getTarget();
-                this.entityData.set(TARGET_ID, (Object)(e != null && e.isAlive() ? e.getId() : -1));
+                this.entityData.set(TARGET_ID, (e != null && e.isAlive() ? e.getId() : -1));
             }
             boolean attacking = !this.getComingBack() && target != null && target.isAlive();
             Vec3 vec3 = attacking ? target.getEyePosition() : levi.getTonguePosition();
@@ -118,7 +121,7 @@ extends Entity {
     }
 
     private void hurtEntity(LivingEntity holder, Entity target) {
-        if (target.hurt(this.damageSources().mobAttack(holder), 6.0f) && !this.level().isClientSide()) {
+        if (target.hurtOrSimulate(this.damageSources().mobAttack(holder), 6.0f) && !this.level().isClientSide()) {
             target.startRiding((Entity)this);
         }
     }
@@ -165,17 +168,17 @@ extends Entity {
         return false;
     }
 
-    protected void readAdditionalSaveData(CompoundTag tag) {
-        if (tag.hasUUID("ControllerUUID")) {
-            this.setControllerUUID(tag.getUUID("ControllerUUID"));
+    protected void readAdditionalSaveData(ValueInput tag) {
+        if (tag.read("ControllerUUID", UUIDUtil.CODEC).isPresent()) {
+            this.setControllerUUID(tag.read("ControllerUUID", UUIDUtil.CODEC).orElse(null));
         }
-        this.setDuration(tag.getInt("Duration"));
-        this.setDuration(tag.getInt("Max_Duration"));
+        this.setDuration(tag.getIntOr("Duration", 0));
+        this.setDuration(tag.getIntOr("Max_Duration", 0));
     }
 
-    protected void addAdditionalSaveData(CompoundTag tag) {
+    protected void addAdditionalSaveData(ValueOutput tag) {
         if (this.getControllerUUID() != null) {
-            tag.putUUID("ControllerUUID", this.getControllerUUID());
+            tag.store("ControllerUUID", UUIDUtil.CODEC, this.getControllerUUID());
         }
         tag.putInt("Duration", this.getDuration());
         tag.putInt("Max_Duration", this.getMaxDuration());
@@ -183,11 +186,12 @@ extends Entity {
 
     @Nullable
     public UUID getControllerUUID() {
-        return ((Optional)this.entityData.get(CONTROLLER_UUID)).orElse(null);
+        String s = (String)this.entityData.get(CONTROLLER_UUID);
+        return s.isEmpty() ? null : java.util.UUID.fromString(s);
     }
 
     public void setControllerUUID(@Nullable UUID uniqueId) {
-        this.entityData.set(CONTROLLER_UUID, Optional.ofNullable(uniqueId));
+        this.entityData.set(CONTROLLER_UUID, uniqueId == null ? "" : uniqueId.toString());
     }
 
     public int getDuration() {
@@ -195,7 +199,7 @@ extends Entity {
     }
 
     public void setDuration(int i) {
-        this.entityData.set(DURATION, (Object)i);
+        this.entityData.set(DURATION, i);
     }
 
     public int getMaxDuration() {
@@ -203,7 +207,7 @@ extends Entity {
     }
 
     public void setMaxDuration(int i) {
-        this.entityData.set(MAX_DURATION, (Object)i);
+        this.entityData.set(MAX_DURATION, i);
     }
 
     public boolean getComingBack() {
@@ -211,7 +215,7 @@ extends Entity {
     }
 
     public void setComingBack(boolean i) {
-        this.entityData.set(COMING_BACK, (Object)i);
+        this.entityData.set(COMING_BACK, i);
     }
 
     public Entity getController() {
@@ -226,6 +230,11 @@ extends Entity {
     public Entity getTarget() {
         int id = (Integer)this.entityData.get(TARGET_ID);
         return id == -1 ? null : this.level().getEntity(id);
+    }
+
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return false;
     }
 }
 

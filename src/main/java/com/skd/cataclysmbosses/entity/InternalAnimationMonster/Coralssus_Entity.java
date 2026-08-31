@@ -29,7 +29,7 @@
  *  net.minecraft.world.entity.EntityType
  *  net.minecraft.world.entity.LivingEntity
  *  net.minecraft.world.entity.Mob
- *  net.minecraft.world.entity.MobSpawnType
+ *  net.minecraft.world.entity.EntitySpawnReason
  *  net.minecraft.world.entity.MoverType
  *  net.minecraft.world.entity.PathfinderMob
  *  net.minecraft.world.entity.SpawnGroupData
@@ -63,6 +63,7 @@
  *  net.neoforged.neoforge.fluids.FluidType
  */
 package com.skd.cataclysmbosses.entity.InternalAnimationMonster;
+import net.minecraft.server.level.ServerLevel;
 
 import com.skd.cataclysmbosses.client.particle.Options.RingParticleOptions;
 import com.skd.cataclysmbosses.entity.AI.MobAIFindWater;
@@ -108,11 +109,10 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.SpawnGroupData;
-import net.minecraft.world.entity.VariantHolder;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.BodyRotationControl;
@@ -138,11 +138,12 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.fluids.FluidType;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Coralssus_Entity
 extends Internal_Animation_Monster
-implements VariantHolder<Variant>,
-ISemiAquatic {
+implements ISemiAquatic {
     private static final EntityDataAccessor<Integer> MOISTNESS = SynchedEntityData.defineId(Coralssus_Entity.class, (EntityDataSerializer)EntityDataSerializers.INT);
     public static final EntityDataAccessor<Integer> VARIANT = SynchedEntityData.defineId(Coralssus_Entity.class, (EntityDataSerializer)EntityDataSerializers.INT);
     public static final EntityDataAccessor<Boolean> RIGHT = SynchedEntityData.defineId(Coralssus_Entity.class, (EntityDataSerializer)EntityDataSerializers.BOOLEAN);
@@ -290,10 +291,10 @@ ISemiAquatic {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(MOISTNESS, (Object)40000);
-        p_326229_.define(VARIANT, (Object)Variant.FIRE.id);
-        p_326229_.define(RIGHT, (Object)false);
-        p_326229_.define(CORALSSUS_SWIM, (Object)false);
+        p_326229_.define(MOISTNESS, 40000);
+        p_326229_.define(VARIANT, Variant.FIRE.id);
+        p_326229_.define(RIGHT, false);
+        p_326229_.define(CORALSSUS_SWIM, false);
     }
 
     public boolean isSponge() {
@@ -301,7 +302,7 @@ ISemiAquatic {
         return s != null && s.toLowerCase().contains("squarepants") && this.getVariant() == Variant.HORN;
     }
 
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_29678_, DifficultyInstance p_29679_, MobSpawnType p_29680_, @Nullable SpawnGroupData p_29681_) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_29678_, DifficultyInstance p_29679_, EntitySpawnReason p_29680_, @Nullable SpawnGroupData p_29681_) {
         this.setVariant(Variant.byId(this.random.nextInt(3)));
         return super.finalizeSpawn(p_29678_, p_29679_, p_29680_, p_29681_);
     }
@@ -379,16 +380,16 @@ ISemiAquatic {
         return 30;
     }
 
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         compound.putInt("Variant", this.getVariant().id);
         compound.putInt("Moisture", this.getMoistness());
     }
 
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        this.setVariant(Variant.byId(compound.getInt("Variant")));
-        this.setMoistness(compound.getInt("Moisture"));
+        this.setVariant(Variant.byId(compound.getIntOr("Variant", 0)));
+        this.setMoistness(compound.getIntOr("Moisture", 0));
     }
 
     public int getMoistness() {
@@ -396,7 +397,7 @@ ISemiAquatic {
     }
 
     public void setMoistness(int p_211137_1_) {
-        this.entityData.set(MOISTNESS, (Object)p_211137_1_);
+        this.entityData.set(MOISTNESS, p_211137_1_);
     }
 
     public Variant getVariant() {
@@ -404,11 +405,11 @@ ISemiAquatic {
     }
 
     public void setVariant(Variant p_262578_) {
-        this.entityData.set(VARIANT, (Object)p_262578_.id);
+        this.entityData.set(VARIANT, p_262578_.id);
     }
 
     public void setRight(boolean right) {
-        this.entityData.set(RIGHT, (Object)right);
+        this.entityData.set(RIGHT, right);
     }
 
     public boolean getIsRight() {
@@ -423,11 +424,11 @@ ISemiAquatic {
         return livingentity != null && livingentity.isInWater();
     }
 
-    public boolean hurt(DamageSource source, float damage) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         if (source.is(DamageTypes.HOT_FLOOR)) {
             return false;
         }
-        return super.hurt(source, damage);
+        return super.hurtOrSimulate(source, damage);
     }
 
     public void onInsideBubbleColumn(boolean p_20322_) {
@@ -457,17 +458,17 @@ ISemiAquatic {
         }
         if (this.isNoAi()) {
             this.setAirSupply(this.getMaxAirSupply());
-        } else if (this.isInWaterRainOrBubble()) {
+        } else if (this.isInWaterOrRain()) {
             this.setMoistness(6000);
         } else {
-            int dry = this.level().isDay() ? 2 : 1;
+            int dry = (this.level().getOverworldClockTime() % 24000 < 12000) ? 2 : 1;
             this.setMoistness(this.getMoistness() - dry);
             if (this.getMoistness() <= 0 && this.moistureAttackTime-- <= 0) {
-                this.hurt(this.damageSources().dryOut(), this.random.nextInt(2) == 0 ? 1.0f : 0.0f);
+                this.hurtOrSimulate(this.damageSources().dryOut(), this.random.nextInt(2) == 0 ? 1.0f : 0.0f);
                 this.moistureAttackTime = 20;
             }
         }
-        boolean flag1 = this.canInFluidType(this.getEyeInFluidType());
+        boolean flag1 = this.canBreatheUnderwater();
         if (flag1) {
             if (this.level().noCollision((Entity)this, this.getBoundingBox()) && !this.getSwim()) {
                 this.setSwim(true);
@@ -534,8 +535,8 @@ ISemiAquatic {
             for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate((double)grow))) {
                 if (this.isAlliedTo((Entity)entity) || entity instanceof Coralssus_Entity || entity == this) continue;
                 this.launch(entity, true);
-                entity.hurt(damagesource, (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) + (float)this.random.nextInt(damage));
-                if (!entity.isDamageSourceBlocked(damagesource) || !(entity instanceof Player)) continue;
+                entity.hurtOrSimulate(damagesource, (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) + (float)this.random.nextInt(damage));
+                if (!entity.isBlocking() || !(entity instanceof Player)) continue;
                 Player player = (Player)entity;
                 if (shieldbreakticks <= 0) continue;
                 EntityUtil.disableShield(player, shieldbreakticks);
@@ -545,7 +546,7 @@ ISemiAquatic {
 
     private void BlockBreaking() {
         boolean flag = false;
-        if (!this.level().isClientSide() && EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+        if (this.level() instanceof net.minecraft.server.level.ServerLevel sl && EventHooks.canEntityGrief(sl, (Entity)this)) {
             AABB aabb = this.getBoundingBox().inflate(1.5, 1.5, 1.5);
             for (BlockPos blockpos : BlockPos.betweenClosed((int)Mth.floor((double)aabb.minX), (int)Mth.floor((double)this.getY()), (int)Mth.floor((double)aabb.minZ), (int)Mth.floor((double)aabb.maxX), (int)Mth.floor((double)aabb.maxY), (int)Mth.floor((double)aabb.maxZ))) {
                 BlockState blockstate = this.level().getBlockState(blockpos);
@@ -611,14 +612,14 @@ ISemiAquatic {
         return null;
     }
 
-    public boolean isAlliedTo(Entity entityIn) {
+    public boolean considersEntityAsAlly(Entity entityIn) {
         if (entityIn == this) {
             return true;
         }
-        if (super.isAlliedTo(entityIn)) {
+        if (super.considersEntityAsAlly(entityIn)) {
             return true;
         }
-        if (entityIn.getType().is(ModTag.TEAM_THE_LEVIATHAN)) {
+        if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_THE_LEVIATHAN)) {
             return this.getTeam() == null && entityIn.getTeam() == null;
         }
         return false;
@@ -660,7 +661,7 @@ ISemiAquatic {
     }
 
     public void setSwim(boolean swim) {
-        this.entityData.set(CORALSSUS_SWIM, (Object)swim);
+        this.entityData.set(CORALSSUS_SWIM, swim);
     }
 
     public boolean isPushedByFluid() {
@@ -827,7 +828,7 @@ ISemiAquatic {
         }
 
         static {
-            BY_ID = ByIdMap.sparse(Variant::id, (Object[])Variant.values(), (Object)((Object)FIRE));
+            BY_ID = ByIdMap.sparse(Variant::id, Variant.values(), FIRE);
             CODEC = StringRepresentable.fromEnum(Variant::values);
         }
     }

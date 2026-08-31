@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "gCE",
+    "DOG",
+    "RCB"
+  ],
+  "key": {
+    "g": "minecraft:gold_ingot",
+    "C": "minecraft:chiseled_sandstone",
+    "E": "minecraft:emerald",
+    "D": "minecraft:dead_bush",
+    "O": "minecraft:ender_eye",
+    "G": "minecraft:cactus",
+    "R": "minecraft:rotten_flesh",
+    "B": "minecraft:bone"
+  },
+  "result": {
+    "id": "cataclysm:desert_eye",
+    "count": 1
+  }
+}

@@ -25,8 +25,9 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.Map;
 import java.util.Optional;
 import net.minecraft.client.model.ArmedModel;
-import net.minecraft.client.model.HierarchicalModel;
+import com.skd.cataclysmbosses.client.model.compat.CmHierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
@@ -37,7 +38,7 @@ import net.minecraft.world.entity.HumanoidArm;
 import org.jetbrains.annotations.NotNull;
 
 public class Elite_Draugr_Model
-extends HierarchicalModel<Elite_Draugr_Entity>
+extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRenderState>
 implements ArmedModel {
     private final ModelPart everything;
     private final ModelPart root;
@@ -63,8 +64,8 @@ implements ArmedModel {
     private final Map<String, Optional<ModelPart>> optionalPartCache = new Object2ObjectOpenHashMap();
 
     public Elite_Draugr_Model(ModelPart root) {
+        super(root);
         this.everything = root;
-        this.buildPartCache(root);
         this.root = this.everything.getChild("root");
         this.body = this.root.getChild("body");
         this.front_cloth1 = this.body.getChild("front_cloth1");
@@ -111,61 +112,17 @@ implements ArmedModel {
         return LayerDefinition.create((MeshDefinition)meshdefinition, (int)128, (int)128);
     }
 
-    public void setupAnim(Elite_Draugr_Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        this.root().getAllParts().forEach(ModelPart::resetPose);
-        this.animateHeadLookTarget(netHeadYaw, headPitch);
-        this.animateWalk(Elite_Draugr_Animation.WALK, limbSwing, limbSwingAmount, 2.0f, 2.0f);
-        this.animate(entity.getAnimationState("idle"), Elite_Draugr_Animation.IDLE, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("re_load"), Elite_Draugr_Animation.RE_LOAD, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("shoot"), Elite_Draugr_Animation.SHOOT, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("shoot2"), Elite_Draugr_Animation.SHOOT2, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("swing"), Elite_Draugr_Animation.SWING, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("attack"), Elite_Draugr_Animation.ATTACK, ageInTicks, 1.5f);
-        this.animate(entity.getAnimationState("attack2"), Elite_Draugr_Animation.ATTACK2, ageInTicks, 1.5f);
+        @Override
+    public void setupAnim(EntityRenderState state) {
+        super.setupAnim(state);
     }
 
-    private void animateHeadLookTarget(float yRot, float xRot) {
-        this.head.xRot = xRot * ((float)Math.PI / 180);
-        this.head.yRot = yRot * ((float)Math.PI / 180);
-    }
-
-    private void buildPartCache(ModelPart part) {
-        for (Map.Entry entry : part.children.entrySet()) {
-            String partName = (String)entry.getKey();
-            ModelPart childPart = (ModelPart)entry.getValue();
-            this.partCache.putIfAbsent(partName, childPart);
-            this.optionalPartCache.putIfAbsent(partName, Optional.of(childPart));
-            if (childPart.children.isEmpty()) continue;
-            this.buildPartCache(childPart);
-        }
-    }
-
-    @NotNull
-    public Optional<ModelPart> getAnyDescendantWithName(String name) {
-        if ("root".equals(name)) {
-            return Optional.of(this.root);
-        }
-        return this.optionalPartCache.getOrDefault(name, Optional.empty());
-    }
-
-    public void translateToHand(HumanoidArm arm, PoseStack poseStack) {
+    @Override
+    public void translateToHand(EntityRenderState state, HumanoidArm arm, PoseStack poseStack) {
         this.root.translateAndRotate(poseStack);
         this.body.translateAndRotate(poseStack);
         this.waist.translateAndRotate(poseStack);
         this.chest.translateAndRotate(poseStack);
-        if (arm == HumanoidArm.RIGHT) {
-            this.r_arm.translateAndRotate(poseStack);
-            this.r_arm2.translateAndRotate(poseStack);
-            poseStack.translate(0.0f, 0.0f, 0.0f);
-        } else {
-            this.l_arm.translateAndRotate(poseStack);
-            this.l_arm2.translateAndRotate(poseStack);
-            poseStack.translate(0.0f, 0.0f, 0.0f);
-        }
-    }
-
-    public ModelPart root() {
-        return this.root;
+        this.r_arm.translateAndRotate(poseStack);
     }
 }
-

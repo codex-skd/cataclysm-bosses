@@ -46,7 +46,7 @@ public record MessageHookFalling(int entityID, boolean falling) implements Custo
         ctx.enqueueWork(() -> {
             Entity entity = ctx.player().level().getEntity(message.entityID());
             if (entity instanceof LivingEntity) {
-                entity.setData(ModDataAttachments.HOOK_FALLING, (Object)message.falling());
+                entity.setData(ModDataAttachments.HOOK_FALLING.get(), message.falling());
             }
         });
     }

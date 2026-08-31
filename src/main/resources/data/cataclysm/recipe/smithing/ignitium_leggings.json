@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smithing_transform",
+  "addition": "cataclysm:ignitium_ingot",
+  "base": "minecraft:netherite_leggings",
+  "result": {
+    "id": "cataclysm:ignitium_leggings"
+  },
+  "template": "cataclysm:ignitium_upgrade_smithing_template"
+}

@@ -22,7 +22,8 @@ import com.skd.cataclysmbosses.entity.projectile.Urchin_Spike_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -32,22 +33,24 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Urchin_Spike_Renderer
-extends EntityRenderer<Urchin_Spike_Entity> {
+extends CmEntityRenderer<Urchin_Spike_Entity> {
     public Urchin_Spike_Renderer(EntityRendererProvider.Context manager) {
         super(manager);
     }
 
-    public void render(Urchin_Spike_Entity entity, float yaw, float partialTicks, PoseStack stack, MultiBufferSource buffer, int light) {
+    protected void render(Urchin_Spike_Entity entity, float partialTicks, PoseStack stack, CmMultiBufferSource buffer, int light) {
         stack.pushPose();
         stack.pushPose();
         stack.mulPose(Axis.YP.rotationDegrees(Mth.lerp((float)partialTicks, (float)entity.yRotO, (float)entity.getYRot()) - 90.0f));
         stack.mulPose(Axis.ZP.rotationDegrees(-45.0f));
         stack.mulPose(Axis.ZP.rotationDegrees(Mth.lerp((float)partialTicks, (float)entity.xRotO, (float)entity.getXRot())));
         stack.translate(0.0f, 0.0f, 0.0f);
-        Minecraft.getInstance().getItemRenderer().renderStatic(entity.getItem(), ItemDisplayContext.GROUND, light, OverlayTexture.NO_OVERLAY, stack, buffer, entity.level(), entity.getId());
+        // PORT TODO(26.2): re-wire item render
+        // Minecraft.getInstance().getItemRenderer().renderStatic(entity.getItem(), ItemDisplayContext.GROUND, light, OverlayTexture.NO_OVERLAY, stack, buffer, entity.level(), entity.getId());
         stack.popPose();
         stack.popPose();
     }

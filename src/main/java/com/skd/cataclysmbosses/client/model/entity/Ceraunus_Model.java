@@ -26,8 +26,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.Map;
 import java.util.Optional;
-import net.minecraft.client.model.HierarchicalModel;
+import com.skd.cataclysmbosses.client.model.compat.CmHierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
@@ -44,16 +45,16 @@ import org.joml.Vector4f;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Ceraunus_Model<T extends Entity>
-extends HierarchicalModel<T> {
+extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRenderState> {
     private final ModelPart root;
     private final ModelPart everything;
     private final ModelPart chain;
-    private final Map<String, ModelPart> partCache = new Object2ObjectOpenHashMap();
-    private final Map<String, Optional<ModelPart>> optionalPartCache = new Object2ObjectOpenHashMap();
+    private final java.util.function.Function<String, ModelPart> partLookup;
 
     public Ceraunus_Model(ModelPart root) {
+        super(root);
         this.root = root;
-        this.buildPartCache(root);
+        this.partLookup = root.createPartLookup();
         this.everything = this.root.getChild("everything");
         this.chain = this.everything.getChild("chain");
     }
@@ -87,31 +88,16 @@ extends HierarchicalModel<T> {
         return new Vec3((double)vec.x(), (double)vec.y(), (double)vec.z());
     }
 
-    private void buildPartCache(ModelPart part) {
-        for (Map.Entry entry : part.children.entrySet()) {
-            String partName = (String)entry.getKey();
-            ModelPart childPart = (ModelPart)entry.getValue();
-            this.partCache.putIfAbsent(partName, childPart);
-            this.optionalPartCache.putIfAbsent(partName, Optional.of(childPart));
-            if (childPart.children.isEmpty()) continue;
-            this.buildPartCache(childPart);
-        }
-    }
-
     @NotNull
     public Optional<ModelPart> getAnyDescendantWithName(String name) {
         if ("root".equals(name)) {
             return Optional.of(this.root);
         }
-        return this.optionalPartCache.getOrDefault(name, Optional.empty());
+        return Optional.ofNullable(this.partLookup.apply(name));
     }
 
-    public ModelPart root() {
-        return this.root;
-    }
-
-    public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        this.root().getAllParts().forEach(ModelPart::resetPose);
+        @Override
+    public void setupAnim(EntityRenderState state) {
+        super.setupAnim(state);
     }
 }
-

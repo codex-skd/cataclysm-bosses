@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###",
+    "NON",
+    "###"
+  ],
+  "key": {
+    "#": "minecraft:gold_ingot",
+    "N": "cataclysm:black_steel_ingot",
+    "O": "minecraft:netherite_upgrade_smithing_template"
+  },
+  "result": {
+    "id": "cataclysm:cursium_upgrade_smithing_template",
+    "count": 1
+  }
+}

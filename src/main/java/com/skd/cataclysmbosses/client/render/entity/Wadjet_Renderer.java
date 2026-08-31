@@ -11,12 +11,14 @@
  *  net.neoforged.api.distmarker.OnlyIn
  */
 package com.skd.cataclysmbosses.client.render.entity;
+import com.skd.cataclysmbosses.client.render.compat.CmMobRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 
 import com.skd.cataclysmbosses.client.model.entity.Wadjet_Model;
 import com.skd.cataclysmbosses.client.render.layer.Wadjet_Layer;
 import com.skd.cataclysmbosses.entity.InternalAnimationMonster.Wadjet_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.Identifier;
@@ -25,12 +27,17 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Wadjet_Renderer
-extends MobRenderer<Wadjet_Entity, Wadjet_Model> {
+extends CmMobRenderer<Wadjet_Entity> {
     private static final Identifier KOBOLEDIATOR_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/koboleton/wadjet.png");
 
     public Wadjet_Renderer(EntityRendererProvider.Context renderManagerIn) {
-        super(renderManagerIn, (EntityModel)new Wadjet_Model(), 0.75f);
+        super(renderManagerIn, new Wadjet_Model(), 0.75f);
         this.addLayer(new Wadjet_Layer(this));
+    }
+
+    @Override
+    protected void render(Wadjet_Entity entity, float partialTicks, PoseStack poseStack, CmMultiBufferSource buffer, int packedLight) {
+        // TODO: port render body to 26.2 (old MobRenderer APIs removed)
     }
 
     public Identifier getTextureLocation(Wadjet_Entity entity) {

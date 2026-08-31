@@ -18,10 +18,11 @@ import com.skd.cataclysmbosses.client.particle.Options.CustomPoofParticleOptions
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.particle.SingleQuadParticle;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
@@ -34,7 +35,7 @@ extends SingleQuadParticle {
     private float initialB;
 
     protected Custom_Poof_Particle(ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, SpriteSet sprites, float r, float g, float b, float gravity) {
-        super(level, x, y, z);
+        super(level, x, y, z, (TextureAtlasSprite) null);
         this.gravity = gravity;
         this.friction = 0.9f;
         this.sprites = sprites;
@@ -47,16 +48,12 @@ extends SingleQuadParticle {
         this.initialR = r / 255.0f;
         this.initialG = g / 255.0f;
         this.initialB = b / 255.0f;
-        this.quadSize = 0.25f + level.random.nextFloat() * 0.1f;
+        this.quadSize = 0.25f + level.getRandom().nextFloat() * 0.1f;
         this.lifetime = (int)(24.0 / ((double)this.random.nextFloat() * 0.8 + 0.2)) + 2;
         this.setSpriteFromAge(sprites);
     }
 
-    public ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
-    }
-
-    public int getLightColor(float p_106821_) {
+    public int getLightCoords(float p_106821_) {
         return 240;
     }
 
@@ -98,9 +95,14 @@ extends SingleQuadParticle {
             this.sprites = sprites;
         }
 
-        public Particle createParticle(CustomPoofParticleOptions type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public Particle createParticle(CustomPoofParticleOptions type, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, RandomSource random) {
             return new Custom_Poof_Particle(level, x, y, z, xSpeed, ySpeed, zSpeed, this.sprites, type.r(), type.g(), type.b(), type.gravity());
         }
+    }
+
+    @Override
+    public SingleQuadParticle.Layer getLayer() {
+        return SingleQuadParticle.Layer.TRANSLUCENT;
     }
 }
 

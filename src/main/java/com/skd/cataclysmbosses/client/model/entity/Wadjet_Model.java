@@ -291,7 +291,7 @@ extends AdvancedEntityModel<Wadjet_Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.everything, (Object)this.upper_body1, (Object)this.mid_root, (Object)this.pelvis, (Object)this.upper_body2, (Object)this.body, (Object)this.neck1, (Object)this.neck2, (Object)this.face, (Object)this.head, (Object)this.cube_r1, (Object)this.cube_r2, (Object[])new AdvancedModelBox[]{this.cube_r3, this.cube_r4, this.jaw, this.right_arm, this.right_fore_arm, this.right_finger3, this.right_finger2, this.right_finger1, this.right_finger4, this.wand, this.cube_r5, this.left_arm, this.left_fore_arm, this.left_finger3, this.left_finger2, this.left_finger1, this.left_finger4, this.tail1, this.tail2, this.tail3, this.tail4, this.tail5, this.tailend});
+        return ImmutableList.of(this.everything, this.upper_body1, this.mid_root, this.pelvis, this.upper_body2, this.body, this.neck1, this.neck2, this.face, this.head, this.cube_r1, this.cube_r2, this.cube_r3, this.cube_r4, this.jaw, this.right_arm, this.right_fore_arm, this.right_finger3, this.right_finger2, this.right_finger1, this.right_finger4, this.wand, this.cube_r5, this.left_arm, this.left_fore_arm, this.left_finger3, this.left_finger2, this.left_finger1, this.left_finger4, this.tail1, this.tail2, this.tail3, this.tail4, this.tail5, this.tailend);
     }
 }
 

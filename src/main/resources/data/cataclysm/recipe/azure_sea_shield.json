@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "#": "minecraft:gold_nugget",
+    "X": "minecraft:gold_ingot",
+    "Z": "cataclysm:lacrima"
+  },
+  "pattern": [
+    "#Z#",
+    "ZXZ",
+    "#Z#"
+  ],
+  "result": {
+    "id": "cataclysm:azure_sea_shield"
+  },
+  "show_notification": true
+}

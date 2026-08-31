@@ -69,6 +69,8 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Laser_Beam_Entity
 extends Projectile {
@@ -81,7 +83,9 @@ extends Projectile {
 
     public Laser_Beam_Entity(EntityType<? extends Laser_Beam_Entity> type, double getX, double gety, double getz, Vec3 vec3, Level level) {
         this(type, level);
-        this.moveTo(getX, gety, getz, this.getYRot(), this.getXRot());
+        this.setPos(getX, gety, getz);
+        this.setYRot((float)this.getYRot());
+        this.setXRot((float)this.getXRot());
         this.reapplyPosition();
         this.assignDirectionalMovement(vec3, this.accelerationPower);
     }
@@ -94,7 +98,9 @@ extends Projectile {
 
     public Laser_Beam_Entity(EntityType<? extends Laser_Beam_Entity> type, LivingEntity p_36827_, double getX, double gety, double getz, Vec3 vec3, float damage, Level level) {
         this(type, level);
-        this.moveTo(getX, gety, getz, this.getYRot(), this.getXRot());
+        this.setPos(getX, gety, getz);
+        this.setYRot((float)this.getYRot());
+        this.setXRot((float)this.getXRot());
         this.setOwner((Entity)p_36827_);
         this.setDamage(damage);
         this.reapplyPosition();
@@ -102,7 +108,7 @@ extends Projectile {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(DAMAGE, (Object)Float.valueOf(0.0f));
+        p_326229_.define(DAMAGE, Float.valueOf(0.0f));
     }
 
     public float getDamage() {
@@ -110,7 +116,7 @@ extends Projectile {
     }
 
     public void setDamage(float damage) {
-        this.entityData.set(DAMAGE, (Object)Float.valueOf(damage));
+        this.entityData.set(DAMAGE, Float.valueOf(damage));
     }
 
     public boolean shouldRenderAtSqrDistance(double p_36837_) {
@@ -133,7 +139,7 @@ extends Projectile {
             if (hitresult.getType() != HitResult.Type.MISS && !EventHooks.onProjectileImpact((Projectile)this, (HitResult)hitresult)) {
                 this.hitTargetOrDeflectSelf(hitresult);
             }
-            this.checkInsideBlocks();
+            this.applyEffectsFromBlocks();
             Vec3 vec3 = this.getDeltaMovement();
             double d0 = this.getX() + vec3.x;
             double d1 = this.getY() + vec3.y;
@@ -157,7 +163,7 @@ extends Projectile {
             int $$5 = entity1.getRemainingFireTicks();
             entity1.igniteForSeconds(5.0f);
             DamageSource $$6 = CMDamageTypes.causeLaserDamage((Entity)this, $$4);
-            if (!entity1.hurt($$6, this.getDamage())) {
+            if (!entity1.hurtOrSimulate($$6, this.getDamage())) {
                 entity1.setRemainingFireTicks($$5);
             } else {
                 EnchantmentHelper.doPostAttackEffects((ServerLevel)serverlevel, (Entity)entity1, (DamageSource)$$6);
@@ -174,7 +180,7 @@ extends Projectile {
                 if (this.level().isEmptyBlock(blockpos)) {
                     this.level().setBlockAndUpdate(blockpos, BaseFireBlock.getState((BlockGetter)this.level(), (BlockPos)blockpos));
                 }
-            } else if (!(entity instanceof Mob) || EventHooks.canEntityGrief((Level)this.level(), (Entity)entity)) {
+            } else if (!(entity instanceof Mob) || (this.level() instanceof ServerLevel && EventHooks.canEntityGrief((ServerLevel)this.level(), (Entity)entity))) {
                 BlockPos blockpos = p_37384_.getBlockPos().relative(p_37384_.getDirection());
                 if (this.level().isEmptyBlock(blockpos)) {
                     this.level().setBlockAndUpdate(blockpos, BaseFireBlock.getState((BlockGetter)this.level(), (BlockPos)blockpos));
@@ -207,16 +213,14 @@ extends Projectile {
         return 1.0f;
     }
 
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         compound.putDouble("acceleration_power", this.accelerationPower);
     }
 
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        if (compound.contains("acceleration_power", 6)) {
-            this.accelerationPower = compound.getDouble("acceleration_power");
-        }
+        this.accelerationPower = compound.getDoubleOr("acceleration_power", 0.0);
     }
 
     public boolean isPickable() {

@@ -17,13 +17,14 @@ package com.skd.cataclysmbosses.items;
 
 import java.util.List;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 
 public class ModTemplate
 extends Item {
@@ -53,8 +54,8 @@ extends Item {
     private final List<Identifier> baseSlotEmptyIcons;
     private final List<Identifier> additionalSlotEmptyIcons;
 
-    public ModTemplate(Component p_266834_, Component p_267043_, Component p_267048_, Component p_267278_, Component p_267090_, List<Identifier> p_266755_, List<Identifier> p_267060_) {
-        super(new Item.Properties().fireResistant());
+    public ModTemplate(Item.Properties props, Component p_266834_, Component p_267043_, Component p_267048_, Component p_267278_, Component p_267090_, List<Identifier> p_266755_, List<Identifier> p_267060_) {
+        super(props);
         this.appliesTo = p_266834_;
         this.ingredients = p_267043_;
         this.upgradeDescription = p_267048_;
@@ -64,12 +65,12 @@ extends Item {
         this.additionalSlotEmptyIcons = p_267060_;
     }
 
-    public static ModTemplate createignitiumUpgradeTemplate() {
-        return new ModTemplate(IGNITIUM_UPGRADE_APPLIES_TO, IGNITIUM_UPGRADE_INGREDIENTS, IGNITIUM_UPGRADE, IGNITIUM_UPGRADE_BASE_SLOT_DESCRIPTION, IGNITIUM_UPGRADE_ADDITIONS_SLOT_DESCRIPTION, ModTemplate.createignitiumUpgradeIconList(), ModTemplate.createignitiumUpgradeMaterialList());
+    public static ModTemplate createignitiumUpgradeTemplate(Item.Properties props) {
+        return new ModTemplate(props, IGNITIUM_UPGRADE_APPLIES_TO, IGNITIUM_UPGRADE_INGREDIENTS, IGNITIUM_UPGRADE, IGNITIUM_UPGRADE_BASE_SLOT_DESCRIPTION, IGNITIUM_UPGRADE_ADDITIONS_SLOT_DESCRIPTION, ModTemplate.createignitiumUpgradeIconList(), ModTemplate.createignitiumUpgradeMaterialList());
     }
 
-    public static ModTemplate createcursiumUpgradeTemplate() {
-        return new ModTemplate(CURSIUM_UPGRADE_APPLIES_TO, CURSIUM_UPGRADE_INGREDIENTS, CURSIUM_UPGRADE, IGNITIUM_UPGRADE_BASE_SLOT_DESCRIPTION, IGNITIUM_UPGRADE_ADDITIONS_SLOT_DESCRIPTION, ModTemplate.createignitiumUpgradeIconList(), ModTemplate.createignitiumUpgradeMaterialList());
+    public static ModTemplate createcursiumUpgradeTemplate(Item.Properties props) {
+        return new ModTemplate(props, CURSIUM_UPGRADE_APPLIES_TO, CURSIUM_UPGRADE_INGREDIENTS, CURSIUM_UPGRADE, IGNITIUM_UPGRADE_BASE_SLOT_DESCRIPTION, IGNITIUM_UPGRADE_ADDITIONS_SLOT_DESCRIPTION, ModTemplate.createignitiumUpgradeIconList(), ModTemplate.createignitiumUpgradeMaterialList());
     }
 
     private static List<Identifier> createignitiumUpgradeIconList() {
@@ -80,14 +81,13 @@ extends Item {
         return List.of(EMPTY_SLOT_INGOT);
     }
 
-    public void appendHoverText(ItemStack p_267313_, Item.TooltipContext p_339591_, List<Component> p_266820_, TooltipFlag p_266857_) {
-        super.appendHoverText(p_267313_, p_339591_, p_266820_, p_266857_);
-        p_266820_.add(this.upgradeDescription);
-        p_266820_.add(CommonComponents.EMPTY);
-        p_266820_.add(APPLIES_TO_TITLE);
-        p_266820_.add((Component)CommonComponents.space().append(this.appliesTo));
-        p_266820_.add(INGREDIENTS_TITLE);
-        p_266820_.add((Component)CommonComponents.space().append(this.ingredients));
+    public void appendHoverText(ItemStack p_267313_, Item.TooltipContext p_339591_, TooltipDisplay display, java.util.function.Consumer<Component> builder, TooltipFlag p_266857_) {
+        builder.accept(this.upgradeDescription);
+        builder.accept(CommonComponents.EMPTY);
+        builder.accept(APPLIES_TO_TITLE);
+        builder.accept((Component)CommonComponents.space().append(this.appliesTo));
+        builder.accept(INGREDIENTS_TITLE);
+        builder.accept((Component)CommonComponents.space().append(this.ingredients));
     }
 
     public Component getBaseSlotDescription() {
@@ -106,7 +106,7 @@ extends Item {
         return this.additionalSlotEmptyIcons;
     }
 
-    public String getDescriptionId() {
+    public String getDescriptionId(ItemStack stack) {
         return DESCRIPTION_ID;
     }
 }

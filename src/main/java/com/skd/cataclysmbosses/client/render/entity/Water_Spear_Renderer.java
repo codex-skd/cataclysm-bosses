@@ -22,8 +22,11 @@ import com.skd.cataclysmbosses.client.render.CMRenderTypes;
 import com.skd.cataclysmbosses.entity.projectile.Water_Spear_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderState;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
@@ -31,10 +34,11 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Water_Spear_Renderer
-extends EntityRenderer<Water_Spear_Entity> {
+extends CmEntityRenderer<Water_Spear_Entity> {
     private static final Identifier[] TEXTURE_PROGRESS = new Identifier[6];
     public Elemental_Spear_Model model;
 
@@ -46,16 +50,16 @@ extends EntityRenderer<Water_Spear_Entity> {
         }
     }
 
-    public void render(Water_Spear_Entity entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
+    protected void render(Water_Spear_Entity entity, float partialTicks, PoseStack poseStack, CmMultiBufferSource buffer, int packedLight) {
         poseStack.pushPose();
         poseStack.scale(-1.0f, -1.0f, 1.0f);
-        float f = Mth.rotLerp((float)partialTicks, (float)entity.yRotO, (float)entity.getYRot());
-        float f1 = Mth.lerp((float)partialTicks, (float)entity.xRotO, (float)entity.getXRot());
-        this.model.setupAnim(entity, 0.0f, 0.0f, (float)entity.tickCount + partialTicks, f, f1);
+        CmEntityRenderState state = new CmEntityRenderState();
+        state.entity = entity;
+        state.partialTick = partialTicks;
+        this.model.setupAnim(state);
         VertexConsumer vertexconsumer = buffer.getBuffer(CMRenderTypes.getGhost(this.getTextureLocation(entity)));
-        this.model.renderToBuffer(poseStack, vertexconsumer, packedLight, OverlayTexture.NO_OVERLAY);
+        this.model.renderToBuffer(poseStack, vertexconsumer, packedLight, OverlayTexture.NO_OVERLAY, -1);
         poseStack.popPose();
-        super.render((Entity)entity, entityYaw, partialTicks, poseStack, buffer, packedLight);
     }
 
     public Identifier getTextureLocation(Water_Spear_Entity entity) {

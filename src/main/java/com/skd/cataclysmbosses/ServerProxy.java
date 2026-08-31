@@ -19,6 +19,11 @@ public class ServerProxy {
     public void init() {
     }
 
+    // Client-only: open the Ministrosity pet inventory screen. No-op on the server;
+    // ClientProxy overrides it. Keeps MessageOpenInventory free of client-class references.
+    public void openMinistrosityInventory(com.skd.cataclysmbosses.message.MessageOpenInventory packet) {
+    }
+
     public boolean isFirstPersonPlayer(Entity entity) {
         return false;
     }

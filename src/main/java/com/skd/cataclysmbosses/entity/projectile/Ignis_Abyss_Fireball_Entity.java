@@ -70,6 +70,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Ignis_Abyss_Fireball_Entity
 extends CMAbstractHurtingProjectile {
@@ -153,7 +155,7 @@ extends CMAbstractHurtingProjectile {
                 if (shooter instanceof LivingEntity) {
                     LivingEntity owner = (LivingEntity)shooter;
                     DamageSource damagesource = this.damageSources().mobProjectile((Entity)this, owner);
-                    flag = entity instanceof LivingEntity ? entity.hurt(this.damageSources().mobProjectile((Entity)this, owner), 10.0f + ((LivingEntity)entity).getMaxHealth() * 0.2f) : entity.hurt(this.damageSources().mobProjectile((Entity)this, owner), 10.0f);
+                    flag = entity instanceof LivingEntity ? entity.hurtOrSimulate(this.damageSources().mobProjectile((Entity)this, owner), 10.0f + ((LivingEntity)entity).getMaxHealth() * 0.2f) : entity.hurtOrSimulate(this.damageSources().mobProjectile((Entity)this, owner), 10.0f);
                     if (flag) {
                         if (entity.isAlive()) {
                             EnchantmentHelper.doPostAttackEffects((ServerLevel)serverlevel, (Entity)entity, (DamageSource)damagesource);
@@ -165,7 +167,7 @@ extends CMAbstractHurtingProjectile {
                         }
                     }
                 } else {
-                    flag = entity.hurt(this.damageSources().magic(), 5.0f);
+                    flag = entity.hurtOrSimulate(this.damageSources().magic(), 5.0f);
                 }
                 IgnisExplosion explosion = new IgnisExplosion(this.level(), (Entity)this, null, null, this.getX(), this.getY(), this.getZ(), 2.0f, true, Explosion.BlockInteraction.KEEP);
                 explosion.explode();
@@ -259,12 +261,12 @@ extends CMAbstractHurtingProjectile {
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(BOUNCES, (Object)0);
-        p_326229_.define(FIRED, (Object)false);
+        p_326229_.define(BOUNCES, 0);
+        p_326229_.define(FIRED, false);
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         compound.putInt("totalBounces", this.getTotalBounces());
         compound.putInt("timer", this.timer);
@@ -272,11 +274,11 @@ extends CMAbstractHurtingProjectile {
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        this.setTotalBounces(compound.getInt("totalBounces"));
-        this.timer = compound.getInt("timer");
-        this.setFired(compound.getBoolean("fired"));
+        this.setTotalBounces(compound.getIntOr("totalBounces", 0));
+        this.timer = compound.getIntOr("timer", 0);
+        this.setFired(compound.getBooleanOr("fired", false));
     }
 
     public int getTotalBounces() {
@@ -284,11 +286,11 @@ extends CMAbstractHurtingProjectile {
     }
 
     public void setTotalBounces(int bounces) {
-        this.entityData.set(BOUNCES, (Object)bounces);
+        this.entityData.set(BOUNCES, bounces);
     }
 
     public void setFired(boolean fired) {
-        this.entityData.set(FIRED, (Object)fired);
+        this.entityData.set(FIRED, fired);
     }
 
     public boolean getFired() {
@@ -304,20 +306,8 @@ extends CMAbstractHurtingProjectile {
     }
 
     @Override
-    public void onHitEntity(EntityHitResult p_36839_) {
-        super.onHitEntity(p_36839_);
-        this.markHurt();
-        Entity entity = p_36839_.getEntity();
-        if (entity != null && this.getFired()) {
-            if (!this.level().isClientSide()) {
-                Vec3 vec3 = entity.getLookAngle();
-                this.setDeltaMovement(vec3);
-                this.xPower = vec3.x * 0.1;
-                this.yPower = vec3.y * 0.1;
-                this.zPower = vec3.z * 0.1;
-                this.setOwner(entity);
-            }
-        }
+    protected float getInertia() {
+        return 0.95f;
     }
 }
 

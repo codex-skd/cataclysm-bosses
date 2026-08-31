@@ -62,6 +62,8 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Ignited_Sword_Entity
 extends Abstract_Summoned_Entity {
@@ -87,7 +89,6 @@ extends Abstract_Summoned_Entity {
         FlyingPathNavigation flyingpathnavigation = new FlyingPathNavigation((Mob)this, pLevel);
         flyingpathnavigation.setCanOpenDoors(false);
         flyingpathnavigation.setCanFloat(true);
-        flyingpathnavigation.setCanPassDoors(true);
         return flyingpathnavigation;
     }
 
@@ -95,8 +96,8 @@ extends Abstract_Summoned_Entity {
         return Monster.createMonsterAttributes().add(Attributes.FOLLOW_RANGE, 30.0).add(Attributes.MOVEMENT_SPEED, 0.25).add(Attributes.FLYING_SPEED, 1.25).add(Attributes.ATTACK_DAMAGE, 4.0).add(Attributes.MAX_HEALTH, 28.0).add(Attributes.ARMOR, 3.0).add(Attributes.KNOCKBACK_RESISTANCE, 1.0);
     }
 
-    protected AABB getAttackBoundingBox() {
-        AABB aabb = super.getAttackBoundingBox();
+    protected AABB getAttackBoundingBox(double horizontalExpansion) {
+        AABB aabb = super.getAttackBoundingBox(horizontalExpansion);
         return aabb.inflate(0.5, 0.0, 0.5);
     }
 
@@ -136,9 +137,9 @@ extends Abstract_Summoned_Entity {
         }
     }
 
-    public boolean doHurtTarget(Entity entity) {
+    public boolean doHurtTarget(net.minecraft.server.level.ServerLevel serverLevel, Entity entity) {
         this.level().broadcastEntityEvent((Entity)this, (byte)4);
-        if (!super.doHurtTarget(entity)) {
+        if (!super.doHurtTarget(serverLevel, entity)) {
             return false;
         }
         if (entity instanceof LivingEntity) {
@@ -151,7 +152,7 @@ extends Abstract_Summoned_Entity {
     }
 
     public void travel(Vec3 travelVector) {
-        if (this.isControlledByLocalInstance()) {
+        if (this.isLocalInstanceAuthoritative()) {
             if (this.isInWater()) {
                 this.moveRelative(0.02f, travelVector);
                 this.move(MoverType.SELF, this.getDeltaMovement());
@@ -184,12 +185,12 @@ extends Abstract_Summoned_Entity {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
     }
 

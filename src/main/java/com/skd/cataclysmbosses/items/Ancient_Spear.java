@@ -42,6 +42,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -129,9 +130,9 @@ implements ILeftClick {
         return ItemAbilities.DEFAULT_TRIDENT_ACTIONS.contains(itemAbility);
     }
 
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltips, TooltipFlag flags) {
-        super.appendHoverText(stack, context, tooltips, flags);
-        tooltips.add((Component)Component.translatable((String)"item.cataclysm.ancient_spear.desc").withStyle(ChatFormatting.DARK_GREEN));
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, java.util.function.Consumer<Component> builder, TooltipFlag flags) {
+        super.appendHoverText(stack, context, display, builder, flags);
+        builder.accept((Component)Component.translatable((String)"item.cataclysm.ancient_spear.desc").withStyle(ChatFormatting.DARK_GREEN));
     }
 }
 

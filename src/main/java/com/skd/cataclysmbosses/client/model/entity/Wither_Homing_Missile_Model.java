@@ -33,7 +33,7 @@ extends AdvancedEntityModel<Wither_Homing_Missile_Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.root);
+        return ImmutableList.of(this.root);
     }
 
     public BasicModelPart root() {

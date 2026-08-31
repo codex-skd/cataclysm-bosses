@@ -36,7 +36,7 @@ public class NoOreInStructuresMixin {
         }
         WorldGenRegion worldGenRegion = (WorldGenRegion)worldGenLevel;
         if (MixinUtils.isPositionInTaggedStructure(worldGenRegion, context.origin(), ModTag.BLOCKED_ORE)) {
-            cir.setReturnValue((Object)false);
+            cir.setReturnValue(false);
         }
     }
 }

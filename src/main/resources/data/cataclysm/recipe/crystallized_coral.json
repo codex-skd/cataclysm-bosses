@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "##",
+    "##"
+  ],
+  "key": {
+    "#": "cataclysm:crystallized_coral_fragments"
+  },
+  "result": {
+    "id": "cataclysm:crystallized_coral",
+    "count": 1
+  }
+}

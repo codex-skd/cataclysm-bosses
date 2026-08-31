@@ -18,7 +18,7 @@ package com.skd.cataclysmbosses.client.model.item.CuriosModel;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.model.HumanoidRenderState;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
@@ -48,7 +48,7 @@ extends HumanoidModel<HumanoidRenderState> {
     }
 
     protected Iterable<ModelPart> bodyParts() {
-        return ImmutableList.of((Object)this.body);
+        return ImmutableList.of(this.body);
     }
 }
 

@@ -21,32 +21,37 @@ import com.skd.cataclysmbosses.entity.projectile.Blazing_Bone_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Blazing_Bone_Renderer
-extends EntityRenderer<Blazing_Bone_Entity> {
+extends CmEntityRenderer<Blazing_Bone_Entity> {
     public Blazing_Bone_Renderer(EntityRendererProvider.Context manager) {
         super(manager);
     }
 
-    public void render(Blazing_Bone_Entity entity, float yaw, float partialTicks, PoseStack stack, MultiBufferSource buffer, int light) {
+    protected void render(Blazing_Bone_Entity entity, float partialTicks, PoseStack stack, CmMultiBufferSource buffer, int light) {
         stack.pushPose();
         float spin = ((float)entity.tickCount + partialTicks) * 30.0f;
+        float yaw = Mth.rotLerp(partialTicks, entity.yRotO, entity.getYRot());
         stack.scale(1.25f, 1.25f, 1.25f);
         stack.pushPose();
         stack.mulPose(Axis.YP.rotationDegrees(yaw + 90.0f));
         stack.mulPose(Axis.ZP.rotationDegrees(spin));
         stack.translate(0.0f, 0.0f, 0.0f);
-        Minecraft.getInstance().getItemRenderer().renderStatic(entity.getItem(), ItemDisplayContext.GROUND, light, OverlayTexture.NO_OVERLAY, stack, buffer, entity.level(), entity.getId());
+        // PORT TODO(26.2): re-wire item render
+        // Minecraft.getInstance().getItemRenderer().renderStatic(entity.getItem(), ItemDisplayContext.GROUND, light, OverlayTexture.NO_OVERLAY, stack, buffer, entity.level(), entity.getId());
         stack.popPose();
         stack.popPose();
     }

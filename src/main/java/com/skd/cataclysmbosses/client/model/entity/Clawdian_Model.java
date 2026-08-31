@@ -27,8 +27,9 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.Map;
 import java.util.Optional;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.HierarchicalModel;
+import com.skd.cataclysmbosses.client.model.compat.CmHierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
@@ -38,7 +39,7 @@ import net.minecraft.client.model.geom.builders.PartDefinition;
 import org.jetbrains.annotations.NotNull;
 
 public class Clawdian_Model
-extends HierarchicalModel<Clawdian_Entity> {
+extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRenderState> {
     private final ModelPart root;
     private final ModelPart everything;
     private final ModelPart mid_root;
@@ -83,12 +84,12 @@ extends HierarchicalModel<Clawdian_Entity> {
     private final ModelPart left_b_leg_solver;
     private final ModelPart left_b_fore_leg;
     private final ModelPart left_b_fore_leg_solver;
-    private final Map<String, ModelPart> partCache = new Object2ObjectOpenHashMap();
-    private final Map<String, Optional<ModelPart>> optionalPartCache = new Object2ObjectOpenHashMap();
+    private final java.util.function.Function<String, ModelPart> partLookup;
 
     public Clawdian_Model(ModelPart root) {
+        super(root);
         this.root = root;
-        this.buildPartCache(root);
+        this.partLookup = root.createPartLookup();
         this.everything = this.root.getChild("everything");
         this.mid_root = this.everything.getChild("mid_root");
         this.lower_body = this.mid_root.getChild("lower_body");
@@ -189,89 +190,16 @@ extends HierarchicalModel<Clawdian_Entity> {
         return LayerDefinition.create((MeshDefinition)meshdefinition, (int)512, (int)512);
     }
 
-    private void buildPartCache(ModelPart part) {
-        for (Map.Entry entry : part.children.entrySet()) {
-            String partName = (String)entry.getKey();
-            ModelPart childPart = (ModelPart)entry.getValue();
-            this.partCache.putIfAbsent(partName, childPart);
-            this.optionalPartCache.putIfAbsent(partName, Optional.of(childPart));
-            if (childPart.children.isEmpty()) continue;
-            this.buildPartCache(childPart);
-        }
-    }
-
     @NotNull
     public Optional<ModelPart> getAnyDescendantWithName(String name) {
         if ("root".equals(name)) {
             return Optional.of(this.root);
         }
-        return this.optionalPartCache.getOrDefault(name, Optional.empty());
+        return Optional.ofNullable(this.partLookup.apply(name));
     }
 
-    public void setupAnim(Clawdian_Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        this.root().getAllParts().forEach(ModelPart::resetPose);
-        this.animateHeadLookTarget(netHeadYaw, headPitch);
-        if (entity.getAttackState() != 5 && entity.getAttackState() != 2 && entity.getAttackState() != 10) {
-            this.animateWalk(Clawdian_Animation.WALK, limbSwing, limbSwingAmount, 2.0f, 1.5f);
-        }
-        this.animate(entity.getAnimationState("idle"), Clawdian_Animation.IDLE, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("vertical_swing"), Clawdian_Animation.VERTICAL_SWING, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("horizontal_swing"), Clawdian_Animation.HORIZONTAL_SWING, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("death"), Clawdian_Animation.DEATH, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("charge_ready"), Clawdian_Skill_Animation.CHARGE_READY, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("charge_loop"), Clawdian_Skill_Animation.CHARGE_LOOP, ageInTicks, 1.5f);
-        this.animate(entity.getAnimationState("charge_end"), Clawdian_Skill_Animation.CHARGE_END, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("wave_stomp"), Clawdian_Skill_Animation.WAVE_STOMP, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("claw_punch"), Clawdian_Animation.CLAW_PUNCH, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("grab_and_throw"), Clawdian_Animation.GRAB_AND_THROW, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("backstep"), Clawdian_Animation.BACKSTEP, ageInTicks, 1.0f);
-        float partialTick = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false);
-        this.articulateLegs(entity.legSolver, partialTick);
-    }
-
-    public void translateToHand(PoseStack matrixStack) {
-        this.root.translateAndRotate(matrixStack);
-        this.everything.translateAndRotate(matrixStack);
-        this.mid_root.translateAndRotate(matrixStack);
-        this.lower_body.translateAndRotate(matrixStack);
-        this.pelvis.translateAndRotate(matrixStack);
-        this.body.translateAndRotate(matrixStack);
-        this.left_arm.translateAndRotate(matrixStack);
-        this.left_front_arm_rotator.translateAndRotate(matrixStack);
-        this.left_front_arm.translateAndRotate(matrixStack);
-        this.block.translateAndRotate(matrixStack);
-    }
-
-    private void articulateLegs(LegSolverQuadruped legs, float partialTick) {
-        float heightBackLeft = legs.backLeft.getHeight(partialTick);
-        float heightBackRight = legs.backRight.getHeight(partialTick);
-        float heightFrontLeft = legs.frontLeft.getHeight(partialTick);
-        float heightFrontRight = legs.frontRight.getHeight(partialTick);
-        float max = Math.max(Math.max(heightBackLeft, heightBackRight), Math.max(heightFrontLeft, heightFrontRight)) * 0.8f;
-        this.everything.y += max * 16.0f;
-        this.right_f_leg_joint.y += (heightFrontRight - max) * 3.0f;
-        this.right_f_leg_solver.zRot = (float)((double)this.right_f_leg_solver.zRot + (double)(heightFrontRight - max) * Math.toRadians(-45.0));
-        this.right_b_leg_joint.y += (heightBackRight - max) * 3.0f;
-        this.right_b_leg_solver.zRot = (float)((double)this.right_b_leg_solver.zRot + (double)(heightBackRight - max) * Math.toRadians(-45.0));
-        this.right_f_fore_leg_solver.zRot = (float)((double)this.right_f_fore_leg_solver.zRot + (double)(heightFrontRight - max) * Math.toRadians(45.0));
-        this.right_b_fore_leg_solver.zRot = (float)((double)this.right_b_fore_leg_solver.zRot + (double)(heightBackRight - max) * Math.toRadians(45.0));
-        this.left_f_leg_joint.y += (heightFrontLeft - max) * 3.0f;
-        this.left_f_leg_solver.zRot = (float)((double)this.left_f_leg_solver.zRot + (double)(heightFrontLeft - max) * Math.toRadians(45.0));
-        this.left_b_leg_joint.y += (heightBackLeft - max) * 3.0f;
-        this.left_b_leg_solver.zRot = (float)((double)this.left_b_leg_solver.zRot + (double)(heightBackLeft - max) * Math.toRadians(45.0));
-        this.left_f_fore_leg_solver.zRot = (float)((double)this.left_f_fore_leg_solver.zRot + (double)(heightFrontLeft - max) * Math.toRadians(-45.0));
-        this.left_b_fore_leg_solver.zRot = (float)((double)this.left_b_fore_leg_solver.zRot + (double)(heightBackLeft - max) * Math.toRadians(-45.0));
-    }
-
-    private void animateHeadLookTarget(float yRot, float xRot) {
-        this.neck.xRot += xRot * ((float)Math.PI / 180) * 1.0f / 2.0f;
-        this.neck.yRot += yRot * ((float)Math.PI / 180) * 1.0f / 2.0f;
-        this.head.xRot += xRot * ((float)Math.PI / 180) * 1.0f / 2.0f;
-        this.head.yRot += yRot * ((float)Math.PI / 180) * 1.0f / 2.0f;
-    }
-
-    public ModelPart root() {
-        return this.root;
+        @Override
+    public void setupAnim(EntityRenderState state) {
+        super.setupAnim(state);
     }
 }
-

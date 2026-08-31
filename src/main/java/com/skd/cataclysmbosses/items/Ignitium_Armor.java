@@ -47,18 +47,20 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.item.equipment.ArmorMaterial;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 public class Ignitium_Armor
 extends Cataclysm_Armor
 implements KeybindUsingArmor {
-    public Ignitium_Armor(Holder<ArmorMaterial> material, ArmorItem.Type slot, Item.Properties properties) {
+    public Ignitium_Armor(Holder<ArmorMaterial> material, ArmorType slot, Item.Properties properties) {
         super(material, slot, properties, new AttributeContainer[0]);
     }
 
@@ -66,36 +68,31 @@ implements KeybindUsingArmor {
         return p_41135_.is((Item)ModItems.IGNITIUM_INGOT.get());
     }
 
-    public void inventoryTick(ItemStack stack, Level level, Entity entity, int i, boolean held) {
+    public void inventoryTick(ItemStack stack, ServerLevel level, Entity entity, @javax.annotation.Nullable EquipmentSlot slot) {
         Player player;
-        block5: {
-            block4: {
-                super.inventoryTick(stack, level, entity, i, held);
-                if (!(entity instanceof Player)) break block4;
-                player = (Player)entity;
-                if (level.isClientSide()) break block5;
-            }
+        if (!(entity instanceof Player)) {
             return;
         }
-        if (this.type == ArmorItem.Type.HELMET && player.getItemBySlot(EquipmentSlot.HEAD) == stack && ModKeybind.HELMET_KEY_ABILITY.consumeClick()) {
-            PacketDistributor.sendToServer((CustomPacketPayload)new MessageArmorKey(EquipmentSlot.HEAD.ordinal(), player.getId(), 5), (CustomPacketPayload[])new CustomPacketPayload[0]);
+        player = (Player)entity;
+        if (this.type == ArmorType.HELMET && player.getItemBySlot(EquipmentSlot.HEAD) == stack && ModKeybind.HELMET_KEY_ABILITY.consumeClick()) {
+            PacketDistributor.sendToPlayer((net.minecraft.server.level.ServerPlayer)player, (CustomPacketPayload)new MessageArmorKey(EquipmentSlot.HEAD.ordinal(), player.getId(), 5));
             this.onKeyPacket(player, stack, 5);
         }
     }
 
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltips, TooltipFlag flags) {
-        if (this.type == ArmorItem.Type.HELMET) {
-            tooltips.add((Component)Component.translatable((String)"item.cataclysm.ignitium_helmet.desc").withStyle(ChatFormatting.DARK_GREEN));
-            tooltips.add((Component)Component.translatable((String)"item.cataclysm.ignitium_helmet.desc2", (Object[])new Object[]{ModKeybind.HELMET_KEY_ABILITY.getTranslatedKeyMessage()}).withStyle(ChatFormatting.DARK_GREEN));
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, java.util.function.Consumer<Component> builder, TooltipFlag flags) {
+        if (this.type == ArmorType.HELMET) {
+            builder.accept((Component)Component.translatable((String)"item.cataclysm.ignitium_helmet.desc").withStyle(ChatFormatting.DARK_GREEN));
+            builder.accept((Component)Component.translatable((String)"item.cataclysm.ignitium_helmet.desc2", (Object[])new Object[]{ModKeybind.HELMET_KEY_ABILITY.getTranslatedKeyMessage()}).withStyle(ChatFormatting.DARK_GREEN));
         }
-        if (this.type == ArmorItem.Type.CHESTPLATE) {
-            tooltips.add((Component)Component.translatable((String)"item.cataclysm.ignitium_chestplate.desc").withStyle(ChatFormatting.DARK_GREEN));
+        if (this.type == ArmorType.CHESTPLATE) {
+            builder.accept((Component)Component.translatable((String)"item.cataclysm.ignitium_chestplate.desc").withStyle(ChatFormatting.DARK_GREEN));
         }
-        if (this.type == ArmorItem.Type.LEGGINGS) {
-            tooltips.add((Component)Component.translatable((String)"item.cataclysm.ignitium_leggings.desc").withStyle(ChatFormatting.DARK_GREEN));
+        if (this.type == ArmorType.LEGGINGS) {
+            builder.accept((Component)Component.translatable((String)"item.cataclysm.ignitium_leggings.desc").withStyle(ChatFormatting.DARK_GREEN));
         }
-        if (this.type == ArmorItem.Type.BOOTS) {
-            tooltips.add((Component)Component.translatable((String)"item.cataclysm.ignitium_boots.desc").withStyle(ChatFormatting.DARK_GREEN));
+        if (this.type == ArmorType.BOOTS) {
+            builder.accept((Component)Component.translatable((String)"item.cataclysm.ignitium_boots.desc").withStyle(ChatFormatting.DARK_GREEN));
         }
     }
 
@@ -104,9 +101,9 @@ implements KeybindUsingArmor {
         if (player == null) {
             return;
         }
-        if (Type2 == 5 && !player.getCooldowns().isOnCooldown((Item)ModItems.IGNITIUM_HELMET.get())) {
+        if (Type2 == 5 && !player.getCooldowns().isOnCooldown(new ItemStack(ModItems.IGNITIUM_HELMET.get()))) {
             boolean flag = false;
-            List list = player.level().getEntities((Entity)player, player.getBoundingBox().inflate(16.0));
+            List<Entity> list = player.level().getEntities((Entity)player, player.getBoundingBox().inflate(16.0));
             for (Entity entity : list) {
                 if (entity instanceof LivingEntity) {
                     LivingEntity living = (LivingEntity)entity;
@@ -123,12 +120,12 @@ implements KeybindUsingArmor {
                     flag = living.addEffect(effectinstance);
                 }
                 if (!flag) continue;
-                player.getCooldowns().addCooldown((Item)ModItems.IGNITIUM_HELMET.get(), 300);
+                player.getCooldowns().addCooldown(ModItems.IGNITIUM_HELMET.get().getDefaultInstance(), 300);
             }
         }
     }
 
-    public Identifier getArmorTexture(@Nonnull ItemStack stack, @Nonnull Entity entity, @Nonnull EquipmentSlot slot, @Nonnull ArmorMaterial.Layer layer, boolean isInnerModel) {
+    public Identifier getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, net.minecraft.client.resources.model.EquipmentClientInfo.Layer layer, boolean isInnerModel) {
         return Identifier.fromNamespaceAndPath((String)"cataclysm", (String)("textures/armor/ignitium_armor" + (slot == EquipmentSlot.LEGS ? "_legs.png" : ".png")));
     }
 }

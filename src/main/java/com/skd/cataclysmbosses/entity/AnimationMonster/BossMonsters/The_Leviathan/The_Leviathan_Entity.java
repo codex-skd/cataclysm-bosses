@@ -75,6 +75,7 @@
  */
 package com.skd.cataclysmbosses.entity.AnimationMonster.BossMonsters.The_Leviathan;
 
+import net.minecraft.world.entity.EntitySpawnReason;
 import com.skd.cataclysmbosses.client.particle.Options.RoarParticleOptions;
 import com.skd.cataclysmbosses.config.CMCommonConfig;
 import com.skd.cataclysmbosses.entity.AI.AnimalAIRandomSwimming;
@@ -177,6 +178,8 @@ import net.neoforged.neoforge.entity.PartEntity;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class The_Leviathan_Entity
 extends LLibrary_Boss_Monster
@@ -254,7 +257,7 @@ IHoldEntity {
     private static final EntityDataAccessor<Integer> BLAST_CHANCE = SynchedEntityData.defineId(The_Leviathan_Entity.class, (EntityDataSerializer)EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> MODE_CHANCE = SynchedEntityData.defineId(The_Leviathan_Entity.class, (EntityDataSerializer)EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> MELT_DOWN = SynchedEntityData.defineId(The_Leviathan_Entity.class, (EntityDataSerializer)EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Optional<UUID>> TONGUE_UUID = SynchedEntityData.defineId(The_Leviathan_Entity.class, (EntityDataSerializer)EntityDataSerializers.OPTIONAL_UUID);
+    private static final EntityDataAccessor<String> TONGUE_UUID = SynchedEntityData.defineId(The_Leviathan_Entity.class, (EntityDataSerializer)EntityDataSerializers.STRING);
     private static final EntityDataAccessor<Integer> TONGUE_ID = SynchedEntityData.defineId(The_Leviathan_Entity.class, (EntityDataSerializer)EntityDataSerializers.INT);
 
     public The_Leviathan_Entity(EntityType type, Level worldIn) {
@@ -307,11 +310,11 @@ IHoldEntity {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(BLAST_CHANCE, (Object)0);
-        p_326229_.define(MODE_CHANCE, (Object)0);
-        p_326229_.define(MELT_DOWN, (Object)false);
-        p_326229_.define(TONGUE_UUID, Optional.empty());
-        p_326229_.define(TONGUE_ID, (Object)-1);
+        p_326229_.define(BLAST_CHANCE, 0);
+        p_326229_.define(MODE_CHANCE, 0);
+        p_326229_.define(MELT_DOWN, false);
+        p_326229_.define(TONGUE_UUID, "");
+        p_326229_.define(TONGUE_ID, -1);
     }
 
     protected void registerGoals() {
@@ -388,21 +391,21 @@ IHoldEntity {
         return LEVIATHAN_TENTACLE_STRIKE_UPPER_R;
     }
 
-    public boolean isAlliedTo(Entity entityIn) {
+    public boolean considersEntityAsAlly(Entity entityIn) {
         if (entityIn == this) {
             return true;
         }
-        if (super.isAlliedTo(entityIn)) {
+        if (super.considersEntityAsAlly(entityIn)) {
             return true;
         }
-        if (entityIn.getType().is(ModTag.TEAM_THE_LEVIATHAN)) {
+        if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_THE_LEVIATHAN)) {
             return this.getTeam() == null && entityIn.getTeam() == null;
         }
         return false;
     }
 
     @Override
-    public boolean hurt(DamageSource source, float damage) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         Entity entity = source.getDirectEntity();
         if (entity instanceof Abyss_Blast_Entity || entity instanceof Portal_Abyss_Blast_Entity) {
             return false;
@@ -411,18 +414,18 @@ IHoldEntity {
             this.destroyBlocksTick = 20;
         }
         double range = this.calculateRange(source);
-        boolean flag1 = this.canInFluidType(this.getEyeInFluidType());
+        boolean flag1 = this.isEyeInFluid(net.minecraft.tags.FluidTags.WATER);
         if (!flag1 && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY) && CMCommonConfig.Leviathan.ImmuneOutofWater) {
-            if (entity instanceof Player) {
-                Player player = (Player)entity;
-                player.displayClientMessage((Component)Component.translatable((String)"entity.cataclysm.the_leviathan_immune"), true);
+            if (entity instanceof ServerPlayer) {
+                ServerPlayer player = (ServerPlayer)entity;
+                player.sendSystemMessage((Component)Component.translatable((String)"entity.cataclysm.the_leviathan_immune"), true);
             }
             return false;
         }
         if (this.getAnimation() == LEVIATHAN_PHASE2 && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
             return false;
         }
-        boolean attack = super.hurt(source, damage);
+        boolean attack = super.hurtOrSimulate(source, damage);
         if (this.getAnimation() == LEVIATHAN_RUSH && this.getAnimationTick() >= 38 && this.getAnimationTick() <= 54 && attack) {
             AnimationHandler.INSTANCE.sendAnimationMessage((Entity)this, LEVIATHAN_STUN);
         }
@@ -435,7 +438,7 @@ IHoldEntity {
     }
 
     public ItemEntity spawnAtLocation(ItemStack stack) {
-        ItemEntity itementity = this.spawnAtLocation(stack, 0.0f);
+        ItemEntity itementity = this.spawnAtLocation((ServerLevel)this.level(), stack, 0.0f);
         if (itementity != null) {
             itementity.setGlowingTag(true);
             itementity.setExtendedLifetime();
@@ -454,12 +457,13 @@ IHoldEntity {
     public void onAboveBubbleCol(boolean p_20313_) {
     }
 
-    public boolean isInvulnerableTo(DamageSource source) {
-        return source.is(DamageTypes.IN_WALL) || source.is(DamageTypes.FALLING_BLOCK) || super.isInvulnerableTo(source);
+    @Override
+    public boolean isInvulnerableTo(ServerLevel level, DamageSource source) {
+        return source.is(DamageTypes.IN_WALL) || source.is(DamageTypes.FALLING_BLOCK) || super.isInvulnerableTo(level, source);
     }
 
     public boolean attackEntityFromPart(The_Leviathan_Part leviathan_part, DamageSource source, float amount) {
-        return this.hurt(source, amount);
+        return this.hurtOrSimulate(source, amount);
     }
 
     @Override
@@ -475,7 +479,7 @@ IHoldEntity {
         }
         if ((weapon = this.getTongue()) instanceof The_Leviathan_Tongue_Entity) {
             The_Leviathan_Tongue_Entity magneticWeapon = (The_Leviathan_Tongue_Entity)weapon;
-            this.entityData.set(TONGUE_ID, (Object)magneticWeapon.getId());
+            this.entityData.set(TONGUE_ID, magneticWeapon.getId());
             magneticWeapon.setControllerUUID(this.getUUID());
         }
         if (!this.getPassengers().isEmpty() && ((Entity)this.getPassengers().get(0)).isShiftKeyDown() && this.getAnimation() == LEVIATHAN_TENTACLE_HOLD_BLAST) {
@@ -555,7 +559,7 @@ IHoldEntity {
                     if (this.destroyBlocksTick == 0) {
                         if (CMCommonConfig.Leviathan.ignoreMobGriefing) {
                             this.blockbreak(0.5, 0.5, 0.5);
-                        } else if (EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+                        } else if (this.level() instanceof ServerLevel && EventHooks.canEntityGrief((ServerLevel)this.level(), (Entity)this)) {
                             this.blockbreak(0.5, 0.5, 0.5);
                         }
                     }
@@ -563,7 +567,7 @@ IHoldEntity {
                 if (this.mode == AttackMode.MELEE) {
                     if (CMCommonConfig.Leviathan.ignoreMobGriefing) {
                         this.blockbreak2();
-                    } else if (EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+                    } else if (this.level() instanceof ServerLevel && EventHooks.canEntityGrief((ServerLevel)this.level(), (Entity)this)) {
                         this.blockbreak2();
                     }
                 }
@@ -697,7 +701,7 @@ IHoldEntity {
                 if (!this.level().isClientSide()) {
                     if (CMCommonConfig.Leviathan.ignoreMobGriefing) {
                         this.chargeblockbreaking();
-                    } else if (EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+                    } else if (this.level() instanceof ServerLevel && EventHooks.canEntityGrief((ServerLevel)this.level(), (Entity)this)) {
                         this.chargeblockbreaking();
                     }
                 }
@@ -940,7 +944,9 @@ IHoldEntity {
             Level level = this.level();
             if (level instanceof ServerLevel) {
                 ServerLevel serverLevel = (ServerLevel)level;
-                serverLevel.getPlayers(EntitySelector.NO_SPECTATORS).forEach(serverPlayer -> serverPlayer.displayClientMessage((Component)Component.translatable((String)"entity.cataclysm.the_leviathan.defeat_message").withStyle(ChatFormatting.DARK_PURPLE), true));
+                for (ServerPlayer serverPlayer : serverLevel.getPlayers(p -> EntitySelector.NO_SPECTATORS.test(p))) {
+                    serverPlayer.sendSystemMessage((Component)Component.translatable((String)"entity.cataclysm.the_leviathan.defeat_message").withStyle(ChatFormatting.DARK_PURPLE), true);
+                }
             }
         }
     }
@@ -950,8 +956,8 @@ IHoldEntity {
             for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(7.0, 7.0, 7.0))) {
                 if (this.isAlliedTo((Entity)entity) || entity instanceof The_Leviathan_Entity || entity == this) continue;
                 DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
-                boolean flag = entity.hurt(damagesource, (float)((double)((float)this.getAttributeValue(Attributes.ATTACK_DAMAGE)) + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE), (double)(entity.getMaxHealth() * (float)CMCommonConfig.Leviathan.TailSwingHpDamage))));
-                if (entity.isDamageSourceBlocked(damagesource) && entity instanceof Player) {
+                boolean flag = entity.hurtOrSimulate(damagesource, (float)((double)((float)this.getAttributeValue(Attributes.ATTACK_DAMAGE)) + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE), (double)(entity.getMaxHealth() * (float)CMCommonConfig.Leviathan.TailSwingHpDamage))));
+                if (entity.isBlocking() && entity instanceof Player) {
                     Player player = (Player)entity;
                     EntityUtil.disableShield(player, 120);
                 }
@@ -1090,10 +1096,10 @@ IHoldEntity {
             for (LivingEntity Lentity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(3.0))) {
                 if (this.isAlliedTo((Entity)Lentity) || Lentity instanceof The_Leviathan_Entity || Lentity == this) continue;
                 DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
-                boolean flag = Lentity.hurt(damagesource, (float)((double)((float)this.getAttributeValue(Attributes.ATTACK_DAMAGE)) + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE), (double)(Lentity.getMaxHealth() * (float)CMCommonConfig.Leviathan.RushHpDamage))));
+                boolean flag = Lentity.hurtOrSimulate(damagesource, (float)((double)((float)this.getAttributeValue(Attributes.ATTACK_DAMAGE)) + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE), (double)(Lentity.getMaxHealth() * (float)CMCommonConfig.Leviathan.RushHpDamage))));
                 if (Lentity instanceof Player) {
                     Player player = (Player)Lentity;
-                    if (Lentity.isDamageSourceBlocked(damagesource)) {
+                    if (Lentity.isBlocking()) {
                         EntityUtil.disableShield(player, 120);
                     }
                 }
@@ -1118,10 +1124,10 @@ IHoldEntity {
             for (LivingEntity target : hit) {
                 if (this.isAlliedTo((Entity)target) || target instanceof The_Leviathan_Entity || target == this) continue;
                 DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
-                boolean flag = target.hurt(damagesource, (float)((double)((float)this.getAttributeValue(Attributes.ATTACK_DAMAGE)) * 1.5 + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * 1.5, (double)(target.getMaxHealth() * (float)CMCommonConfig.Leviathan.TentacleHpDamage))));
+                boolean flag = target.hurtOrSimulate(damagesource, (float)((double)((float)this.getAttributeValue(Attributes.ATTACK_DAMAGE)) * 1.5 + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * 1.5, (double)(target.getMaxHealth() * (float)CMCommonConfig.Leviathan.TentacleHpDamage))));
                 if (target instanceof Player) {
                     Player player = (Player)target;
-                    if (target.isDamageSourceBlocked(damagesource)) {
+                    if (target.isBlocking()) {
                         EntityUtil.disableShield(player, 200);
                     }
                 }
@@ -1144,10 +1150,10 @@ IHoldEntity {
                 for (LivingEntity target : hit) {
                     if (this.isAlliedTo((Entity)target) || target instanceof The_Leviathan_Entity || target == this) continue;
                     DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
-                    boolean flag = target.hurt(damagesource, (float)((double)((float)this.getAttributeValue(Attributes.ATTACK_DAMAGE)) + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE), (double)(target.getMaxHealth() * (float)CMCommonConfig.Leviathan.TentacleHpDamage))));
+                    boolean flag = target.hurtOrSimulate(damagesource, (float)((double)((float)this.getAttributeValue(Attributes.ATTACK_DAMAGE)) + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE), (double)(target.getMaxHealth() * (float)CMCommonConfig.Leviathan.TentacleHpDamage))));
                     if (target instanceof Player) {
                         Player player = (Player)target;
-                        if (target.isDamageSourceBlocked(damagesource)) {
+                        if (target.isBlocking()) {
                             EntityUtil.disableShield(player, 90);
                         }
                     }
@@ -1172,18 +1178,18 @@ IHoldEntity {
             for (LivingEntity target : hit) {
                 if (this.isAlliedTo((Entity)target) || target instanceof The_Leviathan_Entity || target == this) continue;
                 DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
-                boolean flag = target.hurt(damagesource, (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) + target.getMaxHealth() * 0.1f);
-                if (target instanceof Player) {
-                    Player player = (Player)target;
-                    if (target.isDamageSourceBlocked(damagesource) && shieldbreakticks > 0) {
-                        EntityUtil.disableShield(player, shieldbreakticks);
+                boolean flag = target.hurtOrSimulate(damagesource, (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) + target.getMaxHealth() * 0.1f);
+                    if (target instanceof Player) {
+                        Player player = (Player)target;
+                        if (target.isBlocking() && shieldbreakticks > 0) {
+                            EntityUtil.disableShield(player, shieldbreakticks);
+                        }
                     }
-                }
-                if (!flag || target.getType().is(ModTag.IGNIS_CANT_POKE) || !target.isAlive()) continue;
+                if (!flag || target.getType().builtInRegistryHolder().is(ModTag.IGNIS_CANT_POKE) || !target.isAlive()) continue;
                 if (target.isShiftKeyDown()) {
                     target.setShiftKeyDown(false);
                 }
-                target.startRiding((Entity)this, true);
+                target.startRiding((Entity)this, true, true);
                 AnimationHandler.INSTANCE.sendAnimationMessage((Entity)this, LEVIATHAN_TENTACLE_HOLD_BLAST);
             }
         }
@@ -1229,7 +1235,7 @@ IHoldEntity {
         this.collidePosX = this.endPosX;
         this.collidePosY = this.endPosY;
         this.collidePosZ = this.endPosZ;
-        List entities = world.getEntitiesOfClass(LivingEntity.class, new AABB(Math.min(this.getX(), this.collidePosX), Math.min(this.getY(), this.collidePosY), Math.min(this.getZ(), this.collidePosZ), Math.max(this.getX(), this.collidePosX), Math.max(this.getY(), this.collidePosY), Math.max(this.getZ(), this.collidePosZ)).inflate(inflateX, inflateY, inflateZ));
+        List<LivingEntity> entities = world.getEntitiesOfClass(LivingEntity.class, new AABB(Math.min(this.getX(), this.collidePosX), Math.min(this.getY(), this.collidePosY), Math.min(this.getZ(), this.collidePosZ), Math.max(this.getX(), this.collidePosX), Math.max(this.getY(), this.collidePosY), Math.max(this.getZ(), this.collidePosZ)).inflate(inflateX, inflateY, inflateZ));
         for (LivingEntity entity : entities) {
             float pad = 2.5f;
             AABB aabb = entity.getBoundingBox().inflate((double)pad, (double)pad, (double)pad);
@@ -1253,7 +1259,7 @@ IHoldEntity {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         compound.putInt("BlastChance", this.getBlastChance());
         compound.putBoolean("MeltDown", this.getMeltDown());
@@ -1261,11 +1267,11 @@ IHoldEntity {
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        this.setBlastChance(compound.getInt("BlastChance"));
-        this.setModeChance(compound.getInt("ModeChance"));
-        this.setMeltDown(compound.getBoolean("MeltDown"));
+        this.setBlastChance(compound.getIntOr("BlastChance", 0));
+        this.setModeChance(compound.getIntOr("ModeChance", 0));
+        this.setMeltDown(compound.getBooleanOr("MeltDown", false));
         if (this.hasCustomName()) {
             this.bossInfo.setName(this.getDisplayName());
         }
@@ -1291,7 +1297,7 @@ IHoldEntity {
     }
 
     public void setMeltDown(boolean chance) {
-        this.entityData.set(MELT_DOWN, (Object)chance);
+        this.entityData.set(MELT_DOWN, chance);
     }
 
     public int getBlastChance() {
@@ -1299,7 +1305,7 @@ IHoldEntity {
     }
 
     public void setBlastChance(int chance) {
-        this.entityData.set(BLAST_CHANCE, (Object)chance);
+        this.entityData.set(BLAST_CHANCE, chance);
     }
 
     public int getModeChance() {
@@ -1307,16 +1313,17 @@ IHoldEntity {
     }
 
     public void setModeChance(int chance) {
-        this.entityData.set(MODE_CHANCE, (Object)chance);
+        this.entityData.set(MODE_CHANCE, chance);
     }
 
     @Nullable
     public UUID getTongueUUID() {
-        return ((Optional)this.entityData.get(TONGUE_UUID)).orElse(null);
+        String s = (String)this.entityData.get(TONGUE_UUID);
+        return s.isEmpty() ? null : java.util.UUID.fromString(s);
     }
 
     public void setTongueUUID(@Nullable UUID uniqueId) {
-        this.entityData.set(TONGUE_UUID, Optional.ofNullable(uniqueId));
+        this.entityData.set(TONGUE_UUID, uniqueId == null ? "" : uniqueId.toString());
     }
 
     public Entity getTongue() {
@@ -1337,7 +1344,7 @@ IHoldEntity {
 
     public void createPortal2(double x, double y, double z, Vec3 to) {
         if (!this.level().isClientSide() && this.portalTarget == null) {
-            Abyss_Portal_Entity portal = (Abyss_Portal_Entity)((EntityType)ModEntities.ABYSS_PORTAL.get()).create(this.level());
+            Abyss_Portal_Entity portal = (Abyss_Portal_Entity)((EntityType)ModEntities.ABYSS_PORTAL.get()).create(this.level(), EntitySpawnReason.EVENT);
             portal.setPos(x, y, z);
             portal.setLifespan(10000);
             portal.setEntrance(true);
@@ -1615,7 +1622,7 @@ IHoldEntity {
                 ((The_Leviathan_Entity)this.entity).getLookControl().setLookAt((Entity)target, 30.0f, 90.0f);
             }
             if (((The_Leviathan_Entity)this.entity).getAnimationTick() == 25 && target != null && ((The_Leviathan_Entity)this.entity).getTongue() == null && !((The_Leviathan_Entity)this.entity).level().isClientSide()) {
-                The_Leviathan_Tongue_Entity segment = (The_Leviathan_Tongue_Entity)((EntityType)ModEntities.THE_LEVIATHAN_TONGUE.get()).create(((The_Leviathan_Entity)this.entity).level());
+                The_Leviathan_Tongue_Entity segment = (The_Leviathan_Tongue_Entity)((EntityType)ModEntities.THE_LEVIATHAN_TONGUE.get()).create((net.minecraft.server.level.ServerLevel)((The_Leviathan_Entity)this.entity).level(), EntitySpawnReason.EVENT);
                 segment.copyPosition((Entity)this.entity);
                 segment.setPos(((The_Leviathan_Entity)this.entity).getTonguePosition());
                 segment.setControllerUUID(((The_Leviathan_Entity)this.entity).getUUID());
@@ -1689,7 +1696,7 @@ IHoldEntity {
         }
 
         private Dimensional_Rift_Entity getClosestDimensionalRift() {
-            List list = ((The_Leviathan_Entity)this.entity).level().getEntitiesOfClass(Dimensional_Rift_Entity.class, ((The_Leviathan_Entity)this.entity).getBoundingBox().inflate(15.0, 15.0, 15.0));
+            List<Dimensional_Rift_Entity> list = ((The_Leviathan_Entity)this.entity).level().getEntitiesOfClass(Dimensional_Rift_Entity.class, ((The_Leviathan_Entity)this.entity).getBoundingBox().inflate(15.0, 15.0, 15.0));
             Dimensional_Rift_Entity closest = null;
             if (!list.isEmpty()) {
                 for (Dimensional_Rift_Entity entity : list) {
@@ -2088,7 +2095,7 @@ IHoldEntity {
                 }
                 flag = true;
                 break;
-            } while ((blockpos = blockpos.above()).getY() < Math.min(((The_Leviathan_Entity)this.entity).level().getMaxBuildHeight(), ((The_Leviathan_Entity)this.entity).getBlockY() + 100) && !((The_Leviathan_Entity)this.entity).level().getBlockState(blockpos).isSolid());
+            } while ((blockpos = blockpos.above()).getY() < Math.min(((The_Leviathan_Entity)this.entity).level().getMaxY() + 1, ((The_Leviathan_Entity)this.entity).getBlockY() + 100) && !((The_Leviathan_Entity)this.entity).level().getBlockState(blockpos).isSolid());
             if (flag) {
                 ((The_Leviathan_Entity)this.entity).level().addFreshEntity((Entity)new Abyss_Blast_Portal_Entity(((The_Leviathan_Entity)this.entity).level(), x, (double)blockpos.getY() + d0 + 0.5, z, rotation, delay, (float)CMCommonConfig.Leviathan.AbyssBlastDamage, (float)CMCommonConfig.Leviathan.AbyssBlastHpDamage, (LivingEntity)this.entity));
             }

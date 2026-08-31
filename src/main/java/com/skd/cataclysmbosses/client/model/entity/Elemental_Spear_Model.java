@@ -15,8 +15,9 @@ package com.skd.cataclysmbosses.client.model.entity;
 
 import com.skd.cataclysmbosses.client.animation.Elemental_Spear_Animation;
 import com.skd.cataclysmbosses.entity.projectile.Elemental_Spear_Entity;
-import net.minecraft.client.model.HierarchicalModel;
+import com.skd.cataclysmbosses.client.model.compat.CmHierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
@@ -25,11 +26,12 @@ import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 
 public class Elemental_Spear_Model
-extends HierarchicalModel<Elemental_Spear_Entity> {
+extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRenderState> {
     private final ModelPart root;
     private final ModelPart rot;
 
     public Elemental_Spear_Model(ModelPart root) {
+        super(root);
         this.root = root.getChild("root");
         this.rot = this.root.getChild("rot");
     }
@@ -43,19 +45,8 @@ extends HierarchicalModel<Elemental_Spear_Entity> {
         return LayerDefinition.create((MeshDefinition)meshdefinition, (int)128, (int)128);
     }
 
-    public void setupAnim(Elemental_Spear_Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        this.root().getAllParts().forEach(ModelPart::resetPose);
-        this.root.yRot = netHeadYaw * ((float)Math.PI / 180);
-        this.root.xRot = headPitch * ((float)Math.PI / 180);
-        this.animate(entity.getAnimationState("idle"), Elemental_Spear_Animation.IDLE, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("spawn"), Elemental_Spear_Animation.SPAWN, ageInTicks, 1.0f);
-    }
-
-    public void setupAnim(float yRot, float xRot) {
-    }
-
-    public ModelPart root() {
-        return this.root;
+            @Override
+    public void setupAnim(EntityRenderState state) {
+        super.setupAnim(state);
     }
 }
-

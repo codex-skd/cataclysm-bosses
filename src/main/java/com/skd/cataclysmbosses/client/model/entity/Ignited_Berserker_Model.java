@@ -25,8 +25,9 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.Map;
 import java.util.Optional;
-import net.minecraft.client.model.HierarchicalModel;
+import com.skd.cataclysmbosses.client.model.compat.CmHierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
@@ -36,7 +37,7 @@ import net.minecraft.client.model.geom.builders.PartDefinition;
 import org.jetbrains.annotations.NotNull;
 
 public class Ignited_Berserker_Model<T extends Ignited_Berserker_Entity>
-extends HierarchicalModel<T> {
+extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRenderState> {
     private final ModelPart root;
     private final ModelPart everything;
     private final ModelPart mid_root;
@@ -55,8 +56,9 @@ extends HierarchicalModel<T> {
     private final Map<String, Optional<ModelPart>> optionalPartCache = new Object2ObjectOpenHashMap();
 
     public Ignited_Berserker_Model(ModelPart root) {
+        super(root);
         this.root = root;
-        this.buildPartCache(root);
+
         this.everything = root.getChild("everything");
         this.mid_root = this.everything.getChild("mid_root");
         this.rod = this.mid_root.getChild("rod");
@@ -108,52 +110,8 @@ extends HierarchicalModel<T> {
         return LayerDefinition.create((MeshDefinition)meshdefinition, (int)128, (int)128);
     }
 
-    public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        this.root().getAllParts().forEach(ModelPart::resetPose);
-        this.animateHeadLookTarget(netHeadYaw, headPitch);
-        if (((Internal_Animation_Monster)((Object)entity)).getAttackState() == 0) {
-            this.animateWalk(Ignited_Berserker_Animation.WALK, limbSwing, limbSwingAmount, 1.0f, 2.0f);
-            this.edges.yRot -= ageInTicks * 0.1f;
-        }
-        this.animate(((Ignited_Berserker_Entity)((Object)entity)).getAnimationState("idle"), Ignited_Berserker_Animation.IDLE, ageInTicks, 1.0f);
-        this.animate(((Ignited_Berserker_Entity)((Object)entity)).getAnimationState("x_slash"), Ignited_Berserker_Animation.X_SLASH, ageInTicks, 1.0f);
-        this.animate(((Ignited_Berserker_Entity)((Object)entity)).getAnimationState("mixer_start"), Ignited_Berserker_Animation.MIXER_START, ageInTicks, 1.0f);
-        this.animate(((Ignited_Berserker_Entity)((Object)entity)).getAnimationState("mixer_idle"), Ignited_Berserker_Animation.MIXER_IDLE, ageInTicks, 1.0f);
-        this.animate(((Ignited_Berserker_Entity)((Object)entity)).getAnimationState("mixer_finish"), Ignited_Berserker_Animation.MIXER_FINISH, ageInTicks, 1.0f);
-        this.animate(((Ignited_Berserker_Entity)((Object)entity)).getAnimationState("sword_dance_left"), Ignited_Berserker_Animation.SWORD_DANCE_LEFT, ageInTicks, 1.0f);
-        this.animate(((Ignited_Berserker_Entity)((Object)entity)).getAnimationState("sword_dance_right"), Ignited_Berserker_Animation.SWORD_DANCE_RIGHT, ageInTicks, 1.0f);
-    }
-
-    private void buildPartCache(ModelPart part) {
-        for (Map.Entry entry : part.children.entrySet()) {
-            String partName = (String)entry.getKey();
-            ModelPart childPart = (ModelPart)entry.getValue();
-            this.partCache.putIfAbsent(partName, childPart);
-            this.optionalPartCache.putIfAbsent(partName, Optional.of(childPart));
-            if (childPart.children.isEmpty()) continue;
-            this.buildPartCache(childPart);
-        }
-    }
-
-    @NotNull
-    public Optional<ModelPart> getAnyDescendantWithName(String name) {
-        if ("root".equals(name)) {
-            return Optional.of(this.root);
-        }
-        return this.optionalPartCache.getOrDefault(name, Optional.empty());
-    }
-
-    private void animateHeadLookTarget(float yRot, float xRot) {
-        this.head.xRot = xRot * ((float)Math.PI / 180);
-        this.head.yRot = yRot * ((float)Math.PI / 180);
-    }
-
-    public ModelPart root() {
-        return this.root;
-    }
-
-    public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, int alpha) {
-        this.root.render(poseStack, vertexConsumer, packedLight, packedOverlay, alpha);
+        @Override
+    public void setupAnim(EntityRenderState state) {
+        super.setupAnim(state);
     }
 }
-

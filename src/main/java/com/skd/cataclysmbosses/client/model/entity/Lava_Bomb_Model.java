@@ -33,7 +33,7 @@ extends AdvancedEntityModel<Lava_Bomb_Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.root);
+        return ImmutableList.of(this.root);
     }
 
     public void setupAnim(Lava_Bomb_Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {

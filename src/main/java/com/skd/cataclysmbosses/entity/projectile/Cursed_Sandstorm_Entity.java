@@ -43,6 +43,7 @@ import com.skd.cataclysmbosses.init.ModEntities;
 import com.skd.cataclysmbosses.util.CMDamageTypes;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -72,6 +73,8 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Cursed_Sandstorm_Entity
 extends Projectile {
@@ -102,7 +105,9 @@ extends Projectile {
 
     public Cursed_Sandstorm_Entity(EntityType<? extends Cursed_Sandstorm_Entity> p_36817_, double p_36818_, double p_36819_, double p_36820_, double p_36821_, double p_36822_, double p_36823_, Level p_36824_) {
         this(p_36817_, p_36824_);
-        this.moveTo(p_36818_, p_36819_, p_36820_, this.getYRot(), this.getXRot());
+        this.setPos(p_36818_, p_36819_, p_36820_);
+        this.setYRot((float)this.getYRot());
+        this.setXRot((float)this.getXRot());
         this.reapplyPosition();
         double d0 = Math.sqrt(p_36821_ * p_36821_ + p_36822_ * p_36822_ + p_36823_ * p_36823_);
         if (d0 != 0.0) {
@@ -127,9 +132,9 @@ extends Projectile {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(TRACKING, (Object)false);
-        p_326229_.define(DAMAGE, (Object)Float.valueOf(0.0f));
-        p_326229_.define(STATE, (Object)0);
+        p_326229_.define(TRACKING, false);
+        p_326229_.define(DAMAGE, Float.valueOf(0.0f));
+        p_326229_.define(STATE, 0);
     }
 
     public AnimationState getAnimationState(String input) {
@@ -173,7 +178,7 @@ extends Projectile {
     }
 
     public void setState(int state) {
-        this.entityData.set(STATE, (Object)state);
+        this.entityData.set(STATE, state);
     }
 
     public float getDamage() {
@@ -181,7 +186,7 @@ extends Projectile {
     }
 
     public void setDamage(float damage) {
-        this.entityData.set(DAMAGE, (Object)Float.valueOf(damage));
+        this.entityData.set(DAMAGE, Float.valueOf(damage));
     }
 
     public boolean shouldRenderAtSqrDistance(double p_36837_) {
@@ -192,37 +197,37 @@ extends Projectile {
         return p_36837_ < (d0 *= 64.0) * d0;
     }
 
-    public void addAdditionalSaveData(CompoundTag p_37357_) {
+    public void addAdditionalSaveData(ValueOutput p_37357_) {
         super.addAdditionalSaveData(p_37357_);
         if (this.finalTarget != null) {
-            p_37357_.putUUID("Target", this.finalTarget.getUUID());
+            p_37357_.store("Target", UUIDUtil.CODEC, this.finalTarget.getUUID());
         }
-        p_37357_.put("power", (Tag)this.newDoubleList(new double[]{this.xPower, this.yPower, this.zPower}));
+        p_37357_.putDouble("power_x", this.xPower);
+        p_37357_.putDouble("power_y", this.yPower);
+        p_37357_.putDouble("power_z", this.zPower);
         p_37357_.putInt("timer", this.timer);
         p_37357_.putFloat("damage", this.getDamage());
         p_37357_.putBoolean("tracking", this.getTracking());
         p_37357_.putInt("state", this.getState());
     }
 
-    public void readAdditionalSaveData(CompoundTag p_37353_) {
+    public void readAdditionalSaveData(ValueInput p_37353_) {
         ListTag listtag;
         super.readAdditionalSaveData(p_37353_);
-        if (p_37353_.hasUUID("Target")) {
-            this.targetId = p_37353_.getUUID("Target");
+        if (p_37353_.read("Target", UUIDUtil.CODEC).isPresent()) {
+            this.targetId = p_37353_.read("Target", UUIDUtil.CODEC).orElse(null);
         }
-        if (p_37353_.contains("power", 9) && (listtag = p_37353_.getList("power", 6)).size() == 3) {
-            this.xPower = listtag.getDouble(0);
-            this.yPower = listtag.getDouble(1);
-            this.zPower = listtag.getDouble(2);
-        }
-        this.timer = p_37353_.getInt("timer");
-        this.setTracking(p_37353_.getBoolean("fired"));
-        this.setDamage(p_37353_.getFloat("damage"));
-        this.setState(p_37353_.getInt("state"));
+        this.xPower = p_37353_.getDoubleOr("power_x", 0.0);
+        this.yPower = p_37353_.getDoubleOr("power_y", 0.0);
+        this.zPower = p_37353_.getDoubleOr("power_z", 0.0);
+        this.timer = p_37353_.getIntOr("timer", 0);
+        this.setTracking(p_37353_.getBooleanOr("fired", false));
+        this.setDamage(p_37353_.getFloatOr("damage", 0.0F));
+        this.setState(p_37353_.getIntOr("state", 0));
     }
 
     public void setTracking(boolean tracking) {
-        this.entityData.set(TRACKING, (Object)tracking);
+        this.entityData.set(TRACKING, tracking);
     }
 
     public boolean getTracking() {
@@ -237,7 +242,7 @@ extends Projectile {
             if (hitresult.getType() != HitResult.Type.MISS && !EventHooks.onProjectileImpact((Projectile)this, (HitResult)hitresult)) {
                 this.onHit(hitresult);
             }
-            this.checkInsideBlocks();
+            this.applyEffectsFromBlocks();
             Vec3 vec3 = this.getDeltaMovement();
             double d0 = this.getX() + vec3.x;
             double d1 = this.getY() + vec3.y;
@@ -311,12 +316,12 @@ extends Projectile {
                 LivingEntity ownerliving = (LivingEntity)entity1;
                 if (!ownerliving.isAlliedTo(entity) && !entity.isAlliedTo((Entity)ownerliving)) {
                     DamageSource damagesource = CMDamageTypes.causeMaledictioSagittaDamage((Entity)this, (Entity)ownerliving);
-                    flag = entity.hurt(damagesource, this.getDamage());
+                    flag = entity.hurtOrSimulate(damagesource, this.getDamage());
                     if (flag && entity.isAlive()) {
                         EnchantmentHelper.doPostAttackEffects((ServerLevel)serverlevel, (Entity)entity, (DamageSource)damagesource);
                     }
                 } else {
-                    flag = entity.hurt(this.damageSources().magic(), this.getDamage());
+                    flag = entity.hurtOrSimulate(this.damageSources().magic(), this.getDamage());
                 }
             }
             if (flag && entity instanceof LivingEntity) {
@@ -364,9 +369,10 @@ extends Projectile {
 
     public void recreateFromPacket(ClientboundAddEntityPacket p_150128_) {
         super.recreateFromPacket(p_150128_);
-        double d0 = p_150128_.getXa();
-        double d1 = p_150128_.getYa();
-        double d2 = p_150128_.getZa();
+        Vec3 vec3 = p_150128_.getMovement();
+        double d0 = vec3.x();
+        double d1 = vec3.y();
+        double d2 = vec3.z();
         double d3 = Math.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
         if (d3 != 0.0) {
             this.xPower = d0 / d3 * 0.1;

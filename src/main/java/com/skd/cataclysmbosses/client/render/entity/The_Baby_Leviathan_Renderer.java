@@ -11,11 +11,13 @@
  *  net.neoforged.api.distmarker.OnlyIn
  */
 package com.skd.cataclysmbosses.client.render.entity;
+import com.skd.cataclysmbosses.client.render.compat.CmMobRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 
 import com.skd.cataclysmbosses.client.model.entity.The_Baby_Leviathan_Model;
 import com.skd.cataclysmbosses.entity.Pet.The_Baby_Leviathan_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.Identifier;
@@ -24,11 +26,16 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(value=Dist.CLIENT)
 public class The_Baby_Leviathan_Renderer
-extends MobRenderer<The_Baby_Leviathan_Entity, The_Baby_Leviathan_Model> {
+extends CmMobRenderer<The_Baby_Leviathan_Entity> {
     private static final Identifier BABY_LEVIATHAN_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/leviathan/the_baby_leviathan.png");
 
     public The_Baby_Leviathan_Renderer(EntityRendererProvider.Context renderManagerIn) {
-        super(renderManagerIn, (EntityModel)new The_Baby_Leviathan_Model(), 0.25f);
+        super(renderManagerIn, new The_Baby_Leviathan_Model(), 0.25f);
+    }
+
+    @Override
+    protected void render(The_Baby_Leviathan_Entity entity, float partialTicks, PoseStack poseStack, CmMultiBufferSource buffer, int packedLight) {
+        // TODO: port render body to 26.2 (old MobRenderer APIs removed)
     }
 
     public Identifier getTextureLocation(The_Baby_Leviathan_Entity entity) {

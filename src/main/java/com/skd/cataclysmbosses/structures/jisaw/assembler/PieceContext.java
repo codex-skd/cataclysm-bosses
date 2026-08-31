@@ -22,7 +22,7 @@ import org.apache.commons.lang3.mutable.MutableObject;
 
 public class PieceContext {
     public ObjectArrayList<Pair<StructurePoolElement, Integer>> candidatePoolElements;
-    public StructureTemplate.StructureBlockInfo jigsawBlock;
+    public StructureTemplate.JigsawBlockInfo jigsawBlock;
     public BlockPos jigsawBlockTargetPos;
     public int pieceMinY;
     public BlockPos jigsawBlockPos;
@@ -30,7 +30,7 @@ public class PieceContext {
     public PieceEntry pieceEntry;
     public int depth;
 
-    public PieceContext(ObjectArrayList<Pair<StructurePoolElement, Integer>> candidatePoolElements, StructureTemplate.StructureBlockInfo jigsawBlock, BlockPos jigsawBlockTargetPos, int pieceMinY, BlockPos jigsawBlockPos, MutableObject<BoxOctree> boxOctree, PieceEntry pieceEntry, int depth) {
+    public PieceContext(ObjectArrayList<Pair<StructurePoolElement, Integer>> candidatePoolElements, StructureTemplate.JigsawBlockInfo jigsawBlock, BlockPos jigsawBlockTargetPos, int pieceMinY, BlockPos jigsawBlockPos, MutableObject<BoxOctree> boxOctree, PieceEntry pieceEntry, int depth) {
         this.candidatePoolElements = candidatePoolElements;
         this.jigsawBlock = jigsawBlock;
         this.jigsawBlockTargetPos = jigsawBlockTargetPos;

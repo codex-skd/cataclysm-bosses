@@ -64,6 +64,8 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.entity.IEntityWithComplexSpawn;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Brontes_Entity
 extends AbstractArrow
@@ -73,6 +75,7 @@ implements IEntityWithComplexSpawn {
     private static final EntityDataAccessor<Float> X_ROT_OLD = SynchedEntityData.defineId(Brontes_Entity.class, (EntityDataSerializer)EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> AREA_DAMAGE = SynchedEntityData.defineId(Brontes_Entity.class, (EntityDataSerializer)EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> STORM_DAMAGE = SynchedEntityData.defineId(Brontes_Entity.class, (EntityDataSerializer)EntityDataSerializers.FLOAT);
+    private double baseDamage = 0.0;
 
     public Brontes_Entity(EntityType type, Level worldIn) {
         super(type, worldIn);
@@ -91,11 +94,11 @@ implements IEntityWithComplexSpawn {
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(RETURN, (Object)false);
-        p_326229_.define(Y_ROT_OLD, (Object)Float.valueOf(0.0f));
-        p_326229_.define(X_ROT_OLD, (Object)Float.valueOf(0.0f));
-        p_326229_.define(AREA_DAMAGE, (Object)Float.valueOf(0.0f));
-        p_326229_.define(STORM_DAMAGE, (Object)Float.valueOf(0.0f));
+        p_326229_.define(RETURN, false);
+        p_326229_.define(Y_ROT_OLD, Float.valueOf(0.0f));
+        p_326229_.define(X_ROT_OLD, Float.valueOf(0.0f));
+        p_326229_.define(AREA_DAMAGE, Float.valueOf(0.0f));
+        p_326229_.define(STORM_DAMAGE, Float.valueOf(0.0f));
     }
 
     public boolean getReturn() {
@@ -103,7 +106,7 @@ implements IEntityWithComplexSpawn {
     }
 
     public void setReturn(boolean weapon) {
-        this.entityData.set(RETURN, (Object)weapon);
+        this.entityData.set(RETURN, weapon);
     }
 
     public float getYrotOld() {
@@ -111,7 +114,7 @@ implements IEntityWithComplexSpawn {
     }
 
     public void setYrotOld(float rot) {
-        this.entityData.set(Y_ROT_OLD, (Object)Float.valueOf(rot));
+        this.entityData.set(Y_ROT_OLD, Float.valueOf(rot));
     }
 
     public float getXrotOld() {
@@ -119,7 +122,7 @@ implements IEntityWithComplexSpawn {
     }
 
     public void setXrotOld(float rot) {
-        this.entityData.set(X_ROT_OLD, (Object)Float.valueOf(rot));
+        this.entityData.set(X_ROT_OLD, Float.valueOf(rot));
     }
 
     public float getAreaDamage() {
@@ -127,7 +130,7 @@ implements IEntityWithComplexSpawn {
     }
 
     public void setAreaDamage(float rot) {
-        this.entityData.set(AREA_DAMAGE, (Object)Float.valueOf(rot));
+        this.entityData.set(AREA_DAMAGE, Float.valueOf(rot));
     }
 
     public float getStormDamage() {
@@ -135,17 +138,17 @@ implements IEntityWithComplexSpawn {
     }
 
     public void setStormDamage(float rot) {
-        this.entityData.set(STORM_DAMAGE, (Object)Float.valueOf(rot));
+        this.entityData.set(STORM_DAMAGE, Float.valueOf(rot));
     }
 
-    public void readAdditionalSaveData(CompoundTag tag) {
+    public void readAdditionalSaveData(ValueInput tag) {
         super.readAdditionalSaveData(tag);
-        this.setReturn(tag.getBoolean("Return"));
-        this.setStormDamage(tag.getFloat("StormDamage"));
-        this.setAreaDamage(tag.getFloat("AreaDamage"));
+        this.setReturn(tag.getBooleanOr("Return", false));
+        this.setStormDamage(tag.getFloatOr("StormDamage", 0.0f));
+        this.setAreaDamage(tag.getFloatOr("AreaDamage", 0.0f));
     }
 
-    public void addAdditionalSaveData(CompoundTag tag) {
+    public void addAdditionalSaveData(ValueOutput tag) {
         super.addAdditionalSaveData(tag);
         tag.putBoolean("Return", this.getReturn());
         tag.putFloat("StormDamage", this.getStormDamage());
@@ -194,8 +197,8 @@ implements IEntityWithComplexSpawn {
         Entity entity1;
         DamageSource damagesource;
         Entity entity = p_37573_.getEntity();
-        if (entity.hurt(damagesource = CMDamageTypes.causePlayerCeraunusDamage((Entity)this, (Entity)((entity1 = this.getOwner()) == null ? this : entity1)), (float)this.getBaseDamage())) {
-            if (entity.getType() == EntityType.ENDERMAN) {
+        if (entity.hurtOrSimulate(damagesource = CMDamageTypes.causePlayerCeraunusDamage((Entity)this, (Entity)((entity1 = this.getOwner()) == null ? this : entity1)), (float)this.baseDamage)) {
+            if (entity.getType() == net.minecraft.world.entity.EntityTypes.ENDERMAN) {
                 return;
             }
             if (entity instanceof LivingEntity) {
@@ -275,6 +278,11 @@ implements IEntityWithComplexSpawn {
 
     public boolean canUsePortal(boolean allowPassengers) {
         return false;
+    }
+
+    @Override
+    public void setBaseDamage(double damage) {
+        this.baseDamage = damage;
     }
 
     protected double getDefaultGravity() {

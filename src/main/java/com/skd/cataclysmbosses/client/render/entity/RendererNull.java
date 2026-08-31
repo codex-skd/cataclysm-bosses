@@ -12,23 +12,29 @@
 package com.skd.cataclysmbosses.client.render.entity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 public class RendererNull
-extends EntityRenderer<Entity> {
+extends EntityRenderer<Entity, EntityRenderState> {
     public RendererNull(EntityRendererProvider.Context renderManagerIn) {
         super(renderManagerIn);
+    }
+
+    @Override
+    public EntityRenderState createRenderState() {
+        return new EntityRenderState();
     }
 
     public Identifier getTextureLocation(Entity entity) {
         return null;
     }
 
-    public void render(Entity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
+    public void render(Entity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
     }
 }
 

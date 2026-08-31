@@ -37,7 +37,7 @@ extends AdvancedEntityModel<Wither_Howitzer_Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.root, (Object)this.warhead);
+        return ImmutableList.of(this.root, this.warhead);
     }
 
     public BasicModelPart root() {

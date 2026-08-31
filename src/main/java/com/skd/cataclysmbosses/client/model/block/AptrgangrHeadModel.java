@@ -20,7 +20,7 @@ package com.skd.cataclysmbosses.client.model.block;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.model.SkullModelBase;
+import net.minecraft.client.model.object.skull.SkullModelBase;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
@@ -40,6 +40,7 @@ extends SkullModelBase {
     private final ModelPart jaw;
 
     public AptrgangrHeadModel(ModelPart root) {
+        super(root);
         this.head = root.getChild("head");
         this.helmet = this.head.getChild("helmet");
         this.jaw = this.head.getChild("jaw");
@@ -61,18 +62,16 @@ extends SkullModelBase {
         return LayerDefinition.create((MeshDefinition)meshdefinition, (int)256, (int)256);
     }
 
-    public void setupAnim(float p_104188_, float p_104189_, float p_104190_) {
-        this.jaw.y = -3.0f + Mth.sin((float)(p_104188_ * 0.5f - 2.0f)) * 2.0f;
-        this.head.yRot = p_104189_ * ((float)Math.PI / 180);
-        this.head.xRot = p_104190_ * ((float)Math.PI / 180);
+    @Override
+    public void setupAnim(SkullModelBase.State state) {
+        super.setupAnim(state);
+        this.jaw.y = -3.0f + Mth.sin((float)(state.animationPos * 0.5f - 2.0f)) * 2.0f;
+        this.head.yRot = state.yRot * ((float)Math.PI / 180);
+        this.head.xRot = state.xRot * ((float)Math.PI / 180);
     }
 
-    public void renderToBuffer(PoseStack p_104192_, VertexConsumer p_104193_, int p_104194_, int p_104195_, int p_350947_) {
-        p_104192_.pushPose();
-        p_104192_.translate(0.0f, -0.49916f, 0.0f);
-        p_104192_.scale(1.0f, 1.0f, 1.0f);
-        this.head.render(p_104192_, p_104193_, p_104194_, p_104195_, p_350947_);
-        p_104192_.popPose();
-    }
+// PORT TODO(26.2): Model#renderToBuffer is final now. Original custom transform was
+    // translate(0, -0.49916, 0) + scale(1,1,1) on the 'head' part. Re-apply in
+    // Cataclysm_Skull_Block_Renderer#submit when that renderer is implemented.
 }
 

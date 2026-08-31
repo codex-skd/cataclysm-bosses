@@ -21,9 +21,11 @@ import com.skd.cataclysmbosses.client.render.CMRenderTypes;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.SingleQuadParticle;
+import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
 import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
@@ -90,11 +92,6 @@ extends AbstractTrailParticle {
     }
 
     @Override
-    protected VertexConsumer getVetrexConsumer(MultiBufferSource.BufferSource multibuffersource$buffersource) {
-        return multibuffersource$buffersource.getBuffer(CMRenderTypes.getLightTrailEffect(this.getTrailTexture()));
-    }
-
-    @Override
     public int sampleCount() {
         return 4;
     }
@@ -109,7 +106,7 @@ extends AbstractTrailParticle {
         return 0.5f;
     }
 
-    public int getLightColor(float f) {
+    public int getLightCoords(float f) {
         return 240;
     }
 
@@ -121,7 +118,7 @@ extends AbstractTrailParticle {
     @OnlyIn(value=Dist.CLIENT)
     public static class Factory
     implements ParticleProvider<LightTrailParticleOptions> {
-        public Particle createParticle(LightTrailParticleOptions data, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public Particle createParticle(LightTrailParticleOptions data, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, RandomSource random) {
             LightTrailParticle particle = new LightTrailParticle(level, x, y, z, data.r(), data.g(), data.b(), data.width(), data.height(), data.entityid());
             return particle;
         }

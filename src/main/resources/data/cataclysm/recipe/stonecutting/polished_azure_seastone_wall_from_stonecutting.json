@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": [
+    "cataclysm:azure_seastone",
+    "cataclysm:polished_azure_seastone"
+  ],
+  "result": {
+    "count": 1,
+    "id": "cataclysm:polished_azure_seastone_wall"
+  }
+}

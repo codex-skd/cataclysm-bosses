@@ -19,6 +19,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
@@ -99,7 +100,7 @@ extends AbstractTrailParticle {
         return 0.5f;
     }
 
-    public int getLightColor(float f) {
+    public int getLightCoords(float f) {
         return 240;
     }
 
@@ -111,7 +112,7 @@ extends AbstractTrailParticle {
     @OnlyIn(value=Dist.CLIENT)
     public static class Factory
     implements ParticleProvider<StormParticleOptions> {
-        public Particle createParticle(StormParticleOptions data, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public Particle createParticle(StormParticleOptions data, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, RandomSource random) {
             StormParticle particle = new StormParticle(level, x, y, z, data.r(), data.g(), data.b(), data.width(), data.height(), data.entityid());
             return particle;
         }

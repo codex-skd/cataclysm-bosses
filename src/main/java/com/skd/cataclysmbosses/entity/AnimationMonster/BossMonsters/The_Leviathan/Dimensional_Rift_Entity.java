@@ -44,6 +44,7 @@ import java.util.UUID;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -64,6 +65,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Dimensional_Rift_Entity
 extends Entity {
@@ -105,7 +108,7 @@ extends Entity {
                 entity.setDeltaMovement(entity.getDeltaMovement().subtract(diff));
                 continue;
             }
-            if (entity.getType().is(ModTag.DIMENSIONAL_LIFT_IMMUNE)) continue;
+            if (entity.getType().builtInRegistryHolder().is(ModTag.DIMENSIONAL_LIFT_IMMUNE)) continue;
             diff = diff.normalize().scale((double)this.getStage() * 0.045);
             entity.setDeltaMovement(entity.getDeltaMovement().subtract(diff));
         }
@@ -150,12 +153,12 @@ extends Entity {
         LivingEntity livingentity = this.getOwner();
         if (Hitentity.isAlive() && !Hitentity.isInvulnerable() && Hitentity != livingentity && !(Hitentity instanceof The_Leviathan_Entity) && this.tickCount % 5 == 0) {
             if (livingentity == null) {
-                Hitentity.hurt(this.damageSources().magic(), 10.0f);
+                Hitentity.hurtOrSimulate(this.damageSources().magic(), 10.0f);
             } else {
                 if (livingentity.isAlliedTo((Entity)Hitentity)) {
                     return;
                 }
-                Hitentity.hurt(this.damageSources().indirectMagic((Entity)this, (Entity)livingentity), 10.0f);
+                Hitentity.hurtOrSimulate(this.damageSources().indirectMagic((Entity)this, (Entity)livingentity), 10.0f);
             }
         }
     }
@@ -164,7 +167,7 @@ extends Entity {
         int MthX = Mth.floor((double)this.getX());
         int MthY = Mth.floor((double)this.getY());
         int MthZ = Mth.floor((double)this.getZ());
-        if (!this.level().isClientSide() && EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+        if (!this.level().isClientSide() && this.level() instanceof net.minecraft.server.level.ServerLevel && EventHooks.canEntityGrief((net.minecraft.server.level.ServerLevel)this.level(), (Entity)this)) {
             for (int k2 = -x; k2 <= x; ++k2) {
                 for (int l2 = -z; l2 <= z; ++l2) {
                     for (int j = -y; j <= y; ++j) {
@@ -200,7 +203,7 @@ extends Entity {
     }
 
     public void setLifespan(int i) {
-        this.entityData.set(LIFESPAN, (Object)i);
+        this.entityData.set(LIFESPAN, i);
     }
 
     public int getStage() {
@@ -208,7 +211,7 @@ extends Entity {
     }
 
     public void setStage(int i) {
-        this.entityData.set(STAGE, (Object)i);
+        this.entityData.set(STAGE, i);
     }
 
     public void setOwner(@Nullable LivingEntity p_19719_) {
@@ -226,15 +229,15 @@ extends Entity {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(LIFESPAN, (Object)300);
-        p_326229_.define(STAGE, (Object)0);
+        p_326229_.define(LIFESPAN, 300);
+        p_326229_.define(STAGE, 0);
     }
 
-    protected void readAdditionalSaveData(CompoundTag compound) {
-        this.setLifespan(compound.getInt("Lifespan"));
-        this.setStage(compound.getInt("Stage"));
-        if (compound.hasUUID("Owner")) {
-            this.ownerUUID = compound.getUUID("Owner");
+    protected void readAdditionalSaveData(ValueInput compound) {
+        this.setLifespan(compound.getIntOr("Lifespan", 0));
+        this.setStage(compound.getIntOr("Stage", 0));
+        if (compound.read("Owner", UUIDUtil.CODEC).isPresent()) {
+            this.ownerUUID = compound.read("Owner", UUIDUtil.CODEC).orElse(null);
         }
     }
 
@@ -246,12 +249,17 @@ extends Entity {
         return p_36837_ < (d0 *= 64.0) * d0;
     }
 
-    protected void addAdditionalSaveData(CompoundTag compound) {
+    protected void addAdditionalSaveData(ValueOutput compound) {
         compound.putInt("Lifespan", this.getLifespan());
         compound.putInt("Stage", this.getStage());
         if (this.ownerUUID != null) {
-            compound.putUUID("Owner", this.ownerUUID);
+            compound.store("Owner", UUIDUtil.CODEC, this.ownerUUID);
         }
+    }
+
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return false;
     }
 }
 

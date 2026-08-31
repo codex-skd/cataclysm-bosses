@@ -144,7 +144,7 @@ extends AdvancedEntityModel<Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.root, (Object)this.body, (Object)this.cube_r1, (Object)this.cube_r2, (Object)this.cube_r3, (Object)this.cube_r4, (Object)this.cube_r5, (Object)this.r_leg, (Object)this.l_leg, (Object)this.head, (Object)this.helmet, (Object)this.cube_r6, (Object[])new AdvancedModelBox[]{this.cube_r7, this.cube_r8, this.hair, this.cube_r9, this.cube_r10, this.cube_r11, this.cube_r12, this.cube_r13});
+        return ImmutableList.of(this.root, this.body, this.cube_r1, this.cube_r2, this.cube_r3, this.cube_r4, this.cube_r5, this.r_leg, this.l_leg, this.head, this.helmet, this.cube_r6, this.cube_r7, this.cube_r8, this.hair, this.cube_r9, this.cube_r10, this.cube_r11, this.cube_r12, this.cube_r13);
     }
 
     public void setupAnim(Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {

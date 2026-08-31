@@ -122,18 +122,18 @@ import net.minecraft.world.entity.ai.goal.RandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
-import net.minecraft.world.entity.animal.IronGolem;
-import net.minecraft.world.entity.animal.SnowGolem;
+import net.minecraft.world.entity.animal.golem.IronGolem;
+import net.minecraft.world.entity.animal.golem.SnowGolem;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.npc.AbstractVillager;
+import net.minecraft.world.entity.npc.villager.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.vehicle.DismountHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.CollisionGetter;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Fallable;
@@ -144,6 +144,8 @@ import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Aptrgangr_Entity
 extends Internal_Animation_Monster
@@ -273,7 +275,7 @@ implements IHoldEntity {
     }
 
     public ItemEntity spawnAtLocation(ItemStack stack) {
-        ItemEntity itementity = this.spawnAtLocation(stack, 0.0f);
+        ItemEntity itementity = this.spawnAtLocation((ServerLevel)this.level(), stack, 0.0f);
         if (itementity != null) {
             itementity.setGlowingTag(true);
             itementity.setExtendedLifetime();
@@ -281,14 +283,14 @@ implements IHoldEntity {
         return itementity;
     }
 
-    public boolean hurt(DamageSource source, float damage) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         if (!this.getPassengers().isEmpty() && this.getAttackState() == 4 && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
             return false;
         }
         if (source.is(ModTag.BLOCK_SELF_REGEN)) {
             this.self_regen = 80;
         }
-        return super.hurt(source, damage);
+        return super.hurtOrSimulate(source, damage);
     }
 
     protected int decreaseAirSupply(int air) {
@@ -391,13 +393,11 @@ implements IHoldEntity {
     }
 
     protected void dropCustomDeathLoot(ServerLevel p_348503_, DamageSource p_34697_, boolean p_34699_) {
-        Creeper creeper;
         super.dropCustomDeathLoot(p_348503_, p_34697_, p_34699_);
         Entity entity = p_34697_.getEntity();
-        if (entity instanceof Creeper && (creeper = (Creeper)entity).canDropMobsSkull()) {
+        if (entity instanceof Creeper creeper && this.level() instanceof ServerLevel sl) {
             ItemStack itemstack = new ItemStack((ItemLike)ModItems.APTRGANGR_HEAD.get());
-            creeper.increaseDroppedSkulls();
-            this.spawnAtLocation(itemstack);
+            this.spawnAtLocation(sl, itemstack, 0.0f);
         }
     }
 
@@ -406,11 +406,11 @@ implements IHoldEntity {
         return 60;
     }
 
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
     }
 
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
     }
 
@@ -551,8 +551,8 @@ implements IHoldEntity {
                 float entityRelativeAngle = entityHitAngle - entityAttackingAngle;
                 float entityHitDistance = (float)Math.sqrt((entityHit.getZ() - this.getZ()) * (entityHit.getZ() - this.getZ()) + (entityHit.getX() - this.getX()) * (entityHit.getX() - this.getX()));
                 if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || this.isAlliedTo((Entity)entityHit) || entityHit instanceof Aptrgangr_Entity || entityHit == this) continue;
-                boolean hurt = entityHit.hurt(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
-                if (entityHit.isDamageSourceBlocked(damagesource) && entityHit instanceof Player) {
+                boolean hurt = entityHit.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
+                if (entityHit.isBlocking() && entityHit instanceof Player) {
                     Player player = (Player)entityHit;
                     if (shieldbreakticks > 0) {
                         EntityUtil.disableShield(player, shieldbreakticks);
@@ -583,8 +583,8 @@ implements IHoldEntity {
                 float entityHitDistance = (float)Math.sqrt((entityHit.getZ() - this.getZ()) * (entityHit.getZ() - this.getZ()) + (entityHit.getX() - this.getX()) * (entityHit.getX() - this.getX()));
                 if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || this.isAlliedTo((Entity)entityHit) || entityHit instanceof Aptrgangr_Entity || entityHit == this) continue;
                 DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
-                boolean hurt = entityHit.hurt(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
-                if (entityHit.isDamageSourceBlocked(damagesource) && entityHit instanceof Player) {
+                boolean hurt = entityHit.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
+                if (entityHit.isBlocking() && entityHit instanceof Player) {
                     Player player = (Player)entityHit;
                     if (shieldbreakticks > 0) {
                         EntityUtil.disableShield(player, shieldbreakticks);
@@ -607,27 +607,27 @@ implements IHoldEntity {
         for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, attackRange)) {
             if (this.isAlliedTo((Entity)entity) || entity == this || !this.getPassengers().isEmpty()) continue;
             DamageSource damagesource = maledictio ? CMDamageTypes.causeMaledictioDamage((LivingEntity)this) : this.damageSources().mobAttack((LivingEntity)this);
-            boolean flag = entity.hurt(damagesource, damage);
-            if (entity.isDamageSourceBlocked(damagesource) && entity instanceof Player) {
+            boolean flag = entity.hurtOrSimulate(damagesource, damage);
+            if (entity.isBlocking() && entity instanceof Player) {
                 Player player = (Player)entity;
                 if (shieldbreakticks > 0) {
                     EntityUtil.disableShield(player, shieldbreakticks);
                 }
             }
-            if (!flag || entity.getType().is(ModTag.IGNIS_CANT_POKE) || !entity.isAlive()) continue;
+            if (!flag || entity.getType().builtInRegistryHolder().is(ModTag.IGNIS_CANT_POKE) || !entity.isAlive()) continue;
             if (entity.isShiftKeyDown()) {
                 entity.setShiftKeyDown(false);
             }
             if (this.level().isClientSide()) continue;
-            entity.startRiding((Entity)this, true);
+            entity.startRiding((Entity)this, true, true);
             PacketDistributor.sendToPlayersTrackingEntityAndSelf((Entity)entity, (CustomPacketPayload)new MessageEntityCameraSwitch.ThridPerson(entity.getId()), (CustomPacketPayload[])new CustomPacketPayload[0]);
         }
     }
 
     private void Icicle_Crash() {
-        if (this.level().getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
+        if (this.level() instanceof net.minecraft.server.level.ServerLevel _sl && _sl.getGameRules().get(GameRules.MOB_GRIEFING)) {
             BlockPos ceil = this.blockPosition().offset(0, 5, 0);
-            while (!(this.level().getBlockState(ceil).isSolid() && this.level().getBlockState(ceil).getBlock() != ModBlocks.POINTED_ICICLE.get() || ceil.getY() >= this.level().getMaxBuildHeight())) {
+            while (!(this.level().getBlockState(ceil).isSolid() && this.level().getBlockState(ceil).getBlock() != ModBlocks.POINTED_ICICLE.get() || ceil.getY() >= this.level().getMaxY() + 1)) {
                 ceil = ceil.above();
             }
             int i = 8;
@@ -636,7 +636,7 @@ implements IHoldEntity {
             for (BlockPos blockpos1 : BlockPos.betweenClosed((BlockPos)ceil.offset(-8, -8, -8), (BlockPos)ceil.offset(8, 8, 8))) {
                 if (!(this.level().getBlockState(blockpos1).getBlock() instanceof Fallable)) continue;
                 if (this.isHangingIcicle(blockpos1)) {
-                    while (this.isHangingIcicle(blockpos1.above()) && blockpos1.getY() < this.level().getMaxBuildHeight()) {
+                    while (this.isHangingIcicle(blockpos1.above()) && blockpos1.getY() < this.level().getMaxY() + 1) {
                         blockpos1 = blockpos1.above();
                     }
                     if (!this.isHangingIcicle(blockpos1)) continue;
@@ -681,7 +681,7 @@ implements IHoldEntity {
                     DamageSource damagesource;
                     LivingEntity living;
                     boolean flag;
-                    if (passenger instanceof LivingEntity && (flag = (living = (LivingEntity)passenger).hurt(damagesource = CMDamageTypes.causeMaledictioDamage((LivingEntity)this), (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * 1.5)))) {
+                    if (passenger instanceof LivingEntity && (flag = (living = (LivingEntity)passenger).hurtOrSimulate(damagesource = CMDamageTypes.causeMaledictioDamage((LivingEntity)this), (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * 1.5)))) {
                         this.playSound(SoundEvents.ZOMBIE_ATTACK_IRON_DOOR, 1.0f, 0.9f);
                     }
                     if (!this.level().isClientSide()) {
@@ -729,14 +729,14 @@ implements IHoldEntity {
         return false;
     }
 
-    public boolean isAlliedTo(Entity entityIn) {
+    public boolean considersEntityAsAlly(Entity entityIn) {
         if (entityIn == this) {
             return true;
         }
-        if (super.isAlliedTo(entityIn)) {
+        if (super.considersEntityAsAlly(entityIn)) {
             return true;
         }
-        if (entityIn.getType().is(ModTag.TEAM_MALEDICTUS)) {
+        if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_MALEDICTUS)) {
             return this.getTeam() == null && entityIn.getTeam() == null;
         }
         return false;

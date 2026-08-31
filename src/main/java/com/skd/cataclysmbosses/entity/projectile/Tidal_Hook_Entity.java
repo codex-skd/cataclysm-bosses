@@ -47,7 +47,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.boss.EnderDragonPart;
+import net.minecraft.world.entity.boss.enderdragon.EnderDragonPart;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
@@ -58,6 +58,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Tidal_Hook_Entity
 extends AbstractArrow {
@@ -90,7 +92,7 @@ extends AbstractArrow {
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(HOOKED_ENTITY_ID, (Object)0);
+        p_326229_.define(HOOKED_ENTITY_ID, 0);
     }
 
     public void tick() {
@@ -111,7 +113,7 @@ extends AbstractArrow {
                         this.hookedEntity = null;
                         this.discard();
                     } else {
-                        this.moveTo(this.hookedEntity.getX(), this.hookedEntity.getY(0.8), this.hookedEntity.getZ());
+                        this.setPos(this.hookedEntity.getX(), this.hookedEntity.getY(0.8), this.hookedEntity.getZ());
                     }
                 }
                 if (owner.getMainHandItem() == this.stack || owner.getOffhandItem() == this.stack) {
@@ -147,7 +149,7 @@ extends AbstractArrow {
             PacketDistributor.sendToPlayersTrackingEntityAndSelf((Entity)owner, (CustomPacketPayload)new MessageHookFalling(owner.getId(), true), (CustomPacketPayload[])new CustomPacketPayload[0]);
             owner.setNoGravity(false);
         }
-        super.kill();
+        this.discard();
     }
 
     public boolean shouldRenderAtSqrDistance(double distance) {
@@ -192,20 +194,20 @@ extends AbstractArrow {
             Player owner = (Player)entity;
             if (entityHitResult.getEntity() != owner && (entityHitResult.getEntity() instanceof LivingEntity || entityHitResult.getEntity() instanceof EnderDragonPart) && this.hookedEntity == null) {
                 this.hookedEntity = entityHitResult.getEntity();
-                this.getEntityData().set(HOOKED_ENTITY_ID, (Object)(this.hookedEntity.getId() + 1));
+                this.getEntityData().set(HOOKED_ENTITY_ID, (this.hookedEntity.getId() + 1));
                 this.isPulling = true;
             }
         }
     }
 
-    public void readAdditionalSaveData(CompoundTag tag) {
+    public void readAdditionalSaveData(ValueInput tag) {
         super.readAdditionalSaveData(tag);
-        this.maxRange = tag.getDouble("maxRange");
-        this.maxSpeed = tag.getDouble("maxSpeed");
-        this.isPulling = tag.getBoolean("isPulling");
+        this.maxRange = tag.getDoubleOr("maxRange", 0.0);
+        this.maxSpeed = tag.getDoubleOr("maxSpeed", 0.0);
+        this.isPulling = tag.getBooleanOr("isPulling", false);
     }
 
-    public void addAdditionalSaveData(CompoundTag tag) {
+    public void addAdditionalSaveData(ValueOutput tag) {
         super.addAdditionalSaveData(tag);
         tag.putDouble("maxRange", this.maxRange);
         tag.putDouble("maxSpeed", this.maxSpeed);

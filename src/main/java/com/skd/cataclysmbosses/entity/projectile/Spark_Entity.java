@@ -65,6 +65,8 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Spark_Entity
 extends ThrowableProjectile {
@@ -78,10 +80,11 @@ extends ThrowableProjectile {
     }
 
     public Spark_Entity(Level worldIn, LivingEntity throwerIn) {
-        super((EntityType)ModEntities.SPARK.get(), throwerIn, worldIn);
+        super((EntityType)ModEntities.SPARK.get(), throwerIn.getX(), throwerIn.getEyeY() - 0.10000000149011612D, throwerIn.getZ(), worldIn);
+        this.setOwner(throwerIn);
     }
 
-    public void addAdditionalSaveData(CompoundTag tag) {
+    public void addAdditionalSaveData(ValueOutput tag) {
         super.addAdditionalSaveData(tag);
         tag.putFloat("Damage", this.getDamage());
         tag.putFloat("AreaDamage", this.getAreaDamage());
@@ -89,19 +92,19 @@ extends ThrowableProjectile {
         tag.putFloat("Area_Radius", this.getAreaRadius());
     }
 
-    public void readAdditionalSaveData(CompoundTag tag) {
+    public void readAdditionalSaveData(ValueInput tag) {
         super.readAdditionalSaveData(tag);
-        this.setDamage(tag.getFloat("Damage"));
-        this.setHpDamage(tag.getFloat("HpDamage"));
-        this.setAreaDamage(tag.getFloat("HpDamage"));
-        this.setAreaRadius(tag.getFloat("Area_Radius"));
+        this.setDamage(tag.getFloatOr("Damage", 0.0f));
+        this.setHpDamage(tag.getFloatOr("HpDamage", 0.0f));
+        this.setAreaDamage(tag.getFloatOr("HpDamage", 0.0f));
+        this.setAreaRadius(tag.getFloatOr("Area_Radius", 0.0f));
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(DAMAGE, (Object)Float.valueOf(0.0f));
-        p_326229_.define(AREA_RADIUS, (Object)Float.valueOf(0.0f));
-        p_326229_.define(HP_DAMAGE, (Object)Float.valueOf(0.0f));
-        p_326229_.define(AREA_DAMAGE, (Object)Float.valueOf(0.0f));
+        p_326229_.define(DAMAGE, Float.valueOf(0.0f));
+        p_326229_.define(AREA_RADIUS, Float.valueOf(0.0f));
+        p_326229_.define(HP_DAMAGE, Float.valueOf(0.0f));
+        p_326229_.define(AREA_DAMAGE, Float.valueOf(0.0f));
     }
 
     public float getDamage() {
@@ -109,7 +112,7 @@ extends ThrowableProjectile {
     }
 
     public void setDamage(float damage) {
-        this.entityData.set(DAMAGE, (Object)Float.valueOf(damage));
+        this.entityData.set(DAMAGE, Float.valueOf(damage));
     }
 
     public float getAreaDamage() {
@@ -117,7 +120,7 @@ extends ThrowableProjectile {
     }
 
     public void setAreaDamage(float damage) {
-        this.entityData.set(AREA_DAMAGE, (Object)Float.valueOf(damage));
+        this.entityData.set(AREA_DAMAGE, Float.valueOf(damage));
     }
 
     public float getHpDamage() {
@@ -125,7 +128,7 @@ extends ThrowableProjectile {
     }
 
     public void setHpDamage(float damage) {
-        this.entityData.set(HP_DAMAGE, (Object)Float.valueOf(damage));
+        this.entityData.set(HP_DAMAGE, Float.valueOf(damage));
     }
 
     public float getAreaRadius() {
@@ -133,7 +136,7 @@ extends ThrowableProjectile {
     }
 
     public void setAreaRadius(float radius) {
-        this.entityData.set(AREA_RADIUS, (Object)Float.valueOf(radius));
+        this.entityData.set(AREA_RADIUS, Float.valueOf(radius));
     }
 
     public void tick() {
@@ -197,9 +200,9 @@ extends ThrowableProjectile {
         if (hitresult$type == HitResult.Type.ENTITY) {
             EntityHitResult entityhitresult = (EntityHitResult)result;
             Entity entity = entityhitresult.getEntity();
-            if (entity.getType().is(EntityTypeTags.REDIRECTABLE_PROJECTILE) && entity instanceof Projectile) {
+            if (entity.getType().builtInRegistryHolder().is(EntityTypeTags.REDIRECTABLE_PROJECTILE) && entity instanceof Projectile) {
                 Projectile projectile = (Projectile)entity;
-                projectile.deflect(ProjectileDeflection.AIM_DEFLECT, this.getOwner(), this.getOwner(), true);
+                projectile.deflect(ProjectileDeflection.AIM_DEFLECT, this.getOwner(), null, true);
             }
             this.onHitEntity(entityhitresult);
             this.level().gameEvent((Holder)GameEvent.PROJECTILE_LAND, result.getLocation(), GameEvent.Context.of((Entity)this, (BlockState)null));

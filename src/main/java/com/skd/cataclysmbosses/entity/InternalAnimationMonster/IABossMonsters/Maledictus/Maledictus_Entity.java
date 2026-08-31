@@ -33,7 +33,7 @@
  *  net.minecraft.world.entity.EntityType
  *  net.minecraft.world.entity.LivingEntity
  *  net.minecraft.world.entity.Mob
- *  net.minecraft.world.entity.MobSpawnType
+ *  net.minecraft.world.entity.EntitySpawnReason
  *  net.minecraft.world.entity.PathfinderMob
  *  net.minecraft.world.entity.SpawnGroupData
  *  net.minecraft.world.entity.ai.attributes.AttributeSupplier$Builder
@@ -122,7 +122,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -151,6 +151,8 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.event.EventHooks;
 import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Maledictus_Entity
 extends IABoss_monster
@@ -301,7 +303,7 @@ implements IHoldEntity {
         this.goalSelector.addGoal(1, (Goal)new Uppercut(this, 0, 22, 0, 60, 16, 3.0f, 32.0f));
         this.goalSelector.addGoal(1, (Goal)new Uppercut(this, 0, 23, 0, 60, 16, 3.0f, 32.0f));
         this.goalSelector.addGoal(0, (Goal)new InternalStateGoal(this, 20, 20, 0, 13, 0));
-        this.goalSelector.addGoal(0, (Goal)new InternalStateGoal(this, this, 21, 21, 0, 45, 8){
+        this.goalSelector.addGoal(0, (Goal)new InternalStateGoal(this, 21, 21, 0, 45, 8){
 
             @Override
             public void tick() {
@@ -410,7 +412,7 @@ implements IHoldEntity {
     }
 
     public ItemEntity spawnAtLocation(ItemStack stack) {
-        ItemEntity itementity = this.spawnAtLocation(stack, 0.0f);
+        ItemEntity itementity = this.spawnAtLocation((ServerLevel)this.level(), stack, 0.0f);
         if (itementity != null) {
             itementity.setGlowingTag(true);
             itementity.setExtendedLifetime();
@@ -419,14 +421,14 @@ implements IHoldEntity {
     }
 
     @Override
-    public boolean hurt(DamageSource source, float damage) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         if (!(this.getAttackState() != 31 && this.getAttackState() != 32 && this.getAttackState() != 33 || source.is(DamageTypeTags.BYPASSES_INVULNERABILITY))) {
             return false;
         }
         if (this.destroyBlocksTick <= 0) {
             this.destroyBlocksTick = 20;
         }
-        return super.hurt(source, damage);
+        return super.hurtOrSimulate(source, damage);
     }
 
     @Override
@@ -570,10 +572,10 @@ implements IHoldEntity {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(TOMBSTONE_DIRECTION, (Object)Direction.NORTH);
-        p_326229_.define(WEAPON, (Object)0);
-        p_326229_.define(FLYING, (Object)false);
-        p_326229_.define(RAGE, (Object)0);
+        p_326229_.define(TOMBSTONE_DIRECTION, Direction.NORTH);
+        p_326229_.define(WEAPON, 0);
+        p_326229_.define(FLYING, false);
+        p_326229_.define(RAGE, 0);
     }
 
     public int getWeapon() {
@@ -581,7 +583,7 @@ implements IHoldEntity {
     }
 
     public void setWeapon(int weapon) {
-        this.entityData.set(WEAPON, (Object)weapon);
+        this.entityData.set(WEAPON, weapon);
     }
 
     public boolean isFlying() {
@@ -589,7 +591,7 @@ implements IHoldEntity {
     }
 
     public void setFlying(boolean flying) {
-        this.entityData.set(FLYING, (Object)flying);
+        this.entityData.set(FLYING, flying);
     }
 
     public Direction getTombstoneDirection() {
@@ -597,7 +599,7 @@ implements IHoldEntity {
     }
 
     public void setTombstoneDirection(Direction p_30220_) {
-        this.entityData.set(TOMBSTONE_DIRECTION, (Object)p_30220_);
+        this.entityData.set(TOMBSTONE_DIRECTION, p_30220_);
     }
 
     public int getRageMeter() {
@@ -605,7 +607,7 @@ implements IHoldEntity {
     }
 
     public void setRageMeter(int Rage) {
-        this.entityData.set(RAGE, (Object)Rage);
+        this.entityData.set(RAGE, Rage);
     }
 
     public void travel(Vec3 travelVector) {
@@ -890,22 +892,22 @@ implements IHoldEntity {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         compound.putInt("RageMeter", this.getRageMeter());
         compound.putByte("Tombstone_Direction", (byte)this.getTombstoneDirection().get3DDataValue());
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        this.setTombstoneDirection(Direction.from3DDataValue((int)compound.getByte("Tombstone_Direction")));
-        this.setRageMeter(compound.getInt("RageMeter"));
+        this.setTombstoneDirection(Direction.from3DDataValue(compound.getByteOr("Tombstone_Direction", (byte)0)));
+        this.setRageMeter(compound.getIntOr("RageMeter", 0));
     }
 
     @Override
     @Nullable
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_30153_, DifficultyInstance p_30154_, MobSpawnType p_30155_, @Nullable SpawnGroupData p_30156_) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_30153_, DifficultyInstance p_30154_, EntitySpawnReason p_30155_, @Nullable SpawnGroupData p_30156_) {
         return super.finalizeSpawn(p_30153_, p_30154_, p_30155_, p_30156_);
     }
 
@@ -1056,7 +1058,7 @@ implements IHoldEntity {
                     DamageSource damagesource = CMDamageTypes.causeMaledictioSoulDamage((LivingEntity)this);
                     for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(7.0))) {
                         if (this.isAlliedTo((Entity)entity) || entity == this) continue;
-                        entity.hurt(damagesource, this.DMG() * 1.5f + Math.min(this.DMG() * 1.5f, entity.getMaxHealth() * (float)CMCommonConfig.Maledictus.AOEHpDamage));
+                        entity.hurtOrSimulate(damagesource, this.DMG() * 1.5f + Math.min(this.DMG() * 1.5f, entity.getMaxHealth() * (float)CMCommonConfig.Maledictus.AOEHpDamage));
                     }
                 }
             }
@@ -1087,7 +1089,7 @@ implements IHoldEntity {
                     DamageSource damagesource = CMDamageTypes.causeMaledictioDamage((LivingEntity)this);
                     for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(3.5))) {
                         boolean flag;
-                        if (this.isAlliedTo((Entity)entity) || entity == this || !(flag = entity.hurt(damagesource, this.DMG() * 1.25f + Math.min(this.DMG() * 1.25f, entity.getMaxHealth() * (float)CMCommonConfig.Maledictus.FlyingSmashHpDamage)))) continue;
+                        if (this.isAlliedTo((Entity)entity) || entity == this || !(flag = entity.hurtOrSimulate(damagesource, this.DMG() * 1.25f + Math.min(this.DMG() * 1.25f, entity.getMaxHealth() * (float)CMCommonConfig.Maledictus.FlyingSmashHpDamage)))) continue;
                         this.rageTicks = 200;
                         if (this.getRageMeter() >= 5) continue;
                         this.setRageMeter(this.getRageMeter() + 1);
@@ -1281,7 +1283,7 @@ implements IHoldEntity {
                     DamageSource damagesource = CMDamageTypes.causeMaledictioDamage((LivingEntity)this);
                     for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(2.0))) {
                         boolean flag;
-                        if (this.isAlliedTo((Entity)entity) || entity == this || !(flag = entity.hurt(damagesource, this.DMG() * 1.25f + Math.min(this.DMG() * 1.25f, entity.getMaxHealth() * (float)CMCommonConfig.Maledictus.FlyingSmashHpDamage)))) continue;
+                        if (this.isAlliedTo((Entity)entity) || entity == this || !(flag = entity.hurtOrSimulate(damagesource, this.DMG() * 1.25f + Math.min(this.DMG() * 1.25f, entity.getMaxHealth() * (float)CMCommonConfig.Maledictus.FlyingSmashHpDamage)))) continue;
                         this.rageTicks = 200;
                         if (this.getRageMeter() >= 5) continue;
                         this.setRageMeter(this.getRageMeter() + 1);
@@ -1297,7 +1299,7 @@ implements IHoldEntity {
                     DamageSource damagesource = CMDamageTypes.causeMaledictioDamage((LivingEntity)this);
                     for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(2.0))) {
                         boolean flag;
-                        if (this.isAlliedTo((Entity)entity) || entity == this || !(flag = entity.hurt(damagesource, this.DMG() * 1.25f + Math.min(this.DMG() * 1.25f, entity.getMaxHealth() * (float)CMCommonConfig.Maledictus.FlyingSmashHpDamage)))) continue;
+                        if (this.isAlliedTo((Entity)entity) || entity == this || !(flag = entity.hurtOrSimulate(damagesource, this.DMG() * 1.25f + Math.min(this.DMG() * 1.25f, entity.getMaxHealth() * (float)CMCommonConfig.Maledictus.FlyingSmashHpDamage)))) continue;
                         this.rageTicks = 200;
                         if (this.getRageMeter() >= 5) continue;
                         this.setRageMeter(this.getRageMeter() + 1);
@@ -1406,7 +1408,7 @@ implements IHoldEntity {
                     DamageSource damagesource = CMDamageTypes.causeMaledictioSoulDamage((LivingEntity)this);
                     for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(7.0))) {
                         if (this.isAlliedTo((Entity)entity) || entity == this) continue;
-                        entity.hurt(damagesource, this.DMG() * 1.75f + Math.min(this.DMG() * 1.75f, entity.getMaxHealth() * (float)CMCommonConfig.Maledictus.AOEHpDamage));
+                        entity.hurtOrSimulate(damagesource, this.DMG() * 1.75f + Math.min(this.DMG() * 1.75f, entity.getMaxHealth() * (float)CMCommonConfig.Maledictus.AOEHpDamage));
                     }
                 }
             }
@@ -1420,17 +1422,17 @@ implements IHoldEntity {
         if (!this.isNoAi() && !this.level().isClientSide()) {
             if (CMCommonConfig.Maledictus.ignoreMobGriefing) {
                 this.blockdestroy();
-            } else if (EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+            } else if (this.level() instanceof net.minecraft.server.level.ServerLevel sl && EventHooks.canEntityGrief(sl, (Entity)this)) {
                 this.blockdestroy();
             }
         }
     }
 
     private void flyingdestroy() {
-        if (!this.level().isClientSide()) {
+        if (this.level() instanceof net.minecraft.server.level.ServerLevel sl && !this.level().isClientSide()) {
             if (CMCommonConfig.Maledictus.ignoreMobGriefing) {
                 this.blockdestroy2(0.35, 2.0);
-            } else if (EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+            } else if (EventHooks.canEntityGrief(sl, (Entity)this)) {
                 this.blockdestroy2(0.35, 2.0);
             }
         }
@@ -1600,8 +1602,8 @@ implements IHoldEntity {
                 float entityRelativeAngle = entityHitAngle - entityAttackingAngle;
                 float entityHitDistance = (float)Math.sqrt((entityHit.getZ() - this.getZ()) * (entityHit.getZ() - this.getZ()) + (entityHit.getX() - this.getX()) * (entityHit.getX() - this.getX()));
                 if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || this.isAlliedTo((Entity)entityHit) || entityHit instanceof Maledictus_Entity || entityHit == this) continue;
-                boolean flag = entityHit.hurt(damagesource, this.DMG() * damage + Math.min(this.DMG() * damage, entityHit.getMaxHealth() * hpdamage));
-                if (entityHit.isDamageSourceBlocked(damagesource) && entityHit instanceof Player) {
+                boolean flag = entityHit.hurtOrSimulate(damagesource, this.DMG() * damage + Math.min(this.DMG() * damage, entityHit.getMaxHealth() * hpdamage));
+                if (entityHit.isBlocking() && entityHit instanceof Player) {
                     Player player = (Player)entityHit;
                     if (shieldbreakticks > 0) {
                         EntityUtil.disableShield(player, shieldbreakticks);
@@ -1625,8 +1627,8 @@ implements IHoldEntity {
             DamageSource damagesource = maledictio ? CMDamageTypes.causeMaledictioDamage((LivingEntity)this) : this.damageSources().mobAttack((LivingEntity)this);
             for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, attackRange)) {
                 if (this.isAlliedTo((Entity)entity) || entity == this) continue;
-                boolean flag = entity.hurt(damagesource, this.DMG() * damage + Math.min(this.DMG() * damage, entity.getMaxHealth() * hpdamage));
-                if (entity.isDamageSourceBlocked(damagesource) && entity instanceof Player) {
+                boolean flag = entity.hurtOrSimulate(damagesource, this.DMG() * damage + Math.min(this.DMG() * damage, entity.getMaxHealth() * hpdamage));
+                if (entity.isBlocking() && entity instanceof Player) {
                     Player player = (Player)entity;
                     if (shieldbreakticks > 0) {
                         EntityUtil.disableShield(player, shieldbreakticks);
@@ -1634,12 +1636,12 @@ implements IHoldEntity {
                 }
                 if (!flag) continue;
                 this.grab = true;
-                if (entity.getType().is(ModTag.IGNIS_CANT_POKE) || !entity.isAlive()) continue;
+                if (entity.getType().builtInRegistryHolder().is(ModTag.IGNIS_CANT_POKE) || !entity.isAlive()) continue;
                 if (entity.isShiftKeyDown()) {
                     entity.setShiftKeyDown(false);
                 }
                 if (!this.getPassengers().isEmpty() || this.level().isClientSide()) continue;
-                entity.startRiding((Entity)this, true);
+                entity.startRiding((Entity)this, true, true);
                 PacketDistributor.sendToPlayersTrackingEntityAndSelf((Entity)entity, (CustomPacketPayload)new MessageEntityCameraSwitch.ThridPerson(entity.getId()), (CustomPacketPayload[])new CustomPacketPayload[0]);
             }
         }
@@ -1685,12 +1687,12 @@ implements IHoldEntity {
                 fallingBlockEntity.push(0.0, 0.2 + this.getRandom().nextGaussian() * 0.15, 0.0);
                 this.level().addFreshEntity((Entity)fallingBlockEntity);
                 AABB selection = new AABB(px - 0.5, minY, pz - 0.5, px + 0.5, maxY, pz + 0.5);
-                List hit = this.level().getEntitiesOfClass(LivingEntity.class, selection);
+                List<LivingEntity> hit = this.level().getEntitiesOfClass(LivingEntity.class, selection);
                 for (LivingEntity entity : hit) {
                     float finalDamage;
                     boolean flag;
-                    if (this.isAlliedTo((Entity)entity) || entity == this || !(flag = entity.hurt(damageSource, finalDamage = baseDamage + Math.min(baseDamage, entity.getMaxHealth() * hpdamage)))) continue;
-                    entity.setDeltaMovement(entity.getDeltaMovement().add(0.0, (double)(airborne * (float)distance) + this.level().random.nextDouble() * 0.15, 0.0));
+                    if (this.isAlliedTo((Entity)entity) || entity == this || !(flag = entity.hurtOrSimulate(damageSource, finalDamage = baseDamage + Math.min(baseDamage, entity.getMaxHealth() * hpdamage)))) continue;
+                    entity.setDeltaMovement(entity.getDeltaMovement().add(0.0, (double)(airborne * (float)distance) + this.level().getRandom().nextDouble() * 0.15, 0.0));
                 }
             }
         }
@@ -1807,8 +1809,8 @@ implements IHoldEntity {
             DamageSource damagesource = maledictio ? CMDamageTypes.causeMaledictioDamage((LivingEntity)this) : this.damageSources().mobAttack((LivingEntity)this);
             for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, attackRange)) {
                 if (this.isAlliedTo((Entity)entity) || entity == this) continue;
-                boolean flag = entity.hurt(damagesource, this.DMG() * damage + Math.min(this.DMG() * damage, entity.getMaxHealth() * hpdamage));
-                if (entity.isDamageSourceBlocked(damagesource) && entity instanceof Player) {
+                boolean flag = entity.hurtOrSimulate(damagesource, this.DMG() * damage + Math.min(this.DMG() * damage, entity.getMaxHealth() * hpdamage));
+                if (entity.isBlocking() && entity instanceof Player) {
                     Player player = (Player)entity;
                     if (shieldbreakticks > 0) {
                         EntityUtil.disableShield(player, shieldbreakticks);
@@ -1830,8 +1832,8 @@ implements IHoldEntity {
         DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
         for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, attackRange)) {
             if (this.isAlliedTo((Entity)entity) || entity == this) continue;
-            boolean flag = entity.hurt(damagesource, this.DMG() * damage + Math.min(this.DMG() * damage, entity.getMaxHealth() * hpdamage));
-            if (entity.isDamageSourceBlocked(damagesource) && entity instanceof Player) {
+            boolean flag = entity.hurtOrSimulate(damagesource, this.DMG() * damage + Math.min(this.DMG() * damage, entity.getMaxHealth() * hpdamage));
+            if (entity.isBlocking() && entity instanceof Player) {
                 Player player = (Player)entity;
                 if (shieldbreakticks > 0) {
                     EntityUtil.disableShield(player, shieldbreakticks);
@@ -1864,8 +1866,8 @@ implements IHoldEntity {
             float entityRelativeAngle = entityHitAngle - entityAttackingAngle;
             float entityHitDistance = (float)Math.sqrt((entityHit.getZ() - this.getZ()) * (entityHit.getZ() - this.getZ()) + (entityHit.getX() - this.getX()) * (entityHit.getX() - this.getX()));
             if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || this.isAlliedTo((Entity)entityHit) || entityHit instanceof Maledictus_Entity || entityHit == this) continue;
-            boolean flag = entityHit.hurt(damagesource, this.DMG() * damage + Math.min(this.DMG() * damage, entityHit.getMaxHealth() * hpdamage));
-            if (entityHit.isDamageSourceBlocked(damagesource) && entityHit instanceof Player) {
+            boolean flag = entityHit.hurtOrSimulate(damagesource, this.DMG() * damage + Math.min(this.DMG() * damage, entityHit.getMaxHealth() * hpdamage));
+            if (entityHit.isBlocking() && entityHit instanceof Player) {
                 Player player = (Player)entityHit;
                 if (shieldbreakticks > 0) {
                     EntityUtil.disableShield(player, shieldbreakticks);
@@ -1884,14 +1886,14 @@ implements IHoldEntity {
         }
     }
 
-    public boolean isAlliedTo(Entity entityIn) {
+    public boolean considersEntityAsAlly(Entity entityIn) {
         if (entityIn == this) {
             return true;
         }
-        if (super.isAlliedTo(entityIn)) {
+        if (super.considersEntityAsAlly(entityIn)) {
             return true;
         }
-        if (entityIn.getType().is(ModTag.TEAM_MALEDICTUS)) {
+        if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_MALEDICTUS)) {
             return this.getTeam() == null && entityIn.getTeam() == null;
         }
         return false;
@@ -1914,7 +1916,7 @@ implements IHoldEntity {
         return (SoundEvent)ModSounds.MALEDICTUS_MUSIC.get();
     }
 
-    protected boolean isAffectedByFluids() {
+    public boolean isAffectedByFluids() {
         return false;
     }
 

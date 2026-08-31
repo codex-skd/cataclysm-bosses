@@ -39,7 +39,7 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
@@ -51,6 +51,8 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Void_Shard_Entity
 extends ThrowableItemProjectile {
@@ -62,27 +64,27 @@ extends ThrowableItemProjectile {
     }
 
     public Void_Shard_Entity(EntityType type, Level worldIn, LivingEntity throwerIn) {
-        super(type, throwerIn, worldIn);
+        super(type, throwerIn, worldIn, new net.minecraft.world.item.ItemStack((ItemLike)ModItems.VOID_SHARD.get()));
     }
 
     public Void_Shard_Entity(Level worldIn, LivingEntity throwerIn, double x, double y, double z, Vec3 movement, @Nullable Entity ignore) {
-        super((EntityType)ModEntities.VOID_SHARD.get(), x, y, z, worldIn);
+        super((EntityType)ModEntities.VOID_SHARD.get(), x, y, z, worldIn, new net.minecraft.world.item.ItemStack((ItemLike)ModItems.VOID_SHARD.get()));
         this.setOwner((Entity)throwerIn);
         this.setDeltaMovement(movement);
         this.ignoreEntity = ignore;
     }
 
-    public void addAdditionalSaveData(CompoundTag tag) {
+    public void addAdditionalSaveData(ValueOutput tag) {
         super.addAdditionalSaveData(tag);
         if (this.lastState != null) {
-            tag.put("inBlockState", (Tag)NbtUtils.writeBlockState((BlockState)this.lastState));
+            tag.store("inBlockState", net.minecraft.nbt.CompoundTag.CODEC, NbtUtils.writeBlockState((BlockState)this.lastState));
         }
     }
 
-    public void readAdditionalSaveData(CompoundTag tag) {
+    public void readAdditionalSaveData(ValueInput tag) {
         super.readAdditionalSaveData(tag);
-        if (tag.contains("inBlockState", 10)) {
-            tag.put("inBlockState", (Tag)NbtUtils.writeBlockState((BlockState)this.lastState));
+        if (tag.read("inBlockState", net.minecraft.nbt.CompoundTag.CODEC).isPresent()) {
+            this.lastState = NbtUtils.readBlockState(this.level().holderLookup(net.minecraft.core.registries.Registries.BLOCK), tag.read("inBlockState", net.minecraft.nbt.CompoundTag.CODEC).orElseThrow());
         }
     }
 
@@ -105,10 +107,10 @@ extends ThrowableItemProjectile {
         Entity entity = result.getEntity();
         float i = 1.5f;
         if (shooter == null) {
-            entity.hurt(this.damageSources().magic(), i);
+            entity.hurtOrSimulate(this.damageSources().magic(), i);
             entity.invulnerableTime = 0;
         } else if (entity != shooter && !shooter.isAlliedTo(entity)) {
-            entity.hurt(this.damageSources().indirectMagic((Entity)this, this.getOwner()), i);
+            entity.hurtOrSimulate(this.damageSources().indirectMagic((Entity)this, this.getOwner()), i);
             entity.invulnerableTime = 0;
         }
     }
@@ -145,7 +147,7 @@ extends ThrowableItemProjectile {
     public void handleEntityEvent(byte id) {
         if (id == 3) {
             for (int i = 0; i < 8; ++i) {
-                this.level().addParticle((ParticleOptions)new ItemParticleOption(ParticleTypes.ITEM, new ItemStack((ItemLike)ModItems.VOID_SHARD.get())), this.getX(), this.getY(), this.getZ(), this.random.nextGaussian() * 0.1, this.random.nextGaussian() * 0.1, this.random.nextGaussian() * 0.1);
+                this.level().addParticle((ParticleOptions)new ItemParticleOption(ParticleTypes.ITEM, (Item)ModItems.VOID_SHARD.get()), this.getX(), this.getY(), this.getZ(), this.random.nextGaussian() * 0.1, this.random.nextGaussian() * 0.1, this.random.nextGaussian() * 0.1);
             }
         }
     }

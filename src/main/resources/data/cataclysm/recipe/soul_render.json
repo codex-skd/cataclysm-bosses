@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "#": "cataclysm:black_steel_ingot",
+    "X": "cataclysm:cursium_ingot"
+  },
+  "pattern": [
+    "XX",
+    "X#",
+    " #"
+  ],
+  "result": {
+    "id": "cataclysm:soul_render"
+  }
+}

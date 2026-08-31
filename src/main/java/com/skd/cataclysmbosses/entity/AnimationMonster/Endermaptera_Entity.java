@@ -29,7 +29,7 @@
  *  net.minecraft.world.entity.EntityType
  *  net.minecraft.world.entity.LivingEntity
  *  net.minecraft.world.entity.Mob
- *  net.minecraft.world.entity.SpawnReason
+ *  net.minecraft.world.entity.EntitySpawnReason
  *  net.minecraft.world.entity.PathfinderMob
  *  net.minecraft.world.entity.ai.attributes.AttributeSupplier$Builder
  *  net.minecraft.world.entity.ai.attributes.Attributes
@@ -87,7 +87,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.SpawnReason;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -110,6 +110,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Endermaptera_Entity
 extends Monster
@@ -163,9 +165,9 @@ implements IAnimatedEntity {
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(CLIMBING, (Object)0);
-        p_326229_.define(ATTACHED_FACE, (Object)Direction.DOWN);
-        p_326229_.define(HAS_JAWS, (Object)true);
+        p_326229_.define(CLIMBING, (byte)0);
+        p_326229_.define(ATTACHED_FACE, Direction.DOWN);
+        p_326229_.define(HAS_JAWS, true);
     }
 
     public Direction getAttachmentFacing() {
@@ -176,24 +178,21 @@ implements IAnimatedEntity {
         return new WallClimberNavigation((Mob)this, worldIn);
     }
 
-    @Nullable
-    protected ResourceKey<LootTable> getDefaultLootTable() {
-        return this.getHasJaws() ? this.HAS_JAWS_LOOT : super.getDefaultLootTable();
-    }
 
-    public void addAdditionalSaveData(CompoundTag compound) {
+
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         compound.putBoolean("Has_Jaws", this.getHasJaws());
     }
 
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        this.entityData.set(ATTACHED_FACE, (Object)Direction.from3DDataValue((int)compound.getByte("AttachFace")));
-        this.setHasJaw(compound.getBoolean("Has_Jaws"));
+        this.entityData.set(ATTACHED_FACE, Direction.from3DDataValue(compound.getByteOr("AttachFace", (byte)0)));
+        this.setHasJaw(compound.getBooleanOr("Has_Jaws", false));
     }
 
     public void setHasJaw(boolean HasJaws) {
-        this.entityData.set(HAS_JAWS, (Object)HasJaws);
+        this.entityData.set(HAS_JAWS, HasJaws);
     }
 
     public boolean getHasJaws() {
@@ -227,14 +226,14 @@ implements IAnimatedEntity {
         return new Animation[]{NO_ANIMATION, JAW_ATTACK, HEADBUTT_ATTACK};
     }
 
-    public boolean isAlliedTo(Entity entityIn) {
+    public boolean considersEntityAsAlly(Entity entityIn) {
         if (entityIn == this) {
             return true;
         }
-        if (super.isAlliedTo(entityIn)) {
+        if (super.considersEntityAsAlly(entityIn)) {
             return true;
         }
-        if (entityIn.getType().is(ModTag.TEAM_ENDER_GUARDIAN)) {
+        if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_ENDER_GUARDIAN)) {
             return this.getTeam() == null && entityIn.getTeam() == null;
         }
         return false;
@@ -262,10 +261,10 @@ implements IAnimatedEntity {
                 Vec3 Vec32 = this.getDeltaMovement();
                 if (!this.level().isClientSide()) {
                     this.setBesideClimbableBlock(this.horizontalCollision || this.verticalCollision && !this.onGround());
-                    if (this.onGround() || this.isInWaterOrBubble() || this.isInLava()) {
-                        this.entityData.set(ATTACHED_FACE, (Object)Direction.DOWN);
+                    if (this.onGround() || this.isInWater() || this.isInLava()) {
+                        this.entityData.set(ATTACHED_FACE, Direction.DOWN);
                     } else if (this.verticalCollision) {
-                        this.entityData.set(ATTACHED_FACE, (Object)Direction.UP);
+                        this.entityData.set(ATTACHED_FACE, Direction.UP);
                     } else {
                         Direction closestDirection = Direction.DOWN;
                         double closestDistance = 100.0;
@@ -277,7 +276,7 @@ implements IAnimatedEntity {
                             closestDistance = this.position().distanceTo(offset);
                             closestDirection = dir;
                         }
-                        this.entityData.set(ATTACHED_FACE, (Object)closestDirection);
+                        this.entityData.set(ATTACHED_FACE, closestDirection);
                     }
                 }
                 boolean flag = false;
@@ -286,7 +285,7 @@ implements IAnimatedEntity {
                         this.setDeltaMovement(this.getDeltaMovement().add(0.0, 1.0, 0.0));
                     } else {
                         if (!this.horizontalCollision && this.getAttachmentFacing() != Direction.UP) {
-                            Vec3 vec = Vec3.atLowerCornerOf((Vec3i)this.getAttachmentFacing().getNormal());
+                            Vec3 vec = Vec3.atLowerCornerOf(this.getAttachmentFacing().getUnitVec3i());
                             this.setDeltaMovement(this.getDeltaMovement().add(vec.normalize().multiply((double)0.1f, (double)0.1f, (double)0.1f)));
                         }
                         if (!this.onGround() && Vec32.y < 0.0) {
@@ -318,13 +317,13 @@ implements IAnimatedEntity {
                 if ((target = this.getTarget()) == null || !(this.distanceTo((Entity)target) < target.getBbWidth() + this.getBbWidth()) || !this.hasLineOfSight((Entity)target)) break block22;
                 float damage = (int)this.getAttributeValue(Attributes.ATTACK_DAMAGE);
                 if (this.getAnimation() == JAW_ATTACK && this.getAnimationTick() == 11) {
-                    target.hurt(this.damageSources().mobAttack((LivingEntity)this), damage);
+                    target.hurtOrSimulate(this.damageSources().mobAttack((LivingEntity)this), damage);
                     if (this.random.nextInt(6) == 0) {
                         this.BrokenJaws();
                     }
                 }
                 if (this.getAnimation() != HEADBUTT_ATTACK || this.getAnimationTick() != 6) break block22;
-                target.hurt(this.damageSources().mobAttack((LivingEntity)this), damage * 0.75f);
+                target.hurtOrSimulate(this.damageSources().mobAttack((LivingEntity)this), damage * 0.75f);
                 break block22;
             }
             for (int i = 0; i < 2; ++i) {
@@ -334,7 +333,7 @@ implements IAnimatedEntity {
     }
 
     private void BrokenJaws() {
-        this.playSound(SoundEvents.ITEM_BREAK, 0.5f, 1.0f + this.getRandom().nextFloat() * 0.1f);
+        this.playSound(SoundEvents.ITEM_BREAK.value(), 0.5f, 1.0f + this.getRandom().nextFloat() * 0.1f);
         this.setHasJaw(false);
         int shardCount = 8 + this.random.nextInt(4);
         if (!this.level().isClientSide()) {
@@ -361,11 +360,11 @@ implements IAnimatedEntity {
     public void setBesideClimbableBlock(boolean climbing) {
         byte b0 = (Byte)this.entityData.get(CLIMBING);
         b0 = climbing ? (byte)(b0 | 1) : (byte)(b0 & 0xFFFFFFFE);
-        this.entityData.set(CLIMBING, (Object)b0);
+        this.entityData.set(CLIMBING, b0);
     }
 
-    public static boolean canSpawn(EntityType<Endermaptera_Entity> entity, ServerLevelAccessor worldIn, SpawnReason reason, BlockPos pos, RandomSource randomIn) {
-        return !worldIn.getBlockState(pos.below()).is(ModTag.ENDERMAPTERA_CAN_NOT_SPAWN) && Endermaptera_Entity.checkMonsterSpawnRules(entity, (ServerLevelAccessor)worldIn, (SpawnReason)reason, (BlockPos)pos, (RandomSource)randomIn);
+    public static boolean canSpawn(EntityType<Endermaptera_Entity> entity, ServerLevelAccessor worldIn, EntitySpawnReason reason, BlockPos pos, RandomSource randomIn) {
+        return !worldIn.getBlockState(pos.below()).is(ModTag.ENDERMAPTERA_CAN_NOT_SPAWN) && Endermaptera_Entity.checkMonsterSpawnRules(entity, (ServerLevelAccessor)worldIn, (EntitySpawnReason)reason, (BlockPos)pos, (RandomSource)randomIn);
     }
 
     public int getAnimationTick() {

@@ -126,7 +126,7 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import top.theillusivec4.curios.api.CuriosApi;
 
-@EventBusSubscriber(modid="the_sundering")
+@EventBusSubscriber(modid="cataclysm_bosses")
 public class ServerEventHandler {
     @SubscribeEvent
     public static void onLivingUpdateEvent(PlayerTickEvent.Post event) {
@@ -309,7 +309,7 @@ public class ServerEventHandler {
         // Do not attempt to fix this block until then.
         if ((entity = event.getSource().getDirectEntity()) instanceof LivingEntity) {
             LivingEntity living = (LivingEntity)entity;
-            List slot = CuriosApi.getCuriosHelper().findCurios(living, stack -> stack.is((Item)ModItems.BLAZING_GRIPS.get()));
+            java.util.List slot = new java.util.ArrayList(); // TODO 26.2: CuriosApi.getCuriosHelper() removed - re-wire Curios lookup
             if (!slot.isEmpty() && event.getEntity().getRandom().nextFloat() < 0.15f * (float)slot.size()) {
                 MobEffectInstance effectinstance = new MobEffectInstance(ModEffect.EFFECTBLAZING_BRAND, 60, 0);
                 entity2.addEffect(effectinstance);

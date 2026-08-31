@@ -33,6 +33,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class ScreenShake_Entity
 extends Entity {
@@ -72,10 +74,10 @@ extends Entity {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(RADIUS, (Object)Float.valueOf(10.0f));
-        p_326229_.define(MAGNITUDE, (Object)Float.valueOf(1.0f));
-        p_326229_.define(DURATION, (Object)0);
-        p_326229_.define(FADE_DURATION, (Object)5);
+        p_326229_.define(RADIUS, Float.valueOf(10.0f));
+        p_326229_.define(MAGNITUDE, Float.valueOf(1.0f));
+        p_326229_.define(DURATION, 0);
+        p_326229_.define(FADE_DURATION, 5);
     }
 
     public float getRadius() {
@@ -83,7 +85,7 @@ extends Entity {
     }
 
     public void setRadius(float radius) {
-        this.entityData.set(RADIUS, (Object)Float.valueOf(radius));
+        this.entityData.set(RADIUS, Float.valueOf(radius));
     }
 
     public float getMagnitude() {
@@ -91,7 +93,7 @@ extends Entity {
     }
 
     public void setMagnitude(float magnitude) {
-        this.entityData.set(MAGNITUDE, (Object)Float.valueOf(magnitude));
+        this.entityData.set(MAGNITUDE, Float.valueOf(magnitude));
     }
 
     public int getDuration() {
@@ -99,7 +101,7 @@ extends Entity {
     }
 
     public void setDuration(int duration) {
-        this.entityData.set(DURATION, (Object)duration);
+        this.entityData.set(DURATION, duration);
     }
 
     public int getFadeDuration() {
@@ -107,18 +109,18 @@ extends Entity {
     }
 
     public void setFadeDuration(int fadeDuration) {
-        this.entityData.set(FADE_DURATION, (Object)fadeDuration);
+        this.entityData.set(FADE_DURATION, fadeDuration);
     }
 
-    protected void readAdditionalSaveData(CompoundTag compound) {
-        this.setRadius(compound.getFloat("radius"));
-        this.setMagnitude(compound.getFloat("magnitude"));
-        this.setDuration(compound.getInt("duration"));
-        this.setFadeDuration(compound.getInt("fade_duration"));
-        this.tickCount = compound.getInt("ticks_existed");
+    protected void readAdditionalSaveData(ValueInput compound) {
+        this.setRadius(compound.getFloatOr("radius", 0.0f));
+        this.setMagnitude(compound.getFloatOr("magnitude", 0.0f));
+        this.setDuration(compound.getIntOr("duration", 0));
+        this.setFadeDuration(compound.getIntOr("fade_duration", 0));
+        this.tickCount = compound.getIntOr("ticks_existed", 0);
     }
 
-    protected void addAdditionalSaveData(CompoundTag compound) {
+    protected void addAdditionalSaveData(ValueOutput compound) {
         compound.putFloat("radius", this.getRadius());
         compound.putFloat("magnitude", this.getMagnitude());
         compound.putInt("duration", this.getDuration());
@@ -131,6 +133,11 @@ extends Entity {
             ScreenShake_Entity ScreenShake = new ScreenShake_Entity(world, position, radius, magnitude, duration, fadeDuration);
             world.addFreshEntity((Entity)ScreenShake);
         }
+    }
+
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return false;
     }
 }
 

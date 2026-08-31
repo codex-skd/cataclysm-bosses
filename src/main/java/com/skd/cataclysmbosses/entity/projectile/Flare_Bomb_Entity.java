@@ -69,7 +69,8 @@ extends ThrowableProjectile {
     }
 
     public Flare_Bomb_Entity(EntityType<Flare_Bomb_Entity> type, Level world, LivingEntity thrower) {
-        super(type, thrower, world);
+        super(type, thrower.getX(), thrower.getEyeY() - 0.10000000149011612D, thrower.getZ(), world);
+        this.setOwner(thrower);
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
@@ -87,13 +88,13 @@ extends ThrowableProjectile {
                 if (entity2 instanceof LivingEntity) {
                     LivingEntity livingentity = (LivingEntity)entity2;
                     DamageSource damagesource = this.damageSources().mobProjectile((Entity)this, livingentity);
-                    boolean flag = entity.hurt(damagesource, 7.0f);
+                    boolean flag = entity.hurtOrSimulate(damagesource, 7.0f);
                     if (flag && entity.isAlive()) {
                         entity.igniteForSeconds(5.0f);
                         EnchantmentHelper.doPostAttackEffects((ServerLevel)serverlevel, (Entity)entity, (DamageSource)damagesource);
                     }
                 } else {
-                    entity.hurt(this.damageSources().magic(), 7.0f);
+                    entity.hurtOrSimulate(this.damageSources().magic(), 7.0f);
                 }
             }
         }
@@ -197,7 +198,7 @@ extends ThrowableProjectile {
     public void handleEntityEvent(byte id) {
         super.handleEntityEvent(id);
         if (id == 4) {
-            this.level().playLocalSound(this.getX(), this.getY(), this.getZ(), (SoundEvent)ModSounds.EXPLOSION.get(), SoundSource.BLOCKS, 4.0f, (1.0f + (this.level().random.nextFloat() - this.level().random.nextFloat()) * 0.2f) * 0.7f, false);
+            this.level().playLocalSound(this.getX(), this.getY(), this.getZ(), (SoundEvent)ModSounds.EXPLOSION.get(), SoundSource.BLOCKS, 4.0f, (1.0f + (this.level().getRandom().nextFloat() - this.level().getRandom().nextFloat()) * 0.2f) * 0.7f, false);
             this.level().addParticle((ParticleOptions)ModParticle.FLARE_EXPLODE.get(), this.getX(), this.getY(), this.getZ(), 0.1, 0.0, 0.0);
         }
     }

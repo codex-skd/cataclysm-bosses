@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "cataclysm:cursium_block"
+  ],
+  "result": {
+    "count": 9,
+    "id": "cataclysm:cursium_ingot"
+  }
+}

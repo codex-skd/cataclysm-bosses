@@ -50,8 +50,9 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.arrow.AbstractArrow;
@@ -63,6 +64,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ProjectileWeaponItem;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.ItemUseAnimation;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -75,32 +77,31 @@ extends ProjectileWeaponItem {
         super(group);
     }
 
-    public InteractionResultHolder<ItemStack> use(Level p_40672_, Player p_40673_, InteractionHand p_40674_) {
+    public InteractionResult use(Level p_40672_, Player p_40673_, InteractionHand p_40674_) {
         ItemStack itemstack;
         boolean flag = !p_40673_.getProjectile(itemstack = p_40673_.getItemInHand(p_40674_)).isEmpty();
-        InteractionResultHolder ret = EventHooks.onArrowNock((ItemStack)itemstack, (Level)p_40672_, (Player)p_40673_, (InteractionHand)p_40674_, (boolean)flag);
+        InteractionResult ret = EventHooks.onArrowNock((ItemStack)itemstack, (Level)p_40672_, (Player)p_40673_, (InteractionHand)p_40674_, (boolean)flag);
         if (ret != null) {
             return ret;
         }
         if (!p_40673_.hasInfiniteMaterials() && !flag) {
-            return InteractionResultHolder.fail((Object)itemstack);
+            return InteractionResult.FAIL;
         }
         p_40673_.startUsingItem(p_40674_);
-        return InteractionResultHolder.consume((Object)itemstack);
+        return InteractionResult.CONSUME;
     }
 
     public int getUseDuration(ItemStack stack, LivingEntity pEntity) {
         return 72000;
     }
 
-    public void inventoryTick(ItemStack stack, Level level, Entity entity, int i, boolean held) {
+    public void inventoryTick(ItemStack stack, ServerLevel level, Entity entity, @javax.annotation.Nullable EquipmentSlot slot) {
         LivingEntity living;
-        super.inventoryTick(stack, level, entity, i, held);
         boolean using = entity instanceof LivingEntity && (living = (LivingEntity)entity).getUseItem().equals(stack);
         int useTime = Cursed_bow.getUseTime(stack);
-        ChargeAnimationComponent flaskContents = (ChargeAnimationComponent)stack.getOrDefault(ModDataComponents.CHARGE_ANIMATION, (Object)ChargeAnimationComponent.EMPTY);
+        ChargeAnimationComponent flaskContents = (ChargeAnimationComponent)stack.getOrDefault(ModDataComponents.CHARGE_ANIMATION, ChargeAnimationComponent.EMPTY);
         if (flaskContents.PrevUseTime() != flaskContents.UseTime()) {
-            stack.update(ModDataComponents.CHARGE_ANIMATION, (Object)flaskContents, component -> component.tryAddDose(useTime, Cursed_bow.getUseTime(stack)));
+            stack.update(ModDataComponents.CHARGE_ANIMATION.get(), flaskContents, component -> component.tryAddDose(useTime, Cursed_bow.getUseTime(stack)));
         }
         int maxLoadTime = Cursed_bow.getMaxLoadTime();
         if (using && useTime < maxLoadTime) {
@@ -122,8 +123,8 @@ extends ProjectileWeaponItem {
     }
 
     public static void setUseTime(ItemStack stack, int useTime) {
-        ChargeAnimationComponent flaskContents = (ChargeAnimationComponent)stack.getOrDefault(ModDataComponents.CHARGE_ANIMATION, (Object)ChargeAnimationComponent.EMPTY);
-        stack.update(ModDataComponents.CHARGE_ANIMATION, (Object)flaskContents, component -> component.tryAddDose(useTime, Cursed_bow.getUseTime(stack)));
+        ChargeAnimationComponent flaskContents = (ChargeAnimationComponent)stack.getOrDefault(ModDataComponents.CHARGE_ANIMATION, ChargeAnimationComponent.EMPTY);
+        stack.update(ModDataComponents.CHARGE_ANIMATION.get(), flaskContents, component -> component.tryAddDose(useTime, Cursed_bow.getUseTime(stack)));
     }
 
     public static float getLerpedUseTime(ItemStack stack, float f) {
@@ -156,7 +157,7 @@ extends ProjectileWeaponItem {
         Vec3 lookVec = living.getViewVector(1.0f);
         Vec3 destVec = srcVec.add(lookVec.x() * range, lookVec.y() * range, lookVec.z() * range);
         float var9 = 2.0f;
-        List possibleList = level.getEntities((Entity)living, living.getBoundingBox().expandTowards(lookVec.x() * range, lookVec.y() * range, lookVec.z() * range).inflate((double)var9, (double)var9, (double)var9));
+        List<Entity> possibleList = level.getEntities((Entity)living, living.getBoundingBox().expandTowards(lookVec.x() * range, lookVec.y() * range, lookVec.z() * range).inflate((double)var9, (double)var9, (double)var9));
         double hitDist = 0.0;
         for (Entity possibleEntity : possibleList) {
             double possibleDist;
@@ -185,7 +186,7 @@ extends ProjectileWeaponItem {
             if (!itemstack.isEmpty()) {
                 int i = this.getUseDuration(stack, entityLiving) - timeLeft;
                 if ((i = EventHooks.onArrowLoose((ItemStack)stack, (Level)level, (Player)player, (int)i, (!itemstack.isEmpty() ? 1 : 0) != 0)) < 0) {
-                    return;
+                    return false;
                 }
                 float f = Cursed_bow.getPowerForTime(i);
                 if (!((double)f < 0.1)) {
@@ -197,10 +198,11 @@ extends ProjectileWeaponItem {
                         }
                     }
                     level.playSound((Player)null, player.getX(), player.getY(), player.getZ(), SoundEvents.ARROW_SHOOT, SoundSource.PLAYERS, 1.0f, 1.0f / (level.getRandom().nextFloat() * 0.4f + 1.2f) + f * 0.5f);
-                    player.awardStat(Stats.ITEM_USED.get((Object)this));
+                    player.awardStat(Stats.ITEM_USED.get(this));
                 }
             }
         }
+        return false;
     }
 
     // FASE0 DIAGNOSTIC STUB: CFR failed to decompile this method ("Unable to fully structure
@@ -254,9 +256,9 @@ extends ProjectileWeaponItem {
         projectile.shootFromRotation((Entity)shooter, shooter.getXRot(), shooter.getYRot() + angle, 0.0f, velocity, inaccuracy);
     }
 
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flags) {
-        tooltip.add((Component)Component.translatable((String)"item.cataclysm.cursed_bow.desc").withStyle(ChatFormatting.DARK_GREEN));
-        tooltip.add((Component)Component.translatable((String)"item.cataclysm.cursed_bow2.desc").withStyle(ChatFormatting.DARK_GREEN));
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, java.util.function.Consumer<Component> builder, TooltipFlag flags) {
+        builder.accept((Component)Component.translatable((String)"item.cataclysm.cursed_bow.desc").withStyle(ChatFormatting.DARK_GREEN));
+        builder.accept((Component)Component.translatable((String)"item.cataclysm.cursed_bow2.desc").withStyle(ChatFormatting.DARK_GREEN));
     }
 }
 

@@ -27,13 +27,13 @@
 package com.skd.cataclysmbosses.items;
 
 import javax.annotation.Nullable;
-import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.advancements.triggers.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -50,18 +50,18 @@ import net.minecraft.world.phys.HitResult;
 
 public class ModernRemantBucket
 extends MobBucketItem {
-    public ModernRemantBucket(EntityType<?> fishTypeIn, Fluid fluid, Item.Properties builder) {
+    public ModernRemantBucket(EntityType<? extends net.minecraft.world.entity.Mob> fishTypeIn, Fluid fluid, Item.Properties builder) {
         super(fishTypeIn, fluid, SoundEvents.BUCKET_EMPTY_FISH, builder.stacksTo(1));
     }
 
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand interactionHand) {
+    public InteractionResult use(Level level, Player player, InteractionHand interactionHand) {
         ItemStack itemStack = player.getItemInHand(interactionHand);
         BlockHitResult blockHitResult = ModernRemantBucket.getPlayerPOVHitResult((Level)level, (Player)player, (ClipContext.Fluid)ClipContext.Fluid.NONE);
         if (blockHitResult.getType() == HitResult.Type.MISS) {
-            return InteractionResultHolder.pass((Object)itemStack);
+            return InteractionResult.PASS;
         }
         if (blockHitResult.getType() != HitResult.Type.BLOCK) {
-            return InteractionResultHolder.pass((Object)itemStack);
+            return InteractionResult.PASS;
         }
         BlockPos blockPos = blockHitResult.getBlockPos();
         if (level.mayInteract(player, blockPos)) {
@@ -69,10 +69,14 @@ extends MobBucketItem {
             if (player instanceof ServerPlayer) {
                 CriteriaTriggers.PLACED_BLOCK.trigger((ServerPlayer)player, blockPos, itemStack);
             }
-            player.awardStat(Stats.ITEM_USED.get((Object)this));
-            return InteractionResultHolder.sidedSuccess((Object)ModernRemantBucket.getEmptySuccessItem((ItemStack)itemStack, (Player)player), (boolean)level.isClientSide());
+            player.awardStat(Stats.ITEM_USED.get(this));
+            ItemStack emptyResult = ModernRemantBucket.getEmptySuccessItem(itemStack, player);
+            if (emptyResult != itemStack) {
+                player.setItemInHand(interactionHand, emptyResult);
+            }
+            return level.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.SUCCESS_SERVER;
         }
-        return InteractionResultHolder.fail((Object)itemStack);
+        return InteractionResult.FAIL;
     }
 
     public boolean emptyContents(@Nullable Player player, Level level, BlockPos blockPos, @Nullable BlockHitResult blockHitResult) {

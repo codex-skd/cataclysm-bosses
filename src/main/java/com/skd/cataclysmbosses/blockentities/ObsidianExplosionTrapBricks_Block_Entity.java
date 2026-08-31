@@ -30,6 +30,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
@@ -61,21 +64,21 @@ extends BlockEntity {
             float f = 5.0f;
             if (this.tickCount < 80) {
                 for (LivingEntity inRange : this.level.getEntitiesOfClass(LivingEntity.class, new AABB((double)x - (double)f, (double)y - (double)f, (double)z - (double)f, (double)x + (double)f, (double)y + (double)f, (double)z + (double)f))) {
-                    if (inRange instanceof Player && ((Player)inRange).getAbilities().invulnerable || inRange.getType().is(ModTag.TRAP_BLOCK_NOT_DETECTED)) continue;
+                    if (inRange instanceof Player && ((Player)inRange).getAbilities().invulnerable || inRange.getType().builtInRegistryHolder().is(ModTag.TRAP_BLOCK_NOT_DETECTED)) continue;
                     Vec3 diff = inRange.position().subtract(Vec3.atCenterOf((Vec3i)this.getBlockPos().offset(0, 0, 0)));
                     diff = diff.normalize().scale(0.06);
                     inRange.setDeltaMovement(inRange.getDeltaMovement().subtract(diff));
                 }
                 if (this.level.isClientSide()) {
                     for (int i = 0; i < 3; ++i) {
-                        int j = this.level.random.nextInt(2) * 2 - 1;
-                        int k = this.level.random.nextInt(2) * 2 - 1;
+                        int j = this.level.getRandom().nextInt(2) * 2 - 1;
+                        int k = this.level.getRandom().nextInt(2) * 2 - 1;
                         double d0 = (double)this.worldPosition.getX() + 0.5 + 0.25 * (double)j;
-                        double d1 = (float)this.worldPosition.getY() + this.level.random.nextFloat();
+                        double d1 = (float)this.worldPosition.getY() + this.level.getRandom().nextFloat();
                         double d2 = (double)this.worldPosition.getZ() + 0.5 + 0.25 * (double)k;
-                        double d3 = this.level.random.nextFloat() * (float)j;
-                        double d4 = ((double)this.level.random.nextFloat() - 0.5) * 0.125;
-                        double d5 = this.level.random.nextFloat() * (float)k;
+                        double d3 = this.level.getRandom().nextFloat() * (float)j;
+                        double d4 = ((double)this.level.getRandom().nextFloat() - 0.5) * 0.125;
+                        double d5 = this.level.getRandom().nextFloat() * (float)k;
                         this.level.addParticle((ParticleOptions)ParticleTypes.PORTAL, d0, d1, d2, d3, d4, d5);
                     }
                 }

@@ -40,8 +40,8 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 
 public class FallbackPoolElement
 extends StructurePoolElement {
-    public static final MapCodec<FallbackPoolElement> CODEC = MapCodec.unit(() -> INSTANCE);
     public static final FallbackPoolElement INSTANCE = new FallbackPoolElement();
+    public static final MapCodec<FallbackPoolElement> CODEC = MapCodec.unit(() -> INSTANCE);
 
     private FallbackPoolElement() {
         super(StructureTemplatePool.Projection.TERRAIN_MATCHING);
@@ -51,7 +51,7 @@ extends StructurePoolElement {
         return Vec3i.ZERO;
     }
 
-    public List<StructureTemplate.StructureBlockInfo> getShuffledJigsawBlocks(StructureTemplateManager p_210198_, BlockPos p_210199_, Rotation p_210200_, RandomSource p_210201_) {
+    public List<StructureTemplate.JigsawBlockInfo> getShuffledJigsawBlocks(StructureTemplateManager p_210198_, BlockPos p_210199_, Rotation p_210200_, RandomSource p_210201_) {
         return Collections.emptyList();
     }
 

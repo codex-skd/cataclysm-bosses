@@ -34,8 +34,11 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.CMRenderTypes;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -49,11 +52,11 @@ import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 public class Tidal_Tentacle_Renderer
-extends EntityRenderer<Tidal_Tentacle_Entity> {
+extends CmEntityRenderer<Tidal_Tentacle_Entity> {
     private static final Identifier CLAW_TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/tidal_tentacle_claws.png");
     private static final Identifier TENTACLE_TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/tidal_tentacle.png");
     private static final Tidal_Tentacle_Claws_Model CLAW_MODEL = new Tidal_Tentacle_Claws_Model();
@@ -66,11 +69,10 @@ extends EntityRenderer<Tidal_Tentacle_Entity> {
 
     public boolean shouldRender(Tidal_Tentacle_Entity entity, Frustum frustum, double x, double y, double z) {
         Entity next = entity.getFromEntity();
-        return next != null && frustum.isVisible(entity.getBoundingBox().minmax(next.getBoundingBox())) || super.shouldRender((Entity)entity, frustum, x, y, z);
+        return next != null && frustum.isVisible(entity.getBoundingBox().minmax(next.getBoundingBox())) || super.shouldRender(entity, frustum, x, y, z);
     }
 
-    public void render(Tidal_Tentacle_Entity entity, float yaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int light) {
-        super.render((Entity)entity, yaw, partialTicks, poseStack, buffer, light);
+    protected void render(Tidal_Tentacle_Entity entity, float partialTicks, PoseStack poseStack, CmMultiBufferSource buffer, int light) {
         poseStack.pushPose();
         Entity fromEntity = entity.getFromEntity();
         float x = (float)Mth.lerp((double)partialTicks, (double)entity.xo, (double)entity.getX());
@@ -82,7 +84,7 @@ extends EntityRenderer<Tidal_Tentacle_Entity> {
             Vec3 to = distVec.scale((double)(1.0f - progress));
             Vec3 from = distVec;
             Vec3 currentNeckButt = from;
-            VertexConsumer neckConsumer = buffer.getBuffer(RenderType.entityCutoutNoCull((Identifier)TENTACLE_TEXTURE));
+            VertexConsumer neckConsumer = buffer.getBuffer(CMRenderTypes.entityCutoutNoCull((Identifier)TENTACLE_TEXTURE));
             double remainingDistance = to.distanceTo(from);
             for (int segmentCount = 0; segmentCount < 128 && remainingDistance > 0.0; ++segmentCount) {
                 Vec3 powVec;
@@ -94,14 +96,14 @@ extends EntityRenderer<Tidal_Tentacle_Entity> {
                 Tidal_Tentacle_Renderer.renderNeckCube(currentNeckButt, next, poseStack, neckConsumer, neckLight, OverlayTexture.NO_OVERLAY, 0.0f);
                 currentNeckButt = next;
             }
-            VertexConsumer clawConsumer = buffer.getBuffer(RenderType.entityCutoutNoCull((Identifier)CLAW_TEXTURE));
+            VertexConsumer clawConsumer = buffer.getBuffer(CMRenderTypes.entityCutoutNoCull((Identifier)CLAW_TEXTURE));
             if (entity.hasClaw() || entity.isRetracting()) {
                 poseStack.pushPose();
                 poseStack.translate(to.x, to.y, to.z);
                 float rotY = (float)(Mth.atan2((double)to.x, (double)to.z) * 57.2957763671875);
                 float rotX = (float)(-(Mth.atan2((double)to.y, (double)to.horizontalDistance()) * 57.2957763671875));
                 CLAW_MODEL.setAttributes(rotX, rotY);
-                CLAW_MODEL.renderToBuffer(poseStack, clawConsumer, this.getLightColor(entity, to.add((double)x, (double)y, (double)z)), OverlayTexture.NO_OVERLAY);
+                CLAW_MODEL.renderToBuffer(poseStack, clawConsumer, this.getLightColor(entity, to.add((double)x, (double)y, (double)z)), OverlayTexture.NO_OVERLAY, -1);
                 poseStack.popPose();
             }
         }
@@ -116,7 +118,7 @@ extends EntityRenderer<Tidal_Tentacle_Entity> {
         poseStack.pushPose();
         poseStack.translate(from.x, from.y, from.z);
         TONGUE_MODEL.setAttributes((float)sub.length(), rotX, rotY, additionalYaw);
-        TONGUE_MODEL.renderToBuffer(poseStack, buffer, packedLightIn, overlayCoords);
+        TONGUE_MODEL.renderToBuffer(poseStack, buffer, packedLightIn, overlayCoords, -1);
         poseStack.popPose();
     }
 
@@ -140,7 +142,7 @@ extends EntityRenderer<Tidal_Tentacle_Entity> {
             double d2 = (double)i * 0.35;
             if ((this.entityRenderDispatcher.options == null || this.entityRenderDispatcher.options.getCameraType().isFirstPerson()) && player == Minecraft.getInstance().player) {
                 double d7 = 960.0 / (double)((Integer)this.entityRenderDispatcher.options.fov().get()).intValue();
-                Vec3 vec3 = this.entityRenderDispatcher.camera.getNearPlane().getPointOnPlane((float)i * 0.6f, -1.0f);
+                Vec3 vec3 = this.entityRenderDispatcher.camera.getNearPlane(this.entityRenderDispatcher.camera.getFov()).getPointOnPlane((float)i * 0.6f, -1.0f);
                 vec3 = vec3.scale(d7);
                 vec3 = vec3.yRot(f1 * 0.25f);
                 vec3 = vec3.xRot(-f1 * 0.35f);
@@ -166,8 +168,8 @@ extends EntityRenderer<Tidal_Tentacle_Entity> {
     private int getLightColor(Entity head, Vec3 vec3) {
         BlockPos blockpos = BlockPos.containing((Position)vec3);
         if (head.level().hasChunkAt(blockpos)) {
-            int i = LevelRenderer.getLightColor((BlockAndTintGetter)head.level(), (BlockPos)blockpos);
-            int j = LevelRenderer.getLightColor((BlockAndTintGetter)head.level(), (BlockPos)blockpos.above());
+            int i = 15728880; // PORT TODO(26.2): LevelRenderer.getLightColor(BlockAndTintGetter,BlockPos) removed; full-bright approx
+            int j = 15728880;
             int k = i & 0xFF;
             int l = j & 0xFF;
             int i1 = i >> 16 & 0xFF;

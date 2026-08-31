@@ -30,6 +30,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class SandstoneIgniteTrap_Block_Entity
 extends BlockEntity {
@@ -47,7 +48,7 @@ extends BlockEntity {
     public void tick(Level level, BlockPos pos) {
         boolean LIT = false;
         if (this.getBlockState().getBlock() instanceof Sandstone_Ignite_Trap) {
-            LIT = (Boolean)this.getBlockState().getValue((Property)Sandstone_Ignite_Trap.LIT);
+            LIT = this.getBlockState().getValue(Sandstone_Ignite_Trap.LIT);
         }
         if (LIT) {
             ++this.tickCount;
@@ -57,10 +58,10 @@ extends BlockEntity {
             if (level.isClientSide()) {
                 level.addParticle((ParticleOptions)ModParticle.TRAP_FLAME.get(), x + 0.5, y, z + 0.5, 0.0, 0.5, 0.0);
             } else if (this.tickCount % 5 == 0) {
-                List entitiesInRange = level.getEntitiesOfClass(LivingEntity.class, new AABB(pos.offset(-1, 0, -1).getCenter(), pos.offset(1, 6, 1).getCenter()));
+                List<LivingEntity> entitiesInRange = level.getEntitiesOfClass(LivingEntity.class, new AABB(Vec3.atCenterOf(pos.offset(-1, 0, -1)), Vec3.atCenterOf(pos.offset(1, 6, 1))));
                 for (LivingEntity entity : entitiesInRange) {
-                    if (entity.getType().is(ModTag.TEAM_ANCIENT_REMNANT) || entity.fireImmune()) continue;
-                    entity.hurt(entity.level().damageSources().inFire(), 5.0f);
+                    if (entity.getType().builtInRegistryHolder().is(ModTag.TEAM_ANCIENT_REMNANT) || entity.fireImmune()) continue;
+                    entity.hurtOrSimulate(entity.level().damageSources().inFire(), 5.0f);
                     entity.igniteForSeconds(5.0f);
                 }
             }
@@ -69,4 +70,3 @@ extends BlockEntity {
         }
     }
 }
-

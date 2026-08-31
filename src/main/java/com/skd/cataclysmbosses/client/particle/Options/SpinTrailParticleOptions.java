@@ -34,7 +34,7 @@ public record SpinTrailParticleOptions(float r, float g, float b) implements Par
         buf.writeFloat(option.g);
         buf.writeFloat(option.b);
     }, buf -> new SpinTrailParticleOptions(buf.readFloat(), buf.readFloat(), buf.readFloat()));
-    public static MapCodec<SpinTrailParticleOptions> MAP_CODEC = RecordCodecBuilder.mapCodec(object -> object.group((App)Codec.FLOAT.fieldOf("r").forGetter(p -> Float.valueOf(p.r)), (App)Codec.FLOAT.fieldOf("g").forGetter(p -> Float.valueOf(p.g)), (App)Codec.FLOAT.fieldOf("b").forGetter(p -> Float.valueOf(p.b))).apply((Applicative)object, SpinTrailParticleOptions::new));
+    public static MapCodec<SpinTrailParticleOptions> MAP_CODEC = RecordCodecBuilder.mapCodec(object -> object.group(Codec.FLOAT.fieldOf("r").forGetter(p -> Float.valueOf(p.r)), Codec.FLOAT.fieldOf("g").forGetter(p -> Float.valueOf(p.g)), Codec.FLOAT.fieldOf("b").forGetter(p -> Float.valueOf(p.b))).apply(object, SpinTrailParticleOptions::new));
 
     @NotNull
     public ParticleType<SpinTrailParticleOptions> getType() {

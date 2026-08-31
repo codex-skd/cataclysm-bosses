@@ -26,21 +26,25 @@ import com.skd.cataclysmbosses.entity.projectile.Storm_Serpent_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderState;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Storm_Serpent_Renderer
-extends EntityRenderer<Storm_Serpent_Entity> {
+extends CmEntityRenderer<Storm_Serpent_Entity> {
     private static final Identifier SNAKE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/scylla/storm_serpent.png");
     private final Storm_Serpent_Model model;
 
@@ -49,20 +53,20 @@ extends EntityRenderer<Storm_Serpent_Entity> {
         this.model = new Storm_Serpent_Model(renderManagerIn.bakeLayer(CMModelLayers.STORM_SERPENT_MODEL));
     }
 
-    public void render(Storm_Serpent_Entity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
+    protected void render(Storm_Serpent_Entity entityIn, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
         matrixStackIn.pushPose();
         matrixStackIn.mulPose(Axis.YP.rotationDegrees(-90.0f));
         matrixStackIn.translate(0.0, 1.0, 0.0);
         matrixStackIn.scale(-1.0f, -1.0f, 1.0f);
-        float f = Mth.rotLerp((float)partialTicks, (float)entityIn.yRotO, (float)entityIn.getYRot());
-        float f1 = Mth.lerp((float)partialTicks, (float)entityIn.xRotO, (float)entityIn.getXRot());
-        this.model.setupAnim(entityIn, 0.0f, 0.0f, (float)entityIn.tickCount + partialTicks, f, f1);
+        CmEntityRenderState state = new CmEntityRenderState();
+        state.entity = entityIn;
+        state.partialTick = partialTicks;
+        this.model.setupAnim(state);
         float alpha = 0.8f;
-        int i1 = FastColor.ARGB32.color((int)((int)(alpha * 255.0f)), (int)255, (int)255, (int)255);
+        int i1 = ARGB.color((int)((int)(alpha * 255.0f)), (int)255, (int)255, (int)255);
         VertexConsumer vertexConsumer = bufferIn.getBuffer(CMRenderTypes.getGhost(this.getTextureLocation(entityIn)));
         this.model.renderToBuffer(matrixStackIn, vertexConsumer, packedLightIn, OverlayTexture.NO_OVERLAY, i1);
         matrixStackIn.popPose();
-        super.render((Entity)entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
     }
 
     protected int getBlockLightLevel(Storm_Serpent_Entity entityIn, BlockPos pos) {

@@ -1,0 +1,8 @@
+{
+  "type": "cataclysm:weapon_fusion",
+  "base": "cataclysm:gauntlet_of_guard",
+  "addition": "cataclysm:bulwark_of_the_flame",
+  "result": {
+    "id": "cataclysm:gauntlet_of_bulwark"
+  }
+}

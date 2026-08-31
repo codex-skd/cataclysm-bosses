@@ -15,6 +15,7 @@
 package com.skd.cataclysmbosses.mixin;
 
 import com.skd.cataclysmbosses.init.ModTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -30,10 +31,11 @@ public abstract class ItemMixin {
     @Shadow
     public abstract ItemStack getItem();
 
-    @Inject(method={"hurt"}, remap=true, at={@At(value="HEAD")}, cancellable=true)
-    public void Cmhurt(DamageSource damageSource, float p_32014_, CallbackInfoReturnable<Boolean> cir) {
+    // PORT(26.2): ItemEntity.hurt(DamageSource,float) was split into hurtClient/hurtServer.
+    @Inject(method={"hurtServer"}, remap=true, at={@At(value="HEAD")}, cancellable=true)
+    public void Cmhurt(ServerLevel level, DamageSource damageSource, float p_32014_, CallbackInfoReturnable<Boolean> cir) {
         if (!this.getItem().isEmpty() && damageSource.is(DamageTypeTags.IS_EXPLOSION) && this.getItem().is(ModTag.EXPLOSION_IMMUNE_ITEM)) {
-            cir.setReturnValue((Object)false);
+            cir.setReturnValue(false);
         }
     }
 }

@@ -2,7 +2,7 @@
  * Decompiled with CFR 0.152.
  * 
  * Could not load the following classes:
- *  net.minecraft.client.gui.GuiGraphics
+ *  net.minecraft.client.gui.GuiGraphicsExtractor
  *  net.minecraft.client.gui.screens.inventory.AbstractContainerScreen
  *  net.minecraft.client.gui.screens.inventory.InventoryScreen
  *  net.minecraft.resources.Identifier
@@ -16,13 +16,14 @@ package com.skd.cataclysmbosses.client.gui;
 
 import com.skd.cataclysmbosses.entity.Pet.Netherite_Ministrosity_Entity;
 import com.skd.cataclysmbosses.inventory.MinistrostiyMenu;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
@@ -36,29 +37,24 @@ extends AbstractContainerScreen<MinistrostiyMenu> {
     private float yMouse;
 
     public MinistrosityInventoryScreen(MinistrostiyMenu p_98817_, Inventory p_98818_, Netherite_Ministrosity_Entity p_98819_, int p_352203_) {
-        super((AbstractContainerMenu)p_98817_, p_98818_, p_98819_.getDisplayName());
+        super(p_98817_, p_98818_, p_98819_.getDisplayName());
         this.mini = p_98819_;
         this.inventoryColumns = p_352203_;
     }
 
-    protected void renderBg(GuiGraphics p_282553_, float p_282998_, int p_282929_, int p_283133_) {
+    @Override
+    public void extractBackground(GuiGraphicsExtractor p_282553_, int p_282929_, int p_283133_, float p_282998_) {
         int i = (this.width - this.imageWidth) / 2;
         int j = (this.height - this.imageHeight) / 2;
-        p_282553_.blit(HORSE_INVENTORY_LOCATION, i, j, 0, 0, this.imageWidth, this.imageHeight);
-        p_282553_.blit(HORSE_INVENTORY_LOCATION, i + 70, j + 17, 0, this.imageHeight, this.inventoryColumns * 18, 54);
-        InventoryScreen.renderEntityInInventoryFollowsMouse((GuiGraphics)p_282553_, (int)(i - 10), (int)(j + 18), (int)(i + 78), (int)(j + 70), (int)34, (float)0.0f, (float)this.xMouse, (float)this.yMouse, (LivingEntity)this.mini);
+        p_282553_.blit(RenderPipelines.GUI_TEXTURED, HORSE_INVENTORY_LOCATION, i, j, 0.0f, 0.0f, this.imageWidth, this.imageHeight, 256, 256);
+        p_282553_.blit(RenderPipelines.GUI_TEXTURED, HORSE_INVENTORY_LOCATION, i + 70, j + 17, 0.0f, (float)this.imageHeight, this.inventoryColumns * 18, 54, 256, 256);
+        InventoryScreen.extractEntityInInventoryFollowsMouse(p_282553_, i - 10, j + 18, i + 78, j + 70, 34, 0.0f, this.xMouse, this.yMouse, (LivingEntity)this.mini);
     }
-//             int i = (this.width - this.imageWidth) / 2;
-//             int j = (this.height - this.imageHeight) / 2;
-//             p_282553_.blit(HORSE_INVENTORY_LOCATION, i, j, 0, 0, this.imageWidth, this.imageHeight);
-//             p_282553_.blit(HORSE_INVENTORY_LOCATION, i + 70, j + 17, 0, this.imageHeight, this.inventoryColumns * 18, 54);
-//             InventoryScreen.renderEntityInInventoryFollowsMouse((GuiGraphics)p_282553_, (int)(i - 10), (int)(j + 18), (int)(i + 78), (int)(j + 70), (int)34, (float)0.0f, (float)this.xMouse, (float)this.yMouse, (LivingEntity)this.mini);
-//         }
-//     
-//         public void render(GuiGraphics p_281697_, int p_282103_, int p_283529_, float p_283079_) {
-//             this.xMouse = p_282103_;
-//             this.yMouse = p_283529_;
-//             super.render(p_281697_, p_282103_, p_283529_, p_283079_);
-//             this.renderTooltip(p_281697_, p_282103_, p_283529_);
-//         }
+    
+    @Override
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        this.xMouse = mouseX;
+        this.yMouse = mouseY;
+        super.extractRenderState(graphics, mouseX, mouseY, partialTick);
+    }
 }

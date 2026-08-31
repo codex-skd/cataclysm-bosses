@@ -36,7 +36,7 @@
  *  net.minecraft.world.entity.EntityType
  *  net.minecraft.world.entity.LivingEntity
  *  net.minecraft.world.entity.Mob
- *  net.minecraft.world.entity.MobSpawnType
+ *  net.minecraft.world.entity.EntitySpawnReason
  *  net.minecraft.world.entity.PathfinderMob
  *  net.minecraft.world.entity.SpawnGroupData
  *  net.minecraft.world.entity.ai.attributes.AttributeSupplier$Builder
@@ -117,6 +117,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.GlobalPos;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -143,7 +144,7 @@ import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -159,7 +160,7 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -174,6 +175,8 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.event.EventHooks;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Scylla_Entity
 extends IABoss_monster {
@@ -207,7 +210,7 @@ extends IABoss_monster {
     public AnimationState DeathAnimationState = new AnimationState();
     public static final EntityDataAccessor<Boolean> EYE = SynchedEntityData.defineId(Scylla_Entity.class, (EntityDataSerializer)EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> CHAIN_ANCHOR = SynchedEntityData.defineId(Scylla_Entity.class, (EntityDataSerializer)EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Optional<UUID>> ANCHOR_UUID = SynchedEntityData.defineId(Scylla_Entity.class, (EntityDataSerializer)EntityDataSerializers.OPTIONAL_UUID);
+    private static final EntityDataAccessor<String> ANCHOR_UUID = SynchedEntityData.defineId(Scylla_Entity.class, (EntityDataSerializer)EntityDataSerializers.STRING);
     private static final EntityDataAccessor<Integer> ANCHOR_ID = SynchedEntityData.defineId(Scylla_Entity.class, (EntityDataSerializer)EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> FLYING = SynchedEntityData.defineId(Scylla_Entity.class, (EntityDataSerializer)EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> PARRY_COUNT = SynchedEntityData.defineId(Scylla_Entity.class, (EntityDataSerializer)EntityDataSerializers.INT);
@@ -427,7 +430,7 @@ extends IABoss_monster {
     }
 
     @Override
-    public boolean hurt(DamageSource source, float damage) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         boolean flag;
         if (!source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
             if (this.canBlockFaceSource(source) && !this.level().isClientSide()) {
@@ -461,7 +464,7 @@ extends IABoss_monster {
         if (this.destroyBlocksTick <= 0) {
             this.destroyBlocksTick = 20;
         }
-        if ((flag = super.hurt(source, damage)) && this.canBlockFaceSource(source) && this.getParryCount() < 18) {
+        if ((flag = super.hurtOrSimulate(source, damage)) && this.canBlockFaceSource(source) && this.getParryCount() < 18) {
             this.setParryCount(this.getParryCount() + (source.is(DamageTypeTags.IS_PROJECTILE) ? 2 : 1));
         }
         return flag;
@@ -481,9 +484,7 @@ extends IABoss_monster {
         if (soundevent != null) {
             this.playSound(soundevent, this.getSoundVolume(), (this.random.nextFloat() - this.random.nextFloat()) * 0.2f + 1.0f);
         }
-        this.hurt(this.damageSources().generic(), 0.0f);
-        this.lastDamageSource = damageSource;
-        this.lastDamageStamp = this.level().getGameTime();
+        this.hurtOrSimulate(this.damageSources().generic(), 0.0f);
     }
 
     private boolean canBlockFaceSource(DamageSource damageSource) {
@@ -526,8 +527,8 @@ extends IABoss_monster {
     }
 
     @Override
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_29678_, DifficultyInstance p_29679_, MobSpawnType spawnType, @Nullable SpawnGroupData p_29681_) {
-        if (spawnType == MobSpawnType.COMMAND || spawnType == MobSpawnType.SPAWN_EGG || MobSpawnType.isSpawner((MobSpawnType)spawnType) || spawnType == MobSpawnType.DISPENSER) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_29678_, DifficultyInstance p_29679_, EntitySpawnReason spawnType, @Nullable SpawnGroupData p_29681_) {
+        if (spawnType == EntitySpawnReason.COMMAND || spawnType == EntitySpawnReason.SPAWN_ITEM_USE || EntitySpawnReason.isSpawner((EntitySpawnReason)spawnType) || spawnType == EntitySpawnReason.DISPENSER) {
             this.setAct(true);
         }
         return super.finalizeSpawn(p_29678_, p_29679_, spawnType, p_29681_);
@@ -624,14 +625,14 @@ extends IABoss_monster {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(EYE, (Object)false);
-        p_326229_.define(CHAIN_ANCHOR, (Object)false);
-        p_326229_.define(ANCHOR_UUID, Optional.empty());
-        p_326229_.define(ANCHOR_ID, (Object)-1);
-        p_326229_.define(FLYING, (Object)false);
-        p_326229_.define(PARRY_COUNT, (Object)0);
-        p_326229_.define(PHASE, (Object)0);
-        p_326229_.define(ACT, (Object)false);
+        p_326229_.define(EYE, false);
+        p_326229_.define(CHAIN_ANCHOR, false);
+        p_326229_.define(ANCHOR_UUID, "");
+        p_326229_.define(ANCHOR_ID, -1);
+        p_326229_.define(FLYING, false);
+        p_326229_.define(PARRY_COUNT, 0);
+        p_326229_.define(PHASE, 0);
+        p_326229_.define(ACT, false);
     }
 
     public boolean getEye() {
@@ -639,7 +640,7 @@ extends IABoss_monster {
     }
 
     public void setEye(boolean weapon) {
-        this.entityData.set(EYE, (Object)weapon);
+        this.entityData.set(EYE, weapon);
     }
 
     public boolean isFlying() {
@@ -647,7 +648,7 @@ extends IABoss_monster {
     }
 
     public void setFlying(boolean flying) {
-        this.entityData.set(FLYING, (Object)flying);
+        this.entityData.set(FLYING, flying);
     }
 
     public int isPhase() {
@@ -655,7 +656,7 @@ extends IABoss_monster {
     }
 
     public void setPhase(int phase) {
-        this.entityData.set(PHASE, (Object)phase);
+        this.entityData.set(PHASE, phase);
     }
 
     public int getParryCount() {
@@ -663,7 +664,7 @@ extends IABoss_monster {
     }
 
     public void setParryCount(int parry) {
-        this.entityData.set(PARRY_COUNT, (Object)parry);
+        this.entityData.set(PARRY_COUNT, parry);
     }
 
     public boolean getChainAnchor() {
@@ -671,7 +672,7 @@ extends IABoss_monster {
     }
 
     public void setChainAnchor(boolean weapon) {
-        this.entityData.set(CHAIN_ANCHOR, (Object)weapon);
+        this.entityData.set(CHAIN_ANCHOR, weapon);
     }
 
     public boolean isSleep() {
@@ -679,7 +680,7 @@ extends IABoss_monster {
     }
 
     public void setAct(boolean necklace) {
-        this.entityData.set(ACT, (Object)necklace);
+        this.entityData.set(ACT, necklace);
         this.bossEvent.setVisible(necklace);
         if (!necklace) {
             this.setAttackState(23);
@@ -692,11 +693,12 @@ extends IABoss_monster {
 
     @Nullable
     public UUID getAnchorUUID() {
-        return ((Optional)this.entityData.get(ANCHOR_UUID)).orElse(null);
+        String s = (String)this.entityData.get(ANCHOR_UUID);
+        return s.isEmpty() ? null : UUID.fromString(s);
     }
 
     public void setAnchorUUID(@Nullable UUID uniqueId) {
-        this.entityData.set(ANCHOR_UUID, Optional.ofNullable(uniqueId));
+        this.entityData.set(ANCHOR_UUID, uniqueId == null ? "" : uniqueId.toString());
     }
 
     public Entity getAnchor() {
@@ -916,8 +918,8 @@ extends IABoss_monster {
             BlockEntity blockEntity = targetLevel.getBlockEntity(targetPos);
             if (blockEntity instanceof Boss_Respawn_Spawner_Block_Entity) {
                 Boss_Respawn_Spawner_Block_Entity spawnerBlockEntity = (Boss_Respawn_Spawner_Block_Entity)blockEntity;
-                spawnerBlockEntity.setEntityId((EntityType)ModEntities.SCYLLA.get());
-                spawnerBlockEntity.setTheItem(((Item)ModItems.STORM_EYE.get()).getDefaultInstance());
+                spawnerBlockEntity.spawnType = (EntityType)ModEntities.SCYLLA.get();
+                spawnerBlockEntity.item = ((Item)ModItems.STORM_EYE.get()).getDefaultInstance();
             }
         }
     }
@@ -928,23 +930,23 @@ extends IABoss_monster {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         if (this.getAnchorUUID() != null) {
-            compound.putUUID("AnchorUUID", this.getAnchorUUID());
+            compound.store("AnchorUUID", UUIDUtil.CODEC, this.getAnchorUUID());
         }
         compound.putInt("Phase", this.isPhase());
         compound.putBoolean("Act", this.getAct());
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        if (compound.hasUUID("AnchorUUID")) {
-            this.setAnchorUUID(compound.getUUID("AnchorUUID"));
+        if (compound.read("AnchorUUID", UUIDUtil.CODEC).isPresent()) {
+            this.setAnchorUUID(compound.read("AnchorUUID", UUIDUtil.CODEC).orElse(null));
         }
-        this.setPhase(compound.getInt("Phase"));
-        this.setAct(compound.getBoolean("Act"));
+        this.setPhase(compound.getIntOr("Phase", 0));
+        this.setAct(compound.getBooleanOr("Act", false));
         if (this.hasCustomName()) {
             this.bossEvent.setName(this.getDisplayName());
         }
@@ -962,7 +964,7 @@ extends IABoss_monster {
         Entity weapon = this.getAnchor();
         if (weapon instanceof Scylla_Ceraunus_Entity) {
             Scylla_Ceraunus_Entity anchor = (Scylla_Ceraunus_Entity)weapon;
-            this.entityData.set(ANCHOR_ID, (Object)anchor.getId());
+            this.entityData.set(ANCHOR_ID, anchor.getId());
             anchor.setControllerUUID(this.getUUID());
         }
         if (this.isFlying()) {
@@ -1012,7 +1014,7 @@ extends IABoss_monster {
     private void blockbreak() {
         if (!(this.isNoAi() || this.isSleep() || this.level().isClientSide() || this.destroyBlocksTick <= 0)) {
             --this.destroyBlocksTick;
-            if (this.destroyBlocksTick == 0 && EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+            if (this.destroyBlocksTick == 0 && this.level() instanceof net.minecraft.server.level.ServerLevel sl && EventHooks.canEntityGrief(sl, (Entity)this)) {
                 boolean flag = false;
                 AABB aabb = this.getBoundingBox().inflate(0.2);
                 for (BlockPos blockpos : BlockPos.betweenClosed((int)Mth.floor((double)aabb.minX), (int)this.getBlockY(), (int)Mth.floor((double)aabb.minZ), (int)Mth.floor((double)aabb.maxX), (int)Mth.floor((double)aabb.maxY), (int)Mth.floor((double)aabb.maxZ))) {
@@ -1239,9 +1241,12 @@ extends IABoss_monster {
                     this.level().addFreshEntity((Entity)new Lightning_Storm_Entity(this.level(), d06, d15, d2, (float)theta, -9, (float)CMCommonConfig.Scylla.LightningStormDamage, (float)CMCommonConfig.Scylla.StormHpDamage, (LivingEntity)this, 2.0f));
                 }
                 ScreenShake_Entity.ScreenShake(this.level(), this.position(), 15.0f, 0.1f, 0, 20);
-                if (CMCommonConfig.Scylla.WeatherChange && this.level().getGameRules().getBoolean(GameRules.RULE_WEATHER_CYCLE) && (g2 = this.level()) instanceof ServerLevel) {
-                    ServerLevel serverLevel = (ServerLevel)g2;
-                    serverLevel.setWeatherParameters(24000, 0, false, false);
+                if (CMCommonConfig.Scylla.WeatherChange && this.level() instanceof ServerLevel serverLevel) {
+                    serverLevel.getWeatherData().setClearWeatherTime(24000);
+                    serverLevel.getWeatherData().setRainTime(0);
+                    serverLevel.getWeatherData().setThunderTime(0);
+                    serverLevel.getWeatherData().setRaining(false);
+                    serverLevel.getWeatherData().setThundering(false);
                 }
             }
             if (this.attackTicks > 100 && this.level().isClientSide()) {
@@ -1263,7 +1268,7 @@ extends IABoss_monster {
                 if (!this.level().isClientSide()) {
                     for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(0.5))) {
                         if (this.isAlliedTo((Entity)entity) || entity == this) continue;
-                        entity.hurt(CMDamageTypes.causeLightningMobDamage((LivingEntity)this), (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE), (double)(entity.getMaxHealth() * (float)CMCommonConfig.Scylla.HpDamage))));
+                        entity.hurtOrSimulate(CMDamageTypes.causeLightningMobDamage((LivingEntity)this), (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE), (double)(entity.getMaxHealth() * (float)CMCommonConfig.Scylla.HpDamage))));
                     }
                     int rune = 7;
                     int time = 4;
@@ -1340,7 +1345,7 @@ extends IABoss_monster {
                 } else {
                     for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(4.0))) {
                         if (this.isAlliedTo((Entity)entity) || entity instanceof Scylla_Entity || entity == this) continue;
-                        entity.hurt(CMDamageTypes.causeLightningMobDamage((LivingEntity)this), (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE), (double)(entity.getMaxHealth() * (float)CMCommonConfig.Scylla.HpDamage))));
+                        entity.hurtOrSimulate(CMDamageTypes.causeLightningMobDamage((LivingEntity)this), (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE), (double)(entity.getMaxHealth() * (float)CMCommonConfig.Scylla.HpDamage))));
                     }
                 }
             }
@@ -1355,7 +1360,7 @@ extends IABoss_monster {
                 } else {
                     for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(4.0))) {
                         if (this.isAlliedTo((Entity)entity) || entity instanceof Scylla_Entity || entity == this) continue;
-                        entity.hurt(CMDamageTypes.causeLightningMobDamage((LivingEntity)this), (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE), (double)(entity.getMaxHealth() * (float)CMCommonConfig.Scylla.HpDamage))));
+                        entity.hurtOrSimulate(CMDamageTypes.causeLightningMobDamage((LivingEntity)this), (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE), (double)(entity.getMaxHealth() * (float)CMCommonConfig.Scylla.HpDamage))));
                     }
                 }
             }
@@ -1407,7 +1412,6 @@ extends IABoss_monster {
             }
         }
         if (this.getAttackState() == 21) {
-            Level g32;
             if (this.level().isClientSide()) {
                 if (this.attackTicks > 1 && this.attackTicks < 15) {
                     float r = 0.56078434f;
@@ -1438,13 +1442,15 @@ extends IABoss_monster {
             if (this.attackTicks < 30 && this.attackTicks >= 15) {
                 this.Stormknockback(0.9f, 8.5);
             }
-            if (this.attackTicks == 30 && CMCommonConfig.Scylla.WeatherChange && this.level().getGameRules().getBoolean(GameRules.RULE_WEATHER_CYCLE) && (g32 = this.level()) instanceof ServerLevel) {
-                ServerLevel serverLevel = (ServerLevel)g32;
-                serverLevel.setWeatherParameters(0, 24000, true, false);
+            if (this.attackTicks == 30 && CMCommonConfig.Scylla.WeatherChange && this.level() instanceof ServerLevel serverLevel) {
+                serverLevel.getWeatherData().setClearWeatherTime(0);
+                serverLevel.getWeatherData().setRainTime(24000);
+                serverLevel.getWeatherData().setThunderTime(24000);
+                serverLevel.getWeatherData().setRaining(true);
+                serverLevel.getWeatherData().setThundering(false);
             }
         }
         if (this.getAttackState() == 22) {
-            Level math2;
             if (this.level().isClientSide()) {
                 float vec6 = -0.6f;
                 float math2 = 0.5f;
@@ -1485,9 +1491,12 @@ extends IABoss_monster {
             if (this.attackTicks < 30 && this.attackTicks >= 15) {
                 this.Stormknockback(0.9f, 8.5);
             }
-            if (this.attackTicks == 30 && CMCommonConfig.Scylla.WeatherChange && this.level().getGameRules().getBoolean(GameRules.RULE_WEATHER_CYCLE) && (math2 = this.level()) instanceof ServerLevel) {
-                ServerLevel serverLevel = (ServerLevel)math2;
-                serverLevel.setWeatherParameters(0, 24000, true, true);
+            if (this.attackTicks == 30 && CMCommonConfig.Scylla.WeatherChange && this.level() instanceof ServerLevel serverLevel) {
+                serverLevel.getWeatherData().setClearWeatherTime(0);
+                serverLevel.getWeatherData().setRainTime(24000);
+                serverLevel.getWeatherData().setThunderTime(24000);
+                serverLevel.getWeatherData().setRaining(true);
+                serverLevel.getWeatherData().setThundering(true);
             }
         }
         if (this.getAttackState() == 24) {
@@ -1732,7 +1741,7 @@ extends IABoss_monster {
             AABB attackRange = new AABB(px - inflateXZ, this.getY() - inflateY, pz - inflateXZ, px + inflateXZ, this.getY() + inflateY, pz + inflateXZ).expandTowards((double)f1 * range * 0.75, 0.0, (double)f2 * range * 0.75);
             for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, attackRange)) {
                 if (this.isAlliedTo((Entity)entity) || entity == this) continue;
-                entity.hurt(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage + (double)Math.min((float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage), entity.getMaxHealth() * hpdamage)));
+                entity.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage + (double)Math.min((float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage), entity.getMaxHealth() * hpdamage)));
             }
             if (!this.level().isClientSide()) continue;
             double d0 = px + (double)f1 * range;
@@ -1799,18 +1808,18 @@ extends IABoss_monster {
             double px = this.getX() + vx * distance;
             double pz = this.getZ() + vz * distance;
             AABB selection = new AABB(px - ab, minY, pz - ab, px + ab, maxY, pz + ab);
-            List hit = this.level().getEntitiesOfClass(LivingEntity.class, selection);
+            List<LivingEntity> hit = this.level().getEntitiesOfClass(LivingEntity.class, selection);
             for (LivingEntity entity : hit) {
                 if (this.isAlliedTo((Entity)entity) || entity == this) continue;
-                boolean flag = entity.hurt(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage, (double)(entity.getMaxHealth() * hpdamage))));
-                if (entity.isDamageSourceBlocked(damagesource) && entity instanceof Player) {
+                boolean flag = entity.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage, (double)(entity.getMaxHealth() * hpdamage))));
+                if (entity.isBlocking() && entity instanceof Player) {
                     Player player = (Player)entity;
                     if (shieldbreakticks > 0) {
                         EntityUtil.disableShield(player, shieldbreakticks);
                     }
                 }
                 if (!flag) continue;
-                entity.setDeltaMovement(entity.getDeltaMovement().add(0.0, (double)airborne * distance + this.level().random.nextDouble() * 0.15, 0.0));
+                entity.setDeltaMovement(entity.getDeltaMovement().add(0.0, (double)airborne * distance + this.level().getRandom().nextDouble() * 0.15, 0.0));
             }
         }
     }
@@ -1943,8 +1952,8 @@ extends IABoss_monster {
                 float entityRelativeAngle = entityHitAngle - entityAttackingAngle;
                 float entityHitDistance = (float)Math.sqrt((entityHit.getZ() - this.getZ()) * (entityHit.getZ() - this.getZ()) + (entityHit.getX() - this.getX()) * (entityHit.getX() - this.getX()));
                 if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || this.isAlliedTo((Entity)entityHit) || entityHit instanceof Scylla_Entity || entityHit == this) continue;
-                boolean hurt = entityHit.hurt(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage, (double)(entityHit.getMaxHealth() * (float)CMCommonConfig.Scylla.HpDamage))));
-                if (entityHit.isDamageSourceBlocked(damagesource) && entityHit instanceof Player) {
+                boolean hurt = entityHit.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage, (double)(entityHit.getMaxHealth() * (float)CMCommonConfig.Scylla.HpDamage))));
+                if (entityHit.isBlocking() && entityHit instanceof Player) {
                     Player player = (Player)entityHit;
                     if (shieldbreakticks > 0) {
                         EntityUtil.disableShield(player, shieldbreakticks);
@@ -2030,14 +2039,14 @@ extends IABoss_monster {
         return super.mobInteract(player, hand);
     }
 
-    public boolean isAlliedTo(Entity entityIn) {
+    public boolean considersEntityAsAlly(Entity entityIn) {
         if (entityIn == this) {
             return true;
         }
-        if (super.isAlliedTo(entityIn)) {
+        if (super.considersEntityAsAlly(entityIn)) {
             return true;
         }
-        if (entityIn.getType().is(ModTag.TEAM_SCYLLA)) {
+        if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_SCYLLA)) {
             return this.getTeam() == null && entityIn.getTeam() == null;
         }
         return false;
@@ -2089,7 +2098,7 @@ extends IABoss_monster {
         return false;
     }
 
-    protected boolean isAffectedByFluids() {
+    public boolean isAffectedByFluids() {
         return false;
     }
 
@@ -2104,7 +2113,7 @@ extends IABoss_monster {
     private void floatScylla() {
         if (this.isInWater()) {
             CollisionContext collisioncontext = CollisionContext.of((Entity)this);
-            if (collisioncontext.isAbove(LiquidBlock.STABLE_SHAPE, this.blockPosition(), true) && !this.level().getFluidState(this.blockPosition().above()).is(FluidTags.WATER)) {
+            if (collisioncontext.isAbove(this.getLiquidCollisionShape(), this.blockPosition(), true) && !this.level().getFluidState(this.blockPosition().above()).is(FluidTags.WATER)) {
                 this.setOnGround(true);
             } else {
                 this.setDeltaMovement(this.getDeltaMovement().scale(0.5).add(0.0, 0.05, 0.0));
@@ -2437,7 +2446,7 @@ extends IABoss_monster {
         }
 
         public void start() {
-            if (this.entity.random.nextBoolean()) {
+            if (this.entity.getRandom().nextBoolean()) {
                 this.entity.setAttackState(10);
             } else {
                 this.entity.setAttackState(11);
@@ -2791,15 +2800,15 @@ extends IABoss_monster {
             if (this.entity.attackTicks >= 115 && this.entity.attackTicks <= 145 && target != null) {
                 float f = Mth.cos((float)(this.entity.yBodyRot * ((float)Math.PI / 180)));
                 float f1 = Mth.sin((float)(this.entity.yBodyRot * ((float)Math.PI / 180)));
-                float f2 = this.entity.random.nextFloat() * ((float)Math.PI * 2);
-                float f3 = Mth.sqrt((float)this.entity.random.nextFloat()) * 5.0f;
+                float f2 = this.entity.getRandom().nextFloat() * ((float)Math.PI * 2);
+                float f3 = Mth.sqrt((float)this.entity.getRandom().nextFloat()) * 5.0f;
                 float math = 0.2f;
                 double d0 = this.entity.getX() + (double)(f * math) + (double)(Mth.cos((float)f2) * f3);
                 double d1 = this.entity.getY() + (double)(this.entity.getBbHeight() * 2.8f);
                 double d2 = this.entity.getZ() + (double)(f1 * math) + (double)(Mth.sin((float)f2) * f3);
-                double d3 = target.getX() - (this.entity.random.nextDouble() - 0.5) * 6.0 - d0;
-                double d4 = target.getY(0.35) - this.entity.random.nextDouble() - d1;
-                double d5 = target.getZ() - (this.entity.random.nextDouble() - 0.5) * 6.0 - d2;
+                double d3 = target.getX() - (this.entity.getRandom().nextDouble() - 0.5) * 6.0 - d0;
+                double d4 = target.getY(0.35) - this.entity.getRandom().nextDouble() - d1;
+                double d5 = target.getZ() - (this.entity.getRandom().nextDouble() - 0.5) * 6.0 - d2;
                 Vec3 vec3 = new Vec3(d3, d4, d5).normalize();
                 float yRot = (float)(Mth.atan2((double)vec3.z, (double)vec3.x) * 57.29577951308232) + 90.0f;
                 float xRot = (float)(-(Mth.atan2((double)vec3.y, (double)Math.sqrt(vec3.x * vec3.x + vec3.z * vec3.z)) * 57.29577951308232));

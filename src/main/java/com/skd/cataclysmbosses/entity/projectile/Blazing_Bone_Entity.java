@@ -39,7 +39,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
@@ -48,6 +48,8 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Blazing_Bone_Entity
 extends ThrowableItemProjectile {
@@ -58,13 +60,13 @@ extends ThrowableItemProjectile {
     }
 
     public Blazing_Bone_Entity(Level worldIn, float damage, LivingEntity throwerIn) {
-        super((EntityType)ModEntities.BLAZING_BONE.get(), throwerIn, worldIn);
+        super((EntityType)ModEntities.BLAZING_BONE.get(), throwerIn, worldIn, net.minecraft.world.item.ItemStack.EMPTY);
         this.setDamage(damage);
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(DAMAGE, (Object)Float.valueOf(0.0f));
+        p_326229_.define(DAMAGE, Float.valueOf(0.0f));
     }
 
     public float getDamage() {
@@ -72,17 +74,17 @@ extends ThrowableItemProjectile {
     }
 
     public void setDamage(float damage) {
-        this.entityData.set(DAMAGE, (Object)Float.valueOf(damage));
+        this.entityData.set(DAMAGE, Float.valueOf(damage));
     }
 
-    public void addAdditionalSaveData(CompoundTag tag) {
+    public void addAdditionalSaveData(ValueOutput tag) {
         super.addAdditionalSaveData(tag);
         tag.putFloat("damage", this.getDamage());
     }
 
-    public void readAdditionalSaveData(CompoundTag tag) {
+    public void readAdditionalSaveData(ValueInput tag) {
         super.readAdditionalSaveData(tag);
-        this.setDamage(tag.getFloat("damage"));
+        this.setDamage(tag.getFloatOr("damage", 0.0f));
     }
 
     protected Item getDefaultItem() {
@@ -95,10 +97,10 @@ extends ThrowableItemProjectile {
         Entity entity = result.getEntity();
         if (shooter instanceof LivingEntity) {
             if (entity != shooter && !shooter.isAlliedTo(entity)) {
-                entity.hurt(this.damageSources().mobProjectile((Entity)this, (LivingEntity)shooter), this.getDamage());
+                entity.hurtOrSimulate(this.damageSources().mobProjectile((Entity)this, (LivingEntity)shooter), this.getDamage());
             }
         } else {
-            entity.hurt(this.damageSources().magic(), this.getDamage());
+            entity.hurtOrSimulate(this.damageSources().magic(), this.getDamage());
         }
     }
 
@@ -118,9 +120,10 @@ extends ThrowableItemProjectile {
     public void handleEntityEvent(byte id) {
         if (id == 3) {
             for (int i = 0; i < 8; ++i) {
-                this.level().addParticle((ParticleOptions)new ItemParticleOption(ParticleTypes.ITEM, new ItemStack((ItemLike)ModItems.BLAZING_BONE.get())), this.getX(), this.getY(), this.getZ(), this.random.nextGaussian() * 0.2, this.random.nextGaussian() * 0.2, this.random.nextGaussian() * 0.2);
+                this.level().addParticle((ParticleOptions)new ItemParticleOption(ParticleTypes.ITEM, (Item)ModItems.BLAZING_BONE.get()), this.getX(), this.getY(), this.getZ(), this.random.nextGaussian() * 0.2, this.random.nextGaussian() * 0.2, this.random.nextGaussian() * 0.2);
             }
         }
     }
+
 }
 

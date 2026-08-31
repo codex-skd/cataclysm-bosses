@@ -26,7 +26,7 @@
 package com.skd.cataclysmbosses.items;
 
 import com.skd.cataclysmbosses.entity.projectile.Eye_Of_Dungeon_Entity;
-import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.advancements.triggers.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
@@ -36,7 +36,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -60,7 +60,7 @@ extends Item {
         this.Blue = b;
     }
 
-    public InteractionResultHolder<ItemStack> use(Level p_41184_, Player p_41185_, InteractionHand p_41186_) {
+    public InteractionResult use(Level p_41184_, Player p_41185_, InteractionHand p_41186_) {
         ServerLevel serverlevel;
         BlockPos blockpos;
         ItemStack itemstack = p_41185_.getItemInHand(p_41186_);
@@ -79,12 +79,12 @@ extends Item {
             }
             p_41184_.playSound((Player)null, p_41185_.getX(), p_41185_.getY(), p_41185_.getZ(), SoundEvents.ENDER_EYE_LAUNCH, SoundSource.NEUTRAL, 0.5f, 0.4f / (p_41184_.getRandom().nextFloat() * 0.4f + 0.8f));
             p_41184_.levelEvent((Player)null, 1003, p_41185_.blockPosition(), 0);
-            p_41185_.getCooldowns().addCooldown((Item)this, 60);
-            p_41185_.awardStat(Stats.ITEM_USED.get((Object)this));
+            p_41185_.getCooldowns().addCooldown(this.getDefaultInstance(), 60);
+            p_41185_.awardStat(Stats.ITEM_USED.get(this));
             p_41185_.swing(p_41186_, true);
-            return InteractionResultHolder.success((Object)itemstack);
+            return InteractionResult.SUCCESS;
         }
-        return InteractionResultHolder.consume((Object)itemstack);
+        return InteractionResult.CONSUME;
     }
 }
 

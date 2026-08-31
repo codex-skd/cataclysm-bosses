@@ -39,7 +39,7 @@ implements Fallable {
     }
 
     private void activate(BlockState state, Level world, BlockPos pos, Entity entity) {
-        if (!((Boolean)state.getValue((Property)LIT)).booleanValue() && Sandstone_Falling_Trap.shouldTrigger(entity) && Sandstone_Falling_Trap.isFree(world.getBlockState(pos.below())) && pos.getY() >= world.getMinBuildHeight()) {
+        if (!((Boolean)state.getValue((Property)LIT)).booleanValue() && Sandstone_Falling_Trap.shouldTrigger(entity) && Sandstone_Falling_Trap.isFree(world.getBlockState(pos.below())) && pos.getY() >= world.getMinY()) {
             FallingBlockEntity fallingblockentity = FallingBlockEntity.fall((Level)world, (BlockPos)pos, (BlockState)state);
             this.falling(fallingblockentity);
         }

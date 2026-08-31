@@ -15,13 +15,12 @@ package com.skd.cataclysmbosses.client.particle;
 
 import com.skd.cataclysmbosses.client.particle.AbstractTrailParticle;
 import com.skd.cataclysmbosses.client.particle.Options.NotSpinTrailParticleOptions;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 
 public class Not_Spin_TrailParticle
@@ -52,13 +51,8 @@ extends AbstractTrailParticle {
         this.lifetime = life;
     }
 
-    public int getLightColor(float partialTicks) {
+    public int getLightCoords(float partialTicks) {
         return 240;
-    }
-
-    @Override
-    public void render(VertexConsumer vertexConsumer, Camera camera, float partialTick) {
-        super.render(vertexConsumer, camera, partialTick);
     }
 
     public float getAlpha() {
@@ -104,7 +98,7 @@ extends AbstractTrailParticle {
 
     public static class Factory
     implements ParticleProvider<NotSpinTrailParticleOptions> {
-        public Particle createParticle(NotSpinTrailParticleOptions data, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public Particle createParticle(NotSpinTrailParticleOptions data, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, RandomSource random) {
             Not_Spin_TrailParticle particle = new Not_Spin_TrailParticle(worldIn, x, y, z, xSpeed, ySpeed, zSpeed, data.r(), data.g(), data.b(), data.gravity(), data.reduction(), data.acceleration(), data.direction(), data.life());
             return particle;
         }

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###"
+  ],
+  "key": {
+    "#": "cataclysm:polished_obsidian"
+  },
+  "result": {
+    "id": "cataclysm:polished_obsidian_slab",
+    "count": 6
+  }
+}

@@ -79,7 +79,7 @@ extends AdvancedEntityModel<Phantom_Halberd_Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.root, (Object)this.mid_root, (Object)this.halberd, (Object)this.halberd2, (Object)this.cube_r1, (Object)this.cube_r2, (Object)this.cube_r3);
+        return ImmutableList.of(this.root, this.mid_root, this.halberd, this.halberd2, this.cube_r1, this.cube_r2, this.cube_r3);
     }
 
     public void setupAnim(Phantom_Halberd_Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {

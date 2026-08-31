@@ -51,7 +51,7 @@ public class RenderRushAttachment {
                 AABB attackRange = entity.getBoundingBox().expandTowards(xExpand, 0.0, zExpand);
                 for (LivingEntity target : entity.level().getEntitiesOfClass(LivingEntity.class, attackRange)) {
                     if (target.isAlliedTo((Entity)entity) || target == entity) continue;
-                    target.hurt(entity.damageSources().mobAttack(entity), this.getdamage());
+                    target.hurtOrSimulate(entity.damageSources().mobAttack(entity), this.getdamage());
                 }
                 if (temp % 2 == 0) {
                     this.spawnFangs(entity.getX(), headY, entity.getZ(), standingOnY, yawRadians, 1, entity.level(), entity);

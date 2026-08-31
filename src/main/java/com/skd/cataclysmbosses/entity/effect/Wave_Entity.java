@@ -33,6 +33,7 @@ import com.skd.cataclysmbosses.init.ModEffect;
 import com.skd.cataclysmbosses.init.ModEntities;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -53,6 +54,8 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Wave_Entity
 extends Entity {
@@ -111,11 +114,11 @@ extends Entity {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(LIFESPAN, (Object)0);
-        p_326229_.define(MAX_TICKS, (Object)0);
-        p_326229_.define(Y_ROT, (Object)Float.valueOf(0.0f));
-        p_326229_.define(STATE, (Object)0);
-        p_326229_.define(DAMAGE, (Object)Float.valueOf(0.0f));
+        p_326229_.define(LIFESPAN, 0);
+        p_326229_.define(MAX_TICKS, 0);
+        p_326229_.define(Y_ROT, Float.valueOf(0.0f));
+        p_326229_.define(STATE, 0);
+        p_326229_.define(DAMAGE, Float.valueOf(0.0f));
     }
 
     public AnimationState getAnimationState(String input) {
@@ -168,7 +171,7 @@ extends Entity {
     }
 
     public void setState(int state) {
-        this.entityData.set(STATE, (Object)state);
+        this.entityData.set(STATE, state);
     }
 
     public float getDamage() {
@@ -176,24 +179,20 @@ extends Entity {
     }
 
     public void setDamage(float damage) {
-        this.entityData.set(DAMAGE, (Object)Float.valueOf(damage));
+        this.entityData.set(DAMAGE, Float.valueOf(damage));
     }
 
-    protected void readAdditionalSaveData(CompoundTag tag) {
-        if (tag.hasUUID("Owner")) {
-            this.ownerUUID = tag.getUUID("Owner");
+    protected void readAdditionalSaveData(ValueInput tag) {
+        if (tag.read("Owner", UUIDUtil.CODEC).isPresent()) {
+            this.ownerUUID = tag.read("Owner", UUIDUtil.CODEC).orElse(null);
         }
-        if (tag.contains("Lifespan")) {
-            this.setLifespan(tag.getInt("Lifespan"));
-        }
-        if (tag.contains("Maxticks")) {
-            this.setMaxTicks(tag.getInt("Maxticks"));
-        }
+        this.setLifespan(tag.getIntOr("Lifespan", 0));
+        this.setMaxTicks(tag.getIntOr("Maxticks", 0));
     }
 
-    protected void addAdditionalSaveData(CompoundTag compoundTag) {
+    protected void addAdditionalSaveData(ValueOutput compoundTag) {
         if (this.ownerUUID != null) {
-            compoundTag.putUUID("Owner", this.ownerUUID);
+            compoundTag.store("Owner", UUIDUtil.CODEC, this.ownerUUID);
         }
         compoundTag.putInt("Lifespan", this.getLifespan());
         compoundTag.putInt("Maxticks", this.getMaxTicks());
@@ -204,7 +203,7 @@ extends Entity {
     }
 
     public void setYRot(float f) {
-        this.entityData.set(Y_ROT, (Object)Float.valueOf(f));
+        this.entityData.set(Y_ROT, Float.valueOf(f));
     }
 
     public int getLifespan() {
@@ -212,7 +211,7 @@ extends Entity {
     }
 
     public void setLifespan(int time) {
-        this.entityData.set(LIFESPAN, (Object)time);
+        this.entityData.set(LIFESPAN, time);
     }
 
     public int getMaxTicks() {
@@ -220,7 +219,7 @@ extends Entity {
     }
 
     public void setMaxTicks(int time) {
-        this.entityData.set(MAX_TICKS, (Object)time);
+        this.entityData.set(MAX_TICKS, time);
     }
 
     private void spawnParticleAt(float yOffset, float zOffset, float xOffset, ParticleOptions particleType) {
@@ -230,7 +229,7 @@ extends Entity {
 
     public void tick() {
         super.tick();
-        if (!this.isNoGravity() && !this.isInWaterOrBubble()) {
+        if (!this.isNoGravity() && !this.isInWater()) {
             this.setDeltaMovement(this.getDeltaMovement().add(0.0, (double)-0.04f, 0.0));
         }
         if (this.getState() == 1 && this.getLifespan() >= 5) {
@@ -287,7 +286,7 @@ extends Entity {
         DamageSource source = this.damageSources().mobProjectile((Entity)this, this.owner);
         for (LivingEntity entity : this.level().getEntitiesOfClass(LivingEntity.class, bashBox)) {
             if (this.owner != null && (this.owner.equals((Object)entity) || this.owner.isAlliedTo((Entity)entity) || entity.isAlliedTo((Entity)this.owner))) continue;
-            boolean flag = entity.hurt(source, this.getDamage());
+            boolean flag = entity.hurtOrSimulate(source, this.getDamage());
             if (flag) {
                 entity.extinguishFire();
                 MobEffectInstance effectinstance1 = entity.getEffect(ModEffect.EFFECTWETNESS);
@@ -302,7 +301,6 @@ extends Entity {
                 MobEffectInstance effectinstance = new MobEffectInstance(ModEffect.EFFECTWETNESS, 200, i, false, true, true);
                 entity.addEffect(effectinstance);
             }
-            entity.hasImpulse = true;
             Vec3 vec3 = entity.getDeltaMovement();
             while (x * x + z * z < (double)1.0E-5f) {
                 x = (Math.random() - Math.random()) * 0.01;
@@ -341,6 +339,11 @@ extends Entity {
         this.lyd = lerpY;
         this.lzd = lerpZ;
         this.setDeltaMovement(this.lxd, this.lyd, this.lzd);
+    }
+
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return false;
     }
 }
 

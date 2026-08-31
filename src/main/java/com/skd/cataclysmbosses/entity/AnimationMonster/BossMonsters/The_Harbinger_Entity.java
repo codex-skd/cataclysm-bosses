@@ -126,7 +126,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.PowerableMob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.FlyingMoveControl;
@@ -155,11 +154,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class The_Harbinger_Entity
 extends LLibrary_Boss_Monster
-implements RangedAttackMob,
-PowerableMob {
+implements RangedAttackMob {
     public static final Animation DEATHLASER_ANIMATION = Animation.create((int)124);
     public static final Animation CHARGE_ANIMATION = Animation.create((int)45);
     public static final Animation DEATH_ANIMATION = Animation.create((int)144);
@@ -192,8 +192,8 @@ PowerableMob {
     private final CMBossInfoServer bossEvent = new CMBossInfoServer(this.getDisplayName(), BossEvent.BossBarColor.RED, true, 4);
     private int mode_change_cooldown = 0;
     private int skill_cooldown = 160;
-    private static final Predicate<LivingEntity> LIVING_ENTITY_SELECTOR = p_31504_ -> p_31504_.attackable() && !p_31504_.getType().is(ModTag.TEAM_THE_HARBINGER);
-    private static final TargetingConditions TARGETING_CONDITIONS = TargetingConditions.forCombat().range(20.0).selector(LIVING_ENTITY_SELECTOR);
+    private static final Predicate<LivingEntity> LIVING_ENTITY_SELECTOR = p_31504_ -> p_31504_.attackable() && !p_31504_.getType().builtInRegistryHolder().is(ModTag.TEAM_THE_HARBINGER);
+    private static final TargetingConditions TARGETING_CONDITIONS = TargetingConditions.forCombat().range(20.0).selector((net.minecraft.world.entity.ai.targeting.TargetingConditions.Selector)((le, srv) -> LIVING_ENTITY_SELECTOR.test(le)));
 
     public The_Harbinger_Entity(EntityType entity, Level world) {
         super(entity, world);
@@ -206,7 +206,6 @@ PowerableMob {
         FlyingPathNavigation flyingpathnavigation = new FlyingPathNavigation((Mob)this, p_186262_);
         flyingpathnavigation.setCanOpenDoors(false);
         flyingpathnavigation.setCanFloat(true);
-        flyingpathnavigation.setCanPassDoors(true);
         return flyingpathnavigation;
     }
 
@@ -228,7 +227,7 @@ PowerableMob {
         this.goalSelector.addGoal(6, (Goal)new LookAtPlayerGoal((Mob)this, Player.class, 8.0f));
         this.goalSelector.addGoal(7, (Goal)new RandomLookAroundGoal((Mob)this));
         this.targetSelector.addGoal(1, (Goal)new HurtByNearestTargetGoal((PathfinderMob)this, new Class[0]));
-        this.targetSelector.addGoal(2, (Goal)new NearestAttackableTargetGoal((Mob)this, LivingEntity.class, 0, false, false, LIVING_ENTITY_SELECTOR));
+        this.targetSelector.addGoal(2, (Goal)new NearestAttackableTargetGoal((Mob)this, LivingEntity.class, 0, false, false, (net.minecraft.world.entity.ai.targeting.TargetingConditions.Selector)((le, srv) -> LIVING_ENTITY_SELECTOR.test(le))));
     }
 
     public static AttributeSupplier.Builder harbinger() {
@@ -260,7 +259,7 @@ PowerableMob {
     }
 
     public ItemEntity spawnAtLocation(ItemStack stack) {
-        ItemEntity itementity = this.spawnAtLocation(stack, 0.0f);
+        ItemEntity itementity = this.spawnAtLocation((ServerLevel)this.level(), stack, 0.0f);
         if (itementity != null) {
             itementity.setGlowingTag(true);
             itementity.setExtendedLifetime();
@@ -271,32 +270,32 @@ PowerableMob {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(LASER_MODE, (Object)false);
-        p_326229_.define(ISCHARGE, (Object)false);
-        p_326229_.define(IS_ACT, (Object)true);
-        p_326229_.define(FIRST_HEAD_TARGET, (Object)0);
-        p_326229_.define(SECOND_HEAD_TARGET, (Object)0);
-        p_326229_.define(THIRD_HEAD_TARGET, (Object)0);
-        p_326229_.define(OVERLOAD, (Object)0);
+        p_326229_.define(LASER_MODE, false);
+        p_326229_.define(ISCHARGE, false);
+        p_326229_.define(IS_ACT, true);
+        p_326229_.define(FIRST_HEAD_TARGET, 0);
+        p_326229_.define(SECOND_HEAD_TARGET, 0);
+        p_326229_.define(THIRD_HEAD_TARGET, 0);
+        p_326229_.define(OVERLOAD, 0);
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         compound.putBoolean("Is_Act", this.getIsAct());
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        this.setIsAct(compound.getBoolean("Is_Act"));
+        this.setIsAct(compound.getBooleanOr("Is_Act", false));
         if (this.hasCustomName()) {
             this.bossEvent.setName(this.getDisplayName());
         }
     }
 
     @Override
-    public boolean hurt(DamageSource source, float damage) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         Entity entity;
         Entity entity1 = source.getEntity();
         if (entity1 instanceof The_Harbinger_Entity) {
@@ -319,7 +318,7 @@ PowerableMob {
         if (this.deactivateProgress > 0.0f && !source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
             return false;
         }
-        return super.hurt(source, damage);
+        return super.hurtOrSimulate(source, damage);
     }
 
     public boolean canBeSeenAsEnemy() {
@@ -336,14 +335,14 @@ PowerableMob {
         this.bossEvent.removePlayer(player);
     }
 
-    public boolean isAlliedTo(Entity entityIn) {
+    public boolean considersEntityAsAlly(Entity entityIn) {
         if (entityIn == this) {
             return true;
         }
-        if (super.isAlliedTo(entityIn)) {
+        if (super.considersEntityAsAlly(entityIn)) {
             return true;
         }
-        if (entityIn.getType().is(ModTag.TEAM_THE_HARBINGER)) {
+        if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_THE_HARBINGER)) {
             return this.getTeam() == null && entityIn.getTeam() == null;
         }
         return false;
@@ -415,7 +414,7 @@ PowerableMob {
             this.setIsCharge(false);
         }
         if (this.getAnimation() == STUN_ANIAMATION && this.getAnimationTick() == 15) {
-            this.level().playSound((Player)null, (Entity)this, (SoundEvent)ModSounds.HARBINGER_STUN.get(), SoundSource.HOSTILE, 4.0f, this.level().random.nextFloat() * 0.2f + 1.0f);
+            this.level().playSound((Player)null, (Entity)this, (SoundEvent)ModSounds.HARBINGER_STUN.get(), SoundSource.HOSTILE, 4.0f, this.level().getRandom().nextFloat() * 0.2f + 1.0f);
         }
         if (this.getAnimation() == DEATHLASER_ANIMATION && this.getAnimationTick() == 33) {
             this.level().playSound((Player)null, (Entity)this, (SoundEvent)ModSounds.DEATH_LASER.get(), SoundSource.HOSTILE, 4.0f, 0.75f);
@@ -484,7 +483,7 @@ PowerableMob {
 
     private void blockbreak() {
         if (this.getIsCharge()) {
-            if (!this.level().isClientSide() && EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+            if (!this.level().isClientSide() && this.level() instanceof ServerLevel && EventHooks.canEntityGrief((ServerLevel)this.level(), (Entity)this)) {
                 boolean flag = false;
                 AABB aabb = this.getBoundingBox().inflate(1.5, 0.2, 1.5);
                 for (BlockPos blockpos : BlockPos.betweenClosed((int)Mth.floor((double)aabb.minX), (int)Mth.floor((double)aabb.minY), (int)Mth.floor((double)aabb.minZ), (int)Mth.floor((double)aabb.maxX), (int)Mth.floor((double)aabb.maxY), (int)Mth.floor((double)aabb.maxZ))) {
@@ -506,7 +505,7 @@ PowerableMob {
             if (this.tickCount % 4 == 0) {
                 for (LivingEntity Lentity : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(1.5))) {
                     boolean flag;
-                    if (this.isAlliedTo((Entity)Lentity) || Lentity instanceof The_Harbinger_Entity || Lentity == this || !(flag = Lentity.hurt(this.damageSources().mobAttack((LivingEntity)this), (float)((double)((float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) + (float)this.random.nextInt(5)) + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE), (double)(Lentity.getMaxHealth() * (float)CMCommonConfig.Harbinger.ChargeHpDamage))))) || !Lentity.onGround()) continue;
+                    if (this.isAlliedTo((Entity)Lentity) || Lentity instanceof The_Harbinger_Entity || Lentity == this || !(flag = Lentity.hurtOrSimulate(this.damageSources().mobAttack((LivingEntity)this), (float)((double)((float)this.getAttributeValue(Attributes.ATTACK_DAMAGE) + (float)this.random.nextInt(5)) + Math.min(this.getAttributeValue(Attributes.ATTACK_DAMAGE), (double)(Lentity.getMaxHealth() * (float)CMCommonConfig.Harbinger.ChargeHpDamage))))) || !Lentity.onGround()) continue;
                     double d0 = Lentity.getX() - this.getX();
                     double d1 = Lentity.getZ() - this.getZ();
                     double d2 = Math.max(d0 * d0 + d1 * d1, 0.001);
@@ -523,7 +522,7 @@ PowerableMob {
             return;
         }
         boolean flag = false;
-        if (this.getAnimation() == NO_ANIMATION && !this.getIsCharge() && !this.level().isClientSide() && this.blockBreakCounter == 0 && EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+        if (this.getAnimation() == NO_ANIMATION && !this.getIsCharge() && !this.level().isClientSide() && this.blockBreakCounter == 0 && this.level() instanceof ServerLevel && EventHooks.canEntityGrief((ServerLevel)this.level(), (Entity)this)) {
             AABB aabb = this.getBoundingBox().inflate(0.2);
             for (BlockPos pos : BlockPos.betweenClosed((int)Mth.floor((double)aabb.minX), (int)Mth.floor((double)aabb.minY), (int)Mth.floor((double)aabb.minZ), (int)Mth.floor((double)aabb.maxX), (int)Mth.floor((double)aabb.maxY), (int)Mth.floor((double)aabb.maxZ))) {
                 BlockState blockstate = this.level().getBlockState(pos);
@@ -548,7 +547,7 @@ PowerableMob {
     private void destroyBlock() {
         if (this.getAnimation() != STUN_ANIAMATION && !this.level().isClientSide() && this.destroyBlocksTick > 0) {
             --this.destroyBlocksTick;
-            if (this.destroyBlocksTick == 0 && EventHooks.canEntityGrief((Level)this.level(), (Entity)this)) {
+            if (this.destroyBlocksTick == 0 && this.level() instanceof ServerLevel && EventHooks.canEntityGrief((ServerLevel)this.level(), (Entity)this)) {
                 int j1 = Mth.floor((double)this.getY());
                 int i2 = Mth.floor((double)this.getX());
                 int j2 = Mth.floor((double)this.getZ());
@@ -595,7 +594,7 @@ PowerableMob {
         return super.mobInteract(player, hand);
     }
 
-    protected void customServerAiStep() {
+    protected void customServerAiStep(net.minecraft.server.level.ServerLevel level) {
         if (this.getIsAct()) {
             if (this.deactivateProgress > 0.0f) {
                 float k1 = this.deactivateProgress - 1.0f;
@@ -603,7 +602,7 @@ PowerableMob {
                     this.level().globalLevelEvent(1023, this.blockPosition(), 0);
                 }
             } else {
-                super.customServerAiStep();
+                super.customServerAiStep(level);
                 for (int i = 1; i < 3; ++i) {
                     if (this.tickCount < this.nextHeadUpdate[i - 1]) continue;
                     this.nextHeadUpdate[i - 1] = this.tickCount + 10 + this.random.nextInt(10);
@@ -620,7 +619,7 @@ PowerableMob {
                         this.setAlternativeTarget(i, 0);
                         continue;
                     }
-                    List list = this.level().getNearbyEntities(LivingEntity.class, TARGETING_CONDITIONS, (LivingEntity)this, this.getBoundingBox().inflate(20.0, 8.0, 20.0));
+                    List list = ((ServerLevel)this.level()).getNearbyEntities(LivingEntity.class, TARGETING_CONDITIONS, (LivingEntity)this, this.getBoundingBox().inflate(20.0, 8.0, 20.0));
                     if (list.isEmpty()) continue;
                     LivingEntity livingentity1 = (LivingEntity)list.get(this.random.nextInt(list.size()));
                     this.setAlternativeTarget(i, livingentity1.getId());
@@ -698,8 +697,8 @@ PowerableMob {
             BlockEntity blockEntity = targetLevel.getBlockEntity(targetPos);
             if (blockEntity instanceof Boss_Respawn_Spawner_Block_Entity) {
                 Boss_Respawn_Spawner_Block_Entity spawnerBlockEntity = (Boss_Respawn_Spawner_Block_Entity)blockEntity;
-                spawnerBlockEntity.setEntityId((EntityType)ModEntities.THE_HARBINGER.get());
-                spawnerBlockEntity.setTheItem(((Item)ModItems.MECH_EYE.get()).getDefaultInstance());
+                spawnerBlockEntity.spawnType = (EntityType)ModEntities.THE_HARBINGER.get();
+                spawnerBlockEntity.item = ((Item)ModItems.MECH_EYE.get()).getDefaultInstance();
             }
         }
     }
@@ -794,11 +793,11 @@ PowerableMob {
     }
 
     public void setAlternativeTarget(int targetOffset, int newId) {
-        this.entityData.set(HEAD_TARGETS.get(targetOffset), (Object)newId);
+        this.entityData.set(HEAD_TARGETS.get(targetOffset), newId);
     }
 
     public void setIsLaserMode(boolean isLaserMode) {
-        this.entityData.set(LASER_MODE, (Object)isLaserMode);
+        this.entityData.set(LASER_MODE, isLaserMode);
     }
 
     public boolean getIsLaserMode() {
@@ -806,7 +805,7 @@ PowerableMob {
     }
 
     public void setIsAct(boolean isAct) {
-        this.entityData.set(IS_ACT, (Object)isAct);
+        this.entityData.set(IS_ACT, isAct);
         this.bossEvent.setVisible(isAct);
     }
 
@@ -815,7 +814,7 @@ PowerableMob {
     }
 
     public void setIsCharge(boolean isCharge) {
-        this.entityData.set(ISCHARGE, (Object)isCharge);
+        this.entityData.set(ISCHARGE, isCharge);
     }
 
     public boolean getIsCharge() {
@@ -823,7 +822,7 @@ PowerableMob {
     }
 
     public void setOverload(int Overload) {
-        this.entityData.set(OVERLOAD, (Object)Overload);
+        this.entityData.set(OVERLOAD, Overload);
     }
 
     public int getOverload() {
@@ -851,7 +850,7 @@ PowerableMob {
 
     @Override
     public boolean canBeAffected(MobEffectInstance p_31495_) {
-        return p_31495_.getEffect() != MobEffects.MOVEMENT_SLOWDOWN && p_31495_.getEffect() != MobEffects.POISON && p_31495_.getEffect() != MobEffects.WITHER && p_31495_.getEffect() != MobEffects.WEAKNESS && p_31495_.getEffect() != MobEffects.LEVITATION && super.canBeAffected(p_31495_);
+        return p_31495_.getEffect() != MobEffects.SLOWNESS && p_31495_.getEffect() != MobEffects.POISON && p_31495_.getEffect() != MobEffects.WITHER && p_31495_.getEffect() != MobEffects.WEAKNESS && p_31495_.getEffect() != MobEffects.LEVITATION && super.canBeAffected(p_31495_);
     }
 
     public BossEvent.BossBarColor bossBarColor() {

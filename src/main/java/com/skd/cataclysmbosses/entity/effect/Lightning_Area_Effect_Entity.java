@@ -28,6 +28,7 @@ import com.skd.cataclysmbosses.init.ModEntities;
 import com.skd.cataclysmbosses.util.CMDamageTypes;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -43,6 +44,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.PushReaction;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Lightning_Area_Effect_Entity
 extends Entity {
@@ -72,14 +75,14 @@ extends Entity {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(DATA_RADIUS, (Object)Float.valueOf(0.5f));
-        p_326229_.define(DAMAGE, (Object)Float.valueOf(0.0f));
-        p_326229_.define(DATA_WAITING, (Object)false);
+        p_326229_.define(DATA_RADIUS, Float.valueOf(0.5f));
+        p_326229_.define(DAMAGE, Float.valueOf(0.0f));
+        p_326229_.define(DATA_WAITING, false);
     }
 
     public void setRadius(float p_19713_) {
         if (!this.level().isClientSide()) {
-            this.getEntityData().set(DATA_RADIUS, (Object)Float.valueOf(Mth.clamp((float)p_19713_, (float)0.0f, (float)32.0f)));
+            this.getEntityData().set(DATA_RADIUS, Float.valueOf(Mth.clamp((float)p_19713_, (float)0.0f, (float)32.0f)));
         }
     }
 
@@ -96,7 +99,7 @@ extends Entity {
     }
 
     public void setDamage(float f) {
-        this.entityData.set(DAMAGE, (Object)Float.valueOf(f));
+        this.entityData.set(DAMAGE, Float.valueOf(f));
     }
 
     public float getRadius() {
@@ -104,7 +107,7 @@ extends Entity {
     }
 
     protected void setWaiting(boolean p_19731_) {
-        this.getEntityData().set(DATA_WAITING, (Object)p_19731_);
+        this.getEntityData().set(DATA_WAITING, p_19731_);
     }
 
     public boolean isWaiting() {
@@ -170,9 +173,9 @@ extends Entity {
         LivingEntity caster = this.getOwner();
         if (Hitentity.isAlive() && !Hitentity.isInvulnerable() && Hitentity != caster && this.tickCount % 5 == 0) {
             if (caster == null) {
-                Hitentity.hurt(this.damageSources().lightningBolt(), this.getDamage());
+                Hitentity.hurtOrSimulate(this.damageSources().lightningBolt(), this.getDamage());
             } else if (!caster.isAlliedTo((Entity)Hitentity) && !Hitentity.isAlliedTo((Entity)caster)) {
-                Hitentity.hurt(CMDamageTypes.causeLightningDamage(this, (Entity)caster), this.getDamage());
+                Hitentity.hurtOrSimulate(CMDamageTypes.causeLightningDamage(this, (Entity)caster), this.getDamage());
             }
         }
     }
@@ -223,20 +226,20 @@ extends Entity {
         return this.owner;
     }
 
-    protected void readAdditionalSaveData(CompoundTag p_19727_) {
-        this.tickCount = p_19727_.getInt("Age");
-        this.duration = p_19727_.getInt("Duration");
-        this.waitTime = p_19727_.getInt("WaitTime");
-        this.durationOnUse = p_19727_.getInt("DurationOnUse");
-        this.radiusOnUse = p_19727_.getFloat("RadiusOnUse");
-        this.radiusPerTick = p_19727_.getFloat("RadiusPerTick");
-        this.setRadius(p_19727_.getFloat("Radius"));
-        if (p_19727_.hasUUID("Owner")) {
-            this.ownerUUID = p_19727_.getUUID("Owner");
+    protected void readAdditionalSaveData(ValueInput p_19727_) {
+        this.tickCount = p_19727_.getIntOr("Age", 0);
+        this.duration = p_19727_.getIntOr("Duration", 0);
+        this.waitTime = p_19727_.getIntOr("WaitTime", 0);
+        this.durationOnUse = p_19727_.getIntOr("DurationOnUse", 0);
+        this.radiusOnUse = p_19727_.getFloatOr("RadiusOnUse", 0.0F);
+        this.radiusPerTick = p_19727_.getFloatOr("RadiusPerTick", 0.0F);
+        this.setRadius(p_19727_.getFloatOr("Radius", 0.0F));
+        if (p_19727_.read("Owner", UUIDUtil.CODEC).isPresent()) {
+            this.ownerUUID = p_19727_.read("Owner", UUIDUtil.CODEC).orElse(null);
         }
     }
 
-    protected void addAdditionalSaveData(CompoundTag p_19737_) {
+    protected void addAdditionalSaveData(ValueOutput p_19737_) {
         p_19737_.putInt("Age", this.tickCount);
         p_19737_.putInt("Duration", this.duration);
         p_19737_.putInt("WaitTime", this.waitTime);
@@ -259,6 +262,11 @@ extends Entity {
 
     public EntityDimensions getDimensions(Pose p_19721_) {
         return EntityDimensions.scalable((float)(this.getRadius() * 2.0f), (float)0.5f);
+    }
+
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return false;
     }
 }
 

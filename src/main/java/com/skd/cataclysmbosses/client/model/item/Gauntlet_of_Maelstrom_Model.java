@@ -92,7 +92,7 @@ extends AdvancedEntityModel<Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.root, (Object)this.gauntlet_fist, (Object)this.gauntlet_fist_r1, (Object)this.gauntlet_fist_r2, (Object)this.void_stone_knuckle, (Object)this.gauntlet_arm, (Object)this.gauntlet_arm2, (Object)this.gauntlet_shoulder, (Object)this.big_void_stone);
+        return ImmutableList.of(this.root, this.gauntlet_fist, this.gauntlet_fist_r1, this.gauntlet_fist_r2, this.void_stone_knuckle, this.gauntlet_arm, this.gauntlet_arm2, this.gauntlet_shoulder, this.big_void_stone);
     }
 
     public BasicModelPart root() {

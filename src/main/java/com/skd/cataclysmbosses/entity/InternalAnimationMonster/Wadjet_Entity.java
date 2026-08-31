@@ -25,7 +25,7 @@
  *  net.minecraft.world.entity.EntityType
  *  net.minecraft.world.entity.LivingEntity
  *  net.minecraft.world.entity.Mob
- *  net.minecraft.world.entity.MobSpawnType
+ *  net.minecraft.world.entity.EntitySpawnReason
  *  net.minecraft.world.entity.PathfinderMob
  *  net.minecraft.world.entity.SpawnGroupData
  *  net.minecraft.world.entity.ai.attributes.AttributeSupplier$Builder
@@ -53,6 +53,7 @@
  *  net.neoforged.api.distmarker.OnlyIn
  */
 package com.skd.cataclysmbosses.entity.InternalAnimationMonster;
+import net.minecraft.server.level.ServerLevel;
 
 import com.skd.cataclysmbosses.config.CMCommonConfig;
 import com.skd.cataclysmbosses.entity.InternalAnimationMonster.AI.InternalAttackGoal;
@@ -91,7 +92,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.SpawnGroupData;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -116,6 +117,8 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Wadjet_Entity
 extends Internal_Animation_Monster {
@@ -171,7 +174,7 @@ extends Internal_Animation_Monster {
             @Override
             public void stop() {
                 super.stop();
-                Wadjet_Entity.this.setStab(Wadjet_Entity.this.random.nextBoolean());
+                Wadjet_Entity.this.setStab(Wadjet_Entity.this.getRandom().nextBoolean());
             }
         });
         this.goalSelector.addGoal(1, (Goal)new InternalAttackGoal(this, 0, 6, 0, 55, 55, 5.0f){
@@ -184,10 +187,10 @@ extends Internal_Animation_Monster {
             @Override
             public void stop() {
                 super.stop();
-                Wadjet_Entity.this.setStab(Wadjet_Entity.this.random.nextBoolean());
+                Wadjet_Entity.this.setStab(Wadjet_Entity.this.getRandom().nextBoolean());
             }
         });
-        this.goalSelector.addGoal(1, (Goal)new InternalStateGoal(this, this, 1, 1, 0, 0, 0){
+        this.goalSelector.addGoal(1, (Goal)new InternalStateGoal(this, 1, 1, 0, 0, 0){
 
             @Override
             public void tick() {
@@ -202,7 +205,7 @@ extends Internal_Animation_Monster {
         return Monster.createMonsterAttributes().add(Attributes.FOLLOW_RANGE, 30.0).add(Attributes.MOVEMENT_SPEED, (double)0.28f).add(Attributes.ATTACK_DAMAGE, 11.0).add(Attributes.MAX_HEALTH, 150.0).add(Attributes.ARMOR, 5.0).add(Attributes.STEP_HEIGHT, 1.25).add(Attributes.KNOCKBACK_RESISTANCE, 0.7);
     }
 
-    public boolean hurt(DamageSource source, float damage) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         Entity entity = source.getDirectEntity();
         if (entity instanceof Poison_Dart_Entity) {
             return false;
@@ -223,7 +226,7 @@ extends Internal_Animation_Monster {
             }
             return false;
         }
-        return super.hurt(source, damage);
+        return super.hurtOrSimulate(source, damage);
     }
 
     public void handleDamageEvent(DamageSource damageSource) {
@@ -233,9 +236,7 @@ extends Internal_Animation_Monster {
         if (soundevent != null) {
             this.playSound(soundevent, this.getSoundVolume(), (this.random.nextFloat() - this.random.nextFloat()) * 0.2f + 1.0f);
         }
-        this.hurt(this.damageSources().generic(), 0.0f);
-        this.lastDamageSource = damageSource;
-        this.lastDamageStamp = this.level().getGameTime();
+        this.hurtOrSimulate(this.damageSources().generic(), 0.0f);
     }
 
     private boolean canBlockDamageSource(DamageSource damageSourceIn) {
@@ -288,8 +289,8 @@ extends Internal_Animation_Monster {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(STAB, (Object)false);
-        p_326229_.define(AWAKEN, (Object)false);
+        p_326229_.define(STAB, false);
+        p_326229_.define(AWAKEN, false);
     }
 
     public boolean isAwaken() {
@@ -301,7 +302,7 @@ extends Internal_Animation_Monster {
     }
 
     public void setStab(boolean stab) {
-        this.entityData.set(STAB, (Object)stab);
+        this.entityData.set(STAB, stab);
     }
 
     public boolean getStab() {
@@ -312,7 +313,7 @@ extends Internal_Animation_Monster {
         if (necklace) {
             this.heal(this.getMaxHealth());
         }
-        this.entityData.set(AWAKEN, (Object)necklace);
+        this.entityData.set(AWAKEN, necklace);
     }
 
     public boolean getAwaken() {
@@ -323,7 +324,7 @@ extends Internal_Animation_Monster {
         return this.isAwaken() && super.canBeSeenAsEnemy();
     }
 
-    public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_29678_, DifficultyInstance p_29679_, MobSpawnType p_29680_, @Nullable SpawnGroupData p_29681_) {
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_29678_, DifficultyInstance p_29679_, EntitySpawnReason p_29680_, @Nullable SpawnGroupData p_29681_) {
         return super.finalizeSpawn(p_29678_, p_29679_, p_29680_, p_29681_);
     }
 
@@ -400,14 +401,14 @@ extends Internal_Animation_Monster {
         return 60;
     }
 
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         compound.putBoolean("Awaken", this.getAwaken());
     }
 
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        this.setAwaken(compound.getBoolean("Awaken"));
+        this.setAwaken(compound.getBooleanOr("Awaken", false));
     }
 
     @Override
@@ -482,8 +483,8 @@ extends Internal_Animation_Monster {
                 float entityHitDistance = (float)Math.sqrt((entityHit.getZ() - this.getZ()) * (entityHit.getZ() - this.getZ()) + (entityHit.getX() - this.getX()) * (entityHit.getX() - this.getX()));
                 if (!(entityHitDistance <= range && entityRelativeAngle <= arc / 2.0f && entityRelativeAngle >= -arc / 2.0f || entityRelativeAngle >= 360.0f - arc / 2.0f) && !(entityRelativeAngle <= -360.0f + arc / 2.0f) || this.isAlliedTo((Entity)entityHit) || entityHit instanceof Wadjet_Entity || entityHit == this) continue;
                 DamageSource damagesource = this.damageSources().mobAttack((LivingEntity)this);
-                boolean hurt = entityHit.hurt(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
-                if (entityHit.isDamageSourceBlocked(damagesource) && entityHit instanceof Player) {
+                boolean hurt = entityHit.hurtOrSimulate(damagesource, (float)(this.getAttributeValue(Attributes.ATTACK_DAMAGE) * (double)damage));
+                if (entityHit.isBlocking() && entityHit instanceof Player) {
                     Player player = (Player)entityHit;
                     if (shieldbreakticks > 0) {
                         EntityUtil.disableShield(player, shieldbreakticks);
@@ -502,14 +503,14 @@ extends Internal_Animation_Monster {
         return this.prevAttackProgress + (this.AttackProgress - this.prevAttackProgress) * partialTicks;
     }
 
-    public boolean isAlliedTo(Entity entityIn) {
+    public boolean considersEntityAsAlly(Entity entityIn) {
         if (entityIn == this) {
             return true;
         }
-        if (super.isAlliedTo(entityIn)) {
+        if (super.considersEntityAsAlly(entityIn)) {
             return true;
         }
-        if (entityIn.getType().is(ModTag.TEAM_ANCIENT_REMNANT)) {
+        if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_ANCIENT_REMNANT)) {
             return this.getTeam() == null && entityIn.getTeam() == null;
         }
         return false;
@@ -700,7 +701,7 @@ extends Internal_Animation_Monster {
                 if (this.entity.level().isEmptyBlock(blockpos) || (voxelshape = (blockstate1 = this.entity.level().getBlockState(blockpos)).getCollisionShape((BlockGetter)this.entity.level(), blockpos)).isEmpty()) break;
                 d0 = voxelshape.max(Direction.Axis.Y);
                 break;
-            } while ((blockpos = blockpos.above()).getY() < Math.min(this.entity.level().getMaxBuildHeight(), this.entity.getBlockY() + 12));
+            } while ((blockpos = blockpos.above()).getY() < Math.min(this.entity.level().getMaxY() + 1, this.entity.getBlockY() + 12));
             this.entity.level().addFreshEntity((Entity)new Ancient_Desert_Stele_Entity(this.entity.level(), posX, (double)blockpos.getY() + d0 - 3.0, posZ, rotation, delay, (float)CMCommonConfig.Wadjet.AncientDesertSteledamage, (LivingEntity)this.entity));
         }
     }

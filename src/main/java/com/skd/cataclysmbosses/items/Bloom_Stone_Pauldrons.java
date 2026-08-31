@@ -48,38 +48,35 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.item.equipment.ArmorMaterial;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 public class Bloom_Stone_Pauldrons
 extends Cataclysm_Armor
 implements KeybindUsingArmor {
-    public Bloom_Stone_Pauldrons(Holder<ArmorMaterial> material, ArmorItem.Type slot, Item.Properties properties, AttributeContainer ... attributes) {
+    public Bloom_Stone_Pauldrons(Holder<ArmorMaterial> material, ArmorType slot, Item.Properties properties, AttributeContainer ... attributes) {
         super(material, slot, properties, attributes);
     }
 
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltips, TooltipFlag flags) {
-        tooltips.add((Component)Component.translatable((String)"item.cataclysm.bloom_stone_pauldrons.desc", (Object[])new Object[]{ModKeybind.CHESTPLATE_KEY_ABILITY.getTranslatedKeyMessage()}).withStyle(ChatFormatting.DARK_GREEN));
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, java.util.function.Consumer<Component> builder, TooltipFlag flags) {
+        builder.accept((Component)Component.translatable((String)"item.cataclysm.bloom_stone_pauldrons.desc", (Object[])new Object[]{ModKeybind.CHESTPLATE_KEY_ABILITY.getTranslatedKeyMessage()}).withStyle(ChatFormatting.DARK_GREEN));
     }
 
-    public void inventoryTick(ItemStack stack, Level level, Entity entity, int i, boolean held) {
+    public void inventoryTick(ItemStack stack, ServerLevel level, Entity entity, @javax.annotation.Nullable EquipmentSlot slot) {
         Player player;
-        block5: {
-            block4: {
-                super.inventoryTick(stack, level, entity, i, held);
-                if (!(entity instanceof Player)) break block4;
-                player = (Player)entity;
-                if (level.isClientSide()) break block5;
-            }
+        if (!(entity instanceof Player)) {
             return;
         }
-        if (this.type == ArmorItem.Type.CHESTPLATE && player.getItemBySlot(EquipmentSlot.CHEST) == stack && ModKeybind.CHESTPLATE_KEY_ABILITY.consumeClick()) {
-            PacketDistributor.sendToServer((CustomPacketPayload)new MessageArmorKey(EquipmentSlot.CHEST.ordinal(), player.getId(), 6), (CustomPacketPayload[])new CustomPacketPayload[0]);
+        player = (Player)entity;
+        if (this.type == ArmorType.CHESTPLATE && player.getItemBySlot(EquipmentSlot.CHEST) == stack && ModKeybind.CHESTPLATE_KEY_ABILITY.consumeClick()) {
+            PacketDistributor.sendToPlayer((net.minecraft.server.level.ServerPlayer)player, (CustomPacketPayload)new MessageArmorKey(EquipmentSlot.CHEST.ordinal(), player.getId(), 6));
             this.onKeyPacket(player, stack, 6);
         }
     }
@@ -89,7 +86,7 @@ implements KeybindUsingArmor {
         if (player == null) {
             return;
         }
-        if (Type2 == 6 && !player.getCooldowns().isOnCooldown((Item)ModItems.BLOOM_STONE_PAULDRONS.get())) {
+        if (Type2 == 6 && !player.getCooldowns().isOnCooldown(new ItemStack(ModItems.BLOOM_STONE_PAULDRONS.get()))) {
             for (int i = 0; i < 8; ++i) {
                 float throwAngle = (float)i * (float)Math.PI / 4.0f;
                 double sx = player.getX() + (double)(Mth.cos((float)throwAngle) * 1.0f);
@@ -100,16 +97,18 @@ implements KeybindUsingArmor {
                 double vz = Mth.sin((float)throwAngle);
                 double v3 = Mth.sqrt((float)((float)(vx * vx + vz * vz)));
                 Amethyst_Cluster_Projectile_Entity projectile = new Amethyst_Cluster_Projectile_Entity((EntityType<Amethyst_Cluster_Projectile_Entity>)((EntityType)ModEntities.AMETHYST_CLUSTER_PROJECTILE.get()), player.level(), (LivingEntity)player, 11.0f);
-                projectile.moveTo(sx, sy, sz, (float)i * 11.25f, player.getXRot());
+                projectile.setPos(sx, sy, sz);
+            projectile.setYRot((float)i * 11.25f);
+            projectile.setXRot(player.getXRot());
                 float speed = 0.8f;
                 projectile.shoot(vx, vy + v3 * (double)0.2f, vz, speed, 1.0f);
                 player.level().addFreshEntity((Entity)projectile);
             }
-            player.getCooldowns().addCooldown((Item)ModItems.BLOOM_STONE_PAULDRONS.get(), 240);
+            player.getCooldowns().addCooldown(ModItems.BLOOM_STONE_PAULDRONS.get().getDefaultInstance(), 240);
         }
     }
 
-    public Identifier getArmorTexture(@Nonnull ItemStack stack, @Nonnull Entity entity, @Nonnull EquipmentSlot slot, @Nonnull ArmorMaterial.Layer layer, boolean isInnerModel) {
+    public Identifier getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, net.minecraft.client.resources.model.EquipmentClientInfo.Layer layer, boolean isInnerModel) {
         return Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/armor/bloom_stone_pauldrons.png");
     }
 }

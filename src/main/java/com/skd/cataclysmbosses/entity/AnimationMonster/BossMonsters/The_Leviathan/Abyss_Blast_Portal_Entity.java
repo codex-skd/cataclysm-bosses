@@ -37,7 +37,10 @@ import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.Nullable;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
+import net.minecraft.core.UUIDUtil;
 public class Abyss_Blast_Portal_Entity
 extends Entity {
     private int warmupDelayTicks;
@@ -130,9 +133,9 @@ extends Entity {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(ACTIVATE, (Object)false);
-        p_326229_.define(DAMAGE, (Object)Float.valueOf(0.0f));
-        p_326229_.define(HPDAMAGE, (Object)Float.valueOf(0.0f));
+        p_326229_.define(ACTIVATE, false);
+        p_326229_.define(DAMAGE, Float.valueOf(0.0f));
+        p_326229_.define(HPDAMAGE, Float.valueOf(0.0f));
     }
 
     public float getDamage() {
@@ -140,7 +143,7 @@ extends Entity {
     }
 
     public void setDamage(float damage) {
-        this.entityData.set(DAMAGE, (Object)Float.valueOf(damage));
+        this.entityData.set(DAMAGE, Float.valueOf(damage));
     }
 
     public float getHpDamage() {
@@ -148,7 +151,7 @@ extends Entity {
     }
 
     public void setHpDamage(float damage) {
-        this.entityData.set(HPDAMAGE, (Object)Float.valueOf(damage));
+        this.entityData.set(HPDAMAGE, Float.valueOf(damage));
     }
 
     public boolean isActivate() {
@@ -156,22 +159,22 @@ extends Entity {
     }
 
     public void setActivate(boolean Activate) {
-        this.entityData.set(ACTIVATE, (Object)Activate);
+        this.entityData.set(ACTIVATE, Activate);
     }
 
-    protected void readAdditionalSaveData(CompoundTag compound) {
-        this.warmupDelayTicks = compound.getInt("Warmup");
-        if (compound.hasUUID("Owner")) {
-            this.casterUuid = compound.getUUID("Owner");
+    protected void readAdditionalSaveData(ValueInput compound) {
+        this.warmupDelayTicks = compound.getIntOr("Warmup", 0);
+        if (compound.read("Owner", UUIDUtil.CODEC).isPresent()) {
+            this.casterUuid = compound.read("Owner", UUIDUtil.CODEC).orElse(null);
         }
-        this.setDamage(compound.getFloat("damage"));
-        this.setHpDamage(compound.getFloat("Hpdamage"));
+        this.setDamage(compound.getFloatOr("damage", 0.0f));
+        this.setHpDamage(compound.getFloatOr("Hpdamage", 0.0f));
     }
 
-    protected void addAdditionalSaveData(CompoundTag compound) {
+    protected void addAdditionalSaveData(ValueOutput compound) {
         compound.putInt("Warmup", this.warmupDelayTicks);
         if (this.casterUuid != null) {
-            compound.putUUID("Owner", this.casterUuid);
+            compound.store("Owner", UUIDUtil.CODEC, this.casterUuid);
         }
         compound.putFloat("damage", this.getDamage());
         compound.putFloat("Hpdamage", this.getHpDamage());
@@ -187,6 +190,11 @@ extends Entity {
 
     public PushReaction getPistonPushReaction() {
         return PushReaction.IGNORE;
+    }
+
+    @Override
+    public boolean hurtServer(net.minecraft.server.level.ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return false;
     }
 }
 

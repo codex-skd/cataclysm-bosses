@@ -17,7 +17,6 @@
  */
 package com.skd.cataclysmbosses.client.model.armor;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
@@ -26,11 +25,9 @@ import net.minecraft.client.model.geom.builders.CubeListBuilder;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
-import net.minecraft.client.player.AbstractClientPlayer;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 
-public class Ignitium_Elytra_chestplate_Model<T extends LivingEntity>
+public class Ignitium_Elytra_chestplate_Model<T extends HumanoidRenderState>
 extends HumanoidModel<T> {
     private final ModelPart rightWing;
     private final ModelPart leftWing;
@@ -60,48 +57,17 @@ extends HumanoidModel<T> {
         return LayerDefinition.create((MeshDefinition)meshdefinition, (int)128, (int)128);
     }
 
-    public Ignitium_Elytra_chestplate_Model withAnimations(LivingEntity entity) {
-        float partialTick = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true);
-        float limbSwingAmount = entity.walkAnimation.speed(partialTick);
-        float limbSwing = entity.walkAnimation.position() + partialTick;
-        this.setupAnim(entity, limbSwing, limbSwingAmount, (float)entity.tickCount + partialTick, 0.0f, 0.0f);
-        return this;
-    }
-
-    public void setupAnim(LivingEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        float f = 0.2617994f;
-        float f1 = -0.2617994f;
-        float f2 = 0.0f;
-        float f3 = 0.0f;
-        if (entity.isFallFlying()) {
-            float f4 = 1.0f;
-            Vec3 vec3 = entity.getDeltaMovement();
-            if (vec3.y < 0.0) {
-                Vec3 vec31 = vec3.normalize();
-                f4 = 1.0f - (float)Math.pow(-vec31.y, 1.5);
-            }
-            f = f4 * 0.34906584f + (1.0f - f4) * f;
-            f1 = f4 * -1.5707964f + (1.0f - f4) * f1;
-        } else if (entity.isCrouching()) {
-            f = 0.6981317f;
-            f1 = -0.7853982f;
-            f2 = 3.0f;
-            f3 = 0.08726646f;
-        }
-        this.leftWing.y = f2;
-        if (entity instanceof AbstractClientPlayer) {
-            AbstractClientPlayer abstractclientplayer = (AbstractClientPlayer)entity;
-            abstractclientplayer.elytraRotX += (f - abstractclientplayer.elytraRotX) * 0.1f;
-            abstractclientplayer.elytraRotY += (f3 - abstractclientplayer.elytraRotY) * 0.1f;
-            abstractclientplayer.elytraRotZ += (f1 - abstractclientplayer.elytraRotZ) * 0.1f;
-            this.leftWing.xRot = abstractclientplayer.elytraRotX;
-            this.leftWing.yRot = abstractclientplayer.elytraRotY;
-            this.leftWing.zRot = abstractclientplayer.elytraRotZ;
-        } else {
-            this.leftWing.xRot = f;
-            this.leftWing.zRot = f1;
-            this.leftWing.yRot = f3;
-        }
+    // PORT NOTE (26.2): the fall-flying / crouch wing angles and the smoothing that used to live
+    // here are now computed upstream and delivered via HumanoidRenderState.elytraRot{X,Y,Z}
+    // (see vanilla net.minecraft.client.model.object.equipment.ElytraModel). This model just
+    // applies them to its two wing bones; the extra shoulder-pad/spike cubes are static.
+    @Override
+    public void setupAnim(T state) {
+        super.setupAnim(state);
+        this.leftWing.y = state.isCrouching ? 3.0f : 0.0f;
+        this.leftWing.xRot = state.elytraRotX;
+        this.leftWing.yRot = state.elytraRotY;
+        this.leftWing.zRot = state.elytraRotZ;
         this.rightWing.yRot = -this.leftWing.yRot;
         this.rightWing.y = this.leftWing.y;
         this.rightWing.xRot = this.leftWing.xRot;

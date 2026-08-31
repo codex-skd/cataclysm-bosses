@@ -85,15 +85,18 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import java.util.Random;
-// import net.minecraft.Util;
+import java.lang.reflect.Method;
+import net.minecraft.util.Util;
+// import net.minecraft.util.Util;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-// import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 // import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.Component;
@@ -222,8 +225,8 @@ public class ClientEvent {
     }
 
     public static void onCameraZoom(CalculateDetachedCameraDistanceEvent event) {
-        Entity cameraEntity = event.getCamera().getEntity();
-        float partialTick = event.getCamera().getPartialTickTime();
+        Entity cameraEntity = event.getCamera().entity();
+        float partialTick = event.getCamera().getCameraEntityPartialTicks(Minecraft.getInstance().getDeltaTracker());
         if (cameraEntity != null && cameraEntity.isPassenger() && cameraEntity.getVehicle() instanceof Maledictus_Entity && event.getCamera().isDetached()) {
             event.setDistance(6.0f);
         }
@@ -235,7 +238,7 @@ public class ClientEvent {
         }
         if (false && CameraZoomManager.isActive() && event.getCamera().isDetached()) {
             float zoom = CameraZoomManager.getZoomOffset(partialTick);
-            float floorzoom = event.getCamera().getMaxZoom(zoom);
+            float floorzoom = getMaxZoom(event.getCamera(), zoom);
             if (floorzoom < zoom) {
                 floorzoom = Math.max(0.0f, floorzoom - 0.2f);
             }
@@ -244,7 +247,7 @@ public class ClientEvent {
             if (ny > 0.0f) {
                 dy = Math.min(ny * 0.5f, 1.5f);
             }
-            event.getCamera().move(-floorzoom, dy, 0.0f);
+            moveCamera(event.getCamera(), -floorzoom, dy, 0.0f);
         }
     }
 
@@ -253,9 +256,9 @@ public class ClientEvent {
             return false;
         }
         return switch (keybind.getKey().getType()) {
-            case InputConstants.Type.KEYSYM -> InputConstants.isKeyDown((long)Minecraft.getInstance().getWindow().getWindow(), (int)keybind.getKey().getValue());
+            case InputConstants.Type.KEYSYM -> InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), keybind.getKey().getValue());
             case InputConstants.Type.MOUSE -> {
-                if (GLFW.glfwGetMouseButton((long)Minecraft.getInstance().getWindow().getWindow(), (int)keybind.getKey().getValue()) == 1) {
+                if (GLFW.glfwGetMouseButton((long)Minecraft.getInstance().getWindow().handle(), (int)keybind.getKey().getValue()) == 1) {
                     yield true;
                 }
                 yield false;
@@ -267,18 +270,8 @@ public class ClientEvent {
     public static void MovementInput(MovementInputUpdateEvent event) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player != null && player.hasEffect(ModEffect.EFFECTCURSE_OF_DESERT)) {
-            if (Minecraft.getInstance().options.keyDown.isDown()) {
-                event.getInput().forwardImpulse *= -1.0f;
-            }
-            if (Minecraft.getInstance().options.keyLeft.isDown()) {
-                event.getInput().leftImpulse *= -1.0f;
-            }
-            if (Minecraft.getInstance().options.keyRight.isDown()) {
-                event.getInput().leftImpulse *= -1.0f;
-            }
-            if (Minecraft.getInstance().options.keyUp.isDown()) {
-                event.getInput().forwardImpulse *= -1.0f;
-            }
+            // PORT TODO(26.2): ClientInput.moveVector is protected now; the "curse of desert"
+            // control-reversal needs a MovementInputUpdateEvent accessor or a mixin.
         }
     }
 
@@ -288,24 +281,17 @@ public class ClientEvent {
             Minecraft mc = Minecraft.getInstance();
             if (player.isPassenger()) {
                 if ((player.getVehicle() instanceof The_Leviathan_Tongue_Entity || player.getVehicle() instanceof IHoldEntity) && VanillaGuiLayers.VEHICLE_HEALTH == event.getName()) {
-                    Minecraft.getInstance().gui.setOverlayMessage((Component)Component.translatable((String)"entity.cataclysm.you_cant_escape"), false);
+                    // PORT TODO(26.2): Gui.setOverlayMessage removed; re-route "you_cant_escape" action-bar message.
                 }
                 if (player.getVehicle() instanceof Accretion_Entity && VanillaGuiLayers.VEHICLE_HEALTH == event.getName()) {
-                    Minecraft.getInstance().gui.setOverlayMessage((Component)Component.translatable((String)"entity.cataclysm.accretion_ride"), false);
+                    // PORT TODO(26.2): Gui.setOverlayMessage removed; re-route "accretion_ride" action-bar message.
                 }
             }
         }
     }
 
     public static void onPostRenderHUD(RenderGuiLayerEvent.Post event) {
-        LocalPlayer player = Minecraft.getInstance().player;
-        float delta = Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(true);
-        float screenEffectIntensity = ((Double)Minecraft.getInstance().options.screenEffectScale().get()).floatValue();
-        float ticksExistedDelta = (float)player.tickCount + delta;
-        Minecraft mc = Minecraft.getInstance();
-        if (player == null || VanillaGuiLayers.AIR_LEVEL != event.getName() || mc.options.hideGui || ClientEvent.shouldDrawSurvivalElements()) {
-            // empty if block
-        }
+        // PORT TODO(26.2): body was already empty; mc.options.hideGui field removed.
     }
 
     private static boolean shouldDrawSurvivalElements() {
@@ -314,57 +300,9 @@ public class ClientEvent {
     }
 
     public static void onPreRenderEntity(RenderLivingEvent.Pre event) {
-        PoseStack.Pose lvt_19_1_;
-        VertexConsumer ivertexbuilder;
-        float f3;
-        PoseStack matrixStackIn;
-        float f2;
-        int i;
-        boolean usingImmolator;
-        LivingEntity player = event.getEntity();
-        boolean usingIncinerator = player.isUsingItem() && player.getUseItem().is((Item)ModItems.THE_INCINERATOR.get());
-        boolean bl = usingImmolator = player.isUsingItem() && player.getUseItem().is((Item)ModItems.THE_IMMOLATOR.get());
-        if (usingIncinerator) {
-            i = player.getTicksUsingItem();
-            f2 = (float)player.tickCount + event.getPartialTick();
-            matrixStackIn = event.getPoseStack();
-            f3 = Mth.clamp((int)i, (int)1, (int)60);
-            matrixStackIn.pushPose();
-            ivertexbuilder = ItemRenderer.getArmorFoilBuffer((MultiBufferSource)event.getMultiBufferSource(), (RenderType)RenderType.entityTranslucentEmissive((Identifier)FLAME_STRIKE), (boolean)true);
-            matrixStackIn.translate(0.0, 0.001, 0.0);
-            matrixStackIn.scale(f3 * 0.05f, f3 * 0.05f, f3 * 0.05f);
-            matrixStackIn.mulPose(Axis.YP.rotationDegrees(90.0f + f2));
-            lvt_19_1_ = matrixStackIn.last();
-            ClientEvent.drawVertex(lvt_19_1_, ivertexbuilder, -1, 0, -1, 0.0f, 0.0f, 1, 0, 1, 240);
-            ClientEvent.drawVertex(lvt_19_1_, ivertexbuilder, -1, 0, 1, 0.0f, 1.0f, 1, 0, 1, 240);
-            ClientEvent.drawVertex(lvt_19_1_, ivertexbuilder, 1, 0, 1, 1.0f, 1.0f, 1, 0, 1, 240);
-            ClientEvent.drawVertex(lvt_19_1_, ivertexbuilder, 1, 0, -1, 1.0f, 0.0f, 1, 0, 1, 240);
-            matrixStackIn.popPose();
-        }
-        if (usingImmolator) {
-            i = player.getTicksUsingItem();
-            f2 = (float)player.tickCount + event.getPartialTick();
-            matrixStackIn = event.getPoseStack();
-            f3 = Mth.clamp((int)i, (int)1, (int)45);
-            matrixStackIn.pushPose();
-            ivertexbuilder = ItemRenderer.getArmorFoilBuffer((MultiBufferSource)event.getMultiBufferSource(), (RenderType)RenderType.entityTranslucentEmissive((Identifier)FLAME_STRIKE), (boolean)true);
-            matrixStackIn.translate(0.0, 0.001, 0.0);
-            matrixStackIn.scale(f3 * 0.05f, f3 * 0.05f, f3 * 0.05f);
-            matrixStackIn.mulPose(Axis.YP.rotationDegrees(90.0f + f2));
-            lvt_19_1_ = matrixStackIn.last();
-            ClientEvent.drawVertex(lvt_19_1_, ivertexbuilder, -1, 0, -1, 0.0f, 0.0f, 1, 0, 1, 240);
-            ClientEvent.drawVertex(lvt_19_1_, ivertexbuilder, -1, 0, 1, 0.0f, 1.0f, 1, 0, 1, 240);
-            ClientEvent.drawVertex(lvt_19_1_, ivertexbuilder, 1, 0, 1, 1.0f, 1.0f, 1, 0, 1, 240);
-            ClientEvent.drawVertex(lvt_19_1_, ivertexbuilder, 1, 0, -1, 1.0f, 0.0f, 1, 0, 1, 240);
-            matrixStackIn.popPose();
-        }
-        if (ClientProxy.blockedEntityRenders.contains(event.getEntity().getUUID())) {
-            if (!Cataclysm.PROXY.isFirstPersonPlayer((Entity)event.getEntity())) {
-                NeoForge.EVENT_BUS.post((Event)new RenderLivingEvent.Post(event.getEntity(), event.getRenderer(), event.getPartialTick(), event.getPoseStack(), event.getMultiBufferSource(), event.getPackedLight()));
-                event.setCanceled(true);
-            }
-            ClientProxy.blockedEntityRenders.remove(event.getEntity().getUUID());
-        }
+        // PORT TODO(26.2): RenderLivingEvent.Pre lost getEntity()/getMultiBufferSource()/
+        // getPackedLight(); this drew the incinerator/immolator flame-sigil quad and suppressed
+        // "blocked" entity renders. Re-implement against the new event + SubmitNodeCollector.
     }
 
     public static void onPreRenderPlayer(RenderPlayerEvent.Pre event) {
@@ -375,7 +313,7 @@ public class ClientEvent {
     }
 
     public static void clientTick(ClientTickEvent.Post event) {
-        if (Minecraft.getInstance().isSingleplayer() && Minecraft.getInstance().isPaused()) {
+        if (Minecraft.getInstance().hasSingleplayerServer() && Minecraft.getInstance().isPaused()) {
             return;
         }
         CMItemstackRenderer.incrementTick();
@@ -383,12 +321,8 @@ public class ClientEvent {
     }
 
     private static void updateAllChunks() {
-        if (Minecraft.getInstance().levelRenderer.viewArea != null) {
-            int length = Minecraft.getInstance().levelRenderer.viewArea.sections.length;
-            for (int i = 0; i < length; ++i) {
-                Minecraft.getInstance().levelRenderer.viewArea.sections[i].setDirty(true);
-            }
-        }
+        // PORT(26.2): viewArea/ViewArea.sections are private; use the public rebuild-everything hook.
+        Minecraft.getInstance().levelExtractor.allChanged();
     }
 
     public static void onPoseHand(EventPosePlayerHand event) {
@@ -414,139 +348,21 @@ public class ClientEvent {
     }
 
     public static void onRenderArm(RenderArmEvent event) {
-        InteractionHand hand = event.getArm() == event.getPlayer().getMainArm() ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
-        CuriosApi.getCuriosHelper().getCuriosHandler((LivingEntity)event.getPlayer()).ifPresent(handler -> {
-            ICurioStacksHandler stacksHandler = (ICurioStacksHandler)handler.getCurios().get(SlotTypePreset.HANDS.getIdentifier());
-            if (stacksHandler != null) {
-                int slot;
-                IDynamicStackHandler stacks = stacksHandler.getStacks();
-                IDynamicStackHandler cosmeticStacks = stacksHandler.getCosmeticStacks();
-                int n = slot = hand == InteractionHand.MAIN_HAND ? 0 : 1;
-                while (slot < stacks.getSlots()) {
-                    Chitin_Claw_Renderer clawrenderer;
-                    Sticky_Gloves_Renderer stickyrenderer;
-                    Blazing_Grips_Renderer gripsrenderer;
-                    ItemStack stack = cosmeticStacks.getStackInSlot(slot);
-                    if (stack.isEmpty() && ((Boolean)stacksHandler.getRenders().get(slot)).booleanValue()) {
-                        stack = stacks.getStackInSlot(slot);
-                    }
-                    if ((gripsrenderer = Blazing_Grips_Renderer.getGloveRenderer(stack)) != null) {
-                        gripsrenderer.renderFirstPersonArm(event.getPoseStack(), event.getMultiBufferSource(), event.getPackedLight(), event.getPlayer(), event.getArm(), stack.hasFoil());
-                    }
-                    if ((stickyrenderer = Sticky_Gloves_Renderer.getGloveRenderer(stack)) != null) {
-                        stickyrenderer.renderFirstPersonArm(event.getPoseStack(), event.getMultiBufferSource(), event.getPackedLight(), event.getPlayer(), event.getArm(), stack.hasFoil());
-                    }
-                    if ((clawrenderer = Chitin_Claw_Renderer.getGloveRenderer(stack)) != null) {
-                        clawrenderer.renderFirstPersonArm(event.getPoseStack(), event.getMultiBufferSource(), event.getPackedLight(), event.getPlayer(), event.getArm(), stack.hasFoil());
-                    }
-                    slot += 2;
-                }
-            }
-        });
+        // PORT TODO(26.2): first-person glove-accessory rendering. Used CuriosApi.getCuriosHelper()
+        // + SlotTypePreset.HANDS (both replaced in regalia_slots_api: CuriosApi.getCuriosInventory,
+        // CuriosSlotTypes.Preset.HANDS) and RenderArmEvent.getMultiBufferSource/getPackedLight/
+        // getPlayer (removed). Re-wire with the regalia API + SubmitNodeCollector.
     }
 
     private void CustomHealth(RenderGuiLayerEvent.Pre event, int back) {
-        boolean highlight;
-        LocalPlayer player = Minecraft.getInstance().player;
-        Minecraft mc = Minecraft.getInstance();
-        Gui gui = mc.gui;
-        GuiGraphics stack = event.getGuiGraphics();
-        ClientEvent.setupOverlayRenderState(true, false);
-        int width = stack.guiWidth();
-        int height = stack.guiHeight();
-        event.setCanceled(true);
-        RenderSystem.setShaderTexture((int)0, (Identifier)EFFECT_HEART);
-        RenderSystem.enableBlend();
-        int health = Mth.ceil((float)player.getHealth());
-        int tickCount = gui.getGuiTicks();
-        boolean bl = highlight = this.healthBlinkTime > (long)tickCount && (this.healthBlinkTime - (long)tickCount) / 3L % 2L == 1L;
-        if (health < this.lastHealth && player.invulnerableTime > 0) {
-            this.lastHealthTime = Util.getMillis();
-            this.healthBlinkTime = tickCount + 20;
-        } else if (health > this.lastHealth && player.invulnerableTime > 0) {
-            this.lastHealthTime = Util.getMillis();
-            this.healthBlinkTime = tickCount + 10;
-        }
-        if (Util.getMillis() - this.lastHealthTime > 1000L) {
-            this.lastHealth = health;
-            this.displayHealth = health;
-            this.lastHealthTime = Util.getMillis();
-        }
-        this.lastHealth = health;
-        int healthLast = this.displayHealth;
-        AttributeInstance maxHealth = player.getAttribute(Attributes.MAX_HEALTH);
-        float healthMax = (float)maxHealth.getValue();
-        int absorbtion = Mth.ceil((float)player.getAbsorptionAmount());
-        int healthRows = Mth.ceil((float)((healthMax + (float)absorbtion) / 2.0f / 10.0f));
-        int rowHeight = Math.max(10 - (healthRows - 2), 3);
-        this.random.setSeed((long)tickCount * 312871L);
-        int left = width / 2 - 91;
-        int top = height - this.leftHeight;
-        this.leftHeight += healthRows * rowHeight;
-        if (rowHeight != 10) {
-            this.leftHeight += 10 - rowHeight;
-        }
-        int regen = -1;
-        if (player.hasEffect(MobEffects.REGENERATION)) {
-            regen = tickCount % Mth.ceil((float)(healthMax + 5.0f));
-        }
-        int TOP = player.level().getLevelData().isHardcore() ? 9 : 0;
-        int BACKGROUND = highlight ? back : 16;
-        int margin = 34;
-        float absorbtionRemaining = absorbtion;
-        for (int i = Mth.ceil((float)((healthMax + (float)absorbtion) / 2.0f)) - 1; i >= 0; --i) {
-            int row = Mth.ceil((float)((float)(i + 1) / 10.0f)) - 1;
-            int x = left + i % 10 * 8;
-            int y = top - row * rowHeight;
-            if (health <= 4) {
-                y += this.random.nextInt(2);
-            }
-            if (i == regen) {
-                y -= 2;
-            }
-            stack.blit(EFFECT_HEART, x, y, BACKGROUND, TOP, 9, 9);
-            if (highlight) {
-                if (i * 2 + 1 < healthLast) {
-                    stack.blit(EFFECT_HEART, x, y, margin, TOP, 9, 9);
-                } else if (i * 2 + 1 == healthLast) {
-                    stack.blit(EFFECT_HEART, x, y, margin + 9, TOP, 9, 9);
-                }
-            }
-            if (absorbtionRemaining > 0.0f) {
-                if (absorbtionRemaining == (float)absorbtion && (float)absorbtion % 2.0f == 1.0f) {
-                    stack.blit(EFFECT_HEART, x, y, margin + 9, TOP, 9, 9);
-                    absorbtionRemaining -= 1.0f;
-                    continue;
-                }
-                stack.blit(EFFECT_HEART, x, y, margin, TOP, 9, 9);
-                absorbtionRemaining -= 2.0f;
-                continue;
-            }
-            if (i * 2 + 1 < health) {
-                stack.blit(EFFECT_HEART, x, y, margin, TOP, 9, 9);
-                continue;
-            }
-            if (i * 2 + 1 != health) continue;
-            stack.blit(EFFECT_HEART, x, y, margin + 9, TOP, 9, 9);
-        }
-        RenderSystem.disableBlend();
-        RenderSystem.setShaderTexture((int)0, (Identifier)EFFECT_HEART);
+        // PORT TODO(26.2): custom heart-bar HUD. Not registered on any bus. Rebuild against
+        // GuiGraphicsExtractor + RenderPipelines blit; RenderSystem.setShaderTexture/enableBlend
+        // and Gui.getGuiTicks are gone.
     }
 
     public static void setupOverlayRenderState(boolean blend, boolean depthTest) {
-        if (blend) {
-            RenderSystem.enableBlend();
-            RenderSystem.defaultBlendFunc();
-        } else {
-            RenderSystem.disableBlend();
-        }
-        if (depthTest) {
-            RenderSystem.enableDepthTest();
-        } else {
-            RenderSystem.disableDepthTest();
-        }
-        RenderSystem.setShaderColor((float)1.0f, (float)1.0f, (float)1.0f, (float)1.0f);
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        // PORT(26.2): RenderSystem enable/disableBlend/DepthTest, setShaderColor, setShader and
+        // GameRenderer::getPositionTexShader are gone; GUI blit state is pipeline-managed now.
     }
 
     private static void renderBossOverlay(CustomizeGuiOverlayEvent.BossEventProgress event) {
@@ -560,5 +376,25 @@ public class ClientEvent {
             customBossBar.renderBossBar(event, data.remainLife());
         }
     }
-}
 
+    // Helper methods for Camera reflection
+    private static float getMaxZoom(Camera camera, float cameraDist) {
+        try {
+            Method method = Camera.class.getDeclaredMethod("getMaxZoom", float.class);
+            method.setAccessible(true);
+            return (float) method.invoke(camera, cameraDist);
+        } catch (Exception e) {
+            return 0.0f;
+        }
+    }
+
+    private static void moveCamera(Camera camera, float forwards, float up, float right) {
+        try {
+            Method method = Camera.class.getDeclaredMethod("move", float.class, float.class, float.class);
+            method.setAccessible(true);
+            method.invoke(camera, forwards, up, right);
+        } catch (Exception e) {
+            // Ignore
+        }
+    }
+}

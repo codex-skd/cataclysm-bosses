@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "#i#",
+    "iEi",
+    "#i#"
+  ],
+  "key": {
+    "#": "minecraft:redstone_block",
+    "i": "minecraft:iron_ingot",
+    "E": "minecraft:ender_eye"
+  },
+  "result": {
+    "id": "cataclysm:mech_eye",
+    "count": 1
+  }
+}

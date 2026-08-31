@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:stonecutting",
+  "ingredient": [
+    "cataclysm:azure_seastone",
+    "cataclysm:azure_seastone_pillar"
+  ],
+  "result": {
+    "count": 1,
+    "id": "cataclysm:azure_seastone_pillar_wall"
+  }
+}

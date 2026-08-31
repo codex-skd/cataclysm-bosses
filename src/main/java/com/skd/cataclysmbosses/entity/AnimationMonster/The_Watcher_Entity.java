@@ -33,6 +33,7 @@
  *  net.minecraft.world.phys.Vec3
  */
 package com.skd.cataclysmbosses.entity.AnimationMonster;
+import net.minecraft.server.level.ServerLevel;
 
 import com.skd.cataclysmbosses.entity.AnimationMonster.AI.SimpleAnimationGoal;
 import com.skd.cataclysmbosses.entity.AnimationMonster.LLibrary_Monster;
@@ -69,6 +70,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.level.pathfinder.PathType;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class The_Watcher_Entity
 extends LLibrary_Monster {
@@ -103,12 +106,12 @@ extends LLibrary_Monster {
         return Monster.createMonsterAttributes().add(Attributes.FOLLOW_RANGE, 20.0).add(Attributes.MOVEMENT_SPEED, (double)0.28f).add(Attributes.ATTACK_DAMAGE, 5.0).add(Attributes.MAX_HEALTH, 25.0).add(Attributes.ARMOR, 5.0).add(Attributes.STEP_HEIGHT, 1.25).add(Attributes.KNOCKBACK_RESISTANCE, 0.5);
     }
 
-    public boolean hurt(DamageSource source, float damage) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         if (source.is(CMDamageTypes.EMP)) {
-            super.hurt(source, 1000.0f);
+            super.hurtOrSimulate(source, 1000.0f);
             return true;
         }
-        return super.hurt(source, damage);
+        return super.hurtOrSimulate(source, damage);
     }
 
     protected int decreaseAirSupply(int air) {
@@ -120,11 +123,11 @@ extends LLibrary_Monster {
         super.defineSynchedData(p_326229_);
     }
 
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
     }
 
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
     }
 
@@ -135,7 +138,7 @@ extends LLibrary_Monster {
         LivingEntity target = this.getTarget();
         if (this.getAnimation() == WATCHER_BITE && this.getAnimationTick() == 13 && target != null && this.distanceTo((Entity)target) < 3.0f && this.hasLineOfSight((Entity)target)) {
             float damage = (int)this.getAttributeValue(Attributes.ATTACK_DAMAGE);
-            target.hurt(this.damageSources().mobAttack((LivingEntity)this), damage);
+            target.hurtOrSimulate(this.damageSources().mobAttack((LivingEntity)this), damage);
         }
         if (this.getAnimation() == WATCHER_EXTRA_SHOT && this.getAnimationTick() == 9) {
             if (!this.isSilent()) {
@@ -160,14 +163,14 @@ extends LLibrary_Monster {
         }
     }
 
-    public boolean isAlliedTo(Entity entityIn) {
+    public boolean considersEntityAsAlly(Entity entityIn) {
         if (entityIn == this) {
             return true;
         }
-        if (super.isAlliedTo(entityIn)) {
+        if (super.considersEntityAsAlly(entityIn)) {
             return true;
         }
-        if (entityIn.getType().is(ModTag.TEAM_THE_HARBINGER)) {
+        if (entityIn.getType().builtInRegistryHolder().is(ModTag.TEAM_THE_HARBINGER)) {
             return this.getTeam() == null && entityIn.getTeam() == null;
         }
         return false;
@@ -222,7 +225,7 @@ extends LLibrary_Monster {
             if (!this.followingTargetEvenIfNotSeen) {
                 return !this.watcher.getNavigation().isDone();
             }
-            if (!this.watcher.isWithinRestriction(target.blockPosition())) {
+            if (!this.watcher.isWithinHome(target.blockPosition())) {
                 return false;
             }
             return !(target instanceof Player) || !target.isSpectator() && !((Player)target).isCreative();

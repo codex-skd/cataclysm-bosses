@@ -57,7 +57,7 @@ import com.skd.cataclysmbosses.client.model.item.CuriosModel.Sticky_Gloves_Model
 import com.skd.cataclysmbosses.client.model.item.CuriosModel.Sturdy_Boots_Model;
 import com.skd.cataclysmbosses.client.model.item.CuriosModel.Unbreakable_Skull_Model;
 import com.skd.cataclysmbosses.client.model.item.CuriosModel.Vitality_Ankh_Model;
-import net.minecraft.client.model.HumanoidArmorModel;
+import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
@@ -122,7 +122,8 @@ public class CMModelLayers {
     public static final ModelLayerLocation STORM_SERPENT_MODEL = CMModelLayers.createLocation("storm_serpent_model", "main");
 
     public static void register(EntityRenderersEvent.RegisterLayerDefinitions event) {
-        LayerDefinition layerdefinition3 = LayerDefinition.create((MeshDefinition)HumanoidArmorModel.createBodyLayer((CubeDeformation)new CubeDeformation(0.5f)), (int)64, (int)32);
+        MeshDefinition mesh3 = HumanoidModel.createMesh(new CubeDeformation(0.5f), 0.0F);
+        LayerDefinition layerdefinition3 = LayerDefinition.create(mesh3, 64, 32);
         event.registerLayerDefinition(MONSTROUS_HELM, () -> MonstrousHelm_Model.createArmorLayer(new CubeDeformation(0.3f)));
         event.registerLayerDefinition(IGNITIUM_ARMOR_MODEL, () -> Ignitium_Armor_Model.createArmorLayer(new CubeDeformation(0.6f)));
         event.registerLayerDefinition(BLOOM_STONE_PAULDRONS_MODEL, () -> Bloom_Stone_Pauldrons_Model.createArmorLayer(new CubeDeformation(0.5f)));

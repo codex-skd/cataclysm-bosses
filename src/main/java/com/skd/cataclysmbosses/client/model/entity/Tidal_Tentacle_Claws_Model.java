@@ -53,7 +53,7 @@ extends AdvancedEntityModel<Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.root, (Object)this.claw1, (Object)this.claw2, (Object)this.claw3, (Object)this.claw4);
+        return ImmutableList.of(this.root, this.claw1, this.claw2, this.claw3, this.claw4);
     }
 
     public BasicModelPart root() {

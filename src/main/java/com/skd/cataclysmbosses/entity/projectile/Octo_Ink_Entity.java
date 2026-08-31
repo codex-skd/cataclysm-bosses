@@ -76,7 +76,7 @@ extends Projectile {
         float f = 0.99f;
         if (this.level().getBlockStates(this.getBoundingBox()).noneMatch(BlockBehaviour.BlockStateBase::isAir)) {
             this.discard();
-        } else if (this.isInWaterOrBubble()) {
+        } else if (this.isInWaterOrRain()) {
             this.discard();
         } else {
             this.setDeltaMovement(vec3.scale((double)0.99f));
@@ -93,7 +93,7 @@ extends Projectile {
             DamageSource damagesource;
             LivingEntity livingentity = (LivingEntity)entity;
             Entity entity2 = result.getEntity();
-            if (entity2.hurt(damagesource = this.damageSources().spit((Entity)this, livingentity), 4.0f) && (level = this.level()) instanceof ServerLevel) {
+            if (entity2.hurtOrSimulate(damagesource = this.damageSources().spit((Entity)this, livingentity), 4.0f) && (level = this.level()) instanceof ServerLevel) {
                 ServerLevel serverlevel = (ServerLevel)level;
                 EnchantmentHelper.doPostAttackEffects((ServerLevel)serverlevel, (Entity)entity2, (DamageSource)damagesource);
             }
@@ -112,6 +112,7 @@ extends Projectile {
 
     public void recreateFromPacket(ClientboundAddEntityPacket packet) {
         super.recreateFromPacket(packet);
+        Vec3 vec3 = packet.getMovement();
         double d0 = vec3.x();
         double d1 = vec3.y();
         double d2 = vec3.z();

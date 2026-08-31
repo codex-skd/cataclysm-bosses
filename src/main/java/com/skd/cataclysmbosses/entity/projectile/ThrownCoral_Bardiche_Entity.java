@@ -59,6 +59,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class ThrownCoral_Bardiche_Entity
 extends AbstractArrow {
@@ -73,20 +75,20 @@ extends AbstractArrow {
 
     public ThrownCoral_Bardiche_Entity(Level p_37569_, LivingEntity p_37570_, ItemStack p_37571_) {
         super((EntityType)ModEntities.CORAL_BARDICHE.get(), p_37570_, p_37569_, p_37571_, null);
-        this.entityData.set(ID_LOYALTY, (Object)this.getLoyaltyFromItem(p_37571_));
-        this.entityData.set(ID_FOIL, (Object)p_37571_.hasFoil());
+        this.entityData.set(ID_LOYALTY, this.getLoyaltyFromItem(p_37571_));
+        this.entityData.set(ID_FOIL, p_37571_.hasFoil());
     }
 
     public ThrownCoral_Bardiche_Entity(Level p_338686_, double p_338771_, double p_338674_, double p_338477_, ItemStack p_338255_) {
         super((EntityType)ModEntities.CORAL_BARDICHE.get(), p_338771_, p_338674_, p_338477_, p_338686_, p_338255_, p_338255_);
-        this.entityData.set(ID_LOYALTY, (Object)this.getLoyaltyFromItem(p_338255_));
-        this.entityData.set(ID_FOIL, (Object)p_338255_.hasFoil());
+        this.entityData.set(ID_LOYALTY, this.getLoyaltyFromItem(p_338255_));
+        this.entityData.set(ID_FOIL, p_338255_.hasFoil());
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         super.defineSynchedData(p_326229_);
-        p_326229_.define(ID_LOYALTY, (Object)0);
-        p_326229_.define(ID_FOIL, (Object)false);
+        p_326229_.define(ID_LOYALTY, (byte)0);
+        p_326229_.define(ID_FOIL, false);
     }
 
     public void tick() {
@@ -98,7 +100,7 @@ extends AbstractArrow {
         if (i > 0 && (this.dealtDamage || this.isNoPhysics()) && entity != null) {
             if (!this.isAcceptibleReturnOwner()) {
                 if (!this.level().isClientSide() && this.pickup == AbstractArrow.Pickup.ALLOWED) {
-                    this.spawnAtLocation(this.getPickupItem(), 0.1f);
+                    this.spawnAtLocation((ServerLevel)this.level(), this.getPickupItem(), 0.1f);
                 }
                 this.discard();
             } else {
@@ -144,8 +146,8 @@ extends AbstractArrow {
             f = EnchantmentHelper.modifyDamage((ServerLevel)serverlevel, (ItemStack)this.getWeaponItem(), (Entity)entity, (DamageSource)damagesource, (float)f);
         }
         this.dealtDamage = true;
-        if (entity.hurt(damagesource, f)) {
-            if (entity.getType() == EntityType.ENDERMAN) {
+        if (entity.hurtOrSimulate(damagesource, f)) {
+            if (entity.getType() == net.minecraft.world.entity.EntityTypes.ENDERMAN) {
                 return;
             }
             level = this.level();
@@ -167,7 +169,7 @@ extends AbstractArrow {
         LivingEntity livingentity;
         Vec3 vec3 = p_346320_.getBlockPos().clampLocationWithin(p_346320_.getLocation());
         Entity entity = this.getOwner();
-        EnchantmentHelper.onHitBlock((ServerLevel)p_344953_, (ItemStack)p_344999_, (LivingEntity)(entity instanceof LivingEntity ? (livingentity = (LivingEntity)entity) : null), (Entity)this, null, (Vec3)vec3, (BlockState)p_344953_.getBlockState(p_346320_.getBlockPos()), p_348680_ -> this.kill());
+        EnchantmentHelper.onHitBlock((ServerLevel)p_344953_, (ItemStack)p_344999_, (LivingEntity)(entity instanceof LivingEntity ? (livingentity = (LivingEntity)entity) : null), (Entity)this, null, (Vec3)vec3, (BlockState)p_344953_.getBlockState(p_346320_.getBlockPos()), p_348680_ -> this.discard());
     }
 
     public ItemStack getWeaponItem() {
@@ -192,13 +194,13 @@ extends AbstractArrow {
         }
     }
 
-    public void readAdditionalSaveData(CompoundTag p_37578_) {
+    public void readAdditionalSaveData(ValueInput p_37578_) {
         super.readAdditionalSaveData(p_37578_);
-        this.dealtDamage = p_37578_.getBoolean("DealtDamage");
-        this.entityData.set(ID_LOYALTY, (Object)this.getLoyaltyFromItem(this.getPickupItemStackOrigin()));
+        this.dealtDamage = p_37578_.getBooleanOr("DealtDamage", false);
+        this.entityData.set(ID_LOYALTY, this.getLoyaltyFromItem(this.getPickupItemStackOrigin()));
     }
 
-    public void addAdditionalSaveData(CompoundTag p_37582_) {
+    public void addAdditionalSaveData(ValueOutput p_37582_) {
         super.addAdditionalSaveData(p_37582_);
         p_37582_.putBoolean("DealtDamage", this.dealtDamage);
     }

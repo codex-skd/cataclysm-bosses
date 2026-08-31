@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "##",
+    "##"
+  ],
+  "key": {
+    "#": "minecraft:chorus_fruit"
+  },
+  "result": {
+    "id": "cataclysm:chorus_stem",
+    "count": 1
+  }
+}

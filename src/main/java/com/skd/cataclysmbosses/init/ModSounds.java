@@ -203,12 +203,15 @@ public class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> HEAVY_SMASH = SOUNDS.register("heavy_smash", () -> SoundEvent.createVariableRangeEvent((Identifier)Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"heavy_smash")));
     public static final DeferredHolder<SoundEvent, SoundEvent> SUPER_LIGHTNING = SOUNDS.register("super_lightning_strike", () -> SoundEvent.createVariableRangeEvent((Identifier)Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"super_lightning_strike")));
     public static final DeferredHolder<SoundEvent, SoundEvent> THE_CATACLYSM_FARER = SOUNDS.register("the_cataclysmfarer", () -> SoundEvent.createVariableRangeEvent((Identifier)Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"the_cataclysmfarer")));
-    public static final Holder.Reference<SoundEvent> NOTE_BLOCK_IMITATE_KOBOLEDIATOR = ModSounds.registerForHolder("note_block_imitate_kobolediator");
-    public static final Holder.Reference<SoundEvent> NOTE_BLOCK_IMITATE_DRAUGR = ModSounds.registerForHolder("note_block_imitate_draugr");
-    public static final Holder.Reference<SoundEvent> NOTE_BLOCK_IMITATE_APTRGANGR = ModSounds.registerForHolder("note_block_imitate_aptrgangr");
+    // PORT(26.2): were Registry.registerForHolder(BuiltInRegistries.SOUND_EVENT, ...) in a static
+    // initializer, which crashes ("registry already frozen") if this class inits after mod construction.
+    // Route through the DeferredRegister like every other sound.
+    public static final DeferredHolder<SoundEvent, SoundEvent> NOTE_BLOCK_IMITATE_KOBOLEDIATOR = ModSounds.registerForHolder("note_block_imitate_kobolediator");
+    public static final DeferredHolder<SoundEvent, SoundEvent> NOTE_BLOCK_IMITATE_DRAUGR = ModSounds.registerForHolder("note_block_imitate_draugr");
+    public static final DeferredHolder<SoundEvent, SoundEvent> NOTE_BLOCK_IMITATE_APTRGANGR = ModSounds.registerForHolder("note_block_imitate_aptrgangr");
 
-    private static Holder.Reference<SoundEvent> registerForHolder(String location) {
-        return Registry.registerForHolder((Registry)BuiltInRegistries.SOUND_EVENT, (Identifier)Identifier.fromNamespaceAndPath((String)"cataclysm", (String)location), (Object)SoundEvent.createVariableRangeEvent((Identifier)Identifier.fromNamespaceAndPath((String)"cataclysm", (String)location)));
+    private static DeferredHolder<SoundEvent, SoundEvent> registerForHolder(String location) {
+        return SOUNDS.register(location, () -> SoundEvent.createVariableRangeEvent(Identifier.fromNamespaceAndPath("cataclysm", location)));
     }
 }
 

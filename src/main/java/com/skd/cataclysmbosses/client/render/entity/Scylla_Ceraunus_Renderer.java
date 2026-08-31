@@ -33,8 +33,10 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -44,9 +46,10 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 public class Scylla_Ceraunus_Renderer
-extends EntityRenderer<Scylla_Ceraunus_Entity> {
+extends CmEntityRenderer<Scylla_Ceraunus_Entity> {
     private final Ceraunus_Model model;
     private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/scylla/ceraunus.png");
     private static final Identifier CHAIN_TEXTURE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/scylla/scylla_chain.png");
@@ -56,35 +59,12 @@ extends EntityRenderer<Scylla_Ceraunus_Entity> {
         this.model = new Ceraunus_Model(renderManagerIn.bakeLayer(CMModelLayers.CERAUNUS_MODEL));
     }
 
-    public void render(Scylla_Ceraunus_Entity entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource provider, int light) {
-        matrices.pushPose();
-        float yRot = Mth.lerp((float)tickDelta, (float)entity.yRotO, (float)entity.getYRot());
-        float xRot = Mth.lerp((float)tickDelta, (float)entity.xRotO, (float)entity.getXRot());
-        matrices.mulPose(Axis.YP.rotationDegrees(yRot - 90.0f));
-        matrices.mulPose(Axis.ZP.rotationDegrees(xRot + 90.0f));
-        VertexConsumer vertexConsumer = provider.getBuffer(this.model.renderType(this.getTextureLocation(entity)));
-        this.model.renderToBuffer(matrices, vertexConsumer, light, OverlayTexture.NO_OVERLAY);
-        matrices.popPose();
-        Entity fromEntity = entity.getController();
-        if (fromEntity != null) {
-            Vec3 entityPos = entity.getPosition(tickDelta);
-            PoseStack poseForModel = new PoseStack();
-            poseForModel.mulPose(Axis.YP.rotationDegrees(yRot - 90.0f));
-            poseForModel.mulPose(Axis.ZP.rotationDegrees(xRot + 90.0f));
-            Vec3 modelOffset = this.model.getChainPosition(new Vec3(0.0, 0.0, 0.0), poseForModel);
-            Vec3 fromPos = this.getPositionOfPriorMob(fromEntity, tickDelta);
-            Vec3 chainTo = fromPos.subtract(entityPos);
-            Vec3 chainBase = modelOffset;
-            matrices.pushPose();
-            matrices.translate(chainBase.x, chainBase.y, chainBase.z);
-            VertexConsumer chainBuffer = provider.getBuffer(RenderType.entityCutoutNoCull((Identifier)CHAIN_TEXTURE));
-            Scylla_Ceraunus_Renderer.renderChainCube(chainTo.subtract(chainBase), matrices, chainBuffer, light, OverlayTexture.NO_OVERLAY);
-            matrices.popPose();
-        }
+    protected void render(Scylla_Ceraunus_Entity entity, float tickDelta, PoseStack matrices, CmMultiBufferSource provider, int light) {
+        // TODO: port render body to 26.2 (old MobRenderer APIs removed)
     }
 
     public boolean shouldRender(Scylla_Ceraunus_Entity entity, Frustum camera, double camX, double camY, double camZ) {
-        if (super.shouldRender((Entity)entity, camera, camX, camY, camZ)) {
+        if (super.shouldRender(entity, camera, camX, camY, camZ)) {
             return true;
         }
         Entity weapon = entity.getController();
@@ -100,18 +80,9 @@ extends EntityRenderer<Scylla_Ceraunus_Entity> {
         double d4 = Mth.lerp((double)partialTicks, (double)mob.xo, (double)mob.getX());
         double d5 = Mth.lerp((double)partialTicks, (double)mob.yo, (double)mob.getY());
         double d6 = Mth.lerp((double)partialTicks, (double)mob.zo, (double)mob.getZ());
-        if (mob instanceof Scylla_Entity) {
-            Scylla_Renderer livingRenderer;
-            EntityModel anchorModel;
-            Scylla_Entity living = (Scylla_Entity)mob;
-            float bodyYaw = Mth.rotLerp((float)partialTicks, (float)living.yBodyRotO, (float)living.yBodyRot);
-            EntityRenderer anchorRenderer = Minecraft.getInstance().getEntityRenderDispatcher().getRenderer((Entity)living);
-            if (anchorRenderer instanceof Scylla_Renderer && (anchorModel = (livingRenderer = (Scylla_Renderer)anchorRenderer).getModel()) instanceof Scylla_Model) {
-                Scylla_Model targetModel = (Scylla_Model)anchorModel;
-                Vec3 toPos = targetModel.getHandPosition(new Vec3(0.0, 0.0, 0.0)).yRot((float)(Math.PI - (double)(bodyYaw * ((float)Math.PI / 180))));
-                return new Vec3(d4 + toPos.x, d5 + toPos.y, d6 + toPos.z);
-            }
-        }
+        // PORT TODO(26.2): anchored-hand offset relied on Scylla_Renderer.getModel() +
+        // Scylla_Model.getHandPosition(Vec3); both dropped while Scylla rendering is stubbed.
+        // Falls back to the mob's plain interpolated position.
         return new Vec3(d4, d5, d6);
     }
 

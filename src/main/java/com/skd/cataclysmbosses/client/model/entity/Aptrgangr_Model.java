@@ -22,8 +22,9 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import java.util.Map;
 import java.util.Optional;
-import net.minecraft.client.model.HierarchicalModel;
+import com.skd.cataclysmbosses.client.model.compat.CmHierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
 import net.minecraft.client.model.geom.builders.CubeListBuilder;
@@ -33,7 +34,7 @@ import net.minecraft.client.model.geom.builders.PartDefinition;
 import org.jetbrains.annotations.NotNull;
 
 public class Aptrgangr_Model
-extends HierarchicalModel<Aptrgangr_Entity> {
+extends CmHierarchicalModel<net.minecraft.client.renderer.entity.state.EntityRenderState> {
     private final ModelPart root;
     private final ModelPart roots;
     private final ModelPart l_leg;
@@ -111,8 +112,8 @@ extends HierarchicalModel<Aptrgangr_Entity> {
     private final Map<String, Optional<ModelPart>> optionalPartCache = new Object2ObjectOpenHashMap();
 
     public Aptrgangr_Model(ModelPart root) {
+        super(root);
         this.root = root;
-        this.buildPartCache(root);
         this.roots = this.root.getChild("roots");
         this.l_leg = this.roots.getChild("l_leg");
         this.l_leg_armor = this.l_leg.getChild("l_leg_armor");
@@ -265,59 +266,8 @@ extends HierarchicalModel<Aptrgangr_Entity> {
         return LayerDefinition.create((MeshDefinition)meshdefinition, (int)256, (int)256);
     }
 
-    public void setupAnim(Aptrgangr_Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-        this.root().getAllParts().forEach(ModelPart::resetPose);
-        this.animateHeadLookTarget(netHeadYaw, headPitch);
-        if (entity.getAttackState() != 4) {
-            this.animateWalk(Aptrgangr_Animation.WALK, limbSwing, limbSwingAmount, 2.5f, 4.0f);
-        }
-        this.animate(entity.getAnimationState("idle"), Aptrgangr_Animation.IDLE, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("swing_right"), Aptrgangr_Animation.SWING_RIGHT, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("smash"), Aptrgangr_Animation.SMASH, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("charge_start"), Aptrgangr_Animation.RUSH_START, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("charge"), Aptrgangr_Animation.RUSHING, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("charge_end"), Aptrgangr_Animation.RUSH_END, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("charge_hit"), Aptrgangr_Animation.RUSH_HIT, ageInTicks, 1.0f);
-        this.animate(entity.getAnimationState("death"), Aptrgangr_Animation.DEATH, ageInTicks, 1.0f);
-    }
-
-    private void buildPartCache(ModelPart part) {
-        for (Map.Entry entry : part.children.entrySet()) {
-            String partName = (String)entry.getKey();
-            ModelPart childPart = (ModelPart)entry.getValue();
-            this.partCache.putIfAbsent(partName, childPart);
-            this.optionalPartCache.putIfAbsent(partName, Optional.of(childPart));
-            if (childPart.children.isEmpty()) continue;
-            this.buildPartCache(childPart);
-        }
-    }
-
-    @NotNull
-    public Optional<ModelPart> getAnyDescendantWithName(String name) {
-        if ("root".equals(name)) {
-            return Optional.of(this.root);
-        }
-        return this.optionalPartCache.getOrDefault(name, Optional.empty());
-    }
-
-    private void animateHeadLookTarget(float yRot, float xRot) {
-        this.head.xRot += xRot * ((float)Math.PI / 180);
-        this.head.yRot += yRot * ((float)Math.PI / 180);
-    }
-
-    public void translateToHand(PoseStack matrixStack) {
-        this.root.translateAndRotate(matrixStack);
-        this.roots.translateAndRotate(matrixStack);
-        this.body.translateAndRotate(matrixStack);
-        this.chest.translateAndRotate(matrixStack);
-        this.l_arm.translateAndRotate(matrixStack);
-        this.left_arm2.translateAndRotate(matrixStack);
-        this.l_arm_cloth.translateAndRotate(matrixStack);
-        this.hold.translateAndRotate(matrixStack);
-    }
-
-    public ModelPart root() {
-        return this.root;
+        @Override
+    public void setupAnim(EntityRenderState state) {
+        super.setupAnim(state);
     }
 }
-

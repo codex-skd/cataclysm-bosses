@@ -22,7 +22,7 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.model.HumanoidRenderState;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.CubeDeformation;
@@ -52,7 +52,7 @@ extends HumanoidModel<HumanoidRenderState> {
     public void renderArm(HumanoidArm handSide, PoseStack matrixStack, VertexConsumer buffer, int packedLight, int packedOverlay) {
         this.getArm((HumanoidArm)handSide).visible = true;
         this.getArm((HumanoidArm)handSide.getOpposite()).visible = false;
-        this.renderToBuffer(matrixStack, buffer, packedLight, packedOverlay);
+        this.renderToBuffer(matrixStack, buffer, packedLight, packedOverlay, -1);
     }
 
     protected Iterable<ModelPart> headParts() {
@@ -60,7 +60,7 @@ extends HumanoidModel<HumanoidRenderState> {
     }
 
     protected Iterable<ModelPart> bodyParts() {
-        return ImmutableList.of((Object)this.leftArm, (Object)this.rightArm);
+        return ImmutableList.of(this.leftArm, this.rightArm);
     }
 }
 

@@ -8,15 +8,20 @@
  */
 package com.skd.cataclysmbosses.client.CustomRarity;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.Rarity;
 import net.neoforged.fml.common.asm.enumextension.EnumProxy;
 
 public class CMRarity {
-    public static final EnumProxy<Rarity> MALEDICTUS_PROXY = new EnumProxy(Rarity.class, new Object[]{-1, "cataclysm:maledictus", style -> style.withColor(CMRarity.getPulsingColor(2000L, 7733218, 1534809))});
-    public static final EnumProxy<Rarity> IGNITIUM_PROXY = new EnumProxy(Rarity.class, new Object[]{-1, "cataclysm:ignitium", style -> style.withColor(CMRarity.getPulsingColor(2000L, 16766783, 10173952))});
-    public static final EnumProxy<Rarity> MALGNIS_PROXY = new EnumProxy(Rarity.class, new Object[]{-1, "cataclysm:malgis", style -> style.withColor(CMRarity.getPulsingColor(2000L, 7733218, 16766783))});
+    // PORT TODO(26.2): Rarity's ctor is now (int id, String name, ChatFormatting color) — it no
+    // longer takes a UnaryOperator<Style>, so the animated getPulsingColor() styling is gone.
+    // Falls back to the nearest static ChatFormatting until a name/style hook exists again.
+    public static final EnumProxy<Rarity> MALEDICTUS_PROXY = new EnumProxy<Rarity>(Rarity.class, -1, "cataclysm:maledictus", ChatFormatting.DARK_PURPLE);
+    public static final EnumProxy<Rarity> IGNITIUM_PROXY = new EnumProxy<Rarity>(Rarity.class, -1, "cataclysm:ignitium", ChatFormatting.GOLD);
+    public static final EnumProxy<Rarity> MALGNIS_PROXY = new EnumProxy<Rarity>(Rarity.class, -1, "cataclysm:malgis", ChatFormatting.LIGHT_PURPLE);
 
+    @SuppressWarnings("unused")
     private static int getPulsingColor(long cycle, int color1, int color2) {
         float progress = (float)(Math.sin((double)(System.currentTimeMillis() % cycle) / (double)cycle * 2.0 * Math.PI) + 1.0) / 2.0f;
         int R1 = color1 >> 16 & 0xFF;

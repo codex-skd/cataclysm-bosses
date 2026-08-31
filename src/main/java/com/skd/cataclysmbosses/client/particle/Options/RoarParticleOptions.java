@@ -39,7 +39,7 @@ public record RoarParticleOptions(int duration, int r, int g, int b, float a, fl
         buf.writeFloat(option.increase);
         buf.writeFloat(option.endsize);
     }, buf -> new RoarParticleOptions(buf.readInt(), buf.readInt(), buf.readInt(), buf.readInt(), buf.readFloat(), buf.readFloat(), buf.readFloat(), buf.readFloat()));
-    public static MapCodec<RoarParticleOptions> MAP_CODEC = RecordCodecBuilder.mapCodec(object -> object.group((App)Codec.INT.fieldOf("duration").forGetter(p -> p.duration), (App)Codec.INT.fieldOf("r").forGetter(p -> p.r), (App)Codec.INT.fieldOf("g").forGetter(p -> p.g), (App)Codec.INT.fieldOf("b").forGetter(p -> p.b), (App)Codec.FLOAT.fieldOf("a").forGetter(p -> Float.valueOf(p.a)), (App)Codec.FLOAT.fieldOf("startsize").forGetter(p -> Float.valueOf(p.startsize)), (App)Codec.FLOAT.fieldOf("increase").forGetter(p -> Float.valueOf(p.increase)), (App)Codec.FLOAT.fieldOf("endsize").forGetter(p -> Float.valueOf(p.endsize))).apply((Applicative)object, RoarParticleOptions::new));
+    public static MapCodec<RoarParticleOptions> MAP_CODEC = RecordCodecBuilder.mapCodec(object -> object.group(Codec.INT.fieldOf("duration").forGetter(p -> p.duration), Codec.INT.fieldOf("r").forGetter(p -> p.r), Codec.INT.fieldOf("g").forGetter(p -> p.g), Codec.INT.fieldOf("b").forGetter(p -> p.b), Codec.FLOAT.fieldOf("a").forGetter(p -> Float.valueOf(p.a)), Codec.FLOAT.fieldOf("startsize").forGetter(p -> Float.valueOf(p.startsize)), Codec.FLOAT.fieldOf("increase").forGetter(p -> Float.valueOf(p.increase)), Codec.FLOAT.fieldOf("endsize").forGetter(p -> Float.valueOf(p.endsize))).apply(object, RoarParticleOptions::new));
 
     @NotNull
     public ParticleType<RoarParticleOptions> getType() {

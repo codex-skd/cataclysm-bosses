@@ -21,8 +21,10 @@ import com.skd.cataclysmbosses.client.render.CMRenderTypes;
 import com.skd.cataclysmbosses.entity.effect.Void_Vortex_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
@@ -30,10 +32,11 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Void_Vortex_Renderer
-extends EntityRenderer<Void_Vortex_Entity> {
+extends CmEntityRenderer<Void_Vortex_Entity> {
     private static final Identifier TEXTURE_1 = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/void_vortex/void_vortex_idle1.png");
     private static final Identifier TEXTURE_2 = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/void_vortex/void_vortex_idle2.png");
     private static final Identifier TEXTURE_3 = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/void_vortex/void_vortex_idle3.png");
@@ -47,17 +50,16 @@ extends EntityRenderer<Void_Vortex_Entity> {
         }
     }
 
-    public void render(Void_Vortex_Entity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
+    protected void render(Void_Vortex_Entity entityIn, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
         matrixStackIn.pushPose();
         matrixStackIn.translate(0.0, 0.001, 0.0);
         Identifier tex = entityIn.getLifespan() < 16 ? this.getGrowingTexture((int)((float)entityIn.getLifespan() * 0.5f % 20.0f)) : (entityIn.tickCount < 16 ? this.getGrowingTexture((int)((float)entityIn.tickCount * 0.5f % 20.0f)) : this.getIdleTexture(entityIn.tickCount % 9));
         matrixStackIn.scale(3.0f, 3.0f, 3.0f);
         this.renderArc(matrixStackIn, bufferIn, tex);
         matrixStackIn.popPose();
-        super.render((Entity)entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
     }
 
-    private void renderArc(PoseStack matrixStackIn, MultiBufferSource bufferIn, Identifier res) {
+    private void renderArc(PoseStack matrixStackIn, CmMultiBufferSource bufferIn, Identifier res) {
         matrixStackIn.pushPose();
         VertexConsumer ivertexbuilder = bufferIn.getBuffer(CMRenderTypes.getfullBright(res));
         PoseStack.Pose lvt_19_1_ = matrixStackIn.last();

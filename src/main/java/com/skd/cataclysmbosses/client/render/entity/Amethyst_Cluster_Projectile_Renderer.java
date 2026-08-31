@@ -24,8 +24,10 @@ import com.skd.cataclysmbosses.entity.projectile.Amethyst_Cluster_Projectile_Ent
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -35,10 +37,11 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Amethyst_Cluster_Projectile_Renderer
-extends EntityRenderer<Amethyst_Cluster_Projectile_Entity> {
+extends CmEntityRenderer<Amethyst_Cluster_Projectile_Entity> {
     private static final Identifier WITHER_HOWITZER_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/amethyst_cluster_projectile.png");
     private final Amethyst_Cluster_Projectile_Model model = new Amethyst_Cluster_Projectile_Model();
 
@@ -46,14 +49,13 @@ extends EntityRenderer<Amethyst_Cluster_Projectile_Entity> {
         super(renderManagerIn);
     }
 
-    public void render(Amethyst_Cluster_Projectile_Entity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
+    protected void render(Amethyst_Cluster_Projectile_Entity entityIn, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
         matrixStackIn.pushPose();
         matrixStackIn.mulPose(Axis.YP.rotationDegrees(Mth.lerp((float)partialTicks, (float)entityIn.yRotO, (float)entityIn.getYRot()) - 90.0f));
         matrixStackIn.mulPose(Axis.ZP.rotationDegrees(Mth.lerp((float)partialTicks, (float)entityIn.xRotO, (float)entityIn.getXRot()) + 90.0f));
-        VertexConsumer VertexConsumer2 = bufferIn.getBuffer(RenderType.entityTranslucent((Identifier)this.getTextureLocation(entityIn)));
-        this.model.renderToBuffer(matrixStackIn, VertexConsumer2, packedLightIn, OverlayTexture.NO_OVERLAY);
+        VertexConsumer VertexConsumer2 = bufferIn.getBuffer(RenderTypes.entityTranslucent((Identifier)this.getTextureLocation(entityIn)));
+        this.model.renderToBuffer(matrixStackIn, VertexConsumer2, packedLightIn, OverlayTexture.NO_OVERLAY, -1);
         matrixStackIn.popPose();
-        super.render((Entity)entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
     }
 
     protected int getBlockLightLevel(Amethyst_Cluster_Projectile_Entity entityIn, BlockPos pos) {

@@ -42,16 +42,16 @@ implements CustomPacketPayload {
         ParticleType type;
         int size = buf.readInt();
         for (int i = 0; i < size && (type = (ParticleType)BuiltInRegistries.PARTICLE_TYPE.byId(buf.readInt())) != null; ++i) {
-            this.queuedParticles.add(new QueuedParticle((ParticleOptions)ParticleTypes.STREAM_CODEC.decode((Object)buf), buf.readBoolean(), buf.readDouble(), buf.readDouble(), buf.readDouble(), buf.readDouble(), buf.readDouble(), buf.readDouble()));
+            this.queuedParticles.add(new QueuedParticle((ParticleOptions)ParticleTypes.STREAM_CODEC.decode(buf), buf.readBoolean(), buf.readDouble(), buf.readDouble(), buf.readDouble(), buf.readDouble(), buf.readDouble(), buf.readDouble()));
         }
     }
 
     public void write(RegistryFriendlyByteBuf buf) {
         buf.writeInt(this.queuedParticles.size());
         for (QueuedParticle queuedParticle : this.queuedParticles) {
-            int d = BuiltInRegistries.PARTICLE_TYPE.getId((Object)queuedParticle.particleOptions.getType());
+            int d = BuiltInRegistries.PARTICLE_TYPE.getId(queuedParticle.particleOptions.getType());
             buf.writeInt(d);
-            ParticleTypes.STREAM_CODEC.encode((Object)buf, (Object)queuedParticle.particleOptions);
+            ParticleTypes.STREAM_CODEC.encode(buf, queuedParticle.particleOptions);
             buf.writeBoolean(queuedParticle.b);
             buf.writeDouble(queuedParticle.x);
             buf.writeDouble(queuedParticle.y);
@@ -77,7 +77,7 @@ implements CustomPacketPayload {
     public static void handle(MessageParticle message, IPayloadContext ctx) {
         ctx.enqueueWork(() -> {
             for (QueuedParticle queuedParticle : message.queuedParticles) {
-                ctx.player().level().addParticle(queuedParticle.particleOptions, queuedParticle.b, queuedParticle.x, queuedParticle.y, queuedParticle.z, queuedParticle.x2, queuedParticle.y2, queuedParticle.z2);
+                ctx.player().level().addParticle(queuedParticle.particleOptions, queuedParticle.x, queuedParticle.y, queuedParticle.z, queuedParticle.x2, queuedParticle.y2, queuedParticle.z2);
             }
         });
     }

@@ -18,7 +18,7 @@
  *  net.minecraft.world.item.context.BlockPlaceContext
  *  net.minecraft.world.level.BlockGetter
  *  net.minecraft.world.level.Level
- *  net.minecraft.world.level.LevelAccessor
+ *  net.minecraft.world.level.LevelReader
  *  net.minecraft.world.level.LevelReader
  *  net.minecraft.world.level.block.BaseEntityBlock
  *  net.minecraft.world.level.block.Block
@@ -44,6 +44,7 @@
  */
 package com.skd.cataclysmbosses.blocks;
 
+import net.minecraft.world.entity.EntitySpawnReason;
 import com.skd.cataclysmbosses.blockentities.Abyssal_Egg_Block_Entity;
 import com.skd.cataclysmbosses.entity.Pet.The_Baby_Leviathan_Entity;
 import com.skd.cataclysmbosses.init.ModEntities;
@@ -64,8 +65,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
@@ -124,11 +126,11 @@ implements SimpleWaterloggedBlock {
         return (BlockState)this.defaultBlockState().setValue((Property)WATERLOGGED, (Comparable)Boolean.valueOf(fluidstate.getType() == Fluids.WATER));
     }
 
-    public BlockState updateShape(BlockState p_51555_, Direction p_51556_, BlockState p_51557_, LevelAccessor p_51558_, BlockPos p_51559_, BlockPos p_51560_) {
+    protected BlockState updateShape(BlockState p_51555_, LevelReader p_51558_, ScheduledTickAccess ticks, BlockPos p_51559_, Direction p_51556_, BlockPos p_51560_, BlockState p_51557_, RandomSource random) {
         if (((Boolean)p_51555_.getValue((Property)WATERLOGGED)).booleanValue()) {
-            p_51558_.scheduleTick(p_51559_, (Fluid)Fluids.WATER, Fluids.WATER.getTickDelay((LevelReader)p_51558_));
+            ticks.scheduleTick(p_51559_, Fluids.WATER, Fluids.WATER.getTickDelay(p_51558_));
         }
-        return super.updateShape(p_51555_, p_51556_, p_51557_, p_51558_, p_51559_, p_51560_);
+        return super.updateShape(p_51555_, p_51558_, ticks, p_51559_, p_51556_, p_51560_, p_51557_, random);
     }
 
     public int getHatchLevel(BlockState p_279125_) {
@@ -146,9 +148,11 @@ implements SimpleWaterloggedBlock {
         } else {
             p_277739_.playSound((Player)null, p_277692_, SoundEvents.TURTLE_EGG_HATCH, SoundSource.BLOCKS, 0.7f, 0.9f + p_277973_.nextFloat() * 0.2f);
             p_277739_.destroyBlock(p_277692_, false);
-            The_Baby_Leviathan_Entity levia = (The_Baby_Leviathan_Entity)((EntityType)ModEntities.THE_BABY_LEVIATHAN.get()).create((Level)p_277739_);
+            The_Baby_Leviathan_Entity levia = (The_Baby_Leviathan_Entity)((EntityType)ModEntities.THE_BABY_LEVIATHAN.get()).create((Level)p_277739_, EntitySpawnReason.EVENT);
             if (levia != null) {
-                levia.moveTo((double)p_277692_.getX() + 0.5, (double)p_277692_.getY() + 0.5, (double)p_277692_.getZ() + 0.5, Mth.wrapDegrees((float)(p_277739_.random.nextFloat() * 360.0f)), 0.0f);
+                levia.setPos((double)p_277692_.getX() + 0.5, (double)p_277692_.getY() + 0.5, (double)p_277692_.getZ() + 0.5);
+                levia.setYRot(p_277692_.getZ() + 0.5f);
+                levia.setXRot(Mth.wrapDegrees(p_277739_.getRandom().nextFloat() * 360.0f));
                 p_277739_.addFreshEntity((Entity)levia);
             }
         }
@@ -157,7 +161,7 @@ implements SimpleWaterloggedBlock {
     public void onPlace(BlockState p_277964_, Level p_277827_, BlockPos p_277526_, BlockState p_277618_, boolean p_277819_) {
         int j = 4000;
         p_277827_.gameEvent((Holder)GameEvent.BLOCK_PLACE, p_277526_, GameEvent.Context.of((BlockState)p_277964_));
-        p_277827_.scheduleTick(p_277526_, (Block)this, j + p_277827_.random.nextInt(300));
+        p_277827_.scheduleTick(p_277526_, (Block)this, j + p_277827_.getRandom().nextInt(300));
     }
 
     protected boolean isPathfindable(BlockState p_51023_, PathComputationType p_51026_) {

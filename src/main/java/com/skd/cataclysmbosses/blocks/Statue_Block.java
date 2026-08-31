@@ -49,6 +49,7 @@ import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -57,6 +58,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -83,7 +85,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public class Statue_Block
 extends BaseEntityBlock {
     public static final MapCodec<Statue_Block> CODEC = Statue_Block.simpleCodec(Statue_Block::new);
-    // public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final EnumProperty<DoubleBlockHalf> HALF = BlockStateProperties.DOUBLE_BLOCK_HALF;
     protected static final VoxelShape NORTH_AABB = Block.box((double)2.0, (double)0.0, (double)6.0, (double)14.0, (double)16.0, (double)13.0);
     protected static final VoxelShape WEST_AABB = Block.box((double)6.0, (double)0.0, (double)2.0, (double)13.0, (double)16.0, (double)14.0);
@@ -96,41 +98,41 @@ extends BaseEntityBlock {
 
     public Statue_Block(BlockBehaviour.Properties p_54257_) {
         super(p_54257_);
-        this.registerDefaultState((BlockState)((BlockState)this.defaultBlockState().setValue((Property)FACING, (Comparable)Direction.NORTH)).setValue(HALF, (Comparable)DoubleBlockHalf.LOWER));
+        this.registerDefaultState((BlockState)((BlockState)this.defaultBlockState().setValue(FACING, Direction.NORTH)).setValue(HALF, DoubleBlockHalf.LOWER));
     }
 
     protected RenderShape getRenderShape(BlockState state) {
-        return RenderShape.ENTITYBLOCK_ANIMATED;
+        return RenderShape.INVISIBLE;
     }
 
-    protected BlockState updateShape(BlockState state, Direction facing, BlockState facingState, LevelAccessor level, BlockPos currentPos, BlockPos facingPos) {
-        DoubleBlockHalf half = (DoubleBlockHalf)state.getValue(HALF);
+    protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos, Direction facing, BlockPos facingPos, BlockState facingState, RandomSource random) {
+        DoubleBlockHalf half = state.getValue(HALF);
         if (facing.getAxis() == Direction.Axis.Y && (half == DoubleBlockHalf.UPPER && facing == Direction.DOWN ? !(facingState.getBlock() instanceof Statue_Block) || facingState.getValue(HALF) != DoubleBlockHalf.LOWER : half == DoubleBlockHalf.LOWER && facing == Direction.UP && (!(facingState.getBlock() instanceof Statue_Block) || facingState.getValue(HALF) != DoubleBlockHalf.UPPER))) {
             return Blocks.AIR.defaultBlockState();
         }
-        return super.updateShape(state, facing, facingState, level, currentPos, facingPos);
+        return super.updateShape(state, level, ticks, pos, facing, facingPos, facingState, random);
     }
 
     @Nullable
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         BlockPos blockpos = context.getClickedPos();
         Level level = context.getLevel();
-        if (blockpos.getY() < level.getMaxBuildHeight() - 1 && level.getBlockState(blockpos.above()).canBeReplaced(context)) {
-            return (BlockState)((BlockState)this.defaultBlockState().setValue((Property)FACING, (Comparable)context.getHorizontalDirection().getOpposite())).setValue(HALF, (Comparable)DoubleBlockHalf.LOWER);
+        if (blockpos.getY() < level.getMaxY() + 1 - 1 && level.getBlockState(blockpos.above()).canBeReplaced(context)) {
+            return (BlockState)((BlockState)this.defaultBlockState().setValue(FACING, context.getHorizontalDirection().getOpposite())).setValue(HALF, DoubleBlockHalf.LOWER);
         }
         return null;
     }
 
     public BlockState rotate(BlockState state, Rotation rot) {
-        return (BlockState)state.setValue((Property)FACING, (Comparable)rot.rotate((Direction)state.getValue((Property)FACING)));
+        return (BlockState)state.setValue(FACING, rot.rotate(state.getValue(FACING)));
     }
 
     public BlockState mirror(BlockState state, Mirror mirrorIn) {
-        return state.rotate(mirrorIn.getRotation((Direction)state.getValue((Property)FACING)));
+        return state.rotate(mirrorIn.getRotation(state.getValue(FACING)));
     }
 
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        Direction direction = (Direction)state.getValue((Property)FACING);
+        Direction direction = state.getValue(FACING);
         return switch (direction) {
             case Direction.SOUTH -> SOUTH_SHAPE;
             case Direction.WEST -> WEST_AABB;
@@ -168,7 +170,7 @@ extends BaseEntityBlock {
     }
 
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack) {
-        level.setBlock(pos.above(), (BlockState)state.setValue(HALF, (Comparable)DoubleBlockHalf.UPPER), 3);
+        level.setBlock(pos.above(), (BlockState)state.setValue(HALF, DoubleBlockHalf.UPPER), 3);
     }
 
     protected long getSeed(BlockState state, BlockPos pos) {

@@ -83,6 +83,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Accretion_Entity
 extends ThrowableProjectile {
@@ -94,12 +96,13 @@ extends ThrowableProjectile {
     }
 
     public Accretion_Entity(EntityType<Accretion_Entity> type, Level world, LivingEntity thrower) {
-        super(type, thrower, world);
+        super(type, thrower.getX(), thrower.getEyeY() - 0.10000000149011612D, thrower.getZ(), world);
+        this.setOwner(thrower);
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
         p_326229_.define(BLOCK_STATE, Optional.empty());
-        p_326229_.define(DAMAGE, (Object)Float.valueOf(0.0f));
+        p_326229_.define(DAMAGE, Float.valueOf(0.0f));
     }
 
     public float getDamage() {
@@ -107,7 +110,7 @@ extends ThrowableProjectile {
     }
 
     public void setDamage(float damage) {
-        this.entityData.set(DAMAGE, (Object)Float.valueOf(damage));
+        this.entityData.set(DAMAGE, Float.valueOf(damage));
     }
 
     public void setBlockState(@Nullable BlockState state) {
@@ -116,7 +119,7 @@ extends ThrowableProjectile {
 
     @Nullable
     public BlockState getBlockState() {
-        return ((Optional)this.entityData.get(BLOCK_STATE)).orElse(null);
+        return (BlockState)((Optional)this.entityData.get(BLOCK_STATE)).orElse(null);
     }
 
     public boolean shouldRiderSit() {
@@ -139,7 +142,7 @@ extends ThrowableProjectile {
                 if (entity != entity1 && !entity1.isAlliedTo(entity)) {
                     LivingEntity livingentity = (LivingEntity)entity1;
                     DamageSource damagesource = this.damageSources().mobProjectile((Entity)this, livingentity);
-                    flag = entity.hurt(damagesource, this.getDamage());
+                    flag = entity.hurtOrSimulate(damagesource, this.getDamage());
                     if (flag) {
                         BlockState blockstate;
                         if (entity.isAlive()) {
@@ -153,7 +156,7 @@ extends ThrowableProjectile {
                     }
                 }
             } else {
-                flag = entity.hurt(this.damageSources().inWall(), 5.0f);
+                flag = entity.hurtOrSimulate(this.damageSources().inWall(), 5.0f);
             }
             if (flag && entity instanceof LivingEntity) {
                 int i = 2;
@@ -179,9 +182,9 @@ extends ThrowableProjectile {
         if (hitresult$type == HitResult.Type.ENTITY) {
             EntityHitResult entityhitresult = (EntityHitResult)result;
             Entity entity = entityhitresult.getEntity();
-            if (entity.getType().is(EntityTypeTags.REDIRECTABLE_PROJECTILE) && entity instanceof Projectile) {
+            if (entity.getType().builtInRegistryHolder().is(EntityTypeTags.REDIRECTABLE_PROJECTILE) && entity instanceof Projectile) {
                 Projectile projectile = (Projectile)entity;
-                projectile.deflect(ProjectileDeflection.AIM_DEFLECT, this.getOwner(), this.getOwner(), true);
+                projectile.deflect(ProjectileDeflection.AIM_DEFLECT, this.getOwner(), null, true);
             }
             this.onHitEntity(entityhitresult);
             this.level().gameEvent((Holder)GameEvent.PROJECTILE_LAND, result.getLocation(), GameEvent.Context.of((Entity)this, (BlockState)null));
@@ -193,23 +196,25 @@ extends ThrowableProjectile {
         }
     }
 
-    public void addAdditionalSaveData(CompoundTag compound) {
+    public void addAdditionalSaveData(ValueOutput compound) {
         super.addAdditionalSaveData(compound);
         BlockState blockstate = this.getBlockState();
         if (blockstate != null) {
-            compound.put("AccretionBlockState", (Tag)NbtUtils.writeBlockState((BlockState)blockstate));
+            compound.store("AccretionBlockState", CompoundTag.CODEC, NbtUtils.writeBlockState((BlockState)blockstate));
         }
         compound.putFloat("Damage", this.getDamage());
     }
 
-    public void readAdditionalSaveData(CompoundTag compound) {
+    public void readAdditionalSaveData(ValueInput compound) {
         super.readAdditionalSaveData(compound);
-        BlockState blockstate = null;
-        if (compound.contains("AccretionBlockState", 10) && (blockstate = NbtUtils.readBlockState((HolderGetter)this.level().holderLookup(Registries.BLOCK), (CompoundTag)compound.getCompound("AccretionBlockState"))).isAir()) {
+        BlockState blockstate = compound.read("AccretionBlockState", CompoundTag.CODEC)
+            .map(tag -> NbtUtils.readBlockState(this.level().holderLookup(Registries.BLOCK), tag))
+            .orElse(null);
+        if (blockstate != null && blockstate.isAir()) {
             blockstate = null;
         }
         this.setBlockState(blockstate);
-        this.setDamage(compound.getFloat("Damage"));
+        this.setDamage(compound.getFloatOr("Damage", 0.0f));
     }
 
     public void tick() {

@@ -96,8 +96,8 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 @ParametersAreNonnullByDefault
 public class CataclysmJigsawSinglePoolElement
 extends CataclysmJigsawPoolElement {
-    private static final Codec<Either<Identifier, StructureTemplate>> TEMPLATE_CODEC = Codec.of(CataclysmJigsawSinglePoolElement::encodeTemplate, (Decoder)Identifier.CODEC.map(Either::left));
-    public static final MapCodec<CataclysmJigsawSinglePoolElement> CODEC = RecordCodecBuilder.mapCodec(builder -> builder.group(CataclysmJigsawSinglePoolElement.templateCodec(), CataclysmJigsawSinglePoolElement.processorsCodec(), (App)CataclysmJigsawSinglePoolElement.projectionCodec(), CataclysmJigsawSinglePoolElement.overrideLiquidSettingsCodec(), CataclysmJigsawSinglePoolElement.nameCodec(), CataclysmJigsawSinglePoolElement.maxCountCodec(), CataclysmJigsawSinglePoolElement.minRequiredDepthCodec(), CataclysmJigsawSinglePoolElement.maxPossibleDepthCodec(), CataclysmJigsawSinglePoolElement.isPriorityCodec(), CataclysmJigsawSinglePoolElement.ignoreBoundsCodec(), CataclysmJigsawSinglePoolElement.conditionCodec(), CataclysmJigsawSinglePoolElement.enhancedTerrainAdaptationCodec(), (App)Identifier.CODEC.optionalFieldOf("deadend_pool").forGetter(element -> element.deadendPool), (App)StructureModifier.CODEC.listOf().optionalFieldOf("modifiers", new ArrayList()).forGetter(element -> element.modifiers)).apply((Applicative)builder, CataclysmJigsawSinglePoolElement::new));
+    private static final Codec<Either<Identifier, StructureTemplate>> TEMPLATE_CODEC = Codec.of(CataclysmJigsawSinglePoolElement::encodeTemplate, Identifier.CODEC.map(Either::left));
+    public static final MapCodec<CataclysmJigsawSinglePoolElement> CODEC = RecordCodecBuilder.mapCodec(builder -> builder.group(CataclysmJigsawSinglePoolElement.templateCodec(), CataclysmJigsawSinglePoolElement.processorsCodec(), CataclysmJigsawSinglePoolElement.projectionCodec(), CataclysmJigsawSinglePoolElement.overrideLiquidSettingsCodec(), CataclysmJigsawSinglePoolElement.nameCodec(), CataclysmJigsawSinglePoolElement.maxCountCodec(), CataclysmJigsawSinglePoolElement.minRequiredDepthCodec(), CataclysmJigsawSinglePoolElement.maxPossibleDepthCodec(), CataclysmJigsawSinglePoolElement.isPriorityCodec(), CataclysmJigsawSinglePoolElement.ignoreBoundsCodec(), CataclysmJigsawSinglePoolElement.conditionCodec(), CataclysmJigsawSinglePoolElement.enhancedTerrainAdaptationCodec(), Identifier.CODEC.optionalFieldOf("deadend_pool").forGetter(element -> element.deadendPool), StructureModifier.CODEC.listOf().optionalFieldOf("modifiers", new ArrayList<>()).forGetter(element -> element.modifiers)).apply(builder, CataclysmJigsawSinglePoolElement::new));
     public final Either<Identifier, StructureTemplate> template;
     public final Holder<StructureProcessorList> processors;
     public final Optional<LiquidSettings> overrideLiquidSettings;
@@ -118,10 +118,10 @@ extends CataclysmJigsawPoolElement {
         return structureTemplate.getSize(rotation);
     }
 
-    public List<StructureTemplate.StructureBlockInfo> getShuffledJigsawBlocks(StructureTemplateManager structureTemplateManager, BlockPos blockPos, Rotation rotation, RandomSource randomSource) {
+    public List<StructureTemplate.JigsawBlockInfo> getShuffledJigsawBlocks(StructureTemplateManager structureTemplateManager, BlockPos blockPos, Rotation rotation, RandomSource randomSource) {
         StructureTemplate structureTemplate = this.getTemplate(structureTemplateManager);
-        ObjectArrayList jigsawBlocks = structureTemplate.filterBlocks(blockPos, new StructurePlaceSettings().setRotation(rotation), Blocks.JIGSAW, true);
-        Util.shuffle((List)jigsawBlocks, (RandomSource)randomSource);
+        List<StructureTemplate.JigsawBlockInfo> jigsawBlocks = structureTemplate.getJigsaws(blockPos, rotation);
+        Util.shuffle(jigsawBlocks, randomSource);
         return jigsawBlocks;
     }
 
@@ -181,10 +181,10 @@ extends CataclysmJigsawPoolElement {
 
     private List<StructureTemplate.StructureBlockInfo> getDataMarkers(StructureTemplateManager structureTemplateManager, BlockPos blockPos, Rotation rotation, boolean isPositionLocal) {
         StructureTemplate structureTemplate = this.getTemplate(structureTemplateManager);
-        ObjectArrayList structureBlocks = structureTemplate.filterBlocks(blockPos, new StructurePlaceSettings().setRotation(rotation), Blocks.STRUCTURE_BLOCK, isPositionLocal);
-        ArrayList dataBlocks = Lists.newArrayList();
+        ObjectArrayList<StructureTemplate.StructureBlockInfo> structureBlocks = structureTemplate.filterBlocks(blockPos, new StructurePlaceSettings().setRotation(rotation), Blocks.STRUCTURE_BLOCK, isPositionLocal);
+        List<StructureTemplate.StructureBlockInfo> dataBlocks = Lists.newArrayList();
         for (StructureTemplate.StructureBlockInfo block : structureBlocks) {
-            StructureMode structureMode = StructureMode.valueOf((String)block.nbt().getString("mode"));
+            StructureMode structureMode = StructureMode.valueOf(block.nbt().getStringOr("mode", "DATA"));
             if (structureMode != StructureMode.DATA) continue;
             dataBlocks.add(block);
         }
@@ -204,8 +204,8 @@ extends CataclysmJigsawPoolElement {
     }
 
     private static <T> DataResult<T> encodeTemplate(Either<Identifier, StructureTemplate> either, DynamicOps<T> ops, T template) {
-        Optional optional = either.left();
-        return !optional.isPresent() ? DataResult.error(() -> "Can not serialize a runtime pool element") : Identifier.CODEC.encode((Object)((Identifier)optional.get()), ops, template);
+        Optional<Identifier> optional = either.left();
+        return !optional.isPresent() ? DataResult.error(() -> "Can not serialize a runtime pool element") : Identifier.CODEC.encode(optional.get(), ops, template);
     }
 }
 

@@ -14,6 +14,7 @@ public class AdvancedHurtByTargetGoal
 extends HurtByTargetGoal {
     private int forcedAggroTime;
     private float intensity;
+    private int timestamp;
 
     public AdvancedHurtByTargetGoal(PathfinderMob mob, Class<?> ... ToIgnoreDamage) {
         super(mob, (Class[])ToIgnoreDamage);

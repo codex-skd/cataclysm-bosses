@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "#": "cataclysm:black_steel_ingot",
+    "X": "cataclysm:cursium_ingot"
+  },
+  "pattern": [
+    " X",
+    " X",
+    " #"
+  ],
+  "result": {
+    "id": "cataclysm:the_annihilator"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "#O#",
+    "OEO",
+    "#O#"
+  ],
+  "key": {
+    "#": "minecraft:crying_obsidian",
+    "O": "minecraft:obsidian",
+    "E": "minecraft:ender_eye"
+  },
+  "result": {
+    "id": "cataclysm:abyss_eye",
+    "count": 1
+  }
+}

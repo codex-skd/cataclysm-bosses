@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": "cataclysm:purpur_tiles"
+  },
+  "result": {
+    "id": "cataclysm:purpur_tile_wall",
+    "count": 6
+  }
+}

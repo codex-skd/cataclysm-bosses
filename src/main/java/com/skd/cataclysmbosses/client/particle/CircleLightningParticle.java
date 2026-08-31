@@ -30,10 +30,11 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
+import net.minecraft.client.renderer.state.level.QuadParticleRenderState;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.ParticleRenderType;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
@@ -43,6 +44,9 @@ import org.joml.Vector4f;
 public class CircleLightningParticle
 extends Particle {
     private LightningRender lightningRender = new LightningRender();
+    private float rCol;
+    private float gCol;
+    private float bCol;
 
     public CircleLightningParticle(ClientLevel world, double x, double y, double z, double xd, double yd, double zd, float size, int r, int g, int b) {
         super(world, x, y, z);
@@ -75,28 +79,19 @@ extends Particle {
         }
     }
 
-    public void render(VertexConsumer consumer, Camera camera, float partialTick) {
-        MultiBufferSource.BufferSource multibuffersource$buffersource = Minecraft.getInstance().renderBuffers().bufferSource();
-        Vec3 cameraPos = camera.getPosition();
-        float x = (float)Mth.lerp((double)partialTick, (double)this.xo, (double)this.x);
-        float y = (float)Mth.lerp((double)partialTick, (double)this.yo, (double)this.y);
-        float z = (float)Mth.lerp((double)partialTick, (double)this.zo, (double)this.z);
-        PoseStack posestack = new PoseStack();
-        posestack.pushPose();
-        posestack.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
-        posestack.translate(x, y, z);
-        this.lightningRender.render(partialTick, posestack, (MultiBufferSource)multibuffersource$buffersource);
-        posestack.popPose();
+    public void extract(QuadParticleRenderState state, Camera camera, float partialTick) {
+        // TODO: Implement trail rendering with new API
     }
 
-    public ParticleRenderType getRenderType() {
-        return ParticleRenderType.CUSTOM;
+    @Override
+    public ParticleRenderType getGroup() {
+        return ParticleRenderType.SINGLE_QUADS;
     }
 
     @OnlyIn(value=Dist.CLIENT)
     public static class Factory
     implements ParticleProvider<CircleLightningParticleOptions> {
-        public Particle createParticle(CircleLightningParticleOptions data, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        public Particle createParticle(CircleLightningParticleOptions data, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, RandomSource random) {
             CircleLightningParticle particle = new CircleLightningParticle(level, x, y, z, xSpeed, ySpeed, zSpeed, data.size(), data.r(), data.g(), data.b());
             return particle;
         }

@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "R": "cataclysm:ancient_metal_ingot"
+  },
+  "pattern": [
+    " R ",
+    " RR",
+    "R  "
+  ],
+  "result": {
+    "id": "cataclysm:ancient_spear"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "#",
+    "#"
+  ],
+  "key": {
+    "#": "cataclysm:azure_seastone_slab"
+  },
+  "result": {
+    "id": "cataclysm:chiseled_azure_seastone",
+    "count": 1
+  }
+}

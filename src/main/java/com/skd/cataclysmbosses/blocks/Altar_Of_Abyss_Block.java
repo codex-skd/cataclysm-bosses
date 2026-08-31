@@ -14,7 +14,7 @@
  *  net.minecraft.world.item.context.BlockPlaceContext
  *  net.minecraft.world.level.BlockGetter
  *  net.minecraft.world.level.Level
- *  net.minecraft.world.level.LevelAccessor
+ *  net.minecraft.world.level.LevelReader
  *  net.minecraft.world.level.LevelReader
  *  net.minecraft.world.level.block.BaseEntityBlock
  *  net.minecraft.world.level.block.Block
@@ -47,6 +47,7 @@ import com.mojang.serialization.MapCodec;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -54,8 +55,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
@@ -140,11 +142,11 @@ implements SimpleWaterloggedBlock {
         return AXIS_AABB;
     }
 
-    public BlockState updateShape(BlockState p_51555_, Direction p_51556_, BlockState p_51557_, LevelAccessor p_51558_, BlockPos p_51559_, BlockPos p_51560_) {
+    protected BlockState updateShape(BlockState p_51555_, LevelReader p_51558_, ScheduledTickAccess ticks, BlockPos p_51559_, Direction p_51556_, BlockPos p_51560_, BlockState p_51557_, RandomSource random) {
         // if (((Boolean)p_51555_.getValue((Property)WATERLOGGED)).booleanValue()) {
-        //     p_51558_.scheduleTick(p_51559_, (Fluid)Fluids.WATER, Fluids.WATER.getTickDelay((LevelReader)p_51558_));
+        //     ticks.scheduleTick(p_51559_, Fluids.WATER, Fluids.WATER.getTickDelay(p_51558_));
         // }
-        return super.updateShape(p_51555_, p_51556_, p_51557_, p_51558_, p_51559_, p_51560_);
+        return super.updateShape(p_51555_, p_51558_, ticks, p_51559_, p_51556_, p_51560_, p_51557_, random);
     }
 
     @Nullable

@@ -42,6 +42,7 @@
  */
 package com.skd.cataclysmbosses.structures;
 
+import net.minecraft.world.entity.EntitySpawnReason;
 import com.skd.cataclysmbosses.entity.AnimationMonster.BossMonsters.Ender_Golem_Entity;
 import com.skd.cataclysmbosses.init.ModEntities;
 import com.skd.cataclysmbosses.init.ModStructures;
@@ -50,13 +51,14 @@ import com.mojang.serialization.MapCodec;
 import java.util.Map;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.monster.Shulker;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
@@ -103,65 +105,65 @@ extends Structure {
     private static final Identifier CITADEL16 = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"ruined_citadel16");
     private static final Identifier CITADEL17 = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"ruined_citadel17");
     private static final Identifier CITADEL18 = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"ruined_citadel18");
-    private static final Map<Identifier, BlockPos> OFFSET = ImmutableMap.builder().put((Object)CITADEL1, (Object)new BlockPos(0, 1, 0)).put((Object)CITADEL2, (Object)new BlockPos(0, 1, 0)).put((Object)CITADEL3, (Object)new BlockPos(0, 1, 0)).put((Object)CITADEL4, (Object)new BlockPos(0, 1, 0)).put((Object)CITADEL5, (Object)new BlockPos(0, 1, 0)).put((Object)CITADEL6, (Object)new BlockPos(0, 1, 0)).put((Object)CITADEL7, (Object)new BlockPos(0, 1, 0)).put((Object)CITADEL8, (Object)new BlockPos(0, 1, 0)).put((Object)CITADEL9, (Object)new BlockPos(0, 1, 0)).put((Object)CITADEL10, (Object)new BlockPos(0, 1, 0)).put((Object)CITADEL11, (Object)new BlockPos(0, 1, 0)).put((Object)CITADEL12, (Object)new BlockPos(0, 1, 0)).put((Object)CITADEL13, (Object)new BlockPos(0, 1, 0)).put((Object)CITADEL14, (Object)new BlockPos(0, 1, 0)).put((Object)CITADEL15, (Object)new BlockPos(0, 1, 0)).put((Object)CITADEL16, (Object)new BlockPos(0, 1, 0)).put((Object)CITADEL17, (Object)new BlockPos(0, 1, 0)).put((Object)CITADEL18, (Object)new BlockPos(0, 1, 0)).build();
+    private static final Map<Identifier, BlockPos> OFFSET = ImmutableMap.<Identifier, BlockPos>builder().put(CITADEL1, new BlockPos(0, 1, 0)).put(CITADEL2, new BlockPos(0, 1, 0)).put(CITADEL3, new BlockPos(0, 1, 0)).put(CITADEL4, new BlockPos(0, 1, 0)).put(CITADEL5, new BlockPos(0, 1, 0)).put(CITADEL6, new BlockPos(0, 1, 0)).put(CITADEL7, new BlockPos(0, 1, 0)).put(CITADEL8, new BlockPos(0, 1, 0)).put(CITADEL9, new BlockPos(0, 1, 0)).put(CITADEL10, new BlockPos(0, 1, 0)).put(CITADEL11, new BlockPos(0, 1, 0)).put(CITADEL12, new BlockPos(0, 1, 0)).put(CITADEL13, new BlockPos(0, 1, 0)).put(CITADEL14, new BlockPos(0, 1, 0)).put(CITADEL15, new BlockPos(0, 1, 0)).put(CITADEL16, new BlockPos(0, 1, 0)).put(CITADEL17, new BlockPos(0, 1, 0)).put(CITADEL18, new BlockPos(0, 1, 0)).build();
 
-    public static void start(StructureTemplateManager templateManager, BlockPos pos, Rotation rotation, StructurePieceAccessor pieceList, RandomSource random) {
+    public static void start(StructureTemplateManager templateManager, BlockPos pos, Rotation rotation, StructurePieceAccessor pieceList, RandomSource random, RegistryAccess registryAccess) {
         int x = pos.getX();
         int z = pos.getZ();
         BlockPos rotationOffSet = new BlockPos(0, -45, 0).rotate(rotation);
         BlockPos blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL5, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL5, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(0, 0, 0).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL14, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL14, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(0, -45, 37).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL6, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL6, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(0, 0, 37).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL15, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL15, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(0, -45, -37).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL4, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL4, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(0, 0, -37).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL13, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL13, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(-36, -45, 0).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL2, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL2, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(-36, 0, 0).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL11, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL11, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(36, -45, 0).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL8, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL8, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(36, 0, 0).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL17, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL17, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(-36, -45, -37).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL1, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL1, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(-36, 0, -37).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL10, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL10, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(-36, -45, 37).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL3, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL3, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(-36, 0, 37).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL12, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL12, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(36, -45, 37).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL9, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL9, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(36, 0, 37).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL18, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL18, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(36, -45, -37).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL7, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL7, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(36, 0, -37).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL16, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITADEL16, blockpos, rotation, registryAccess));
     }
 
     public RuinedCitadelStructure(Structure.StructureSettings p_227593_) {
@@ -169,8 +171,8 @@ extends Structure {
     }
 
     public Optional<Structure.GenerationStub> findGenerationPoint(Structure.GenerationContext p_228964_) {
-        int i = p_228964_.chunkPos().x >> 16;
-        int j = p_228964_.chunkPos().z >> 16;
+        int i = p_228964_.chunkPos().x() >> 16;
+        int j = p_228964_.chunkPos().z() >> 16;
         WorldgenRandom worldgenrandom = new WorldgenRandom((RandomSource)new LegacyRandomSource(0L));
         worldgenrandom.setSeed((long)(i ^ j << 9) ^ p_228964_.seed());
         worldgenrandom.nextInt();
@@ -180,7 +182,7 @@ extends Structure {
     private static void generatePieces(StructurePiecesBuilder p_197233_, Structure.GenerationContext p_197234_) {
         BlockPos blockpos = new BlockPos(p_197234_.chunkPos().getMinBlockX(), 53, p_197234_.chunkPos().getMinBlockZ());
         Rotation rotation = Rotation.getRandom((RandomSource)p_197234_.random());
-        RuinedCitadelStructure.start(p_197234_.structureTemplateManager(), blockpos, rotation, (StructurePieceAccessor)p_197233_, (RandomSource)p_197234_.random());
+        RuinedCitadelStructure.start(p_197234_.structureTemplateManager(), blockpos, rotation, (StructurePieceAccessor)p_197233_, (RandomSource)p_197234_.random(), p_197234_.registryAccess());
     }
 
     public StructureType<?> type() {
@@ -193,21 +195,21 @@ extends Structure {
 
     public static class Piece
     extends TemplateStructurePiece {
-        public Piece(StructureTemplateManager templateManagerIn, Identifier resourceLocationIn, BlockPos pos, Rotation rotation) {
-            super((StructurePieceType)ModStructures.RCP.get(), 0, templateManagerIn, resourceLocationIn, resourceLocationIn.toString(), Piece.makeSettings(rotation), Piece.makePosition(resourceLocationIn, pos));
+        public Piece(StructureTemplateManager templateManagerIn, Identifier resourceLocationIn, BlockPos pos, Rotation rotation, RegistryAccess registryAccess) {
+            super((StructurePieceType)ModStructures.RCP.get(), 0, templateManagerIn, resourceLocationIn, resourceLocationIn.toString(), Piece.makeSettings(rotation, registryAccess), Piece.makePosition(resourceLocationIn, pos));
         }
 
-        public Piece(StructureTemplateManager templateManagerIn, CompoundTag tagCompound) {
-            super((StructurePieceType)ModStructures.RCP.get(), tagCompound, templateManagerIn, p_162451_ -> Piece.makeSettings(Rotation.valueOf((String)tagCompound.getString("Rot"))));
+        public Piece(StructureTemplateManager templateManagerIn, CompoundTag tagCompound, RegistryAccess registryAccess) {
+            super((StructurePieceType)ModStructures.RCP.get(), tagCompound, templateManagerIn, p_162451_ -> Piece.makeSettings(Rotation.valueOf(tagCompound.getStringOr("Rot", "NONE")), registryAccess));
         }
 
         public Piece(StructurePieceSerializationContext context, CompoundTag tag) {
-            this(context.structureTemplateManager(), tag);
+            this(context.structureTemplateManager(), tag, context.registryAccess());
         }
 
-        private static StructurePlaceSettings makeSettings(Rotation p_163156_) {
+        private static StructurePlaceSettings makeSettings(Rotation p_163156_, RegistryAccess registryAccess) {
             BlockIgnoreProcessor blockignoreprocessor = BlockIgnoreProcessor.STRUCTURE_BLOCK;
-            StructurePlaceSettings structureplacesettings = new StructurePlaceSettings().setRotation(p_163156_).setMirror(Mirror.NONE).addProcessor((StructureProcessor)blockignoreprocessor).addProcessor((StructureProcessor)new ProtectedBlockProcessor(BlockTags.FEATURES_CANNOT_REPLACE));
+            StructurePlaceSettings structureplacesettings = new StructurePlaceSettings().setRotation(p_163156_).setMirror(Mirror.NONE).addProcessor((StructureProcessor)blockignoreprocessor).addProcessor((StructureProcessor)new ProtectedBlockProcessor(registryAccess.getOrThrow(BlockTags.FEATURES_CANNOT_REPLACE)));
             return structureplacesettings;
         }
 
@@ -224,19 +226,21 @@ extends Structure {
             if (sbb.isInside((Vec3i)pos) && Level.isInSpawnableBounds((BlockPos)pos)) {
                 if (function.startsWith("sentry")) {
                     worldIn.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
-                    Shulker shulker = (Shulker)EntityType.SHULKER.create((Level)worldIn.getLevel());
+                    Shulker shulker = (Shulker)EntityTypes.SHULKER.create((Level)worldIn.getLevel(), EntitySpawnReason.STRUCTURE);
                     shulker.setPos((double)pos.getX() + 0.5, (double)pos.getY(), (double)pos.getZ() + 0.5);
                     worldIn.addFreshEntity((Entity)shulker);
                 } else if (function.startsWith("mimic")) {
                     worldIn.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
-                    Shulker Silentshulkerentity = (Shulker)EntityType.SHULKER.create((Level)worldIn.getLevel());
+                    Shulker Silentshulkerentity = (Shulker)EntityTypes.SHULKER.create((Level)worldIn.getLevel(), EntitySpawnReason.STRUCTURE);
                     Silentshulkerentity.setPos((double)pos.getX() + 0.5, (double)pos.getY(), (double)pos.getZ() + 0.5);
                     Silentshulkerentity.setSilent(true);
                     worldIn.addFreshEntity((Entity)Silentshulkerentity);
                 } else if ("golem".equals(function)) {
-                    Ender_Golem_Entity golem = (Ender_Golem_Entity)((EntityType)ModEntities.ENDER_GOLEM.get()).create((Level)worldIn.getLevel());
+                    Ender_Golem_Entity golem = (Ender_Golem_Entity)ModEntities.ENDER_GOLEM.get().create((Level)worldIn.getLevel(), EntitySpawnReason.STRUCTURE);
                     worldIn.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
-                    golem.moveTo(pos, 180.0f, 180.0f);
+                    golem.setPos((double)pos.getX() + 0.5, (double)pos.getY(), (double)pos.getZ() + 0.5);
+                golem.setYRot(180.0f);
+                golem.setXRot(180.0f);
                     worldIn.addFreshEntity((Entity)golem);
                 }
             }

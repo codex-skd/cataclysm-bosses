@@ -15,27 +15,24 @@ package com.skd.cataclysmbosses.client.particle;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.particle.SingleQuadParticle;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.util.RandomSource;
 
 public class Dust_Blast_Particle
 extends SingleQuadParticle {
     private final SpriteSet sprites;
 
     protected Dust_Blast_Particle(ClientLevel level, double xCoord, double yCoord, double zCoord, SpriteSet spriteSet, double xd, double yd, double zd) {
-        super(level, xCoord, yCoord, zCoord, xd, yd, zd);
+        super(level, xCoord, yCoord, zCoord, xd, yd, zd, (TextureAtlasSprite) null);
         this.sprites = spriteSet;
         this.setSpriteFromAge(this.sprites);
         this.alpha = 0.9f;
         this.quadSize *= 4.0f;
         this.gravity = 0.0f;
         this.lifetime = 4;
-    }
-
-    public ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
     }
 
     public float getQuadSize(float scaleFactor) {
@@ -56,9 +53,14 @@ extends SingleQuadParticle {
             this.sprites = spriteSet;
         }
 
-        public Particle createParticle(SimpleParticleType particleType, ClientLevel level, double x, double y, double z, double dx, double dy, double dz) {
+        public Particle createParticle(SimpleParticleType particleType, ClientLevel level, double x, double y, double z, double dx, double dy, double dz, RandomSource random) {
             return new Dust_Blast_Particle(level, x, y, z, this.sprites, dx, dy, dz);
         }
+    }
+
+    @Override
+    public SingleQuadParticle.Layer getLayer() {
+        return SingleQuadParticle.Layer.TRANSLUCENT;
     }
 }
 

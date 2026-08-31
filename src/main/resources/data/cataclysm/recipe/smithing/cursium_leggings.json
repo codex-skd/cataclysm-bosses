@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:smithing_transform",
+  "addition": "cataclysm:cursium_ingot",
+  "base": "minecraft:netherite_leggings",
+  "result": {
+    "id": "cataclysm:cursium_leggings"
+  },
+  "template": "cataclysm:cursium_upgrade_smithing_template"
+}

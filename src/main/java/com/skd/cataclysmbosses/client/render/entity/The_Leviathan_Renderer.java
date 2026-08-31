@@ -30,17 +30,20 @@ package com.skd.cataclysmbosses.client.render.entity;
 import com.skd.cataclysmbosses.client.model.entity.The_Leviathan_Model;
 import com.skd.cataclysmbosses.client.model.entity.The_Leviathan_Tongue_End_Model;
 import com.skd.cataclysmbosses.client.model.entity.The_Leviathan_Tongue_Model;
+import com.skd.cataclysmbosses.client.render.CMRenderTypes;
 import com.skd.cataclysmbosses.client.render.RenderUtils;
 import com.skd.cataclysmbosses.client.render.layer.LayerBasicGlow;
 import com.skd.cataclysmbosses.client.render.layer.The_Leviathan_Layer;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderState;
 import com.skd.cataclysmbosses.entity.AnimationMonster.BossMonsters.The_Leviathan.The_Leviathan_Entity;
 import com.skd.cataclysmbosses.entity.AnimationMonster.BossMonsters.The_Leviathan.The_Leviathan_Part;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmMobRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.MobRenderer;
@@ -52,7 +55,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
@@ -60,7 +62,7 @@ import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(value=Dist.CLIENT)
 public class The_Leviathan_Renderer
-extends MobRenderer<The_Leviathan_Entity, The_Leviathan_Model> {
+extends CmMobRenderer<The_Leviathan_Entity> {
     private static final Identifier LEVIATHAN_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/leviathan/the_leviathan.png");
     private static final Identifier BURNING_LEVIATHAN_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/leviathan/the_burning_leviathan.png");
     private static final Identifier LEVIATHAN_TEXTURE_EYES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/leviathan/the_leviathan_eye.png");
@@ -69,17 +71,20 @@ extends MobRenderer<The_Leviathan_Entity, The_Leviathan_Model> {
     private static final The_Leviathan_Tongue_End_Model TONGUE_END_MODEL = new The_Leviathan_Tongue_End_Model();
 
     public The_Leviathan_Renderer(EntityRendererProvider.Context renderManagerIn) {
-        super(renderManagerIn, (EntityModel)new The_Leviathan_Model(), 1.5f);
+        super(renderManagerIn, new The_Leviathan_Model(), 1.5f);
+        this.model = new The_Leviathan_Model();
         this.addLayer(new The_Leviathan_Layer(this));
         this.addLayer(new LayerBasicGlow(this, LEVIATHAN_TEXTURE_EYES));
     }
+
+    private final The_Leviathan_Model model;
 
     public Identifier getTextureLocation(The_Leviathan_Entity entity) {
         return entity.getMeltDown() ? BURNING_LEVIATHAN_TEXTURES : LEVIATHAN_TEXTURES;
     }
 
     public boolean shouldRender(The_Leviathan_Entity livingentity, Frustum camera, double camX, double camY, double camZ) {
-        if (super.shouldRender((Entity)livingentity, camera, camX, camY, camZ)) {
+        if (super.shouldRender(livingentity, camera, camX, camY, camZ)) {
             return true;
         }
         for (The_Leviathan_Part part : livingentity.leviathanParts) {
@@ -95,18 +100,19 @@ extends MobRenderer<The_Leviathan_Entity, The_Leviathan_Model> {
         return false;
     }
 
-    public Vec3 getRenderOffset(The_Leviathan_Entity entity, float partialTicks) {
+    public Vec3 getRenderOffset(CmEntityRenderState state) {
+        The_Leviathan_Entity entity = (The_Leviathan_Entity) state.entity;
         if (entity.getAnimation() == The_Leviathan_Entity.LEVIATHAN_ABYSS_BLAST && entity.getAnimationTick() <= 66) {
             double d0 = 0.01;
             return new Vec3(this.rnd.nextGaussian() * d0, 0.0, this.rnd.nextGaussian() * d0);
         }
-        return super.getRenderOffset((Entity)entity, partialTicks);
+        return super.getRenderOffset(state);
     }
 
-    public void render(The_Leviathan_Entity entity, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
-        super.render((LivingEntity)entity, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
+    protected void render(The_Leviathan_Entity entity, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
+        float entityYaw = Mth.rotLerp(partialTicks, entity.yBodyRotO, entity.yBodyRot);
         if (entity.getAnimation() == The_Leviathan_Entity.LEVIATHAN_TAIL_WHIPS) {
-            Vec3 bladePos = RenderUtils.matrixStackFromCitadelModel((Entity)entity, entityYaw, ((The_Leviathan_Model)this.model).Tail_Particle);
+            Vec3 bladePos = RenderUtils.matrixStackFromCitadelModel((Entity)entity, entityYaw, this.model.Tail_Particle);
             entity.setSocketPosArray(0, bladePos);
         }
         double x = Mth.lerp((double)partialTicks, (double)entity.xOld, (double)entity.getX());
@@ -117,11 +123,11 @@ extends MobRenderer<The_Leviathan_Entity, The_Leviathan_Model> {
         if (weapon != null && entity.isAlive() && weapon.isAlive()) {
             matrixStackIn.pushPose();
             matrixStackIn.translate(-x, -y, -z);
-            Vec3 headModelPos = ((The_Leviathan_Model)this.getModel()).translateToTongue(new Vec3(0.0, 0.0, 0.0), yaw).scale(0.2);
+            Vec3 headModelPos = this.model.translateToTongue(new Vec3(0.0, 0.0, 0.0), yaw).scale(0.2);
             Vec3 fromVec = entity.getTonguePosition().add(headModelPos);
             Vec3 toVec = weapon.getPosition(partialTicks);
             Vec3 currentNeckButt = fromVec;
-            VertexConsumer neckConsumer = bufferIn.getBuffer(RenderType.entityCutoutNoCull((Identifier)LEVIATHAN_TEXTURES));
+            VertexConsumer neckConsumer = bufferIn.getBuffer(CMRenderTypes.entityCutoutNoCull((Identifier)LEVIATHAN_TEXTURES));
             double remainingDistance = toVec.distanceTo(fromVec);
             for (int segmentCount = 0; segmentCount < 128 && remainingDistance > 0.0; ++segmentCount) {
                 Vec3 powVec;
@@ -133,14 +139,14 @@ extends MobRenderer<The_Leviathan_Entity, The_Leviathan_Model> {
                 The_Leviathan_Renderer.renderNeckCube(currentNeckButt, next, matrixStackIn, neckConsumer, neckLight, OverlayTexture.NO_OVERLAY, 0.0f);
                 currentNeckButt = next;
             }
-            VertexConsumer clawConsumer = bufferIn.getBuffer(RenderType.entityCutoutNoCull((Identifier)LEVIATHAN_TEXTURES));
+            VertexConsumer clawConsumer = bufferIn.getBuffer(CMRenderTypes.entityCutoutNoCull((Identifier)LEVIATHAN_TEXTURES));
             matrixStackIn.pushPose();
             matrixStackIn.translate(toVec.x, toVec.y, toVec.z);
             matrixStackIn.translate(0.0f, -0.5f, 0.0f);
             float rotY = (float)(Mth.atan2((double)toVec.x, (double)toVec.z) * 57.2957763671875);
             float rotX = (float)(-(Mth.atan2((double)toVec.y, (double)toVec.horizontalDistance()) * 57.2957763671875));
             TONGUE_END_MODEL.setAttributes(rotX, rotY);
-            TONGUE_END_MODEL.renderToBuffer(matrixStackIn, clawConsumer, this.getLightColor((Entity)entity, toVec.add(x, y, z)), OverlayTexture.NO_OVERLAY);
+            TONGUE_END_MODEL.renderToBuffer(matrixStackIn, clawConsumer, this.getLightColor((Entity)entity, toVec.add(x, y, z)), OverlayTexture.NO_OVERLAY, -1);
             matrixStackIn.popPose();
             matrixStackIn.popPose();
         }
@@ -160,15 +166,15 @@ extends MobRenderer<The_Leviathan_Entity, The_Leviathan_Model> {
         matrixStackIn.translate(from.x, from.y, from.z);
         matrixStackIn.translate(0.0f, -0.5f, 0.0f);
         TONGUE_MODEL.setAttributes((float)sub.length(), rotX, rotY, additionalYaw);
-        TONGUE_MODEL.renderToBuffer(matrixStackIn, buffer, packedLightIn, overlayCoords);
+        TONGUE_MODEL.renderToBuffer(matrixStackIn, buffer, packedLightIn, overlayCoords, -1);
         matrixStackIn.popPose();
     }
 
     private int getLightColor(Entity head, Vec3 vec3) {
         BlockPos blockpos = BlockPos.containing((Position)vec3);
         if (head.level().hasChunkAt(blockpos)) {
-            int i = LevelRenderer.getLightColor((BlockAndTintGetter)head.level(), (BlockPos)blockpos);
-            int j = LevelRenderer.getLightColor((BlockAndTintGetter)head.level(), (BlockPos)blockpos.above());
+            int i = 15728880; // PORT TODO(26.2): LevelRenderer.getLightColor(BlockAndTintGetter,BlockPos) removed; full-bright approx
+            int j = 15728880;
             int k = i & 0xFF;
             int l = j & 0xFF;
             int i1 = i >> 16 & 0xFF;

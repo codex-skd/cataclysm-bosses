@@ -29,6 +29,7 @@ import com.skd.cataclysmbosses.init.ModSounds;
 import com.skd.cataclysmbosses.util.CMDamageTypes;
 import java.util.UUID;
 import javax.annotation.Nullable;
+import net.minecraft.core.UUIDUtil;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -44,6 +45,8 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class Phantom_Halberd_Entity
 extends Entity {
@@ -74,8 +77,8 @@ extends Entity {
     }
 
     protected void defineSynchedData(SynchedEntityData.Builder p_326229_) {
-        p_326229_.define(STATE, (Object)0);
-        p_326229_.define(DAMAGE, (Object)Float.valueOf(0.0f));
+        p_326229_.define(STATE, 0);
+        p_326229_.define(DAMAGE, Float.valueOf(0.0f));
     }
 
     public AnimationState getAnimationState(String input) {
@@ -137,7 +140,7 @@ extends Entity {
     }
 
     public void setState(int state) {
-        this.entityData.set(STATE, (Object)state);
+        this.entityData.set(STATE, state);
     }
 
     public float getDamage() {
@@ -145,7 +148,7 @@ extends Entity {
     }
 
     public void setDamage(float damage) {
-        this.entityData.set(DAMAGE, (Object)Float.valueOf(damage));
+        this.entityData.set(DAMAGE, Float.valueOf(damage));
     }
 
     public void setCaster(@Nullable LivingEntity p_190549_1_) {
@@ -162,17 +165,17 @@ extends Entity {
         return this.caster;
     }
 
-    protected void readAdditionalSaveData(CompoundTag compound) {
-        this.warmupDelayTicks = compound.getInt("Warmup");
-        if (compound.hasUUID("Owner")) {
-            this.casterUuid = compound.getUUID("Owner");
+    protected void readAdditionalSaveData(ValueInput compound) {
+        this.warmupDelayTicks = compound.getIntOr("Warmup", 0);
+        if (compound.read("Owner", UUIDUtil.CODEC).isPresent()) {
+            this.casterUuid = compound.read("Owner", UUIDUtil.CODEC).orElse(null);
         }
     }
 
-    protected void addAdditionalSaveData(CompoundTag compound) {
+    protected void addAdditionalSaveData(ValueOutput compound) {
         compound.putInt("Warmup", this.warmupDelayTicks);
         if (this.casterUuid != null) {
-            compound.putUUID("Owner", this.casterUuid);
+            compound.store("Owner", UUIDUtil.CODEC, this.casterUuid);
         }
     }
 
@@ -222,9 +225,9 @@ extends Entity {
         LivingEntity livingentity = this.getCaster();
         if (Hitentity.isAlive() && !Hitentity.isInvulnerable() && Hitentity != livingentity && this.tickCount % 5 == 0) {
             if (livingentity == null) {
-                Hitentity.hurt(this.damageSources().magic(), this.getDamage());
+                Hitentity.hurtOrSimulate(this.damageSources().magic(), this.getDamage());
             } else if (!livingentity.isAlliedTo((Entity)Hitentity) && !Hitentity.isAlliedTo((Entity)livingentity)) {
-                Hitentity.hurt(CMDamageTypes.causeMaledictioMagicaeDamage(this, (Entity)livingentity), this.getDamage());
+                Hitentity.hurtOrSimulate(CMDamageTypes.causeMaledictioMagicaeDamage(this, (Entity)livingentity), this.getDamage());
             }
         }
     }
@@ -238,6 +241,11 @@ extends Entity {
                 this.level().playLocalSound(this.getX(), this.getY(), this.getZ(), (SoundEvent)ModSounds.PHANTOM_SPEAR.get(), this.getSoundSource(), 0.3f, this.random.nextFloat() * 0.2f + 0.85f, false);
             }
         }
+    }
+
+    @Override
+    public boolean hurtServer(ServerLevel level, net.minecraft.world.damagesource.DamageSource source, float amount) {
+        return false;
     }
 
     public float getAnimationProgress(float p_36937_) {

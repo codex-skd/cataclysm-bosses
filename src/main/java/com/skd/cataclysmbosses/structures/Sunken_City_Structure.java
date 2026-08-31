@@ -13,7 +13,7 @@
  *  net.minecraft.world.entity.Entity
  *  net.minecraft.world.entity.EntityType
  *  net.minecraft.world.entity.Mob
- *  net.minecraft.world.entity.MobSpawnType
+ *  net.minecraft.world.entity.EntitySpawnReason
  *  net.minecraft.world.level.Level
  *  net.minecraft.world.level.ServerLevelAccessor
  *  net.minecraft.world.level.block.Blocks
@@ -52,6 +52,7 @@ import java.util.Map;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
@@ -118,107 +119,107 @@ extends Structure {
     private static final Identifier CITY_LOWER_PRISON = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"sunken_city_lower_prison");
     private static final Identifier CITY_LOWERSIDE_PRISON = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"sunken_city_lowerside_prison");
     private static final Identifier CITY_MID_NORTH_SIDE = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"sunken_city_mid_north_side");
-    private static final Map<Identifier, BlockPos> OFFSET = ImmutableMap.builder().put((Object)CITY_MID, (Object)new BlockPos(0, 1, 0)).put((Object)CITY_LOWER, (Object)new BlockPos(0, 1, 0)).put((Object)CITY_UPPER, (Object)new BlockPos(0, 1, 0)).put((Object)CITY_MID_EAST, (Object)new BlockPos(0, 1, 0)).put((Object)CITY_MID_NORTH, (Object)new BlockPos(0, 1, 0)).put((Object)CITY_MID_SOUTH, (Object)new BlockPos(0, 1, 0)).put((Object)CITY_MID_WEST, (Object)new BlockPos(0, 1, 0)).put((Object)CITY_MID_NORTHEAST, (Object)new BlockPos(0, 1, 0)).put((Object)CITY_MID_NORTHWEST, (Object)new BlockPos(0, 1, 0)).put((Object)CITY_MID_SOUTHEAST, (Object)new BlockPos(0, 1, 0)).put((Object)CITY_MID_SOUTHWEST, (Object)new BlockPos(0, 1, 0)).put((Object)CITY_LOWER_EAST, (Object)new BlockPos(0, 1, 0)).put((Object)CITY_LOWER_NORTH, (Object)new BlockPos(0, 1, 0)).put((Object)CITY_LOWER_SOUTH, (Object)new BlockPos(0, 1, 0)).put((Object)CITY_LOWER_WEST, (Object)new BlockPos(0, 1, 0)).put((Object)CITY_LOWER_NORTHEAST, (Object)new BlockPos(0, 1, 0)).put((Object)CITY_LOWER_NORTHWEST, (Object)new BlockPos(0, 1, 0)).put((Object)CITY_LOWER_SOUTHEAST, (Object)new BlockPos(0, 1, 0)).put((Object)CITY_LOWER_SOUTHWEST, (Object)new BlockPos(0, 1, 0)).put((Object)CITY_UPPER_TREASURE, (Object)new BlockPos(0, 1, 0)).put((Object)CITY_LOWER_TREASURE, (Object)new BlockPos(0, 1, 0)).put((Object)CITY_ENTRANCE1, (Object)new BlockPos(0, 1, 0)).put((Object)CITY_ENTRANCE2, (Object)new BlockPos(0, 1, 0)).put((Object)CITY_ENTRANCE3, (Object)new BlockPos(0, 1, 0)).put((Object)CITY_ENTRANCE4, (Object)new BlockPos(0, 1, 0)).put((Object)CITY_TEMPLE1, (Object)new BlockPos(0, 1, 0)).put((Object)CITY_TEMPLE2, (Object)new BlockPos(0, 1, 0)).put((Object)CITY_UPPER_PRISON, (Object)new BlockPos(0, 1, 0)).put((Object)CITY_UPPERSIDE_PRISON, (Object)new BlockPos(0, 1, 0)).put((Object)CITY_LOWER_PRISON, (Object)new BlockPos(0, 1, 0)).put((Object)CITY_LOWERSIDE_PRISON, (Object)new BlockPos(0, 1, 0)).put((Object)CITY_MID_NORTH_SIDE, (Object)new BlockPos(0, 1, 0)).build();
+    private static final Map<Identifier, BlockPos> OFFSET = ImmutableMap.<Identifier, BlockPos>builder().put(CITY_MID, new BlockPos(0, 1, 0)).put(CITY_LOWER, new BlockPos(0, 1, 0)).put(CITY_UPPER, new BlockPos(0, 1, 0)).put(CITY_MID_EAST, new BlockPos(0, 1, 0)).put(CITY_MID_NORTH, new BlockPos(0, 1, 0)).put(CITY_MID_SOUTH, new BlockPos(0, 1, 0)).put(CITY_MID_WEST, new BlockPos(0, 1, 0)).put(CITY_MID_NORTHEAST, new BlockPos(0, 1, 0)).put(CITY_MID_NORTHWEST, new BlockPos(0, 1, 0)).put(CITY_MID_SOUTHEAST, new BlockPos(0, 1, 0)).put(CITY_MID_SOUTHWEST, new BlockPos(0, 1, 0)).put(CITY_LOWER_EAST, new BlockPos(0, 1, 0)).put(CITY_LOWER_NORTH, new BlockPos(0, 1, 0)).put(CITY_LOWER_SOUTH, new BlockPos(0, 1, 0)).put(CITY_LOWER_WEST, new BlockPos(0, 1, 0)).put(CITY_LOWER_NORTHEAST, new BlockPos(0, 1, 0)).put(CITY_LOWER_NORTHWEST, new BlockPos(0, 1, 0)).put(CITY_LOWER_SOUTHEAST, new BlockPos(0, 1, 0)).put(CITY_LOWER_SOUTHWEST, new BlockPos(0, 1, 0)).put(CITY_UPPER_TREASURE, new BlockPos(0, 1, 0)).put(CITY_LOWER_TREASURE, new BlockPos(0, 1, 0)).put(CITY_ENTRANCE1, new BlockPos(0, 1, 0)).put(CITY_ENTRANCE2, new BlockPos(0, 1, 0)).put(CITY_ENTRANCE3, new BlockPos(0, 1, 0)).put(CITY_ENTRANCE4, new BlockPos(0, 1, 0)).put(CITY_TEMPLE1, new BlockPos(0, 1, 0)).put(CITY_TEMPLE2, new BlockPos(0, 1, 0)).put(CITY_UPPER_PRISON, new BlockPos(0, 1, 0)).put(CITY_UPPERSIDE_PRISON, new BlockPos(0, 1, 0)).put(CITY_LOWER_PRISON, new BlockPos(0, 1, 0)).put(CITY_LOWERSIDE_PRISON, new BlockPos(0, 1, 0)).put(CITY_MID_NORTH_SIDE, new BlockPos(0, 1, 0)).build();
 
-    public static void start(StructureTemplateManager templateManager, BlockPos pos, Rotation rotation, StructurePieceAccessor pieceList, RandomSource random) {
+    public static void start(StructureTemplateManager templateManager, BlockPos pos, Rotation rotation, StructurePieceAccessor pieceList, RandomSource random, RegistryAccess registryAccess) {
         int x = pos.getX();
         int z = pos.getZ();
         BlockPos rotationOffSet = new BlockPos(0, 0, 0).rotate(rotation);
         BlockPos blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_MID, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_MID, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(0, 48, 0).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_UPPER, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_UPPER, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(0, -38, 0).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_LOWER, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_LOWER, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(47, 0, 0).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_MID_EAST, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_MID_EAST, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(0, 0, -47).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_MID_NORTH, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_MID_NORTH, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(0, 0, 47).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_MID_SOUTH, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_MID_SOUTH, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(-47, 0, 0).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_MID_WEST, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_MID_WEST, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(47, 0, -12).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_MID_NORTHEAST, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_MID_NORTHEAST, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(-47, 0, -47).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_MID_NORTHWEST, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_MID_NORTHWEST, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(47, 0, 47).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_MID_SOUTHEAST, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_MID_SOUTHEAST, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(-47, 0, 47).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_MID_SOUTHWEST, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_MID_SOUTHWEST, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(47, -38, 0).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_LOWER_EAST, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_LOWER_EAST, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(0, -38, -47).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_LOWER_NORTH, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_LOWER_NORTH, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(0, -38, 47).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_LOWER_SOUTH, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_LOWER_SOUTH, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(-47, -38, 0).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_LOWER_WEST, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_LOWER_WEST, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(47, -38, -9).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_LOWER_NORTHEAST, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_LOWER_NORTHEAST, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(-47, -38, -47).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_LOWER_NORTHWEST, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_LOWER_NORTHWEST, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(47, -38, 47).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_LOWER_SOUTHEAST, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_LOWER_SOUTHEAST, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(-47, -38, 47).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_LOWER_SOUTHWEST, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_LOWER_SOUTHWEST, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(-105, 0, 0).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_ENTRANCE1, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_ENTRANCE1, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(-94, 0, 0).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_ENTRANCE2, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_ENTRANCE2, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(-105, -38, 0).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_ENTRANCE3, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_ENTRANCE3, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(-94, -38, 0).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_ENTRANCE4, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_ENTRANCE4, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(-94, 0, 47).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_UPPER_PRISON, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_UPPER_PRISON, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(-94, -38, 47).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_LOWER_PRISON, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_LOWER_PRISON, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(-52, 0, 94).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_UPPERSIDE_PRISON, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_UPPERSIDE_PRISON, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(-52, -38, 94).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_LOWERSIDE_PRISON, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_LOWERSIDE_PRISON, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(-94, 0, -47).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_UPPER_TREASURE, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_UPPER_TREASURE, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(-94, -38, -47).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_LOWER_TREASURE, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_LOWER_TREASURE, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(94, -38, 0).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_TEMPLE1, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_TEMPLE1, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(94, 0, 0).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_TEMPLE2, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_TEMPLE2, blockpos, rotation, registryAccess));
         rotationOffSet = new BlockPos(0, 0, -50).rotate(rotation);
         blockpos = rotationOffSet.offset(x, pos.getY(), z);
-        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_MID_NORTH_SIDE, blockpos, rotation));
+        pieceList.addPiece((StructurePiece)new Piece(templateManager, CITY_MID_NORTH_SIDE, blockpos, rotation, registryAccess));
     }
 
     public Sunken_City_Structure(Structure.StructureSettings p_227593_) {
@@ -240,7 +241,7 @@ extends Structure {
         int j = p_197234_.chunkPos().getMinBlockZ();
         BlockPos blockpos = new BlockPos(i, 19, j);
         Rotation rotation = Rotation.getRandom((RandomSource)p_197234_.random());
-        Sunken_City_Structure.start(p_197234_.structureTemplateManager(), blockpos, rotation, (StructurePieceAccessor)p_197233_, (RandomSource)p_197234_.random());
+        Sunken_City_Structure.start(p_197234_.structureTemplateManager(), blockpos, rotation, (StructurePieceAccessor)p_197233_, (RandomSource)p_197234_.random(), p_197234_.registryAccess());
     }
 
     public StructureType<?> type() {
@@ -253,21 +254,21 @@ extends Structure {
 
     public static class Piece
     extends TemplateStructurePiece {
-        public Piece(StructureTemplateManager templateManagerIn, Identifier resourceLocationIn, BlockPos pos, Rotation rotation) {
-            super((StructurePieceType)ModStructures.SCP.get(), 0, templateManagerIn, resourceLocationIn, resourceLocationIn.toString(), Piece.makeSettings(rotation), Piece.makePosition(resourceLocationIn, pos));
+        public Piece(StructureTemplateManager templateManagerIn, Identifier resourceLocationIn, BlockPos pos, Rotation rotation, RegistryAccess registryAccess) {
+            super((StructurePieceType)ModStructures.SCP.get(), 0, templateManagerIn, resourceLocationIn, resourceLocationIn.toString(), Piece.makeSettings(rotation, registryAccess), Piece.makePosition(resourceLocationIn, pos));
         }
 
-        public Piece(StructureTemplateManager templateManagerIn, CompoundTag tagCompound) {
-            super((StructurePieceType)ModStructures.SCP.get(), tagCompound, templateManagerIn, p_162451_ -> Piece.makeSettings(Rotation.valueOf((String)tagCompound.getString("Rot"))));
+        public Piece(StructureTemplateManager templateManagerIn, CompoundTag tagCompound, RegistryAccess registryAccess) {
+            super((StructurePieceType)ModStructures.SCP.get(), tagCompound, templateManagerIn, p_162451_ -> Piece.makeSettings(Rotation.valueOf(tagCompound.getStringOr("Rot", "NONE")), registryAccess));
         }
 
         public Piece(StructurePieceSerializationContext context, CompoundTag tag) {
-            this(context.structureTemplateManager(), tag);
+            this(context.structureTemplateManager(), tag, context.registryAccess());
         }
 
-        private static StructurePlaceSettings makeSettings(Rotation p_163156_) {
+        private static StructurePlaceSettings makeSettings(Rotation p_163156_, RegistryAccess registryAccess) {
             BlockIgnoreProcessor blockignoreprocessor = BlockIgnoreProcessor.STRUCTURE_BLOCK;
-            StructurePlaceSettings structureplacesettings = new StructurePlaceSettings().setRotation(p_163156_).setMirror(Mirror.NONE).addProcessor((StructureProcessor)blockignoreprocessor).setLiquidSettings(LiquidSettings.IGNORE_WATERLOGGING).addProcessor((StructureProcessor)new ProtectedBlockProcessor(ModTag.SUNKEN_CITY_MATERIAL));
+            StructurePlaceSettings structureplacesettings = new StructurePlaceSettings().setRotation(p_163156_).setMirror(Mirror.NONE).addProcessor((StructureProcessor)blockignoreprocessor).setLiquidSettings(LiquidSettings.IGNORE_WATERLOGGING).addProcessor((StructureProcessor)new ProtectedBlockProcessor(registryAccess.getOrThrow(ModTag.SUNKEN_CITY_MATERIAL)));
             return structureplacesettings;
         }
 
@@ -284,27 +285,27 @@ extends Structure {
             ArrayList<Mob> list = new ArrayList<Mob>();
             switch (function) {
                 case "deepling_brute": {
-                    list.add((Mob)((EntityType)ModEntities.DEEPLING_BRUTE.get()).create((Level)worldIn.getLevel()));
+                    list.add((Mob)((EntityType)ModEntities.DEEPLING_BRUTE.get()).create((Level)worldIn.getLevel(), EntitySpawnReason.STRUCTURE));
                     break;
                 }
                 case "deepling_angler": {
-                    list.add((Mob)((EntityType)ModEntities.DEEPLING_ANGLER.get()).create((Level)worldIn.getLevel()));
+                    list.add((Mob)((EntityType)ModEntities.DEEPLING_ANGLER.get()).create((Level)worldIn.getLevel(), EntitySpawnReason.STRUCTURE));
                     break;
                 }
                 case "deepling": {
-                    list.add((Mob)((EntityType)ModEntities.DEEPLING.get()).create((Level)worldIn.getLevel()));
+                    list.add((Mob)((EntityType)ModEntities.DEEPLING.get()).create((Level)worldIn.getLevel(), EntitySpawnReason.STRUCTURE));
                     break;
                 }
                 case "sus": {
-                    list.add((Mob)((EntityType)ModEntities.CORALSSUS.get()).create((Level)worldIn.getLevel()));
+                    list.add((Mob)((EntityType)ModEntities.CORALSSUS.get()).create((Level)worldIn.getLevel(), EntitySpawnReason.STRUCTURE));
                     break;
                 }
                 case "deepling_priest": {
                     if (rand.nextBoolean()) {
-                        list.add((Mob)((EntityType)ModEntities.DEEPLING_PRIEST.get()).create((Level)worldIn.getLevel()));
+                        list.add((Mob)((EntityType)ModEntities.DEEPLING_PRIEST.get()).create((Level)worldIn.getLevel(), EntitySpawnReason.STRUCTURE));
                         break;
                     }
-                    list.add((Mob)((EntityType)ModEntities.DEEPLING_WARLOCK.get()).create((Level)worldIn.getLevel()));
+                    list.add((Mob)((EntityType)ModEntities.DEEPLING_WARLOCK.get()).create((Level)worldIn.getLevel(), EntitySpawnReason.STRUCTURE));
                     break;
                 }
                 default: {
@@ -313,8 +314,10 @@ extends Structure {
             }
             for (Mob mob : list) {
                 mob.setPersistenceRequired();
-                mob.moveTo(pos, 0.0f, 0.0f);
+                mob.setPos((double)pos.getX() + 0.5, (double)pos.getY(), (double)pos.getZ() + 0.5);
                 mob.finalizeSpawn(worldIn, worldIn.getCurrentDifficultyAt(mob.blockPosition()), EntitySpawnReason.STRUCTURE, null);
+                mob.setYRot(0.0f);
+                mob.setXRot(0.0f);
                 worldIn.addFreshEntityWithPassengers((Entity)mob);
                 worldIn.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
             }

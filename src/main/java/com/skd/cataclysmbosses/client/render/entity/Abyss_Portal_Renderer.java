@@ -19,8 +19,8 @@ import com.skd.cataclysmbosses.client.render.CMRenderTypes;
 import com.skd.cataclysmbosses.entity.AnimationMonster.BossMonsters.The_Leviathan.Abyss_Portal_Entity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.EntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmEntityRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
@@ -28,7 +28,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 
 public class Abyss_Portal_Renderer
-extends EntityRenderer<Abyss_Portal_Entity> {
+extends CmEntityRenderer<Abyss_Portal_Entity> {
     private static final Identifier TEXTURE_0 = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/leviathan/portal/abyss_portal_idle_0.png");
     private static final Identifier TEXTURE_1 = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/leviathan/portal/abyss_portal_idle_1.png");
     private static final Identifier TEXTURE_2 = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/leviathan/portal/abyss_portal_idle_2.png");
@@ -47,16 +47,15 @@ extends EntityRenderer<Abyss_Portal_Entity> {
         }
     }
 
-    public void render(Abyss_Portal_Entity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
+    protected void render(Abyss_Portal_Entity entityIn, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
         matrixStackIn.pushPose();
         matrixStackIn.translate(0.0f, 0.01f, 0.0f);
         matrixStackIn.scale(4.0f, 4.0f, 4.0f);
         this.renderPortal(entityIn, matrixStackIn, bufferIn, false);
         matrixStackIn.popPose();
-        super.render((Entity)entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
     }
 
-    private void renderPortal(Abyss_Portal_Entity entityIn, PoseStack matrixStackIn, MultiBufferSource bufferIn, boolean shattered) {
+    private void renderPortal(Abyss_Portal_Entity entityIn, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, boolean shattered) {
         Identifier tex = entityIn.getLifespan() < 20 ? this.getGrowingTexture((int)((float)entityIn.getLifespan() * 0.5f % 20.0f)) : (entityIn.tickCount < 20 ? this.getGrowingTexture((int)((float)entityIn.tickCount * 0.5f % 20.0f)) : this.getIdleTexture((int)((float)entityIn.tickCount * 0.35f % 3.0f)));
         VertexConsumer ivertexbuilder = bufferIn.getBuffer(CMRenderTypes.getfullBright(tex));
         this.renderArc(matrixStackIn, ivertexbuilder);

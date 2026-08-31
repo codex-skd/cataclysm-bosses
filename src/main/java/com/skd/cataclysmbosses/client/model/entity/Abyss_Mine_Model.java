@@ -37,7 +37,7 @@ extends AdvancedEntityModel<Entity> {
     }
 
     public Iterable<AdvancedModelBox> getAllParts() {
-        return ImmutableList.of((Object)this.root, (Object)this.glass, (Object)this.glass2);
+        return ImmutableList.of(this.root, this.glass, this.glass2);
     }
 
     public BasicModelPart root() {

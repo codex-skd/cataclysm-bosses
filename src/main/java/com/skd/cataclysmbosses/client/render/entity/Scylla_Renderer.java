@@ -46,7 +46,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.renderer.MultiBufferSource;
+import com.skd.cataclysmbosses.client.render.compat.CmMobRenderer;
+import com.skd.cataclysmbosses.client.render.compat.CmMultiBufferSource;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -57,7 +58,7 @@ import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -75,12 +76,12 @@ import net.neoforged.neoforge.common.NeoForge;
 
 @OnlyIn(value=Dist.CLIENT)
 public class Scylla_Renderer
-extends MobRenderer<Scylla_Entity, Scylla_Model> {
+extends CmMobRenderer<Scylla_Entity> {
     private static final Identifier SCYLLA_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/scylla/scylla_no_snake.png");
     private static final Identifier SCYLLA_EYE_TEXTURES = Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/scylla/scylla_eye.png");
 
     public Scylla_Renderer(EntityRendererProvider.Context renderManagerIn) {
-        super(renderManagerIn, (EntityModel)new Scylla_Model(renderManagerIn.bakeLayer(CMModelLayers.SCYLLA_MODEL)), 0.75f);
+        super(renderManagerIn, new Scylla_Model(renderManagerIn.bakeLayer(CMModelLayers.SCYLLA_MODEL)), 0.75f);
         this.addLayer(new Scylla_Snake_Layer(this));
         this.addLayer(new Scylla_Eye_Spark_Layer(this, renderManagerIn));
         this.addLayer(new LayerGenericGlowing(this, SCYLLA_EYE_TEXTURES));
@@ -90,102 +91,18 @@ extends MobRenderer<Scylla_Entity, Scylla_Model> {
         return SCYLLA_TEXTURES;
     }
 
-    public void render(Scylla_Entity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
-        Direction direction;
-        Entity entity;
-        boolean shouldSit;
-        if (((RenderLivingEvent.Pre)NeoForge.EVENT_BUS.post((Event)new RenderLivingEvent.Pre((LivingEntity)entityIn, (LivingEntityRenderer)this, partialTicks, matrixStackIn, bufferIn, packedLightIn))).isCanceled()) {
-            return;
-        }
-        matrixStackIn.pushPose();
-        ((Scylla_Model)this.model).attackTime = this.getAttackAnim((LivingEntity)entityIn, partialTicks);
-        ((Scylla_Model)this.model).riding = shouldSit = entityIn.isPassenger() && entityIn.getVehicle() != null && entityIn.getVehicle().shouldRiderSit();
-        ((Scylla_Model)this.model).young = entityIn.isBaby();
-        float f = Mth.rotLerp((float)partialTicks, (float)entityIn.yBodyRotO, (float)entityIn.yBodyRot);
-        float f1 = Mth.rotLerp((float)partialTicks, (float)entityIn.yHeadRotO, (float)entityIn.yHeadRot);
-        float f2 = f1 - f;
-        if (shouldSit && (entity = entityIn.getVehicle()) instanceof LivingEntity) {
-            LivingEntity livingentity = (LivingEntity)entity;
-            f = Mth.rotLerp((float)partialTicks, (float)livingentity.yBodyRotO, (float)livingentity.yBodyRot);
-            f2 = f1 - f;
-            float f7 = Mth.wrapDegrees((float)f2);
-            if (f7 < -85.0f) {
-                f7 = -85.0f;
-            }
-            if (f7 >= 85.0f) {
-                f7 = 85.0f;
-            }
-            f = f1 - f7;
-            if (f7 * f7 > 2500.0f) {
-                f += f7 * 0.2f;
-            }
-            f2 = f1 - f;
-        }
-        float f6 = Mth.lerp((float)partialTicks, (float)entityIn.xRotO, (float)entityIn.getXRot());
-        if (Scylla_Renderer.isEntityUpsideDown((LivingEntity)entityIn)) {
-            f6 *= -1.0f;
-            f2 *= -1.0f;
-        }
-        f2 = Mth.wrapDegrees((float)f2);
-        if (entityIn.hasPose(Pose.SLEEPING) && (direction = entityIn.getBedOrientation()) != null) {
-            float f3 = entityIn.getEyeHeight(Pose.STANDING) - 0.1f;
-            matrixStackIn.translate((float)(-direction.getStepX()) * f3, 0.0f, (float)(-direction.getStepZ()) * f3);
-        }
-        float f8 = entityIn.getScale();
-        matrixStackIn.scale(f8, f8, f8);
-        float f9 = this.getBob((LivingEntity)entityIn, partialTicks);
-        this.setupRotations((LivingEntity)entityIn, matrixStackIn, f9, f, partialTicks, f8);
-        matrixStackIn.scale(-1.0f, -1.0f, 1.0f);
-        this.scale(entityIn, matrixStackIn, partialTicks);
-        matrixStackIn.translate(0.0f, -1.501f, 0.0f);
-        float f4 = 0.0f;
-        float f5 = 0.0f;
-        if (!shouldSit && entityIn.isAlive()) {
-            f4 = entityIn.walkAnimation.speed(partialTicks);
-            f5 = entityIn.walkAnimation.position(partialTicks);
-            if (entityIn.isBaby()) {
-                f5 *= 3.0f;
-            }
-            if (f4 > 1.0f) {
-                f4 = 1.0f;
-            }
-        }
-        ((Scylla_Model)this.model).prepareMobModel((Entity)entityIn, f5, f4, partialTicks);
-        ((Scylla_Model)this.model).setupAnim(entityIn, f5, f4, f9, f2, f6);
-        Minecraft minecraft = Minecraft.getInstance();
-        boolean flag = entityIn.isDeadOrDying() ? false : this.isBodyVisible((LivingEntity)entityIn);
-        boolean flag1 = !flag && !entityIn.isInvisibleTo((Player)minecraft.player);
-        boolean flag2 = minecraft.shouldEntityAppearGlowing((Entity)entityIn);
-        RenderType rendertype = this.getRenderType((LivingEntity)entityIn, flag, flag1, flag2);
-        if (rendertype != null) {
-            int i;
-            VertexConsumer vertexconsumer = bufferIn.getBuffer(rendertype);
-            int n = i = entityIn.isDeadOrDying() ? OverlayTexture.NO_OVERLAY : Scylla_Renderer.getOverlayCoords((LivingEntity)entityIn, (float)this.getWhiteOverlayProgress((LivingEntity)entityIn, partialTicks));
-            int alpha = entityIn.getAttackState() != 12 ? 255 : (entityIn.attackTicks < 100 ? 255 : Math.max(35, 255 - (entityIn.deathTime - 100) * 255 / (entityIn.deathtimer() - 100)));
-            int i1 = FastColor.ARGB32.color((int)alpha, (int)255, (int)255, (int)255);
-            ((Scylla_Model)this.model).renderToBuffer(matrixStackIn, vertexconsumer, packedLightIn, i, flag1 ? i1 : -1);
-        }
-        if (!entityIn.isSpectator()) {
-            for (RenderLayer renderlayer : this.layers) {
-                renderlayer.render(matrixStackIn, bufferIn, packedLightIn, (Entity)entityIn, f5, f4, partialTicks, f9, f2, f6);
-            }
-        }
-        matrixStackIn.popPose();
-        this.renderetc(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);
-        NeoForge.EVENT_BUS.post((Event)new RenderLivingEvent.Post((LivingEntity)entityIn, (LivingEntityRenderer)this, partialTicks, matrixStackIn, bufferIn, packedLightIn));
-        this.shadowRadius = entityIn.getAct() ? 0.75f : 0.0f;
-    }
-
-    private void renderetc(Scylla_Entity p_entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
-        RenderNameTagEvent event = new RenderNameTagEvent((Entity)p_entity, p_entity.getDisplayName(), (EntityRenderer)this, poseStack, bufferSource, packedLight, partialTick);
-        NeoForge.EVENT_BUS.post((Event)event);
-        if (event.canRender().isTrue() || event.canRender().isDefault() && this.shouldShowName((Mob)p_entity)) {
-            this.renderNameTag((Entity)p_entity, event.getContent(), poseStack, bufferSource, packedLight, partialTick);
-        }
+    // PORT TODO(26.2): the full render body (model attackTime/riding/young setup, setupRotations,
+    // prepareMobModel/setupAnim, renderToBuffer with the ARGB death-fade alpha, the Scylla_Snake /
+    // Eye_Spark / glow layers, and the RenderLivingEvent.Pre/Post + RenderNameTagEvent firing) needs
+    // a real port to the 26.2 SubmitNodeCollector pipeline: NeoForge.EVENT_BUS.post now returns
+    // boolean, RenderLivingEvent/RenderNameTagEvent ctors take a LivingEntityRenderer +
+    // SubmitNodeCollector which the CmMultiBufferSource bridge does not expose. Stubbed to match the
+    // other boss renderers until the bridge grows a SubmitNodeCollector accessor.
+    protected void render(Scylla_Entity entityIn, float partialTicks, PoseStack matrixStackIn, CmMultiBufferSource bufferIn, int packedLightIn) {
     }
 
     public boolean shouldRender(Scylla_Entity livingentity, Frustum camera, double camX, double camY, double camZ) {
-        if (super.shouldRender((Entity)livingentity, camera, camX, camY, camZ)) {
+        if (super.shouldRender(livingentity, camera, camX, camY, camZ)) {
             return true;
         }
         Entity weapon = livingentity.getAnchor();

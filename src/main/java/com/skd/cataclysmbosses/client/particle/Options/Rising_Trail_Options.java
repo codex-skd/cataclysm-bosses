@@ -36,7 +36,7 @@ public record Rising_Trail_Options(float r, float g, float b, float width, float
         buf.writeFloat(option.width);
         buf.writeFloat(option.indewidth);
     }, buf -> new Rising_Trail_Options(buf.readFloat(), buf.readFloat(), buf.readFloat(), buf.readFloat(), buf.readFloat()));
-    public static MapCodec<Rising_Trail_Options> MAP_CODEC = RecordCodecBuilder.mapCodec(object -> object.group((App)Codec.FLOAT.fieldOf("r").forGetter(p -> Float.valueOf(p.r)), (App)Codec.FLOAT.fieldOf("g").forGetter(p -> Float.valueOf(p.g)), (App)Codec.FLOAT.fieldOf("b").forGetter(p -> Float.valueOf(p.b)), (App)Codec.FLOAT.fieldOf("width").forGetter(p -> Float.valueOf(p.width)), (App)Codec.FLOAT.fieldOf("indewidth").forGetter(p -> Float.valueOf(p.indewidth))).apply((Applicative)object, Rising_Trail_Options::new));
+    public static MapCodec<Rising_Trail_Options> MAP_CODEC = RecordCodecBuilder.mapCodec(object -> object.group(Codec.FLOAT.fieldOf("r").forGetter(p -> Float.valueOf(p.r)), Codec.FLOAT.fieldOf("g").forGetter(p -> Float.valueOf(p.g)), Codec.FLOAT.fieldOf("b").forGetter(p -> Float.valueOf(p.b)), Codec.FLOAT.fieldOf("width").forGetter(p -> Float.valueOf(p.width)), Codec.FLOAT.fieldOf("indewidth").forGetter(p -> Float.valueOf(p.indewidth))).apply(object, Rising_Trail_Options::new));
 
     @NotNull
     public ParticleType<Rising_Trail_Options> getType() {

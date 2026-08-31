@@ -45,7 +45,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -53,13 +53,14 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.ItemUseAnimation;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.common.ItemAbilities;
 import net.neoforged.neoforge.common.ItemAbility;
+import net.neoforged.neoforge.common.ItemAbilities;
 
 public class The_Incinerator
 extends Cataclysm_Weapon {
@@ -92,7 +93,7 @@ extends Cataclysm_Weapon {
                 }
                 if (hasSucceeded) {
                     if (!p_43395_.isClientSide()) {
-                        player.getCooldowns().addCooldown((Item)this, CMCommonConfig.Incinerator.cooldown);
+                        player.getCooldowns().addCooldown(this.getDefaultInstance(), CMCommonConfig.Incinerator.cooldown);
                     }
                     ScreenShake_Entity.ScreenShake(p_43395_, player.position(), 30.0f, 0.15f, 0, 30);
                     player.playSound((SoundEvent)ModSounds.SWORD_STOMP.get(), 1.0f, 1.0f);
@@ -109,15 +110,15 @@ extends Cataclysm_Weapon {
         }
     }
 
-    public InteractionResultHolder<ItemStack> use(Level p_77659_1_, Player p_77659_2_, InteractionHand p_77659_3_) {
+    public InteractionResult use(Level p_77659_1_, Player p_77659_2_, InteractionHand p_77659_3_) {
         ItemStack item = p_77659_2_.getItemInHand(p_77659_3_);
         InteractionHand otherhand = p_77659_3_ == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
         ItemStack otheritem = p_77659_2_.getItemInHand(otherhand);
-        if (otheritem.canPerformAction(ItemAbilities.SHIELD_BLOCK) && !p_77659_2_.getCooldowns().isOnCooldown(otheritem.getItem())) {
-            return InteractionResultHolder.fail((Object)item);
+        if (otheritem.has(net.minecraft.core.component.DataComponents.BLOCKS_ATTACKS) && !p_77659_2_.getCooldowns().isOnCooldown(otheritem)) {
+            return InteractionResult.FAIL;
         }
         p_77659_2_.startUsingItem(p_77659_3_);
-        return InteractionResultHolder.consume((Object)item);
+        return InteractionResult.CONSUME;
     }
 
     public boolean canDisableShield(ItemStack stack, ItemStack shield, LivingEntity entity, LivingEntity attacker) {
@@ -171,13 +172,13 @@ extends Cataclysm_Weapon {
     }
 
     public boolean canPerformAction(ItemStack stack, ItemAbility itemAbility) {
-        return ItemAbilities.DEFAULT_SWORD_ACTIONS.contains(itemAbility);
+        return false; // TODO 26.2: shield blocking is the DataComponents.BLOCKS_ATTACKS component on Item.Properties now, not this override
     }
 
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flags) {
-        tooltip.add((Component)Component.translatable((String)"item.cataclysm.incinerator.desc").withStyle(ChatFormatting.DARK_GREEN));
-        tooltip.add((Component)Component.translatable((String)"item.cataclysm.incinerator2.desc").withStyle(ChatFormatting.DARK_GREEN));
-        tooltip.add((Component)Component.translatable((String)"item.cataclysm.incinerator3.desc").withStyle(ChatFormatting.DARK_GREEN));
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, java.util.function.Consumer<Component> builder, TooltipFlag flags) {
+        builder.accept((Component)Component.translatable((String)"item.cataclysm.incinerator.desc").withStyle(ChatFormatting.DARK_GREEN));
+        builder.accept((Component)Component.translatable((String)"item.cataclysm.incinerator2.desc").withStyle(ChatFormatting.DARK_GREEN));
+        builder.accept((Component)Component.translatable((String)"item.cataclysm.incinerator3.desc").withStyle(ChatFormatting.DARK_GREEN));
     }
 }
 

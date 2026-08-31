@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "#": "cataclysm:lacrima",
+    "X": "cataclysm:essence_of_the_storm"
+  },
+  "pattern": [
+    "X#X",
+    " # ",
+    " # "
+  ],
+  "result": {
+    "id": "cataclysm:ceraunus"
+  }
+}

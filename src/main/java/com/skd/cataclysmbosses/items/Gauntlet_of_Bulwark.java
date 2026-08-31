@@ -44,7 +44,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -54,9 +54,11 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.ItemUseAnimation;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.common.ItemAbility;
 import net.neoforged.neoforge.common.ItemAbilities;
 
 public class Gauntlet_of_Bulwark
@@ -73,21 +75,21 @@ extends Cataclysm_Weapon {
         return 72000;
     }
 
-    public InteractionResultHolder<ItemStack> use(Level p_77659_1_, Player p_77659_2_, InteractionHand p_77659_3_) {
+    public InteractionResult use(Level p_77659_1_, Player p_77659_2_, InteractionHand p_77659_3_) {
         ItemStack item = p_77659_2_.getItemInHand(p_77659_3_);
         InteractionHand otherhand = p_77659_3_ == InteractionHand.MAIN_HAND ? InteractionHand.OFF_HAND : InteractionHand.MAIN_HAND;
         ItemStack otheritem = p_77659_2_.getItemInHand(otherhand);
-        if (otheritem.canPerformAction(ItemAbilities.SHIELD_BLOCK) && !p_77659_2_.getCooldowns().isOnCooldown(otheritem.getItem())) {
-            return InteractionResultHolder.fail((Object)item);
+        if (otheritem.has(net.minecraft.core.component.DataComponents.BLOCKS_ATTACKS) && !p_77659_2_.getCooldowns().isOnCooldown(otheritem)) {
+            return InteractionResult.FAIL;
         }
         p_77659_2_.startUsingItem(p_77659_3_);
-        return InteractionResultHolder.consume((Object)item);
+        return InteractionResult.CONSUME;
     }
 
     public void onUseTick(Level worldIn, LivingEntity livingEntityIn, ItemStack stack, int count) {
         double radius = 4.5;
         Level world = livingEntityIn.level();
-        List list = world.getEntities((Entity)livingEntityIn, livingEntityIn.getBoundingBox().inflate(radius));
+        List<Entity> list = world.getEntities((Entity)livingEntityIn, livingEntityIn.getBoundingBox().inflate(radius));
         int c = this.getUseDuration(stack, livingEntityIn) - count;
         if (c == 20) {
             livingEntityIn.playSound((SoundEvent)ModSounds.FLAME_BURST.get(), 1.0f, 1.0f);
@@ -140,7 +142,7 @@ extends Cataclysm_Weapon {
                 charge.setdx(f1 * 0.5f);
                 charge.setdZ(f3 * 0.5f);
                 if (!level.isClientSide()) {
-                    ((Player)entityLiving).getCooldowns().addCooldown((Item)this, CMCommonConfig.GauntletOfBulwark.cooldown);
+                    ((Player)entityLiving).getCooldowns().addCooldown(this.getDefaultInstance(), CMCommonConfig.GauntletOfBulwark.cooldown);
                 }
             }
         }
@@ -163,9 +165,9 @@ extends Cataclysm_Weapon {
         return !player.isCreative();
     }
 
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltips, TooltipFlag flags) {
-        tooltips.add((Component)Component.translatable((String)"item.cataclysm.gauntlet_of_bulwark.desc").withStyle(ChatFormatting.DARK_GREEN));
-        tooltips.add((Component)Component.translatable((String)"item.cataclysm.gauntlet_of_bulwark.desc2").withStyle(ChatFormatting.DARK_GREEN));
+    public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, java.util.function.Consumer<Component> builder, TooltipFlag flags) {
+        builder.accept((Component)Component.translatable((String)"item.cataclysm.gauntlet_of_bulwark.desc").withStyle(ChatFormatting.DARK_GREEN));
+        builder.accept((Component)Component.translatable((String)"item.cataclysm.gauntlet_of_bulwark.desc2").withStyle(ChatFormatting.DARK_GREEN));
     }
 }
 

@@ -9,7 +9,7 @@
  *  net.minecraft.core.Direction$Axis
  *  net.minecraft.world.item.context.BlockPlaceContext
  *  net.minecraft.world.level.BlockGetter
- *  net.minecraft.world.level.LevelAccessor
+ *  net.minecraft.world.level.LevelReader
  *  net.minecraft.world.level.LevelReader
  *  net.minecraft.world.level.block.Block
  *  net.minecraft.world.level.block.FaceAttachedHorizontalDirectionalBlock
@@ -33,10 +33,12 @@ import com.mojang.serialization.MapCodec;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.FaceAttachedHorizontalDirectionalBlock;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
@@ -71,7 +73,7 @@ implements SimpleWaterloggedBlock {
 
     public Mural_Block(BlockBehaviour.Properties properties) {
         super(properties);
-        this.registerDefaultState((BlockState)((BlockState)((BlockState)((BlockState)this.stateDefinition.any()).setValue((Property)FACING, (Comparable)Direction.NORTH)).setValue((Property)FACE, (Comparable)AttachFace.WALL)).setValue((Property)WATERLOGGED, (Comparable)Boolean.FALSE));
+        this.registerDefaultState((BlockState)((BlockState)((BlockState)((BlockState)this.stateDefinition.any().setValue(FACING, Direction.NORTH)).setValue(FACE, AttachFace.WALL)).setValue(WATERLOGGED, false)));
     }
 
     protected boolean canSurvive(BlockState state, LevelReader level, BlockPos pos) {
@@ -105,7 +107,7 @@ implements SimpleWaterloggedBlock {
     public BlockState getStateForPlacement(BlockPlaceContext context) {
         FluidState fluidstate = context.getLevel().getFluidState(context.getClickedPos());
         for (Direction direction : context.getNearestLookingDirections()) {
-            BlockState blockstate = direction.getAxis() == Direction.Axis.Y ? (BlockState)((BlockState)((BlockState)this.defaultBlockState().setValue((Property)FACE, (Comparable)(direction == Direction.UP ? AttachFace.CEILING : AttachFace.FLOOR))).setValue((Property)FACING, (Comparable)context.getHorizontalDirection())).setValue((Property)WATERLOGGED, (Comparable)Boolean.valueOf(fluidstate.getType() == Fluids.WATER)) : (BlockState)((BlockState)((BlockState)this.defaultBlockState().setValue((Property)FACE, (Comparable)AttachFace.WALL)).setValue((Property)FACING, (Comparable)direction.getOpposite())).setValue((Property)WATERLOGGED, (Comparable)Boolean.valueOf(fluidstate.getType() == Fluids.WATER));
+            BlockState blockstate = direction.getAxis() == Direction.Axis.Y ? (BlockState)((BlockState)((BlockState)this.defaultBlockState().setValue(FACE, direction == Direction.UP ? AttachFace.CEILING : AttachFace.FLOOR)).setValue(FACING, context.getHorizontalDirection())).setValue(WATERLOGGED, fluidstate.getType() == Fluids.WATER) : (BlockState)((BlockState)((BlockState)this.defaultBlockState().setValue(FACE, AttachFace.WALL)).setValue(FACING, direction.getOpposite())).setValue(WATERLOGGED, fluidstate.getType() == Fluids.WATER);
             if (!blockstate.canSurvive((LevelReader)context.getLevel(), context.getClickedPos())) continue;
             return blockstate;
         }
@@ -116,11 +118,11 @@ implements SimpleWaterloggedBlock {
         return (Boolean)p_51581_.getValue((Property)WATERLOGGED) != false ? Fluids.WATER.getSource(false) : super.getFluidState(p_51581_);
     }
 
-    public BlockState updateShape(BlockState p_51555_, Direction p_51556_, BlockState p_51557_, LevelAccessor p_51558_, BlockPos p_51559_, BlockPos p_51560_) {
+    protected BlockState updateShape(BlockState p_51555_, LevelReader p_51558_, ScheduledTickAccess ticks, BlockPos p_51559_, Direction p_51556_, BlockPos p_51560_, BlockState p_51557_, RandomSource random) {
         if (((Boolean)p_51555_.getValue((Property)WATERLOGGED)).booleanValue()) {
-            p_51558_.scheduleTick(p_51559_, (Fluid)Fluids.WATER, Fluids.WATER.getTickDelay((LevelReader)p_51558_));
+            ticks.scheduleTick(p_51559_, Fluids.WATER, Fluids.WATER.getTickDelay(p_51558_));
         }
-        return super.updateShape(p_51555_, p_51556_, p_51557_, p_51558_, p_51559_, p_51560_);
+        return super.updateShape(p_51555_, p_51558_, ticks, p_51559_, p_51556_, p_51560_, p_51557_, random);
     }
 
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
