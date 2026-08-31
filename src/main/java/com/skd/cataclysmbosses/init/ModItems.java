@@ -290,8 +290,8 @@ public class ModItems {
     public static final DeferredItem<Item> BLACK_STEEL_NUGGET = ITEMS.registerItem("black_steel_nugget", props -> new Item(props), () -> new Item.Properties());
     public static final DeferredItem<Item> LACRIMA = ITEMS.registerItem("lacrima", props -> new Item(props), () -> new Item.Properties().rarity(Rarity.UNCOMMON));
     public static final DeferredItem<Item> ESSENCE_OF_THE_STORM = ITEMS.registerItem("essence_of_the_storm", props -> new Item(props), () -> new Item.Properties().fireResistant().rarity(Rarity.EPIC));
-    public static final DeferredItem<Item> IGNITIUM_INGOT = ITEMS.registerItem("ignitium_ingot", props -> new Item(props), () -> new Item.Properties().fireResistant().rarity((Rarity)CMRarity.IGNITIUM_PROXY.getValue()));
-    public static final DeferredItem<Item> CURSIUM_INGOT = ITEMS.registerItem("cursium_ingot", props -> new Item(props), () -> new Item.Properties().fireResistant().rarity((Rarity)CMRarity.MALEDICTUS_PROXY.getValue()));
+    public static final DeferredItem<Item> IGNITIUM_INGOT = ITEMS.registerItem("ignitium_ingot", props -> new Item(props), () -> new Item.Properties().fireResistant().rarity(Rarity.EPIC /* PORT(26.2): custom pulsing rarity dropped (no enumextensions.json) */));
+    public static final DeferredItem<Item> CURSIUM_INGOT = ITEMS.registerItem("cursium_ingot", props -> new Item(props), () -> new Item.Properties().fireResistant().rarity(Rarity.EPIC /* PORT(26.2): custom pulsing rarity dropped */));
     public static final DeferredItem<Item> IGNITIUM_UPGARDE_SMITHING_TEMPLATE = ITEMS.registerItem("ignitium_upgrade_smithing_template", ModTemplate::createignitiumUpgradeTemplate, () -> new net.minecraft.world.item.Item.Properties().fireResistant());
     public static final DeferredItem<Item> CURSIUM_UPGARDE_SMITHING_TEMPLATE = ITEMS.registerItem("cursium_upgrade_smithing_template", ModTemplate::createcursiumUpgradeTemplate, () -> new net.minecraft.world.item.Item.Properties().fireResistant());
     public static final DeferredItem<Item> CHAIN_OF_SOUL_BINDING = ITEMS.registerItem("chain_of_soul_binding", props -> new ItemInventoryOnly(props), () -> new Item.Properties());
