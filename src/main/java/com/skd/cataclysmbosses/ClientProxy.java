@@ -122,6 +122,18 @@ extends ServerProxy {
         BLOCK_ENTITY_SOUND_INSTANCE_MAP.remove(entity);
     }
 
+    @Override
+    public void openMinistrosityInventory(com.skd.cataclysmbosses.message.MessageOpenInventory packet) {
+        net.minecraft.world.entity.Entity entity;
+        net.minecraft.client.player.LocalPlayer player = Minecraft.getInstance().player;
+        if (player != null && (entity = player.level().getEntity(packet.entityId())) instanceof com.skd.cataclysmbosses.entity.Pet.Netherite_Ministrosity_Entity guard) {
+            int i = guard.getInventoryColumns();
+            com.skd.cataclysmbosses.inventory.MinistrostiyMenu container = new com.skd.cataclysmbosses.inventory.MinistrostiyMenu(packet.id(), player.getInventory(), (net.minecraft.world.Container)guard.miniInventory, guard);
+            player.containerMenu = container;
+            Minecraft.getInstance().setScreenAndShow((net.minecraft.client.gui.screens.Screen)new com.skd.cataclysmbosses.client.gui.MinistrosityInventoryScreen(container, player.getInventory(), guard, i));
+        }
+    }
+
     public record BossBarData(int renderType, int remainLife) {
     }
 }

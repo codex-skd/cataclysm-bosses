@@ -19,21 +19,12 @@
  */
 package com.skd.cataclysmbosses.message;
 
-import com.skd.cataclysmbosses.client.gui.MinistrosityInventoryScreen;
-import com.skd.cataclysmbosses.entity.Pet.Netherite_Ministrosity_Entity;
-import com.skd.cataclysmbosses.inventory.MinistrostiyMenu;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public record MessageOpenInventory(int id, int size, int entityId) implements CustomPacketPayload
@@ -42,21 +33,7 @@ public record MessageOpenInventory(int id, int size, int entityId) implements Cu
     public static final StreamCodec<FriendlyByteBuf, MessageOpenInventory> STREAM_CODEC = StreamCodec.composite((StreamCodec)ByteBufCodecs.INT, MessageOpenInventory::id, (StreamCodec)ByteBufCodecs.INT, MessageOpenInventory::size, (StreamCodec)ByteBufCodecs.INT, MessageOpenInventory::entityId, MessageOpenInventory::new);
 
     public static void handle(MessageOpenInventory payload, IPayloadContext context) {
-        context.enqueueWork(() -> MessageOpenInventory.openGuardInventory(payload));
-    }
-
-    @OnlyIn(value=Dist.CLIENT)
-    public static void openGuardInventory(MessageOpenInventory packet) {
-        Entity entity;
-        LocalPlayer player = Minecraft.getInstance().player;
-        if (player != null && (entity = player.level().getEntity(packet.entityId())) instanceof Netherite_Ministrosity_Entity) {
-            Netherite_Ministrosity_Entity guard = (Netherite_Ministrosity_Entity)entity;
-            LocalPlayer clientplayerentity = Minecraft.getInstance().player;
-            int i = guard.getInventoryColumns();
-            MinistrostiyMenu container = new MinistrostiyMenu(packet.id(), player.getInventory(), (Container)guard.miniInventory, guard);
-            clientplayerentity.containerMenu = container;
-            Minecraft.getInstance().setScreenAndShow((Screen)new MinistrosityInventoryScreen(container, player.getInventory(), guard, i));
-        }
+        context.enqueueWork(() -> com.skd.cataclysmbosses.Cataclysm_Bosses.PROXY.openMinistrosityInventory(payload));
     }
 
     public CustomPacketPayload.Type<? extends CustomPacketPayload> type() {
