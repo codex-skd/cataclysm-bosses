@@ -52,18 +52,20 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 
 public class Ink_Mural_Block
 extends Mural_Block {
-    private static final List<Block> RANDOM_INK = Util.make(Lists.newArrayList(), list -> {
-        list.add(ModBlocks.AZURE_SEASTONE_MURAL_URCHINKIN.get());
-        list.add(ModBlocks.AZURE_SEASTONE_MURAL_CINDARIA.get());
-        list.add(ModBlocks.AZURE_SEASTONE_MURAL_HIPPOCAMTUS.get());
-        list.add(ModBlocks.AZURE_SEASTONE_MURAL_CLAWDIAN.get());
-        list.add(ModBlocks.AZURE_SEASTONE_MURAL_THUNDER.get());
-        list.add(ModBlocks.AZURE_SEASTONE_MURAL_SEA.get());
-        list.add(ModBlocks.AZURE_SEASTONE_MURAL_UNDERWORLD.get());
-        list.add(ModBlocks.AZURE_SEASTONE_MURAL_HARVEST.get());
-        list.add(ModBlocks.AZURE_SEASTONE_MURAL_WISDOM.get());
-        list.add(ModBlocks.AZURE_SEASTONE_MURAL_SMITHING.get());
-    });
+    // PORT(26.2): was Util.make(..., list -> list.add(ModBlocks.X.get())) — eager .get() in <clinit>
+    // crashed ("unbound value") because this class inits mid block-registration. Hold the deferred
+    // holders instead and resolve lazily at use (all use sites are currently commented out anyway).
+    private static final List<DeferredBlock<Block>> RANDOM_INK = List.of(
+        ModBlocks.AZURE_SEASTONE_MURAL_URCHINKIN,
+        ModBlocks.AZURE_SEASTONE_MURAL_CINDARIA,
+        ModBlocks.AZURE_SEASTONE_MURAL_HIPPOCAMTUS,
+        ModBlocks.AZURE_SEASTONE_MURAL_CLAWDIAN,
+        ModBlocks.AZURE_SEASTONE_MURAL_THUNDER,
+        ModBlocks.AZURE_SEASTONE_MURAL_SEA,
+        ModBlocks.AZURE_SEASTONE_MURAL_UNDERWORLD,
+        ModBlocks.AZURE_SEASTONE_MURAL_HARVEST,
+        ModBlocks.AZURE_SEASTONE_MURAL_WISDOM,
+        ModBlocks.AZURE_SEASTONE_MURAL_SMITHING);
 
     public Ink_Mural_Block(BlockBehaviour.Properties properties) {
         super(properties);

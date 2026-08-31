@@ -119,9 +119,10 @@ extends BaseEntityBlock {
 //         return ItemInteractionResult.FAIL;
 //     }
 
-//     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> p_48814_) {
-//         p_48814_.add(new Property[]{FACING, LIT, POWERED});
-//     }
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> p_48814_) {
+        p_48814_.add(FACING, LIT, POWERED);
+    }
 
 //     public VoxelShape getShape(BlockState p_48816_, BlockGetter p_48817_, BlockPos p_48818_, CollisionContext p_48819_) {
 //         Direction direction = (Direction)p_48816_.getValue((Property)FACING);
