@@ -20,8 +20,7 @@
     "accessor.StructureTemplatePoolAccessor"
   ],
   "client": [
-    "Client.HumanoidArmorLayerMixin",
-    "Client.HumanoidModelMixin"
+    "Client.HumanoidArmorLayerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
