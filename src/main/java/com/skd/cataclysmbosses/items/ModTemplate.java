@@ -54,8 +54,8 @@ extends Item {
     private final List<Identifier> baseSlotEmptyIcons;
     private final List<Identifier> additionalSlotEmptyIcons;
 
-    public ModTemplate(Component p_266834_, Component p_267043_, Component p_267048_, Component p_267278_, Component p_267090_, List<Identifier> p_266755_, List<Identifier> p_267060_) {
-        super(new Item.Properties().fireResistant());
+    public ModTemplate(Item.Properties props, Component p_266834_, Component p_267043_, Component p_267048_, Component p_267278_, Component p_267090_, List<Identifier> p_266755_, List<Identifier> p_267060_) {
+        super(props);
         this.appliesTo = p_266834_;
         this.ingredients = p_267043_;
         this.upgradeDescription = p_267048_;
@@ -65,12 +65,12 @@ extends Item {
         this.additionalSlotEmptyIcons = p_267060_;
     }
 
-    public static ModTemplate createignitiumUpgradeTemplate() {
-        return new ModTemplate(IGNITIUM_UPGRADE_APPLIES_TO, IGNITIUM_UPGRADE_INGREDIENTS, IGNITIUM_UPGRADE, IGNITIUM_UPGRADE_BASE_SLOT_DESCRIPTION, IGNITIUM_UPGRADE_ADDITIONS_SLOT_DESCRIPTION, ModTemplate.createignitiumUpgradeIconList(), ModTemplate.createignitiumUpgradeMaterialList());
+    public static ModTemplate createignitiumUpgradeTemplate(Item.Properties props) {
+        return new ModTemplate(props, IGNITIUM_UPGRADE_APPLIES_TO, IGNITIUM_UPGRADE_INGREDIENTS, IGNITIUM_UPGRADE, IGNITIUM_UPGRADE_BASE_SLOT_DESCRIPTION, IGNITIUM_UPGRADE_ADDITIONS_SLOT_DESCRIPTION, ModTemplate.createignitiumUpgradeIconList(), ModTemplate.createignitiumUpgradeMaterialList());
     }
 
-    public static ModTemplate createcursiumUpgradeTemplate() {
-        return new ModTemplate(CURSIUM_UPGRADE_APPLIES_TO, CURSIUM_UPGRADE_INGREDIENTS, CURSIUM_UPGRADE, IGNITIUM_UPGRADE_BASE_SLOT_DESCRIPTION, IGNITIUM_UPGRADE_ADDITIONS_SLOT_DESCRIPTION, ModTemplate.createignitiumUpgradeIconList(), ModTemplate.createignitiumUpgradeMaterialList());
+    public static ModTemplate createcursiumUpgradeTemplate(Item.Properties props) {
+        return new ModTemplate(props, CURSIUM_UPGRADE_APPLIES_TO, CURSIUM_UPGRADE_INGREDIENTS, CURSIUM_UPGRADE, IGNITIUM_UPGRADE_BASE_SLOT_DESCRIPTION, IGNITIUM_UPGRADE_ADDITIONS_SLOT_DESCRIPTION, ModTemplate.createignitiumUpgradeIconList(), ModTemplate.createignitiumUpgradeMaterialList());
     }
 
     private static List<Identifier> createignitiumUpgradeIconList() {

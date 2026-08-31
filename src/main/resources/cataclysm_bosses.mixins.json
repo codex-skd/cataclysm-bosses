@@ -15,16 +15,8 @@
     "NoMagmaBlockInStructuresMixin",
     "NoMultifaceGrowthFeatureInStructuresMixin",
     "NoOreInStructuresMixin",
-    "NoteBlockInstrumentMixin",
     "NoteBlockMixin",
-    "accessor.BeardifierAccessor",
     "accessor.BoundingBoxAccessor",
-    "accessor.FeaturePoolElementAccessor",
-    "accessor.ListPoolElementAccessor",
-    "accessor.LivingEntityRendererAccessor",
-    "accessor.SinglePoolElementAccessor",
-    "accessor.StructureManagerAccessor",
-    "accessor.StructureProcessorAccessor",
     "accessor.StructureTemplatePoolAccessor"
   ],
   "client": [
