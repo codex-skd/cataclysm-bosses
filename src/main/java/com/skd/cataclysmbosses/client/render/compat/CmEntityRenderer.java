@@ -1,9 +1,11 @@
 package com.skd.cataclysmbosses.client.render.compat;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.world.entity.Entity;
 
@@ -15,9 +17,19 @@ import net.minecraft.world.entity.Entity;
  * replayed as ordered submitCustomGeometry calls.
  */
 public abstract class CmEntityRenderer<T extends Entity>
-extends EntityRenderer<T, CmEntityRenderState> {
+extends EntityRenderer<T, CmEntityRenderState>
+implements RenderLayerParent<CmEntityRenderState, EntityModel<CmEntityRenderState>> {
+    // PORT NOTE (26.2): implemented only so the many `(RenderLayerParent) this` casts in the legacy
+    // boss renderers succeed. The compat layers are all no-op stubs and never read the model.
+    protected EntityModel<CmEntityRenderState> model;
+
     protected CmEntityRenderer(EntityRendererProvider.Context context) {
         super(context);
+    }
+
+    @Override
+    public EntityModel<CmEntityRenderState> getModel() {
+        return this.model;
     }
 
     @Override
