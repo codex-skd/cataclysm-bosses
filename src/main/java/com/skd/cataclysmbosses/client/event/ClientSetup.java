@@ -217,7 +217,7 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
-import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
+// import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 
 public class ClientSetup {
     public static void ClientSetupevent(IEventBus bus) {
@@ -421,18 +421,22 @@ public class ClientSetup {
     }
 
     private static void doClientStuff(FMLClientSetupEvent event) {
-        CuriosRendererRegistry.register((Item)((Item)ModItems.STICKY_GLOVES.get()), Sticky_Gloves_Renderer::new);
-        CuriosRendererRegistry.register((Item)((Item)ModItems.BLAZING_GRIPS.get()), Blazing_Grips_Renderer::new);
-        CuriosRendererRegistry.register((Item)((Item)ModItems.KOBOLEDIATOR_SKULL.get()), CurioHeadRenderer::new);
-        CuriosRendererRegistry.register((Item)((Item)ModItems.APTRGANGR_HEAD.get()), CurioHeadRenderer::new);
-        CuriosRendererRegistry.register((Item)((Item)ModItems.DRAUGR_HEAD.get()), CurioHeadRenderer::new);
-        CuriosRendererRegistry.register((Item)((Item)ModItems.CHITIN_CLAW.get()), Chitin_Claw_Renderer::new);
-        CuriosRendererRegistry.register((Item)((Item)ModItems.VITALITY_ANKH.get()), Vitality_Ankh_Renderer::new);
-        CuriosRendererRegistry.register((Item)((Item)ModItems.BELT_OF_BEGINNER.get()), Belt_Of_Beginner_Renderer::new);
-        CuriosRendererRegistry.register((Item)((Item)ModItems.BELT_OF_MONSTROSITY.get()), Belt_Of_Monstrosity_Renderer::new);
-        CuriosRendererRegistry.register((Item)((Item)ModItems.UNBREAKABLE_SKULL.get()), Unbreakable_Skull_Renderer::new);
-        CuriosRendererRegistry.register((Item)((Item)ModItems.BERSERKER_SOUL_AMULET.get()), Berserker_Soul_Amulet_Renderer::new);
-        CuriosRendererRegistry.register((Item)((Item)ModItems.STURDY_BOOTS.get()), Sturdy_Boots_Renderer::new);
+        // PORT TODO(26.2): CuriosRendererRegistry (the top.theillusivec4 shim) routes to a
+        // client service ICuriosClientExtensions that regalia_slots_api does not ship a binding
+        // for -> NoClassDefFoundError at FMLClientSetupEvent. Accessory-on-player rendering
+        // is disabled until wired to regalia native com.skd.regaliaslotsapi.api.client.ICurioRenderer.
+        // CuriosRendererRegistry.register((Item)((Item)ModItems.STICKY_GLOVES.get()), Sticky_Gloves_Renderer::new);
+        // CuriosRendererRegistry.register((Item)((Item)ModItems.BLAZING_GRIPS.get()), Blazing_Grips_Renderer::new);
+        // CuriosRendererRegistry.register((Item)((Item)ModItems.KOBOLEDIATOR_SKULL.get()), CurioHeadRenderer::new);
+        // CuriosRendererRegistry.register((Item)((Item)ModItems.APTRGANGR_HEAD.get()), CurioHeadRenderer::new);
+        // CuriosRendererRegistry.register((Item)((Item)ModItems.DRAUGR_HEAD.get()), CurioHeadRenderer::new);
+        // CuriosRendererRegistry.register((Item)((Item)ModItems.CHITIN_CLAW.get()), Chitin_Claw_Renderer::new);
+        // CuriosRendererRegistry.register((Item)((Item)ModItems.VITALITY_ANKH.get()), Vitality_Ankh_Renderer::new);
+        // CuriosRendererRegistry.register((Item)((Item)ModItems.BELT_OF_BEGINNER.get()), Belt_Of_Beginner_Renderer::new);
+        // CuriosRendererRegistry.register((Item)((Item)ModItems.BELT_OF_MONSTROSITY.get()), Belt_Of_Monstrosity_Renderer::new);
+        // CuriosRendererRegistry.register((Item)((Item)ModItems.UNBREAKABLE_SKULL.get()), Unbreakable_Skull_Renderer::new);
+        // CuriosRendererRegistry.register((Item)((Item)ModItems.BERSERKER_SOUL_AMULET.get()), Berserker_Soul_Amulet_Renderer::new);
+        // CuriosRendererRegistry.register((Item)((Item)ModItems.STURDY_BOOTS.get()), Sturdy_Boots_Renderer::new);
         SkullBlockRenderer.SKIN_BY_TYPE.put(Cataclysm_Skull_Block.Types.KOBOLEDIATOR, Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/koboleton/kobolediator.png"));
         SkullBlockRenderer.SKIN_BY_TYPE.put(Cataclysm_Skull_Block.Types.APTRGANGR, Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/draugar/aptrgangr.png"));
         SkullBlockRenderer.SKIN_BY_TYPE.put(Cataclysm_Skull_Block.Types.DRAUGR, Identifier.fromNamespaceAndPath((String)"cataclysm", (String)"textures/entity/draugar/draugr.png"));
