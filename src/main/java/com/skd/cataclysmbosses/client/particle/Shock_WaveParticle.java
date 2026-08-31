@@ -86,7 +86,7 @@ extends SingleQuadParticle {
     }
 
     public static class Factory
-    implements ParticleProvider.Sprite<SimpleParticleType> {
+    implements ParticleProvider<SimpleParticleType> { // PORT(26.2): was .Sprite; registerSpecial needs a plain ParticleProvider
         public SingleQuadParticle createParticle(SimpleParticleType typeIn, ClientLevel worldIn, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed, RandomSource random) {
             return new Shock_WaveParticle(worldIn, x, y, z, xSpeed, ySpeed, zSpeed);
         }
