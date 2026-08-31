@@ -64,7 +64,7 @@ extends CmMobRenderer<The_Harbinger_Entity> {
         this.addLayer(new The_Harbinger_Layer(this));
         this.addLayer(new The_Harbinger_Jet_Layer(this, renderManagerIn));
         this.addLayer(new The_Harbinger_Shield_Layer(this));
-        this.addLayer(new The_Harbinger_Item_Layer(this, this.model.nether_star, Items.NETHER_STAR.getDefaultInstance(), ItemDisplayContext.GROUND));
+        this.addLayer(new The_Harbinger_Item_Layer(this) /* PORT(26.2): stub layer; args (nether_star bone, NETHER_STAR stack) dropped - getDefaultInstance() NPEs during renderer ctor */);
     }
 
     private final The_Harbinger_Model model;

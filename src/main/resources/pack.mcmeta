@@ -2,9 +2,7 @@
     "pack": {
         "description": "Cataclysm Bosses resources",
         "pack_format": 84,
-        "supported_formats": {
-            "min_inclusive": 34,
-            "max_inclusive": 999
-        }
+        "min_format": 34,
+        "max_format": 9999
     }
 }
