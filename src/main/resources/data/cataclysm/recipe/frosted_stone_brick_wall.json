@@ -1,16 +1,14 @@
 {
-    "type": "minecraft:crafting_shaped",
-    "pattern": [
-        "###",
-        "###"
-    ],
-    "key": {
-        "#": {
-            "item": "cataclysm:frosted_stone_bricks"
-        }
-    },
-    "result": {
-        "id": "cataclysm:frosted_stone_brick_wall",
-        "count": 6
-    }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": "cataclysm:frosted_stone_bricks"
+  },
+  "result": {
+    "id": "cataclysm:frosted_stone_brick_wall",
+    "count": 6
+  }
 }

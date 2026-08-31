@@ -1,29 +1,19 @@
 {
-    "type": "minecraft:crafting_shaped",
-    "pattern": [
-        "#S#",
-        "EVE",
-        "PSP"
-    ],
-    "key": {
-        "#": {
-            "item": "minecraft:purpur_pillar"
-        },
-        "S": {
-            "item": "minecraft:shulker_shell"
-        },
-        "E": {
-            "item": "minecraft:end_stone_bricks"
-        },
-        "V": {
-            "item": "minecraft:ender_eye"
-        },
-        "P": {
-            "item": "minecraft:purpur_block"
-        }
-    },
-    "result": {
-        "id": "cataclysm:void_eye",
-        "count": 1
-    }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "#S#",
+    "EVE",
+    "PSP"
+  ],
+  "key": {
+    "#": "minecraft:purpur_pillar",
+    "S": "minecraft:shulker_shell",
+    "E": "minecraft:end_stone_bricks",
+    "V": "minecraft:ender_eye",
+    "P": "minecraft:purpur_block"
+  },
+  "result": {
+    "id": "cataclysm:void_eye",
+    "count": 1
+  }
 }

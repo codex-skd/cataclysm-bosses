@@ -1,15 +1,11 @@
 {
-    "type": "minecraft:stonecutting",
-    "ingredient": [
-        {
-            "item": "minecraft:end_stone"
-        },
-        {
-            "item": "cataclysm:polished_end_stone"
-        }
-    ],
-    "result": {
-        "count": 1,
-        "id": "cataclysm:polished_end_stone_stairs"
-    }
+  "type": "minecraft:stonecutting",
+  "ingredient": [
+    "minecraft:end_stone",
+    "cataclysm:polished_end_stone"
+  ],
+  "result": {
+    "count": 1,
+    "id": "cataclysm:polished_end_stone_stairs"
+  }
 }

@@ -1,12 +1,8 @@
 {
   "type": "minecraft:crafting_shaped",
   "key": {
-    "#": {
-      "item": "minecraft:stone_bricks"
-    },
-    "E": {
-      "item": "minecraft:snow_block"
-    }
+    "#": "minecraft:stone_bricks",
+    "E": "minecraft:snow_block"
   },
   "pattern": [
     "###",

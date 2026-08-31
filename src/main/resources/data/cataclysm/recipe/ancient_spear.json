@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "key": {
-    "R": {
-      "item": "cataclysm:ancient_metal_ingot"
-    }
+    "R": "cataclysm:ancient_metal_ingot"
   },
   "pattern": [
     " R ",

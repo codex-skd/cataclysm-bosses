@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "key": {
-    "X": {
-      "item": "cataclysm:amethyst_crab_shell"
-    }
+    "X": "cataclysm:amethyst_crab_shell"
   },
   "pattern": [
     "X X",

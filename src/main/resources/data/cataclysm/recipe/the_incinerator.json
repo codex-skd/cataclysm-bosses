@@ -1,23 +1,17 @@
 {
-    "type": "minecraft:crafting_shaped",
-    "pattern": [
-        " /#",
-        "/#/",
-        "N/ "
-    ],
-    "key": {
-        "/": {
-            "item": "minecraft:blaze_rod"
-        },
-        "#": {
-            "item": "cataclysm:ignitium_ingot"
-        },
-        "N": {
-            "item": "minecraft:netherite_sword"
-        }
-    },
-    "result": {
-        "id": "cataclysm:the_incinerator",
-        "count": 1
-    }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " /#",
+    "/#/",
+    "N/ "
+  ],
+  "key": {
+    "/": "minecraft:blaze_rod",
+    "#": "cataclysm:ignitium_ingot",
+    "N": "minecraft:netherite_sword"
+  },
+  "result": {
+    "id": "cataclysm:the_incinerator",
+    "count": 1
+  }
 }

@@ -1,20 +1,16 @@
 {
-    "type": "minecraft:crafting_shaped",
-    "group": "wooden_fence",
-    "pattern": [
-        "W#W",
-        "W#W"
-    ],
-    "key": {
-        "#": {
-            "item": "cataclysm:black_steel_ingot"
-        },
-        "W": {
-            "item": "cataclysm:black_steel_block"
-        }
-    },
-    "result": {
-        "id": "cataclysm:black_steel_fence",
-        "count": 6
-    }
+  "type": "minecraft:crafting_shaped",
+  "group": "wooden_fence",
+  "pattern": [
+    "W#W",
+    "W#W"
+  ],
+  "key": {
+    "#": "cataclysm:black_steel_ingot",
+    "W": "cataclysm:black_steel_block"
+  },
+  "result": {
+    "id": "cataclysm:black_steel_fence",
+    "count": 6
+  }
 }

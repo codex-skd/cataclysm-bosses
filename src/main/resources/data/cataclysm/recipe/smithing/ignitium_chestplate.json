@@ -1,15 +1,9 @@
 {
-    "type": "minecraft:smithing_transform",
-    "addition": {
-        "item": "cataclysm:ignitium_ingot"
-    },
-    "base": {
-        "item": "minecraft:netherite_chestplate"
-    },
-    "result": {
-        "id": "cataclysm:ignitium_chestplate"
-    },
-    "template": {
-        "item": "cataclysm:ignitium_upgrade_smithing_template"
-    }
+  "type": "minecraft:smithing_transform",
+  "addition": "cataclysm:ignitium_ingot",
+  "base": "minecraft:netherite_chestplate",
+  "result": {
+    "id": "cataclysm:ignitium_chestplate"
+  },
+  "template": "cataclysm:ignitium_upgrade_smithing_template"
 }

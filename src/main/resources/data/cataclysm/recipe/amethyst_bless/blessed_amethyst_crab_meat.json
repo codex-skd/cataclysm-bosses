@@ -1,8 +1,6 @@
 {
   "type": "cataclysm:amethyst_bless",
-  "ingredient": {
-    "item": "cataclysm:amethyst_crab_meat"
-  },
+  "ingredient": "cataclysm:amethyst_crab_meat",
   "result": {
     "id": "cataclysm:blessed_amethyst_crab_meat"
   },

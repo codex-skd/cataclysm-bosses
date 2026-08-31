@@ -1,16 +1,14 @@
 {
-    "type": "minecraft:crafting_shaped",
-    "pattern": [
-        "##",
-        "##"
-    ],
-    "key": {
-        "#": {
-            "item": "minecraft:purpur_block"
-        }
-    },
-    "result": {
-        "id": "cataclysm:purpur_tiles",
-        "count": 4
-    }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "##",
+    "##"
+  ],
+  "key": {
+    "#": "minecraft:purpur_block"
+  },
+  "result": {
+    "id": "cataclysm:purpur_tiles",
+    "count": 4
+  }
 }

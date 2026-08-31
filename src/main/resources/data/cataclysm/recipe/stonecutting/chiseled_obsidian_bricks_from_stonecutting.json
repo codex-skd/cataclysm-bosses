@@ -1,15 +1,11 @@
 {
-    "type": "minecraft:stonecutting",
-    "ingredient": [
-        {
-            "item": "minecraft:obsidian"
-        },
-        {
-            "item": "cataclysm:obsidian_bricks"
-        }
-    ],
-    "result": {
-        "count": 1,
-        "id": "cataclysm:chiseled_obsidian_bricks"
-    }
+  "type": "minecraft:stonecutting",
+  "ingredient": [
+    "minecraft:obsidian",
+    "cataclysm:obsidian_bricks"
+  ],
+  "result": {
+    "count": 1,
+    "id": "cataclysm:chiseled_obsidian_bricks"
+  }
 }

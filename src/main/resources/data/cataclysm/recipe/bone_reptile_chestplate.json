@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "key": {
-    "R": {
-      "item": "cataclysm:ancient_metal_ingot"
-    },
-    "n": {
-      "item": "cataclysm:koboleton_bone"
-    }
+    "R": "cataclysm:ancient_metal_ingot",
+    "n": "cataclysm:koboleton_bone"
   },
   "pattern": [
     "R R",

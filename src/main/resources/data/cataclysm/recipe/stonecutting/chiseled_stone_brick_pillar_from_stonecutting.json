@@ -2,17 +2,10 @@
   "type": "minecraft:stonecutting",
   "count": 1,
   "ingredient": [
-    {
-      "item": "minecraft:stone_bricks"
-    },
-    {
-      "item": "minecraft:stone"
-    },
-    {
-      "item": "minecraft:chiseled_stone_bricks"
-    }
+    "minecraft:stone_bricks",
+    "minecraft:stone",
+    "minecraft:chiseled_stone_bricks"
   ],
-
   "result": {
     "count": 1,
     "id": "cataclysm:chiseled_stone_brick_pillar"

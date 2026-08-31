@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "key": {
-    "#": {
-      "item": "cataclysm:black_steel_ingot"
-    },
-    "X": {
-      "item": "cataclysm:cursium_ingot"
-    },
-    "S": {
-      "item": "minecraft:string"
-    }
+    "#": "cataclysm:black_steel_ingot",
+    "X": "cataclysm:cursium_ingot",
+    "S": "minecraft:string"
   },
   "pattern": [
     " XS",

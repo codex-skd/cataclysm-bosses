@@ -1,12 +1,8 @@
 {
   "type": "minecraft:crafting_shaped",
   "key": {
-    "#": {
-      "item": "cataclysm:purpur_tiles"
-    },
-    "E": {
-      "item": "cataclysm:void_stone"
-    }
+    "#": "cataclysm:purpur_tiles",
+    "E": "cataclysm:void_stone"
   },
   "pattern": [
     "###",

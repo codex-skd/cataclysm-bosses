@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shapeless",
   "category": "misc",
   "ingredients": [
-    {
-      "item": "cataclysm:ancient_metal_block"
-    }
+    "cataclysm:ancient_metal_block"
   ],
   "result": {
     "count": 9,

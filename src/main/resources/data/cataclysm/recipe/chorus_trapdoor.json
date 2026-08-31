@@ -2,9 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "group": "wooden_trapdoor",
   "key": {
-    "#": {
-      "item": "cataclysm:chorus_planks"
-    }
+    "#": "cataclysm:chorus_planks"
   },
   "pattern": [
     "###",

@@ -1,9 +1,7 @@
 {
   "type": "minecraft:crafting_shaped",
   "key": {
-    "S": {
-      "item": "minecraft:stone_bricks"
-    }
+    "S": "minecraft:stone_bricks"
   },
   "pattern": [
     "SS",

@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "key": {
-    "i": {
-      "item": "cataclysm:kobolediator_skull"
-    },
-    "R": {
-      "item": "cataclysm:ancient_metal_ingot"
-    },
-    "n": {
-      "item": "cataclysm:koboleton_bone"
-    }
+    "i": "cataclysm:kobolediator_skull",
+    "R": "cataclysm:ancient_metal_ingot",
+    "n": "cataclysm:koboleton_bone"
   },
   "pattern": [
     "R R",

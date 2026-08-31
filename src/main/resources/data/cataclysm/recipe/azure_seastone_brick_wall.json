@@ -1,16 +1,14 @@
 {
-    "type": "minecraft:crafting_shaped",
-    "pattern": [
-        "###",
-        "###"
-    ],
-    "key": {
-        "#": {
-            "item": "cataclysm:azure_seastone_bricks"
-        }
-    },
-    "result": {
-        "id": "cataclysm:azure_seastone_brick_wall",
-        "count": 6
-    }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": "cataclysm:azure_seastone_bricks"
+  },
+  "result": {
+    "id": "cataclysm:azure_seastone_brick_wall",
+    "count": 6
+  }
 }

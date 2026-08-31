@@ -2,15 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "key": {
-    "#": {
-      "item": "minecraft:gold_nugget"
-    },
-    "X": {
-      "item": "minecraft:gold_ingot"
-    },
-    "Z": {
-      "item": "cataclysm:lacrima"
-    }
+    "#": "minecraft:gold_nugget",
+    "X": "minecraft:gold_ingot",
+    "Z": "cataclysm:lacrima"
   },
   "pattern": [
     "#Z#",

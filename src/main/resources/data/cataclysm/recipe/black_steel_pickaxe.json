@@ -2,12 +2,8 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "key": {
-    "#": {
-      "item": "minecraft:stick"
-    },
-    "X": {
-      "item": "cataclysm:black_steel_ingot"
-    }
+    "#": "minecraft:stick",
+    "X": "cataclysm:black_steel_ingot"
   },
   "pattern": [
     "XXX",

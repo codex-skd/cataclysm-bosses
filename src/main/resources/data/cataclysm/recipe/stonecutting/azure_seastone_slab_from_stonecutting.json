@@ -1,12 +1,10 @@
 {
-    "type": "minecraft:stonecutting",
-    "ingredient": [
-        {
-            "item": "cataclysm:azure_seastone"
-        }
-    ],
-    "result": {
-        "count": 2,
-        "id": "cataclysm:azure_seastone_slab"
-    }
+  "type": "minecraft:stonecutting",
+  "ingredient": [
+    "cataclysm:azure_seastone"
+  ],
+  "result": {
+    "count": 2,
+    "id": "cataclysm:azure_seastone_slab"
+  }
 }

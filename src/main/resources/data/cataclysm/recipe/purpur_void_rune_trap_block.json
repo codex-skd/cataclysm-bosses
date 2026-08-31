@@ -1,20 +1,16 @@
 {
-    "type": "minecraft:crafting_shaped",
-    "pattern": [
-        "###",
-        "#C#",
-        "###"
-    ],
-    "key": {
-        "#": {
-            "item": "minecraft:purpur_block"
-        },
-        "C": {
-            "item": "cataclysm:void_stone"
-        }
-    },
-    "result": {
-        "id": "cataclysm:purpur_void_rune_trap_block",
-        "count": 8
-    }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###",
+    "#C#",
+    "###"
+  ],
+  "key": {
+    "#": "minecraft:purpur_block",
+    "C": "cataclysm:void_stone"
+  },
+  "result": {
+    "id": "cataclysm:purpur_void_rune_trap_block",
+    "count": 8
+  }
 }

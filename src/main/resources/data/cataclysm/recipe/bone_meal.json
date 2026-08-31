@@ -3,9 +3,7 @@
   "category": "misc",
   "group": "bonemeal",
   "ingredients": [
-    {
-      "item": "cataclysm:koboleton_bone"
-    }
+    "cataclysm:koboleton_bone"
   ],
   "result": {
     "count": 4,

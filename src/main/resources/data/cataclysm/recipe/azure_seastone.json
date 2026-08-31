@@ -1,12 +1,8 @@
 {
   "type": "minecraft:crafting_shaped",
   "key": {
-    "#": {
-      "item": "minecraft:stone"
-    },
-    "E": {
-      "item": "cataclysm:lacrima"
-    }
+    "#": "minecraft:stone",
+    "E": "cataclysm:lacrima"
   },
   "pattern": [
     "###",

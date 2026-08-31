@@ -1,17 +1,15 @@
 {
-    "type": "minecraft:crafting_shaped",
-    "pattern": [
-        "###",
-        "###",
-        "###"
-    ],
-    "key": {
-        "#": {
-            "item": "cataclysm:witherite_ingot"
-        }
-    },
-    "result": {
-        "id": "cataclysm:witherite_block",
-        "count": 1
-    }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": "cataclysm:witherite_ingot"
+  },
+  "result": {
+    "id": "cataclysm:witherite_block",
+    "count": 1
+  }
 }

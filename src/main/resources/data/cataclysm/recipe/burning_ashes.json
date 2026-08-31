@@ -1,16 +1,14 @@
 {
-    "type": "minecraft:crafting_shaped",
-    "pattern": [
-        "##",
-        "##"
-    ],
-    "key": {
-        "#": {
-            "item": "cataclysm:dying_ember"
-        }
-    },
-    "result": {
-        "id": "cataclysm:burning_ashes",
-        "count": 1
-    }
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "##",
+    "##"
+  ],
+  "key": {
+    "#": "cataclysm:dying_ember"
+  },
+  "result": {
+    "id": "cataclysm:burning_ashes",
+    "count": 1
+  }
 }

@@ -1,15 +1,11 @@
 {
-    "type": "minecraft:stonecutting",
-    "ingredient": [
-        {
-            "item": "minecraft:obsidian"
-        },
-        {
-            "item": "cataclysm:polished_obsidian"
-        }
-    ],
-    "result": {
-        "count": 2,
-        "id": "cataclysm:polished_obsidian_slab"
-    }
+  "type": "minecraft:stonecutting",
+  "ingredient": [
+    "minecraft:obsidian",
+    "cataclysm:polished_obsidian"
+  ],
+  "result": {
+    "count": 2,
+    "id": "cataclysm:polished_obsidian_slab"
+  }
 }
