@@ -1,23 +1,19 @@
 # CurseForge — Variables del proyecto
 
-> ⚠️ **PROYECTO CERRADO POR CURSEFORGE (2026-08-15)**: subimos versiones esqueleto sin
-> contenido real y CurseForge cerró el proyecto. `project_id=1652963` **ya no es válido** —
-> no usar `curseforge-upload.ps1` ni ningún dato de este archivo hasta que el usuario indique
-> lo contrario. **No recrear el proyecto ni subir nada a CurseForge hasta tener una versión
-> genuinamente estable** (con contenido real portado de Cataclysm, no solo scaffolding).
-> Dado que The Sundering depende de NautilusAPI (también cerrado, ver su propio
-> `project_vars.md`), esto probablemente no ocurra hasta bastante avanzada la Fase 1. Cuando
-> llegue ese momento, crear un proyecto nuevo desde cero siguiendo el formulario manual
-> documentado más abajo — los datos de Name/Summary/Description/License siguen siendo
-> válidos como referencia.
+> El proyecto anterior (`the_sundering` / `project_id=1652963`) fue **cerrado por CurseForge**
+> (2026-08-15) por subir versiones esqueleto sin contenido real. Se creó un **proyecto nuevo**
+> tras renombrar el mod a **Cataclysm Bosses** — ver `project_id` abajo. El versionado se
+> reinició en `0.0.0-alpha.1` para marcar que el port compila y arranca pero **aún no está
+> verificado como jugable**; las release notes lo dejan claro.
 
 ## Proyecto
 
 | Variable | Valor |
 |----------|-------|
-| `curseforge_project_id` | ~~`1652963`~~ **INVÁLIDO — proyecto cerrado, ver aviso arriba** |
-| `mod_id` | `the_sundering` |
-| `display_name` | `The Sundering` |
+| `curseforge_project_id` | `1664413` |
+| ~~antiguo~~ | ~~`1652963` (proyecto cerrado, `the_sundering`)~~ |
+| `mod_id` | `cataclysm_bosses` |
+| `display_name` | `Cataclysm Bosses` |
 
 ## Tokens
 
@@ -29,55 +25,55 @@
 Autenticación Upload: cabecera `X-Api-Token`
 Autenticación Core: cabecera `x-api-key`
 
-> Token de cuenta (mismo para todos los mods, reutilizado desde `vellumli/docs/curseforge/project_vars.md`). No hace falta generar uno nuevo.
+> Token de cuenta (mismo para todos los mods de este conglomerado). No hace falta generar uno nuevo.
 
 ## Variables para script (lectura automática)
 
 ```
-project_id = 1652963
+project_id = 1664413
 api_token = ee776b0a-ee95-4850-b554-06be02a8657f
-release_type = beta
+release_type = alpha
 game_versions = 9638, 9639, 16498, 10150
-relations =                   # dependencias (NautilusAPI, Curios) no cableadas aun -- sin relations hasta que existan como jars/proyectos referenciables
+relations =                   # NautilusAPI / regalia_slots_api aun sin proyecto CF referenciable -- sin relations
 ```
+
+> `game_versions = 9638, 9639, 16498, 10150` → `Client, Server, 26.2, NeoForge`. Incluye los IDs de
+> `Client` **y** `Server`, así que CurseForge publica el fichero como **Client & Server**
+> automáticamente (sin paso manual en la web).
 
 ## Rama
 
 ```
-minecraft/26.2/neoforge-26.2.0.45-beta/production
+minecraft/26.2/neoforge-26.2.0.57/production
 ```
 
 ## Tag
 
 Formato: `<mc-version>-<framework>-<version>`
-Ejemplo: `26.2-neoforge-0.0.0-beta.1`
+Ejemplo: `26.2-neoforge-0.0.0-alpha.1`
 
 ## Nota
 
-La **primera subida a CurseForge se hace manual** (proyecto recién creado, sin archivos previos que verificar por API). A partir de la segunda subida se puede usar el script `codex-docs/scripts/curseforge-upload.ps1`.
+La **primera subida al proyecto nuevo se hace manual** (proyecto recién creado, sin archivos
+previos que verificar por API). A partir de la segunda subida se puede usar
+`codex-docs/scripts/curseforge-upload.ps1`.
 
 ---
 
-## Alta del proyecto en CurseForge (formulario manual)
-
-Datos a usar al crear el proyecto en https://www.curseforge.com/ (Minecraft → Create Project):
+## Alta del proyecto en CurseForge (formulario manual — referencia)
 
 | Campo | Valor |
 |---|---|
-| **Name** | The Sundering |
-| **Summary** (short, ~1 línea) | A boss-monster mod — a port of L_Ender's Cataclysm. |
+| **Name** | Cataclysm Bosses |
+| **Summary** | A boss-monster mod — a port of L_Ender's Cataclysm. |
 | **Project Type** | Mod |
 | **Game** | Minecraft |
 | **Categories** | Mobs, Bosses (o la más cercana disponible) |
 | **Mod Loader** | NeoForge |
-| **License** | CC BY-NC-ND 4.0 (seleccionar "Attribution-NonCommercial-NoDerivatives" si aparece como opción, o pegar el texto/enlace de `LICENSE`) |
+| **License** | CC BY-NC-ND 4.0 |
 | **Client/Server side** | Both |
-| **Repository URL** | `https://github.com/stalking-dragons/the-sundering` (mirror público — confirmar tras configurar el mirror en GitLab) |
-| **Issue tracker** | `https://gitlab.com/stalking-dragons/minecraft/the-sundering/-/issues` |
 | **Description** | Contenido de `docs/curseforge/project_description.md` (HTML) |
-| **Logo** | `assets/the_sundering/icon.png` (listo) |
-| **Relaciones / dependencias** | NautilusAPI (requerida), Curios API (requerida) |
+| **Logo** | `assets/cataclysm_bosses/icon.png` |
+| **Relaciones / dependencias** | NautilusAPI (requerida), regalia_slots_api (requerida) |
 
-**IMPORTANTE — sin mencionar el permiso del autor en ningún campo** (ver nota de confidencialidad en `docs/WORKFLOW_SUNDERING_26-2.md`).
-
-Tras crear el proyecto, pegar aquí `project_id`.
+**IMPORTANTE — sin mencionar el permiso del autor en ningún campo** (ver nota de confidencialidad en `docs/WORKFLOW_CATACLYSM_BOSSES_26-2.md`).
