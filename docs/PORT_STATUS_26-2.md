@@ -1,5 +1,50 @@
-SESSION STATUS — NeoForge 26.2 port  (compileJava + build: GREEN as of 2026-08-30)
+SESSION STATUS — NeoForge 26.2 port  (server BOOTS; client loads clean as of 2026-08-31)
 ================================================================
+
+== 2026-08-31 (sesión 6) — runServer llega a "Done!" + runClient carga sin FATAL ==
+
+**El servidor dedicado ARRANCA** (`runServer` -> `Done (6.2s)! For help, type help`): registro,
+mixins, packets, attachments, datapack, worldgen, regalia_slots_api (14 curio slots). El cliente
+(`runClient`) carga TODO el mod + recursos (renderers, atlas de texturas, sonidos) SIN crash
+fatal; se queda en init de ventana/menú (probable límite del entorno sin display, no un crash
+del mod). NUNCA verificado in-game de verdad (entrar a un mundo, invocar un jefe).
+
+Trabajo sesión 6 (28 commits, rama production, SIN pushear) — cazando crashes de arranque uno a uno:
+  MIXINS: ItemMixin hurt->hurtServer(ServerLevel,...); FoodDataMixin tick(Player)->tick(ServerPlayer)
+    + heal() owner ServerPlayer; NoteBlockInstrumentMixin quitado (Type es private -> @Invoker no
+    casa; los 3 skull blocks usan NoteBlockInstrument.CUSTOM_HEAD); 7 accessors sin usar quitados;
+    Client.HumanoidModelMixin quitado (poseRightArm/LeftArm ahora toman HumanoidRenderState).
+  REGISTRO: ModSounds NOTE_BLOCK_IMITATE_* Registry.registerForHolder -> SOUNDS DeferredRegister
+    (registry frozen); **ModBlocks (134) + ModItems (282): register(name, ()->new X(props)) ->
+    registerBlock/registerItem(name, X::new, propsSupplier)** para que NeoForge llame
+    Properties.setId() antes de construir ("Block/Item id not set" NPE). ModTemplate ctor +props.
+  CLASS-INIT: Ink_Mural_Block RANDOM_INK eager .get() -> holds DeferredBlock; Cursed_Tombstone
+    createBlockStateDefinition estaba comentado -> re-añadido (FACING/LIT/POWERED).
+  DATA COMPONENTS: ModDataAttachments (MapCodec)Codec.BOOL -> Codec.BOOL.fieldOf("value");
+    AttributeUtils.mergeAttributes lee del builder (DataComponentGetter) no item.components()
+    ("Components not bound yet" en ModifyDefaultComponentsEvent).
+  CUSTOM RARITY: CMRarity EnumProxy sin enumextensions.json -> los 2 ingots usan Rarity.EPIC.
+  NETWORK: MessageOpenInventory tocaba Screen/Minecraft en un @OnlyIn method que el server
+    carga igual -> movido el cuerpo a ClientProxy.openMinistrosityInventory (ServerProxy no-op).
+  CLIENT: EM_Pulse/Shock_Wave particle Factory -> ParticleProvider (no .Sprite) para registerSpecial;
+    CmEntityRenderer implements RenderLayerParent (los (RenderLayerParent)this de renderers legacy);
+    CuriosRendererRegistry.register(...) COMENTADO (regalia_slots_api no trae binding de
+    ICuriosClientExtensions -> NoClassDefFoundError); The_Harbinger_Renderer NETHER_STAR
+    .getDefaultInstance() en el ctor -> stub.
+  DATA PACK: **copiado data/ + assets/ completos del jar 1.21.1** (~914 data + ~1771 assets,
+    namespace cataclysm). pack.mcmeta -> pack_format 84 + min/max_format. **210 recetas migradas
+    de {"item":"X"}/{"tag":"Y"} a string "X"/"#Y"**.
+
+PENDIENTE para "funcional de verdad" (drift de formato 1.21.1->26.2 que sale al cargar):
+  - ~12 recetas aún con otro drift; worldgen/structure JSON (¿generan las estructuras? sin verificar);
+    item model definitions nuevas de 26.2 (assets/cataclysm/items/*.json) probablemente faltan;
+    tags de curios: (regalia). Subtítulos de sonido faltan (lang) - solo warnings.
+  - Verificar in-game: entrar a un mundo, /summon un jefe (¿se ve? render stub -> invisible),
+    craftear, que generen estructuras, drops.
+  - Todos los PORT TODO de render siguen (jefes = render() vacío, layers stub, boss bar, etc.).
+
+--- histórico ---
+
 
 == 2026-08-30 (sesión 5) — 423 -> 0 errores | `./gradlew build` PASA ==
 
